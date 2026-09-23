@@ -85,6 +85,8 @@ class RunResult:
     n_evaluations: int
     simple_regret: float | None
     known_optimum: float | None
+    system2_kind: str = "fallback"
+    llm_stats: dict | None = None
 
 
 class _FakeLayaSurrogateAcquisition:
@@ -127,8 +129,33 @@ class _FakeLayaUniform:
         }}}
 
 
+def _make_system2(system2_kind: str) -> Any:
+    """Build a System-2 policy for the smoke run.
+
+    `fallback` (default): deterministic FallbackSystem2 (delegates to
+    RulePolicy). No external dependencies.
+
+    `deepseek`: LLMSystem2 backed by the DeepSeek Chat Completions API.
+    Requires DEEPSEEK_API_KEY in the environment (or pass via api_key).
+    Token usage and per-call latency are recorded on the instance.
+    """
+    if system2_kind == "fallback":
+        return FallbackSystem2()
+    if system2_kind == "deepseek":
+        try:
+            from opt_agent.system2 import LLMSystem2
+        except ImportError as exc:
+            raise RuntimeError(
+                "LLMSystem2 unavailable; install httpx to enable the "
+                "deepseek system-2 backend."
+            ) from exc
+        return LLMSystem2(timeout_s=20.0, max_tokens=256, temperature=0.2)
+    raise ValueError(f"unknown system2 kind: {system2_kind!r}")
+
+
 def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
-                 laya_agent: Any = None) -> HybridPolicy:
+                 laya_agent: Any = None,
+                 system2_kind: str = "fallback") -> HybridPolicy:
     """Build a HybridPolicy backed by a deterministic Laya stub.
 
     Parameters
@@ -143,13 +170,17 @@ def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
     laya_agent : object
         Laya agent (predict callable). Defaults to the deterministic
         surrogate_acquisition stub.
+    system2_kind : {"fallback", "deepseek"}
+        Which System-2 policy to install. Default `fallback`
+        (deterministic RulePolicy). `deepseek` uses LLMSystem2
+        against the DeepSeek Chat Completions API.
     """
     agent = laya_agent if laya_agent is not None else _FakeLayaSurrogateAcquisition()
     laya = LayaPolicy(agent=agent, seed=seed)
     return HybridPolicy(
         system1=laya,
         router=ConfidenceRouter(tau_conf=tau_conf),
-        system2=FallbackSystem2(),
+        system2=_make_system2(system2_kind),
     )
 
 
@@ -181,10 +212,13 @@ def _best_value(backend: BocodeBotorchBackend) -> float:
 def _run_hybrid(
     problem: str, seed: int, total_budget: int, n_init: int,
     *, tau_conf: float = 0.5, policy_name: str = "hybrid",
-    laya_agent: Any = None,
+    laya_agent: Any = None, system2_kind: str = "fallback",
 ) -> RunResult:
     backend = _build_backend(problem, seed, n_init)
-    hybrid = _make_hybrid(seed, tau_conf=tau_conf, laya_agent=laya_agent)
+    hybrid = _make_hybrid(
+        seed, tau_conf=tau_conf, laya_agent=laya_agent,
+        system2_kind=system2_kind,
+    )
     loop = DecisionLoop(backend, total_budget=total_budget)
     trajectory = loop.run(hybrid)
 
@@ -218,6 +252,19 @@ def _run_hybrid(
     best = _best_value(backend)
     opt = KNOWN_OPTIMA.get(problem)
     simple_regret = (opt - best) if opt is not None else None
+    # Capture LLM token / latency stats if System-2 was an LLM.
+    llm_stats: dict | None = None
+    if system2_kind == "deepseek":
+        sys2 = hybrid._system2  # type: ignore[attr-defined]
+        llm_stats = {
+            "model": sys2.model,
+            "call_count": sys2.call_count,
+            "total_tokens": sys2.total_tokens,
+            "last_latency_s": (sys2.last_stats.latency_s
+                                if sys2.last_stats else None),
+            "last_total_tokens": (sys2.last_stats.total_tokens
+                                   if sys2.last_stats else None),
+        }
     return RunResult(
         problem=problem, seed=seed, total_budget=total_budget,
         policy_name=policy_name, steps=steps,
@@ -225,6 +272,7 @@ def _run_hybrid(
         termination_reason=trajectory.termination_reason.value,
         n_evaluations=_count_evaluations(backend),
         simple_regret=simple_regret, known_optimum=opt,
+        system2_kind=system2_kind, llm_stats=llm_stats,
     )
 
 
@@ -350,6 +398,12 @@ def main() -> int:
     parser.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
     parser.add_argument("--budgets", nargs="+", type=int, default=[10, 30])
     parser.add_argument("--n-init", type=int, default=5)
+    parser.add_argument("--system2", choices=["fallback", "deepseek"],
+                        default="fallback",
+                        help="System-2 policy: 'fallback' (RulePolicy, "
+                             "deterministic) or 'deepseek' (LLMSystem2 "
+                             "against DeepSeek API; requires "
+                             "DEEPSEEK_API_KEY in env).")
     args = parser.parse_args()
 
     runs: list[RunResult] = []
@@ -380,6 +434,7 @@ def main() -> int:
                         problem, seed, budget, args.n_init,
                         tau_conf=1.0, policy_name="hybrid_forced_escalate",
                         laya_agent=_FakeLayaUniform(),
+                        system2_kind=args.system2,
                     ))
                 except Exception as exc:
                     runs.append(RunResult(
@@ -425,6 +480,7 @@ def main() -> int:
             {
                 "problem": r.problem, "seed": r.seed,
                 "total_budget": r.total_budget, "policy": r.policy_name,
+                "system2_kind": r.system2_kind,
                 "best_value": r.best_value,
                 "termination_reason": r.termination_reason,
                 "n_evaluations": r.n_evaluations,
@@ -436,6 +492,7 @@ def main() -> int:
                     "system2": sum(1 for s in r.steps if s.route_name == "system2"),
                     "rule": sum(1 for s in r.steps if s.route_name == "rule"),
                 },
+                "llm_stats": r.llm_stats,
                 "steps": [
                     {"round": s.round, "action": s.action_type, "route": s.route_name}
                     for s in r.steps
