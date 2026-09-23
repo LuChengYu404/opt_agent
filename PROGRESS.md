@@ -173,3 +173,37 @@ proper-scoring-rule loss (avoids the utility-hacking failure mode
 observed in Phase 8.5 / 8.6A). Reference implementation candidate
 deferred until the framework skeleton's real-backend smoke is
 validated end-to-end (now done in Phase 9.1).
+
+## Phase 9 status: DONE
+
+Phase 9 closed with the following deliverables:
+
+- **Framework skeleton** (commit `5f79257`): actions/factory.py,
+  dataset/splits.py, metrics/{calibration,decision}.py, system2/
+  {base,fallback}.py, router/{base,confidence}.py,
+  system1/hybrid_policy.py. All interface contracts validated.
+- **Real-backend smoke** (commit `c209e7d`, `98b595c`,
+  `b9a2a77`, `20a9d83`): `scripts/run_hybrid_smoke.py` exercises
+  HybridPolicy vs RulePolicy on Branin + Ackley + Hartmann × seeds
+  {0, 1, 2} × total_budget in {10, 30}. 54/54 runs pass all five
+  acceptance criteria (no exceptions, routing-sum equals
+  decision-step count, ≥1 evaluation beyond the n_init bootstrap
+  per problem, ≤ total_budget per-step sample cap, finite
+  simple_regret for Branin).
+- **LLM System-2** (commit `579dc38`, `20a9d83`):
+  `src/opt_agent/system2/llm_deepseek.py` wraps the DeepSeek Chat
+  Completions API. The smoke harness runs end-to-end on the real
+  API (DEEPSEEK_API_KEY loaded from `./.env` via python-dotenv).
+  17 unit tests cover params preservation (candidate defaults as
+  base, LLM `params` as filtered overrides), budget validation
+  (n_samples overshoots dropped with a `fallback:` note), JSON /
+  markdown-fence / regex response parsing, fallback bookkeeping,
+  HTTP error propagation, and the System-1 top-action
+  last-resort preference. Test count: 268/268.
+
+NOT a performance claim: the smoke does not assert that HybridPolicy
+beats RulePolicy. Performance comparison needs more seeds and a
+separate evaluation plan; this is documented in PHASE9_DESIGN.md.
+
+Phase 9.3 (typed-decision model fine-tuning) is the next milestone
+but is not required for closing Phase 9.
