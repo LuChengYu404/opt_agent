@@ -28,6 +28,11 @@ from opt_agent.metrics.decision import (
     top_k_agreement,
     top_one_agreement,
 )
+from opt_agent.metrics.temperature import (
+    CalibrationResult as TSResult,
+    TemperatureCalibrator,
+    fit_temperature,
+)
 
 __all__ = [
     # calibration
@@ -44,4 +49,8 @@ __all__ = [
     "kl_divergence",
     "negative_log_likelihood_vs_gold",
     "aggregate_decision_metrics",
+    # temperature scaling
+    "TemperatureCalibrator",
+    "fit_temperature",
+    "TSResult",
 ]
