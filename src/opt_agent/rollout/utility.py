@@ -72,8 +72,11 @@ def compute_utility(
     """
     if not math.isfinite(delta_optimization):
         raise ValueError("delta_optimization must be finite")
-    if min(optimization_scale, evaluation_scale, fit_scale) <= 0:
-        raise ValueError("utility scales must be positive")
+    scales = (optimization_scale, evaluation_scale, fit_scale)
+    if not all(math.isfinite(x) and x > 0 for x in scales):
+        raise ValueError(
+            f"utility scales must be finite and positive; got {scales}"
+        )
     if n_new_samples < 0 or n_model_fits < 0:
         raise ValueError("resource counts must be non-negative")
 

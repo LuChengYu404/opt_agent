@@ -119,8 +119,11 @@ class CounterfactualRollout:
     ) -> None:
         if horizon < 1:
             raise ValueError(f"horizon must be >= 1; got {horizon}")
-        if min(optimization_scale, evaluation_scale, fit_scale) <= 0:
-            raise ValueError("utility scales must be positive")
+        scales = (optimization_scale, evaluation_scale, fit_scale)
+        if not all(math.isfinite(s) and s > 0 for s in scales):
+            raise ValueError(
+                f"utility scales must be finite and positive; got {scales}"
+            )
         self.backend = backend
         self.horizon = horizon
         self.weights = utility_weights or UtilityWeights()

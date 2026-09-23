@@ -13,6 +13,7 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
 from __future__ import annotations
 
 import hashlib
+import math
 import random
 from dataclasses import dataclass, field, replace
 from typing import Callable, Iterable, Iterator
@@ -104,10 +105,15 @@ class DatasetConfig:
     utility_weights: UtilityWeights = field(default_factory=UtilityWeights)
     temperature: float = 1.0
     random_action_rate: float = 0.2  # 20% random, 80% rule
-    # Phase 8.5 oracle-gate: scales passed through to CounterfactualRollout.
-    optimization_scale: float = 1.0
-    evaluation_scale: float = 1.0
-    fit_scale: float = 1.0
+    # Phase 8.6A oracle-gate fix (per codex 2025-09-23):
+    # - evaluation_scale / fit_scale default to None → generator sets
+    #   evaluation_scale = fit_scale = total_budget (so 1 evaluation ≈
+    #   1/total_budget utility units, comparable to Δopt).
+    # - optimization_scale default to None → generator computes
+    #   std(initial_objectives) per trajectory for cross-problem invariance.
+    optimization_scale: float | None = None
+    evaluation_scale: float | None = None
+    fit_scale: float | None = None
 
 
 BackendFactory = Callable[[], UnifiedBackend]
@@ -147,6 +153,27 @@ class DatasetGenerator:
             seed=problem_seed,
             n_init=self.config.n_init,
         ))
+        # Phase 8.6A: per-trajectory scales — defaults to budget-based for
+        # resource costs and std(initial_objectives) for Δopt normalization.
+        initial_y = backend.get_history().objectives[:, 0]
+        obj_std = float(initial_y.std(correction=0).item())
+        if not math.isfinite(obj_std) or obj_std <= 0:
+            obj_std = 1.0
+        optimization_scale = (
+            obj_std if self.config.optimization_scale is None
+            else float(self.config.optimization_scale)
+        )
+        evaluation_scale = (
+            float(self.config.total_budget)
+            if self.config.evaluation_scale is None
+            else float(self.config.evaluation_scale)
+        )
+        fit_scale = (
+            float(self.config.total_budget)
+            if self.config.fit_scale is None
+            else float(self.config.fit_scale)
+        )
+
         rule = RulePolicy(seed=run_seed)
         random_policy = RandomPolicy(seed=run_seed)
         behavior_rng = random.Random(run_seed)
@@ -166,9 +193,9 @@ class DatasetGenerator:
                     backend,
                     horizon=self.config.horizon,
                     utility_weights=self.config.utility_weights,
-                    optimization_scale=self.config.optimization_scale,
-                    evaluation_scale=self.config.evaluation_scale,
-                    fit_scale=self.config.fit_scale,
+                    optimization_scale=optimization_scale,
+                    evaluation_scale=evaluation_scale,
+                    fit_scale=fit_scale,
                 ).rollout(state, cands)
                 probs = to_gold_probs(
                     output.results,
@@ -185,6 +212,9 @@ class DatasetGenerator:
                     candidates=cands,
                     output=output,
                     probs=probs,
+                    optimization_scale=optimization_scale,
+                    evaluation_scale=evaluation_scale,
+                    fit_scale=fit_scale,
                 )
 
             # Behavior policy — NEVER samples from gold_probs.
@@ -210,6 +240,9 @@ class DatasetGenerator:
         candidates: list[Candidate],
         output,
         probs: dict[str, float],
+        optimization_scale: float,
+        evaluation_scale: float,
+        fit_scale: float,
     ) -> DecisionRecord:
         return DecisionRecord(
             id=f"{problem.lower()}:{problem_seed}:{trajectory_id}:{step}",
@@ -246,6 +279,11 @@ class DatasetGenerator:
                 "trajectory_id": int(trajectory_id),
                 "step": int(step),
                 "run_seed": int(run_seed),
-                "utility_version": "phase7-v1",
+                "utility_version": "phase8.6a",
+                "optimization_scale": float(optimization_scale),
+                "evaluation_scale": float(evaluation_scale),
+                "fit_scale": float(fit_scale),
+                "horizon": int(self.config.horizon),
+                "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
             },
         )
