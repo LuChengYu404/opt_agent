@@ -1,0 +1,119 @@
+{
+  "policy": "laya_zero_shot",
+  "model_id": "/home/lcy/.cache/opt_agent_v3/laya",
+  "subfolder": null,
+  "problem": "Branin",
+  "seed": 0,
+  "total_budget": 10,
+  "initial_best": -3.5451956715421797,
+  "final_best": -3.5451956715421797,
+  "evaluations": 10,
+  "termination_reason": "budget_exhausted",
+  "actions": [
+    {
+      "round": 0,
+      "type": "error_guided_sampling",
+      "params": {
+        "n_samples": 1,
+        "seed": 5
+      },
+      "n_new_samples": 1,
+      "best_value": -3.5451956715421797,
+      "confidence": 0.1248,
+      "probabilities": {
+        "global_exploration": 0.1528152815281528,
+        "uncertainty_sampling": 0.21682168216821682,
+        "boundary_sampling": 0.21852185218521852,
+        "surrogate_acquisition": 0.036103610361036105,
+        "stop": 0.061606160616061605,
+        "local_exploitation": 0.0375037503750375,
+        "error_guided_sampling": 0.2447244724472447,
+        "retrain_surrogate": 0.0319031903190319
+      }
+    },
+    {
+      "round": 1,
+      "type": "error_guided_sampling",
+      "params": {
+        "n_samples": 1,
+        "seed": 6
+      },
+      "n_new_samples": 1,
+      "best_value": -3.5451956715421797,
+      "confidence": 0.1907,
+      "probabilities": {
+        "global_exploration": 0.0758,
+        "uncertainty_sampling": 0.2235,
+        "boundary_sampling": 0.2019,
+        "surrogate_acquisition": 0.03,
+        "stop": 0.0509,
+        "local_exploitation": 0.031,
+        "error_guided_sampling": 0.36,
+        "retrain_surrogate": 0.0269
+      }
+    },
+    {
+      "round": 2,
+      "type": "error_guided_sampling",
+      "params": {
+        "n_samples": 1,
+        "seed": 7
+      },
+      "n_new_samples": 1,
+      "best_value": -3.5451956715421797,
+      "confidence": 0.2166,
+      "probabilities": {
+        "global_exploration": 0.0628874225154969,
+        "uncertainty_sampling": 0.23505298940211958,
+        "boundary_sampling": 0.15966806638672268,
+        "surrogate_acquisition": 0.025794841031793643,
+        "stop": 0.061887622475504896,
+        "local_exploitation": 0.025994801039792043,
+        "error_guided_sampling": 0.4029194161167767,
+        "retrain_surrogate": 0.025794841031793643
+      }
+    },
+    {
+      "round": 3,
+      "type": "error_guided_sampling",
+      "params": {
+        "n_samples": 1,
+        "seed": 8
+      },
+      "n_new_samples": 1,
+      "best_value": -3.5451956715421797,
+      "confidence": 0.1945,
+      "probabilities": {
+        "global_exploration": 0.0713,
+        "uncertainty_sampling": 0.2042,
+        "boundary_sampling": 0.1867,
+        "surrogate_acquisition": 0.0274,
+        "stop": 0.0644,
+        "local_exploitation": 0.0297,
+        "error_guided_sampling": 0.3876,
+        "retrain_surrogate": 0.0287
+      }
+    },
+    {
+      "round": 4,
+      "type": "error_guided_sampling",
+      "params": {
+        "n_samples": 1,
+        "seed": 9
+      },
+      "n_new_samples": 1,
+      "best_value": -3.5451956715421797,
+      "confidence": 0.186,
+      "probabilities": {
+        "global_exploration": 0.0791,
+        "uncertainty_sampling": 0.2122,
+        "boundary_sampling": 0.2009,
+        "surrogate_acquisition": 0.0286,
+        "stop": 0.0596,
+        "local_exploitation": 0.0305,
+        "error_guided_sampling": 0.3624,
+        "retrain_surrogate": 0.0267
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "by_problem": {
+    "ackley": {
+      "gold_top1": 1.0,
+      "gold_utility": 0.7311800646222724,
+      "prior_cross_entropy": 2.0680367100634185,
+      "prior_top1": 0.0,
+      "prior_utility": -0.03839898034288162,
+      "rule_top1": 0.0625,
+      "rule_utility": 0.20432488037520524,
+      "uniform_cross_entropy": 2.0794415416798357,
+      "uniform_top1": 0.125,
+      "uniform_utility": 0.02597400550090715
+    },
+    "branin": {
+      "gold_top1": 1.0,
+      "gold_utility": -0.11119493412195501,
+      "prior_cross_entropy": 2.0872827571626886,
+      "prior_top1": 0.058823529411764705,
+      "prior_utility": -0.1475643615723431,
+      "rule_top1": 0.0,
+      "rule_utility": -0.1654948415669095,
+      "uniform_cross_entropy": 2.0794415416798357,
+      "uniform_top1": 0.125,
+      "uniform_utility": -0.1752885122432947
+    },
+    "hartmann": {
+      "gold_top1": 1.0,
+      "gold_utility": 0.5055177716353273,
+      "prior_cross_entropy": 2.069622343777277,
+      "prior_top1": 0.14285714285714285,
+      "prior_utility": -0.002804829930370511,
+      "rule_top1": 0.0,
+      "rule_utility": -0.17202380952380952,
+      "uniform_cross_entropy": 2.0794415416798357,
+      "uniform_top1": 0.125,
+      "uniform_utility": -0.06247923520483201
+    }
+  },
+  "dataset": "runs/phase8_6b_h3_10seed.jsonl",
+  "holdout_seeds": [
+    8,
+    9
+  ],
+  "interpretation": "Offline agreement with provisional labels only; not an optimization-performance claim.",
+  "mlp": {
+    "predicted_actions": {
+      "boundary_sampling": 2,
+      "global_exploration": 9,
+      "local_exploitation": 15,
+      "retrain_surrogate": 3,
+      "surrogate_acquisition": 17,
+      "uncertainty_sampling": 1
+    },
+    "test_cross_entropy": 2.0761654376983643,
+    "test_rollout_utility": 0.060014651421474156,
+    "test_top1": 0.2553191489361702,
+    "validation_cross_entropy": 2.077331781387329
+  },
+  "overall": {
+    "gold_top1": 1.0,
+    "gold_utility": 0.3592726799314405,
+    "prior_cross_entropy": 2.0754703626736655,
+    "prior_top1": 0.06382978723404255,
+    "prior_utility": -0.06728181811151332,
+    "rule_top1": 0.02127659574468085,
+    "rule_utility": -0.041543564978032146,
+    "uniform_cross_entropy": 2.0794415416798357,
+    "uniform_top1": 0.125,
+    "uniform_utility": -0.07317084921253497
+  },
+  "prior": {
+    "boundary_sampling": 0.10619192409780441,
+    "error_guided_sampling": 0.13060533487133466,
+    "global_exploration": 0.1324608054986504,
+    "local_exploitation": 0.15289551396862416,
+    "retrain_surrogate": 0.12507614532929948,
+    "stop": 0.0792607168252479,
+    "surrogate_acquisition": 0.15345966287987528,
+    "uncertainty_sampling": 0.12004989652916366
+  },
+  "test_records": 47,
+  "train_records": 179
+}
