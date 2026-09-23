@@ -6,6 +6,7 @@ dependencies = [
     "bocode>=1.0.1",
     "botorch>=0.18.1",
     "gpytorch>=1.15.2",
+    "httpx>=0.27",
     "numpy>=2.5.3",
     "python-dotenv>=1.0.0",
 ]

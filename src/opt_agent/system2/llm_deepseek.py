@@ -100,6 +100,10 @@ class LLMSystem2(System2Policy):
         self.last_stats: DeepSeekCallStats | None = None
         self.call_count = 0
         self.total_tokens = 0
+        self.fallback_count = 0
+        # The router sets this to the System-1 top action just before
+        # escalation so the fallback can prefer it over arbitrary picks.
+        self.last_system1_top_action = None
 
     def _get_client(self) -> Any:
         if self._client is not None:
@@ -158,12 +162,34 @@ class LLMSystem2(System2Policy):
         self,
         candidates: dict[str, OptimizationAction],
         content: str,
+        remaining_budget: int,
     ) -> tuple[OptimizationAction, str]:
-        """Extract (action, reasoning) from the LLM response."""
+        """Extract (action, reasoning) from the LLM response.
+
+        Per codex gpt-6-sol review 2026-09-23:
+        - The CANDIDATE action is the source of truth for defaults
+          (seed, n_samples, tol, ...). LLM `params` are treated as
+          overrides; only keys that are allowed AND budget-valid survive.
+        - Empty / missing `params` ⇒ use the candidate verbatim.
+        - Any override that violates the budget or the action's allowed
+          key set is dropped (with a `fallback:` note) and the candidate
+          defaults are kept.
+        - Unparseable responses fall back to the highest-confidence
+          System-1 action recorded on `self.last_system1_top_action`,
+          set by the router just before escalation. If that is missing
+          (shouldn't happen), we fall back to the candidate factory's
+          first non-stop candidate as a last resort.
+
+        Returns
+        -------
+        (action, reasoning)
+            The chosen action and a free-form note. Reasoning starts
+            with `fallback:` whenever the parser deviated from the
+            clean interpretation path.
+        """
         # Try strict JSON first.
         parsed: Mapping[str, Any] | None = None
         text = content.strip()
-        # Some models wrap JSON in ```json ... ``` fences; strip them.
         if text.startswith("```"):
             text = text.strip("`")
             if text.startswith("json"):
@@ -182,33 +208,74 @@ class LLMSystem2(System2Policy):
                     _, _, value = line.partition(":")
                     value = value.strip().strip(",").strip('"').strip("'")
                     if value in candidates:
+                        self.fallback_count += 1
                         return candidates[value], (
                             "fallback: parsed action_id from line"
                         )
-            # Last resort: pick the highest-budget "useful" candidate.
-            for aid, action in candidates.items():
-                if aid == "stop":
-                    continue
-                return action, "fallback: LLM response unparseable, picked first non-stop candidate"
-            return candidates["stop"], "fallback: only STOP available"
+            self.fallback_count += 1
+            return self._last_resort(candidates)
 
         action_id = str(parsed.get("action_id", "")).strip()
         if action_id not in candidates:
-            for aid, action in candidates.items():
-                if aid == "stop":
-                    continue
-                return action, (
-                    f"fallback: LLM returned unknown action_id={action_id!r}"
-                )
+            self.fallback_count += 1
+            return self._last_resort(
+                candidates,
+                reason=f"LLM returned unknown action_id={action_id!r}",
+            )
+        # Use the candidate's params as the base; LLM `params` are
+        # overrides filtered through `_ALLOWED_PARAMS` and a budget
+        # check on `n_samples`.
+        base = candidates[action_id]
+        merged = dict(base.params)
         params = parsed.get("params") or {}
         if not isinstance(params, Mapping):
             params = {}
+        allowed = _ALLOWED_PARAMS[base.type]
+        overrides_applied: list[str] = []
+        overrides_dropped: list[str] = []
+        for k, v in params.items():
+            if k not in allowed:
+                overrides_dropped.append(f"{k}=not_allowed")
+                continue
+            if k == "n_samples" and v > remaining_budget:
+                overrides_dropped.append(f"n_samples={v}>budget={remaining_budget}")
+                continue
+            merged[k] = v
+            overrides_applied.append(k)
         reasoning = str(parsed.get("reasoning", ""))
-        action_type = candidates[action_id].type
-        # Validate params against the action's allowed set.
-        allowed = _ALLOWED_PARAMS[action_type]
-        filtered = {k: v for k, v in params.items() if k in allowed}
-        return OptimizationAction(action_type, filtered), reasoning
+        if overrides_dropped:
+            self.fallback_count += 1
+            note = "; ".join(overrides_dropped)
+            reasoning = (
+                f"fallback: dropped LLM overrides [{note}]; "
+                + (reasoning or "kept candidate defaults")
+            )
+        return OptimizationAction(base.type, merged), reasoning
+
+    def _last_resort(
+        self,
+        candidates: dict[str, OptimizationAction],
+        reason: str = "LLM response unparseable",
+    ) -> tuple[OptimizationAction, str]:
+        """Last-resort pick when the LLM response is unusable.
+
+        Prefers the System-1 top action recorded on this instance by
+        the router (the most confident available choice). If that is
+        missing (defensive — should never happen), falls back to the
+        candidate factory's first non-stop candidate.
+        """
+        last = getattr(self, "last_system1_top_action", None)
+        if last is not None and last.type.value in candidates:
+            return candidates[last.type.value], (
+                f"fallback: {reason}; using last System-1 top action"
+            )
+        for aid, action in candidates.items():
+            if aid == "stop":
+                continue
+            return action, (
+                f"fallback: {reason}; picked first non-stop candidate"
+            )
+        return candidates["stop"], "fallback: only STOP available"
 
     def reason(
         self,
@@ -268,7 +335,9 @@ class LLMSystem2(System2Policy):
         )
         self.call_count += 1
         self.total_tokens += self.last_stats.total_tokens
-        action, reasoning = self._parse_response(candidates, content)
+        action, reasoning = self._parse_response(
+            candidates, content, state.resource.remaining_budget,
+        )
         # Confidence: 1.0 unless the parser fell back to a default pick.
         fallback_markers = ("fallback:", "forced:")
         confidence = 0.0 if any(
@@ -280,4 +349,5 @@ class LLMSystem2(System2Policy):
 
     def reset(self) -> None:
         # LLM is stateless across calls (no internal policy state).
-        return None
+        self.last_system1_top_action = None
+        self.fallback_count = 0

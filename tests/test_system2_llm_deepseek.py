@@ -210,3 +210,120 @@ def test_llm_system2_reset_is_noop() -> None:
     s = LLMSystem2(client=_FakeClient(), _skip_key_check=True)
     s.reset()  # must not raise
     assert s.call_count == 0
+
+
+# ---------------------------------------------------------------------------
+# Per codex gpt-6-sol re-review: params handling and fallback bookkeeping
+# ---------------------------------------------------------------------------
+
+
+def _body_with(action_id: str, params: dict, reasoning: str = "x") -> dict:
+    return {
+        "id": "x",
+        "choices": [{"message": {"content": json.dumps({
+            "action_id": action_id, "params": params, "reasoning": reasoning,
+        })}}],
+        "usage": {"total_tokens": 10},
+    }
+
+
+def test_llm_system2_preserves_candidate_defaults_when_params_empty() -> None:
+    """If the LLM emits an empty params dict, the candidate's defaults
+    (seed, n_samples, ...) must NOT be replaced by an empty set."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {}, "trust the candidate defaults"
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.GLOBAL_EXPLORATION
+    # Candidate factory sets seed = 0 + n_samples=2. Both must survive.
+    assert "seed" in decision.action.params
+    assert decision.action.params["n_samples"] == 2
+    assert "defaults" in decision.reasoning.lower() or s.fallback_count == 0
+
+
+def test_llm_system2_drops_n_samples_overshoot() -> None:
+    """An LLM-supplied n_samples that exceeds remaining_budget is
+    dropped (with a fallback note), and the candidate's default wins."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": 999},
+        "I want lots of samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(3)  # tiny budget
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.GLOBAL_EXPLORATION
+    # n_samples must NOT be 999; candidate's n_samples is min(2, 3) = 2.
+    assert decision.action.params["n_samples"] <= 3
+    assert decision.reasoning.startswith("fallback:")
+    assert s.fallback_count == 1
+
+
+def test_llm_system2_drops_disallowed_param_keys() -> None:
+    """LLM params outside the action's _ALLOWED_PARAMS are dropped."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": 1, "fake_param": "ignored"},
+        "trying to inject",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.GLOBAL_EXPLORATION
+    assert "fake_param" not in decision.action.params
+    # n_samples=1 is allowed; the candidate's n_samples=2 is overridden.
+    assert decision.action.params["n_samples"] == 1
+    assert s.fallback_count == 1  # fake_param was dropped
+
+
+def test_llm_system2_fallback_count_increments_on_unparseable() -> None:
+    s = LLMSystem2(client=_FakeClient(body={
+        "id": "x",
+        "choices": [{"message": {"content": "garbage response"}}],
+        "usage": {"total_tokens": 5},
+    }), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert s.fallback_count == 1
+    assert decision.reasoning.startswith("fallback:")
+
+
+def test_llm_system2_fallback_count_increments_on_unknown_action() -> None:
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "fictional", {}, "made-up action",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert s.fallback_count == 1
+    assert decision.reasoning.startswith("fallback:")
+
+
+def test_llm_system2_prefers_system1_top_action_in_last_resort() -> None:
+    """When the LLM response is unusable, the fallback should prefer
+    the System-1 top action that the router recorded, not a random
+    non-stop candidate."""
+    s = LLMSystem2(client=_FakeClient(body={
+        "id": "x",
+        "choices": [{"message": {"content": "garbage"}}],
+        "usage": {"total_tokens": 5},
+    }), _skip_key_check=True)
+    state = _state_with_budget(20)
+    # Inject a System-1 top action as the router would.
+    s.last_system1_top_action = state.sampling if False else None  # placeholder
+    # Use a real action the candidate factory would produce.
+    from opt_agent.actions import OptimizationAction as _OA
+    s.last_system1_top_action = _OA(ActionType.UNCERTAINTY_SAMPLING, {"n_samples": 1})
+    decision = s.reason(state)
+    # The fallback should pick uncertainty_sampling (the System-1 top
+    # action we recorded), not the arbitrary first non-stop candidate.
+    assert decision.action.type == ActionType.UNCERTAINTY_SAMPLING
+    assert "last System-1 top action" in decision.reasoning
+
+
+def test_llm_system2_reset_clears_fallback_count() -> None:
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "fictional", {}, "x",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    s.reason(state)
+    assert s.fallback_count == 1
+    s.reset()
+    assert s.fallback_count == 0
+    assert s.last_system1_top_action is None

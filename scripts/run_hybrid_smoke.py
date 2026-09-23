@@ -249,9 +249,12 @@ def _run_hybrid(
     # samples consumed by the run must not exceed the available budget
     # (n_init + total_budget; n_init is covered by the bootstrap batch).
     bootstrap_budget = n_init
-    assert total_samples_consumed <= total_budget + bootstrap_budget, (
-        f"total samples consumed {total_samples_consumed} exceeds "
-        f"budget {total_budget} + bootstrap {bootstrap_budget}"
+    # The n_init samples are a bootstrap batch consumed by initialize();
+    # only the per-step n_new_samples count against the decision budget.
+    assert total_samples_consumed <= total_budget, (
+        f"decision-step samples {total_samples_consumed} exceeds budget "
+        f"{total_budget} (n_init={bootstrap_budget} bootstrap samples are "
+        f"not counted)"
     )
 
     best = _best_value(backend)
@@ -336,21 +339,26 @@ def _summarize(runs: list[RunResult]) -> dict[str, Any]:
     return summary
 
 
-def _acceptance_check(runs: list[RunResult]) -> tuple[bool, list[str]]:
+def _acceptance_check(runs: list[RunResult], *, n_init: int) -> tuple[bool, list[str]]:
     """Verify the Phase 9.1 acceptance criteria from the codex review."""
     errors: list[str] = []
     # No exceptions (encoded in termination_reason != "exception").
     for r in runs:
         if r.termination_reason == "exception":
             errors.append(f"{r.problem}/seed={r.seed}/{r.policy_name} raised an exception")
-    # Per-problem: at least one Hybrid trajectory actually executed an evaluation.
+    # Per-problem: at least one Hybrid trajectory actually executed an
+    # evaluation BEYOND the n_init bootstrap batch.
     for problem in {"Branin", "Hartmann", "Ackley"}:
         hybrid_runs = [r for r in runs if r.problem == problem and r.policy_name == "hybrid"]
         if not hybrid_runs:
             errors.append(f"{problem}: no Hybrid runs recorded")
             continue
-        if not any(r.n_evaluations > 0 for r in hybrid_runs):
-            errors.append(f"{problem}: Hybrid did not execute any evaluation across {len(hybrid_runs)} runs")
+        if not any(r.n_evaluations > n_init for r in hybrid_runs):
+            errors.append(
+                f"{problem}: Hybrid did not execute any evaluation beyond "
+                f"the n_init={n_init} bootstrap batch across "
+                f"{len(hybrid_runs)} runs"
+            )
     # Per-problem: routing-count sum equals decision-step count for Hybrid runs.
     for r in [r for r in runs if r.policy_name == "hybrid"]:
         sys1 = sum(1 for s in r.steps if s.route_name == "system1")
@@ -367,8 +375,9 @@ def _acceptance_check(runs: list[RunResult]) -> tuple[bool, list[str]]:
                 f"{r.problem}/seed={r.seed}/forced-escalate: "
                 f"only {sys2}/{len(r.steps)} steps went via System-2"
             )
-    # Forced-escalate runs must execute at least one evaluation on
-    # every problem (proves the System-2 path works end-to-end).
+    # Forced-escalate runs must execute at least one evaluation beyond
+    # the n_init bootstrap batch on every problem (proves the System-2
+    # path works end-to-end and isn't only consuming bootstrap samples).
     for problem in {"Branin", "Hartmann", "Ackley"}:
         forced_runs = [
             r for r in runs
@@ -377,19 +386,20 @@ def _acceptance_check(runs: list[RunResult]) -> tuple[bool, list[str]]:
         if not forced_runs:
             errors.append(f"{problem}: no forced-escalate runs recorded")
             continue
-        if not any(r.n_evaluations > 0 for r in forced_runs):
+        if not any(r.n_evaluations > n_init for r in forced_runs):
             errors.append(
-                f"{problem}: forced-escalate hybrid executed 0 evaluations"
+                f"{problem}: forced-escalate hybrid executed 0 evaluations "
+                f"beyond n_init={n_init}"
             )
-    # Per-step budget invariant: total samples consumed never exceeds
-    # n_init + total_budget for any run (regardless of policy).
+    # Per-step budget invariant: total samples consumed across decision
+    # steps never exceeds the remaining budget (n_init is the bootstrap
+    # batch and is NOT counted here).
     for r in runs:
         total = sum(s.n_new_samples for s in r.steps)
-        bootstrap = 5  # n_init default
-        if total > r.total_budget + bootstrap:
+        if total > r.total_budget:
             errors.append(
                 f"{r.problem}/seed={r.seed}/{r.policy_name}: "
-                f"step samples {total} > budget {r.total_budget}+{bootstrap}"
+                f"decision-step samples {total} > budget {r.total_budget}"
             )
     return (len(errors) == 0), errors
 
@@ -468,7 +478,7 @@ def main() -> int:
                           file=sys.stderr)
 
     summary = _summarize(runs)
-    passed, errors = _acceptance_check(runs)
+    passed, errors = _acceptance_check(runs, n_init=args.n_init)
 
     payload = {
         "config": {

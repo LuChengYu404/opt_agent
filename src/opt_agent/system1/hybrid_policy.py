@@ -175,6 +175,11 @@ class HybridPolicy:
         if route.name == "system1":
             chosen = action
         else:
+            # Hand the System-2 policy the System-1 top action so its
+            # fallback (if the LLM response is unusable) prefers the
+            # most-confident available choice over an arbitrary pick.
+            if hasattr(self._system2, "last_system1_top_action"):
+                self._system2.last_system1_top_action = action  # type: ignore[attr-defined]
             chosen = self._system2.reason(state).action
             # Per codex re-review: System-2's chosen action must also be
             # budget-valid for the current state.

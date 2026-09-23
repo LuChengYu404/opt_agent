@@ -37,14 +37,13 @@
     },
     "Branin/hybrid_forced_escalate/b10": {
       "n_seeds": 3,
-      "best_value_mean": -4.742512411026734,
-      "best_value_max": -1.7299751931826304,
+      "best_value_mean": -4.503162822882459,
+      "best_value_max": -1.0119264287498044,
       "best_value_min": -8.635607356162051,
-      "simple_regret_mean": 4.344625411026734,
+      "simple_regret_mean": 4.105275822882459,
       "any_evaluation": true,
-      "steps_mean": 5.666666666666667,
+      "steps_mean": 6.333333333333333,
       "termination_reasons": [
-        "budget_exhausted",
         "stop"
       ]
     },
@@ -110,14 +109,13 @@
     },
     "Hartmann/hybrid_forced_escalate/b10": {
       "n_seeds": 3,
-      "best_value_mean": 1.3723068021648297,
+      "best_value_mean": 1.4510201104143607,
       "best_value_max": 1.912191341937519,
-      "best_value_min": 0.5395971097024564,
+      "best_value_min": 0.7757370344510501,
       "simple_regret_mean": null,
       "any_evaluation": true,
-      "steps_mean": 5.666666666666667,
+      "steps_mean": 5.0,
       "termination_reasons": [
-        "budget_exhausted",
         "stop"
       ]
     },
@@ -152,7 +150,7 @@
       "best_value_min": 1.7246157970650198,
       "simple_regret_mean": null,
       "any_evaluation": true,
-      "steps_mean": 16.666666666666668,
+      "steps_mean": 16.0,
       "termination_reasons": [
         "budget_exhausted",
         "stop"
@@ -184,14 +182,13 @@
     },
     "Ackley/hybrid_forced_escalate/b10": {
       "n_seeds": 3,
-      "best_value_mean": -20.39451647931946,
-      "best_value_max": -19.849772427780906,
-      "best_value_min": -20.76010655041534,
+      "best_value_mean": -20.694592677638184,
+      "best_value_max": -20.57367045976213,
+      "best_value_min": -20.8517370690908,
       "simple_regret_mean": null,
       "any_evaluation": true,
-      "steps_mean": 5.333333333333333,
+      "steps_mean": 6.0,
       "termination_reasons": [
-        "budget_exhausted",
         "stop"
       ]
     },
@@ -221,14 +218,13 @@
     },
     "Ackley/hybrid_forced_escalate/b30": {
       "n_seeds": 3,
-      "best_value_mean": -19.73201435864751,
-      "best_value_max": -19.42864799751057,
+      "best_value_mean": -19.782383808975755,
+      "best_value_max": -19.504202173002938,
       "best_value_min": -20.338747080921394,
       "simple_regret_mean": null,
       "any_evaluation": true,
-      "steps_mean": 19.666666666666668,
+      "steps_mean": 17.333333333333332,
       "termination_reasons": [
-        "budget_exhausted",
         "stop"
       ]
     },
@@ -302,11 +298,11 @@
       "total_budget": 10,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": -1.7299751931826304,
+      "best_value": -1.0119264287498044,
       "termination_reason": "stop",
       "n_evaluations": 9,
       "n_steps": 6,
-      "simple_regret": 1.3320881931826305,
+      "simple_regret": 0.6140394287498044,
       "known_optimum": -0.397887,
       "route_distribution": {
         "system1": 0,
@@ -316,9 +312,9 @@
       "llm_stats": {
         "model": "deepseek-chat",
         "call_count": 6,
-        "total_tokens": 2301,
-        "last_latency_s": 0.6401637520175427,
-        "last_total_tokens": 376
+        "total_tokens": 2304,
+        "last_latency_s": 0.7003640310140327,
+        "last_total_tokens": 379
       },
       "steps": [
         {
@@ -333,7 +329,7 @@
         },
         {
           "round": 2,
-          "action": "local_exploitation",
+          "action": "uncertainty_sampling",
           "route": "system2"
         },
         {
@@ -539,25 +535,25 @@
       "best_value": -1.6863752547656183,
       "termination_reason": "stop",
       "n_evaluations": 27,
-      "n_steps": 14,
+      "n_steps": 15,
       "simple_regret": 1.2884882547656185,
       "known_optimum": -0.397887,
       "route_distribution": {
         "system1": 0,
-        "system2": 14,
+        "system2": 15,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 14,
-        "total_tokens": 5384,
-        "last_latency_s": 0.9784855340258218,
-        "last_total_tokens": 380
+        "call_count": 15,
+        "total_tokens": 5761,
+        "last_latency_s": 0.9040124760358594,
+        "last_total_tokens": 379
       },
       "steps": [
         {
           "round": 0,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
@@ -582,12 +578,12 @@
         },
         {
           "round": 5,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 6,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
@@ -612,16 +608,21 @@
         },
         {
           "round": 11,
-          "action": "retrain_surrogate",
-          "route": "system2"
-        },
-        {
-          "round": 12,
           "action": "global_exploration",
           "route": "system2"
         },
         {
+          "round": 12,
+          "action": "retrain_surrogate",
+          "route": "system2"
+        },
+        {
           "round": 13,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 14,
           "action": "stop",
           "route": "system2"
         }
@@ -766,22 +767,22 @@
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
       "best_value": -8.635607356162051,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 10,
-      "n_steps": 5,
+      "termination_reason": "stop",
+      "n_evaluations": 9,
+      "n_steps": 6,
       "simple_regret": 8.23772035616205,
       "known_optimum": -0.397887,
       "route_distribution": {
         "system1": 0,
-        "system2": 5,
+        "system2": 6,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 5,
-        "total_tokens": 1945,
-        "last_latency_s": 0.8190973279997706,
-        "last_total_tokens": 389
+        "call_count": 6,
+        "total_tokens": 2296,
+        "last_latency_s": 0.6004462310229428,
+        "last_total_tokens": 378
       },
       "steps": [
         {
@@ -791,7 +792,7 @@
         },
         {
           "round": 1,
-          "action": "local_exploitation",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
@@ -807,6 +808,11 @@
         {
           "round": 4,
           "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -996,7 +1002,7 @@
       "system2_kind": "deepseek",
       "best_value": -1.6863752547656183,
       "termination_reason": "stop",
-      "n_evaluations": 28,
+      "n_evaluations": 29,
       "n_steps": 16,
       "simple_regret": 1.2884882547656185,
       "known_optimum": -0.397887,
@@ -1008,9 +1014,9 @@
       "llm_stats": {
         "model": "deepseek-chat",
         "call_count": 16,
-        "total_tokens": 6144,
-        "last_latency_s": 0.8043610890163109,
-        "last_total_tokens": 380
+        "total_tokens": 6164,
+        "last_latency_s": 0.9445447909529321,
+        "last_total_tokens": 379
       },
       "steps": [
         {
@@ -1065,27 +1071,27 @@
         },
         {
           "round": 10,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 11,
-          "action": "global_exploration",
-          "route": "system2"
-        },
-        {
-          "round": 12,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 13,
           "action": "retrain_surrogate",
           "route": "system2"
         },
         {
-          "round": 14,
+          "round": 12,
           "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 14,
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
@@ -1244,42 +1250,42 @@
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
       "best_value": -3.8619546837355205,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 10,
-      "n_steps": 6,
+      "termination_reason": "stop",
+      "n_evaluations": 9,
+      "n_steps": 7,
       "simple_regret": 3.4640676837355207,
       "known_optimum": -0.397887,
       "route_distribution": {
         "system1": 0,
-        "system2": 6,
+        "system2": 7,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 6,
-        "total_tokens": 2329,
-        "last_latency_s": 1.0201330850250088,
-        "last_total_tokens": 388
+        "call_count": 7,
+        "total_tokens": 2682,
+        "last_latency_s": 0.7590402700006962,
+        "last_total_tokens": 379
       },
       "steps": [
         {
           "round": 0,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 1,
           "action": "retrain_surrogate",
           "route": "system2"
         },
         {
+          "round": 1,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
           "round": 2,
-          "action": "uncertainty_sampling",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 3,
-          "action": "local_exploitation",
+          "action": "uncertainty_sampling",
           "route": "system2"
         },
         {
@@ -1290,6 +1296,11 @@
         {
           "round": 5,
           "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -1480,19 +1491,19 @@
       "best_value": -1.6863752547656183,
       "termination_reason": "stop",
       "n_evaluations": 28,
-      "n_steps": 15,
+      "n_steps": 14,
       "simple_regret": 1.2884882547656185,
       "known_optimum": -0.397887,
       "route_distribution": {
         "system1": 0,
-        "system2": 15,
+        "system2": 14,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 15,
-        "total_tokens": 5781,
-        "last_latency_s": 1.0877438109600917,
+        "call_count": 14,
+        "total_tokens": 5409,
+        "last_latency_s": 0.6010505349840969,
         "last_total_tokens": 379
       },
       "steps": [
@@ -1523,7 +1534,7 @@
         },
         {
           "round": 5,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -1548,26 +1559,21 @@
         },
         {
           "round": 10,
-          "action": "global_exploration",
-          "route": "system2"
-        },
-        {
-          "round": 11,
           "action": "retrain_surrogate",
           "route": "system2"
         },
         {
-          "round": 12,
+          "round": 11,
           "action": "global_exploration",
           "route": "system2"
         },
         {
-          "round": 13,
+          "round": 12,
           "action": "local_exploitation",
           "route": "system2"
         },
         {
-          "round": 14,
+          "round": 13,
           "action": "stop",
           "route": "system2"
         }
@@ -1717,8 +1723,8 @@
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
       "best_value": 1.912191341937519,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 10,
+      "termination_reason": "stop",
+      "n_evaluations": 9,
       "n_steps": 5,
       "simple_regret": null,
       "known_optimum": null,
@@ -1730,9 +1736,9 @@
       "llm_stats": {
         "model": "deepseek-chat",
         "call_count": 5,
-        "total_tokens": 1948,
-        "last_latency_s": 0.5807583979913034,
-        "last_total_tokens": 388
+        "total_tokens": 1932,
+        "last_latency_s": 0.46004015498328954,
+        "last_total_tokens": 377
       },
       "steps": [
         {
@@ -1757,7 +1763,7 @@
         },
         {
           "round": 4,
-          "action": "local_exploitation",
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -1945,23 +1951,23 @@
       "total_budget": 30,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": 1.7246157970650198,
-      "termination_reason": "stop",
-      "n_evaluations": 28,
-      "n_steps": 15,
+      "best_value": 2.584361312599882,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 16,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 15,
+        "system2": 16,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 15,
-        "total_tokens": 5767,
-        "last_latency_s": 0.8262314620078541,
-        "last_total_tokens": 379
+        "call_count": 16,
+        "total_tokens": 6193,
+        "last_latency_s": 0.5785834469716065,
+        "last_total_tokens": 388
       },
       "steps": [
         {
@@ -2001,7 +2007,7 @@
         },
         {
           "round": 7,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -2016,27 +2022,32 @@
         },
         {
           "round": 10,
-          "action": "global_exploration",
-          "route": "system2"
-        },
-        {
-          "round": 11,
           "action": "retrain_surrogate",
           "route": "system2"
         },
         {
+          "round": 11,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
           "round": 12,
-          "action": "surrogate_acquisition",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 13,
-          "action": "global_exploration",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 14,
-          "action": "stop",
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 15,
+          "action": "local_exploitation",
           "route": "system2"
         }
       ]
@@ -2184,52 +2195,47 @@
       "total_budget": 10,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": 0.5395971097024564,
+      "best_value": 0.7757370344510501,
       "termination_reason": "stop",
-      "n_evaluations": 8,
-      "n_steps": 6,
+      "n_evaluations": 9,
+      "n_steps": 5,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 6,
+        "system2": 5,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 6,
-        "total_tokens": 2298,
-        "last_latency_s": 1.0502906600013375,
+        "call_count": 5,
+        "total_tokens": 1939,
+        "last_latency_s": 0.7411168990074657,
         "last_total_tokens": 379
       },
       "steps": [
         {
           "round": 0,
-          "action": "retrain_surrogate",
-          "route": "system2"
-        },
-        {
-          "round": 1,
-          "action": "uncertainty_sampling",
-          "route": "system2"
-        },
-        {
-          "round": 2,
-          "action": "retrain_surrogate",
-          "route": "system2"
-        },
-        {
-          "round": 3,
-          "action": "uncertainty_sampling",
-          "route": "system2"
-        },
-        {
-          "round": 4,
           "action": "local_exploitation",
           "route": "system2"
         },
         {
-          "round": 5,
+          "round": 1,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 4,
           "action": "stop",
           "route": "system2"
         }
@@ -2421,19 +2427,19 @@
       "best_value": 2.584361312599882,
       "termination_reason": "budget_exhausted",
       "n_evaluations": 30,
-      "n_steps": 18,
+      "n_steps": 17,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 18,
+        "system2": 17,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 18,
-        "total_tokens": 6928,
-        "last_latency_s": 0.8920442609814927,
+        "call_count": 17,
+        "total_tokens": 6561,
+        "last_latency_s": 0.9336730130016804,
         "last_total_tokens": 388
       },
       "steps": [
@@ -2454,7 +2460,7 @@
         },
         {
           "round": 3,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -2474,12 +2480,12 @@
         },
         {
           "round": 7,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 8,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -2494,12 +2500,12 @@
         },
         {
           "round": 11,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 12,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
@@ -2519,11 +2525,6 @@
         },
         {
           "round": 16,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 17,
           "action": "local_exploitation",
           "route": "system2"
         }
@@ -2670,25 +2671,25 @@
       "best_value": 1.6651319548545134,
       "termination_reason": "stop",
       "n_evaluations": 9,
-      "n_steps": 6,
+      "n_steps": 5,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 6,
+        "system2": 5,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 6,
-        "total_tokens": 2303,
-        "last_latency_s": 0.589396389957983,
-        "last_total_tokens": 377
+        "call_count": 5,
+        "total_tokens": 1942,
+        "last_latency_s": 0.5932020570035093,
+        "last_total_tokens": 385
       },
       "steps": [
         {
           "round": 0,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
@@ -2708,11 +2709,6 @@
         },
         {
           "round": 4,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 5,
           "action": "stop",
           "route": "system2"
         }
@@ -2901,23 +2897,23 @@
       "total_budget": 30,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": 2.584361312599882,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 30,
-      "n_steps": 17,
+      "best_value": 1.7246157970650198,
+      "termination_reason": "stop",
+      "n_evaluations": 28,
+      "n_steps": 15,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 17,
+        "system2": 15,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 17,
-        "total_tokens": 6570,
-        "last_latency_s": 0.6643504539970309,
-        "last_total_tokens": 387
+        "call_count": 15,
+        "total_tokens": 5785,
+        "last_latency_s": 0.738981478032656,
+        "last_total_tokens": 379
       },
       "steps": [
         {
@@ -2982,27 +2978,17 @@
         },
         {
           "round": 12,
-          "action": "local_exploitation",
+          "action": "uncertainty_sampling",
           "route": "system2"
         },
         {
           "round": 13,
-          "action": "local_exploitation",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 14,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 15,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 16,
-          "action": "local_exploitation",
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -3140,23 +3126,23 @@
       "total_budget": 10,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": -20.76010655041534,
+      "best_value": -20.658370504061626,
       "termination_reason": "stop",
       "n_evaluations": 9,
-      "n_steps": 5,
+      "n_steps": 6,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 5,
+        "system2": 6,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 5,
-        "total_tokens": 1912,
-        "last_latency_s": 0.590070565987844,
-        "last_total_tokens": 375
+        "call_count": 6,
+        "total_tokens": 2300,
+        "last_latency_s": 0.8589252440142445,
+        "last_total_tokens": 372
       },
       "steps": [
         {
@@ -3171,7 +3157,7 @@
         },
         {
           "round": 2,
-          "action": "global_exploration",
+          "action": "uncertainty_sampling",
           "route": "system2"
         },
         {
@@ -3181,6 +3167,11 @@
         },
         {
           "round": 4,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 5,
           "action": "stop",
           "route": "system2"
         }
@@ -3372,20 +3363,20 @@
       "best_value": -20.338747080921394,
       "termination_reason": "stop",
       "n_evaluations": 29,
-      "n_steps": 20,
+      "n_steps": 18,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 20,
+        "system2": 18,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 20,
-        "total_tokens": 7643,
-        "last_latency_s": 0.9699942679726519,
-        "last_total_tokens": 379
+        "call_count": 18,
+        "total_tokens": 6925,
+        "last_latency_s": 0.6876399059547111,
+        "last_total_tokens": 380
       },
       "steps": [
         {
@@ -3430,61 +3421,51 @@
         },
         {
           "round": 8,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 9,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 10,
-          "action": "retrain_surrogate",
-          "route": "system2"
-        },
-        {
-          "round": 11,
           "action": "global_exploration",
           "route": "system2"
         },
         {
-          "round": 12,
+          "round": 11,
           "action": "retrain_surrogate",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 13,
-          "action": "surrogate_acquisition",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 14,
-          "action": "retrain_surrogate",
-          "route": "system2"
-        },
-        {
-          "round": 15,
           "action": "surrogate_acquisition",
           "route": "system2"
         },
         {
+          "round": 15,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
           "round": 16,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 17,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 18,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 19,
           "action": "stop",
           "route": "system2"
         }
@@ -3633,38 +3614,38 @@
       "total_budget": 10,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": -19.849772427780906,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 10,
-      "n_steps": 6,
+      "best_value": -20.8517370690908,
+      "termination_reason": "stop",
+      "n_evaluations": 9,
+      "n_steps": 7,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 6,
+        "system2": 7,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 6,
-        "total_tokens": 2324,
-        "last_latency_s": 0.7669979500351474,
-        "last_total_tokens": 390
+        "call_count": 7,
+        "total_tokens": 2674,
+        "last_latency_s": 0.9423197260475717,
+        "last_total_tokens": 375
       },
       "steps": [
         {
           "round": 0,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 1,
           "action": "retrain_surrogate",
           "route": "system2"
         },
         {
+          "round": 1,
+          "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
           "round": 2,
-          "action": "uncertainty_sampling",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
@@ -3680,6 +3661,11 @@
         {
           "round": 5,
           "action": "local_exploitation",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -3867,23 +3853,23 @@
       "total_budget": 30,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": -19.42864799751057,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 30,
-      "n_steps": 19,
+      "best_value": -19.504202173002938,
+      "termination_reason": "stop",
+      "n_evaluations": 29,
+      "n_steps": 17,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 19,
+        "system2": 17,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 19,
-        "total_tokens": 7300,
-        "last_latency_s": 0.9991449959925376,
-        "last_total_tokens": 389
+        "call_count": 17,
+        "total_tokens": 6566,
+        "last_latency_s": 0.6307382929953746,
+        "last_total_tokens": 379
       },
       "steps": [
         {
@@ -3928,7 +3914,7 @@
         },
         {
           "round": 8,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -3943,7 +3929,7 @@
         },
         {
           "round": 11,
-          "action": "global_exploration",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
@@ -3958,7 +3944,7 @@
         },
         {
           "round": 14,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
@@ -3968,17 +3954,7 @@
         },
         {
           "round": 16,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 17,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 18,
-          "action": "local_exploitation",
+          "action": "stop",
           "route": "system2"
         }
       ]
@@ -4135,8 +4111,8 @@
       "llm_stats": {
         "model": "deepseek-chat",
         "call_count": 5,
-        "total_tokens": 1935,
-        "last_latency_s": 0.5106208200450055,
+        "total_tokens": 1936,
+        "last_latency_s": 0.815254743967671,
         "last_total_tokens": 380
       },
       "steps": [
@@ -4350,23 +4326,23 @@
       "total_budget": 30,
       "policy": "hybrid_forced_escalate",
       "system2_kind": "deepseek",
-      "best_value": -19.42864799751057,
-      "termination_reason": "budget_exhausted",
-      "n_evaluations": 30,
-      "n_steps": 20,
+      "best_value": -19.504202173002938,
+      "termination_reason": "stop",
+      "n_evaluations": 29,
+      "n_steps": 17,
       "simple_regret": null,
       "known_optimum": null,
       "route_distribution": {
         "system1": 0,
-        "system2": 20,
+        "system2": 17,
         "rule": 0
       },
       "llm_stats": {
         "model": "deepseek-chat",
-        "call_count": 20,
-        "total_tokens": 7675,
-        "last_latency_s": 1.017887979047373,
-        "last_total_tokens": 388
+        "call_count": 17,
+        "total_tokens": 6551,
+        "last_latency_s": 0.8074494390166365,
+        "last_total_tokens": 376
       },
       "steps": [
         {
@@ -4376,7 +4352,7 @@
         },
         {
           "round": 1,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
@@ -4411,62 +4387,47 @@
         },
         {
           "round": 8,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 9,
-          "action": "retrain_surrogate",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 10,
-          "action": "uncertainty_sampling",
+          "action": "global_exploration",
           "route": "system2"
         },
         {
           "round": 11,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 12,
-          "action": "global_exploration",
+          "action": "retrain_surrogate",
           "route": "system2"
         },
         {
           "round": 13,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 14,
-          "action": "global_exploration",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 15,
-          "action": "retrain_surrogate",
+          "action": "local_exploitation",
           "route": "system2"
         },
         {
           "round": 16,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 17,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 18,
-          "action": "local_exploitation",
-          "route": "system2"
-        },
-        {
-          "round": 19,
-          "action": "local_exploitation",
+          "action": "stop",
           "route": "system2"
         }
       ]
