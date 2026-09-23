@@ -1,0 +1,212 @@
+"""Tests for LLMSystem2 (DeepSeek-backed) — uses a fake httpx client."""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from conftest import RecordingBackend  # noqa: E402
+
+from opt_agent.actions import ActionType  # noqa: E402
+from opt_agent.state import extract_state  # noqa: E402
+from opt_agent.system2 import LLMSystem2, System2Decision  # noqa: E402
+from opt_agent.system2.llm_deepseek import DeepSeekCallStats  # noqa: E402
+
+
+def _state_with_budget(remaining: int):
+    backend = RecordingBackend()
+    state = extract_state(backend, total_budget=remaining)
+    return state
+
+
+class _FakeResponse:
+    def __init__(self, status_code: int, body: dict) -> None:
+        self.status_code = status_code
+        self._body = body
+
+    def json(self) -> dict:
+        return self._body
+
+    @property
+    def text(self) -> str:
+        return json.dumps(self._body)
+
+
+class _FakeClient:
+    def __init__(
+        self,
+        *,
+        status_code: int = 200,
+        body: dict | None = None,
+        captured: dict | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self.body = body or _default_body()
+        self.captured = captured if captured is not None else {}
+        self.calls = 0
+
+    def post(self, url, *, headers=None, json=None, timeout=None, **kwargs):
+        self.calls += 1
+        self.captured["url"] = url
+        self.captured["json"] = json
+        self.captured["headers"] = headers
+        self.captured["timeout"] = timeout
+        return _FakeResponse(self.status_code, self.body)
+
+
+def _default_body() -> dict:
+    return {
+        "id": "fake-response-id",
+        "choices": [{"message": {"content": json.dumps({
+            "action_id": "global_exploration",
+            "params": {"n_samples": 1, "seed": 7},
+            "reasoning": "explore widely given large remaining budget",
+        })}}],
+        "usage": {"prompt_tokens": 200, "completion_tokens": 30, "total_tokens": 230},
+    }
+
+
+# ---------------------------------------------------------------------------
+# Construction
+# ---------------------------------------------------------------------------
+
+
+def test_llm_system2_requires_api_key(monkeypatch) -> None:
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="DEEPSEEK_API_KEY"):
+        LLMSystem2()
+
+
+def test_llm_system2_uses_env_var(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "env-test-key")
+    s = LLMSystem2()
+    assert s.api_key == "env-test-key"
+
+
+def test_llm_system2_override_via_constructor(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "env-test-key")
+    s = LLMSystem2(api_key="ctor-key", base_url="http://x", model="m")
+    assert s.api_key == "ctor-key"
+    assert s.base_url == "http://x"
+    assert s.model == "m"
+
+
+# ---------------------------------------------------------------------------
+# Reason flow with injected fake client
+# ---------------------------------------------------------------------------
+
+
+def test_llm_system2_parses_json_response() -> None:
+    state = _state_with_budget(20)
+    captured: dict = {}
+    client = _FakeClient(captured=captured)
+    s = LLMSystem2(client=client, _skip_key_check=True)
+    decision = s.reason(state)
+    assert isinstance(decision, System2Decision)
+    assert decision.action.type == ActionType.GLOBAL_EXPLORATION
+    assert decision.action.params["n_samples"] == 1
+    assert decision.action.params["seed"] == 7
+    assert decision.confidence == 1.0  # parsed cleanly, not fallback
+    assert "explore widely" in decision.reasoning.lower() or "budget" in decision.reasoning.lower()
+    # Stats recorded.
+    assert s.last_stats is not None
+    assert s.last_stats.total_tokens == 230
+    assert s.call_count == 1
+    assert s.total_tokens == 230
+    # Request shape.
+    assert captured["url"].endswith("/chat/completions")
+    payload = captured["json"]
+    assert payload["model"] == "deepseek-chat"
+    assert payload["messages"][0]["role"] == "system"
+    assert payload["messages"][1]["role"] == "user"
+
+
+def test_llm_system2_unknown_action_id_falls_back() -> None:
+    state = _state_with_budget(20)
+    bad_body = {
+        "id": "x",
+        "choices": [{"message": {"content": json.dumps({
+            "action_id": "fictional_action", "params": {},
+            "reasoning": "I made a typo",
+        })}}],
+        "usage": {"total_tokens": 10},
+    }
+    s = LLMSystem2(client=_FakeClient(body=bad_body), _skip_key_check=True)
+    decision = s.reason(state)
+    assert decision.confidence == 0.0  # fallback marker
+    assert decision.reasoning.startswith("fallback:")
+    # The fallback picks the first non-stop candidate. RecordingBackend's
+    # default state has surrogate not current and n_samples>=2, so the
+    # first non-stop candidate is global_exploration.
+    assert decision.action.type != ActionType.STOP
+
+
+def test_llm_system2_unparseable_response_falls_back() -> None:
+    state = _state_with_budget(20)
+    bad_body = {
+        "id": "x",
+        "choices": [{"message": {"content": "I cannot help with that."}}],
+        "usage": {"total_tokens": 10},
+    }
+    s = LLMSystem2(client=_FakeClient(body=bad_body), _skip_key_check=True)
+    decision = s.reason(state)
+    assert decision.confidence == 0.0
+    assert decision.reasoning.startswith("fallback:")
+
+
+def test_llm_system2_markdown_fence_is_stripped() -> None:
+    state = _state_with_budget(20)
+    body = {
+        "id": "x",
+        "choices": [{"message": {"content": (
+            "```json\n"
+            + json.dumps({
+                "action_id": "surrogate_acquisition",
+                "params": {},
+                "reasoning": "use the GP",
+            })
+            + "\n```"
+        )}}],
+        "usage": {"total_tokens": 5},
+    }
+    s = LLMSystem2(client=_FakeClient(body=body), _skip_key_check=True)
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.SURROGATE_ACQUISITION
+    assert decision.confidence == 1.0
+
+
+def test_llm_system2_forced_stop_when_budget_exhausted() -> None:
+    """If only STOP is in the candidate set, we short-circuit without
+    calling the API at all (no wasted tokens)."""
+    state = _state_with_budget(4)  # total_budget must be > 0
+    # Force remaining_budget=0 via object.__setattr__ (OptimizationState
+    # is a frozen dataclass).
+    object.__setattr__(state.resource, "remaining_budget", 0)
+    captured: dict = {}
+    client = _FakeClient(captured=captured)
+    s = LLMSystem2(client=client, _skip_key_check=True)
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.STOP
+    assert decision.confidence == 1.0
+    assert client.calls == 0  # never hit the API
+
+
+def test_llm_system2_raises_on_api_error() -> None:
+    state = _state_with_budget(20)
+    client = _FakeClient(status_code=500, body={"error": "boom"})
+    s = LLMSystem2(client=client, _skip_key_check=True)
+    with pytest.raises(RuntimeError, match="DeepSeek API error"):
+        s.reason(state)
+
+
+def test_llm_system2_reset_is_noop() -> None:
+    s = LLMSystem2(client=_FakeClient(), _skip_key_check=True)
+    s.reset()  # must not raise
+    assert s.call_count == 0
