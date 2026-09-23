@@ -18,7 +18,11 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from conftest import RecordingBackend  # noqa: E402
 
-from opt_agent.actions import ActionType, OptimizationAction  # noqa: E402
+from opt_agent.actions import (  # noqa: E402
+    ActionType,
+    OptimizationAction,
+    candidate_actions_for_state,
+)
 from opt_agent.loop import DecisionLoop, TerminationReason  # noqa: E402
 from opt_agent.router import ConfidenceRouter  # noqa: E402
 from opt_agent.state import OptimizationState  # noqa: E402
@@ -55,22 +59,37 @@ class _FakeSystem1:
     def decide(self, state: OptimizationState) -> _FakeDecision:
         action_type, probs = self._sequence[self._idx % len(self._sequence)]
         self._idx += 1
-        # Re-key the probabilities so the action_type's id is guaranteed
-        # to be in the distribution (matches the candidate factory
-        # vocabulary).
-        real_probs = {
-            action_type.value: probs.get(action_type.value, 0.0)
-            for _ in range(1)
+        chosen_id = action_type.value
+        factory_keys = sorted(candidate_actions_for_state(state, seed=0))
+        # If the user provided probabilities keyed by factory ids, pass
+        # them through unchanged (after renormalization).
+        if any(k in factory_keys for k in probs):
+            real = {k: float(v) for k, v in probs.items() if k in factory_keys}
+            total = sum(real.values()) or 1.0
+            return _FakeDecision(
+                action=OptimizationAction(action_type),
+                probabilities={k: v / total for k, v in real.items()},
+            )
+        # Otherwise (placeholder keys like {"a", "b", ...}), spread the
+        # chosen action's mass across the factory vocabulary. If mass is
+        # uniform on the placeholders, this becomes a near-uniform factory
+        # distribution (low confidence) — which is what the tests want.
+        user_mass = sum(probs.values())
+        # Use the placeholder mass distribution as a relative shape.
+        n = max(len(probs), 1)
+        chosen_share = max(user_mass / n, 0.0)
+        remaining = max(1.0 - chosen_share, 0.0)
+        share_per_other = remaining / max(len(factory_keys) - 1, 1)
+        factory_probs = {
+            chosen_id: chosen_share,
         }
-        # Spread remaining mass across the union of the user's keys.
-        other_keys = [k for k in probs if k != action_type.value]
-        if other_keys:
-            share = (1.0 - real_probs[action_type.value]) / len(other_keys)
-            for k in other_keys:
-                real_probs[k] = probs[k] * share
+        for k in factory_keys:
+            if k == chosen_id:
+                continue
+            factory_probs[k] = share_per_other
         return _FakeDecision(
             action=OptimizationAction(action_type),
-            probabilities=real_probs,
+            probabilities=factory_probs,
         )
 
 

@@ -30,13 +30,14 @@ class DecisionResult:
         Per-k fraction of records where argmax(gold_probs) is in the top-k
         of probs. Keys are k values requested by the caller.
     kl_mean : float
-        Mean KL(probs || gold_probs) over records. **By default inf records
-        are excluded** — see `n_infinite_kl` to know how many. Pass
-        `include_infinite=True` to `aggregate_decision_metrics` for an
-        unconditional mean.
+        Mean KL(probs || gold_probs) over records, **excluding** records
+        where KL is +inf. See `n_infinite_kl` to know how many were
+        excluded. To get an unconditional mean, call `kl_divergence` per
+        record yourself — the mean will be +inf if any record diverges.
     nll_mean : float
-        Mean -log P(argmax(gold_probs)) under probs. Inf records excluded;
-        see `n_infinite_nll`.
+        Mean -log P(argmax(gold_probs)) under probs, excluding records
+        where the model places zero mass on the outcome. See
+        `n_infinite_nll`.
     n_records : int
         Number of records included in the aggregate.
     n_infinite_kl : int

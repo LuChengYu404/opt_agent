@@ -150,11 +150,53 @@ class HybridPolicy:
                 f"{sorted(factory_candidates)}; the model is selecting an "
                 f"action that is not budget-valid for the current state."
             )
+        # Per codex re-review: extra keys in `probs` would silently change
+        # `max(probabilities.values())` and the router's escalation
+        # decision. Reject any key not in the factory vocabulary.
+        extra_keys = set(probs) - set(factory_candidates)
+        if extra_keys:
+            raise ValueError(
+                f"system1 probability distribution contains keys not in "
+                f"the candidate factory vocabulary: {sorted(extra_keys)}; "
+                f"this would corrupt the router's confidence signal."
+            )
+        # Per codex re-review: also validate that the chosen action's
+        # parameters are budget-valid (e.g. n_samples ≤ remaining_budget).
+        # Without this, the ID check passes but execute_action raises
+        # at runtime when an n_samples overshoot hits the budget.
+        factory_action = factory_candidates[action_id]
+        params = dict(action.params)
+        if "n_samples" in params and action.type != factory_action.type:
+            # Different action types — param semantics differ.
+            pass
+        if "n_samples" in params and params["n_samples"] > state.resource.remaining_budget:
+            raise ValueError(
+                f"system1 action {action_id!r} requests n_samples="
+                f"{params['n_samples']} but only "
+                f"{state.resource.remaining_budget} budget remains."
+            )
         route = self._router.route(probs)
         if route.name == "system1":
             chosen = action
         else:
             chosen = self._system2.reason(state).action
+            # Per codex re-review: System-2's chosen action must also be
+            # budget-valid for the current state.
+            chosen_id = chosen.type.value
+            if chosen_id not in factory_candidates:
+                raise RuntimeError(
+                    f"system2 returned action {chosen_id!r} which is not "
+                    f"in the candidate factory vocabulary "
+                    f"{sorted(factory_candidates)}"
+                )
+            if "n_samples" in chosen.params and (
+                chosen.params["n_samples"] > state.resource.remaining_budget
+            ):
+                raise RuntimeError(
+                    f"system2 returned action {chosen_id!r} with "
+                    f"n_samples={chosen.params['n_samples']} but only "
+                    f"{state.resource.remaining_budget} budget remains."
+                )
         self.last_step = HybridStep(
             route=route, system1_action=action, chosen_action=chosen,
         )

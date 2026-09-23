@@ -116,7 +116,7 @@ def expected_calibration_error(
     outcomes: Sequence[str],
     n_bins: int = 15,
     *,
-    outcome_source: str = "argmax(probs)",
+    outcome_source: str = "unknown",
 ) -> CalibrationResult:
     """Compute Expected Calibration Error of (probs, outcome) pairs.
 
@@ -130,10 +130,19 @@ def expected_calibration_error(
     probs, outcomes, n_bins
         See module docstring for the regime discussion.
     outcome_source : str
-        Free-form tag describing how `outcomes` was derived. Recorded on
-        the returned `CalibrationResult` so downstream reports can
-        distinguish the internal-consistency regime from real
-        calibration against an independent label.
+        Free-form tag describing how `outcomes` was derived. The default
+        is `"unknown"` — callers SHOULD pass an explicit value:
+
+        - "argmax(probs)" for the internal-consistency regime
+          (outcome == argmax(probs) by construction; ECE measures
+          confidence-in-its-own-choice).
+        - "human" / "rollout_oracle" / etc. for the real-calibration
+          regime (outcome is an independently observed label).
+
+        When `outcome_source` is `"unknown"` and any outcome does NOT
+        match `argmax(probs)`, the result carries a regime-mismatch
+        note so downstream reports cannot silently conflate the two
+        regimes.
     """
     _validate_inputs(probs, outcomes, n_bins)
     if not probs:
@@ -144,12 +153,16 @@ def expected_calibration_error(
 
     confidences: list[float] = []
     accuracies: list[float] = []
+    mismatches = 0
     for p, outcome in zip(probs, outcomes):
         chosen = max(p, key=p.get)
         conf = float(p[chosen])
         conf = max(0.0, min(1.0, conf))  # numeric safety
         confidences.append(conf)
-        accuracies.append(1.0 if chosen == outcome else 0.0)
+        is_match = chosen == outcome
+        if not is_match:
+            mismatches += 1
+        accuracies.append(1.0 if is_match else 0.0)
 
     n = len(probs)
     bins: list[ReliabilityBin] = []
@@ -157,7 +170,6 @@ def expected_calibration_error(
     for b in range(n_bins):
         lo = b / n_bins
         hi = (b + 1) / n_bins
-        # Top bin closed on the upper edge so confidence == 1.0 lands there.
         if b == n_bins - 1:
             in_bin = [
                 (c, a) for c, a in zip(confidences, accuracies)
@@ -180,12 +192,20 @@ def expected_calibration_error(
         )
         ece += (len(in_bin) / n) * abs(bin_conf - bin_acc)
 
-    notes = ""
+    notes_parts: list[str] = []
     if n < n_bins * 5:
-        notes = f"small-sample warning: n={n}, n_bins={n_bins}"
+        notes_parts.append(f"small-sample warning: n={n}, n_bins={n_bins}")
+    # Regime-mismatch detection: warn when caller said "argmax(probs)" or
+    # left it "unknown" but outcomes differ from argmax(probs).
+    if outcome_source in {"argmax(probs)", "unknown"} and mismatches > 0:
+        notes_parts.append(
+            f"regime mismatch: {mismatches}/{n} outcomes differ from "
+            f"argmax(probs); pass outcome_source= explicitly to label "
+            f"the regime."
+        )
     return CalibrationResult(
         ece=ece, bins=tuple(bins), n_records=n, n_bins=n_bins,
-        notes=notes, outcome_source=outcome_source,
+        notes="; ".join(notes_parts), outcome_source=outcome_source,
     )
 
 
