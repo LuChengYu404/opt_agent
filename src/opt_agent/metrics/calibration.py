@@ -74,12 +74,18 @@ class CalibrationResult:
     notes : str
         Free-form warning, e.g. "small-sample warning: n=12, n_bins=15".
     outcome_source : str
-        Describes how `outcome` was derived for each record. Common
-        values: "argmax(probs)" (internal-consistency regime), "human"
-        (independent human label), "rollout_oracle" (oracle gap from
-        rollout). Downstream consumers MUST check this to interpret the
-        ECE: an ECE computed with outcome_source="argmax(probs)" only
-        measures confidence-in-its-own-choice, NOT real calibration.
+        Describes how `outcome` was derived for each record. Default is
+        `"unknown"` — callers SHOULD set this explicitly:
+
+        - "argmax(probs)" for the internal-consistency regime
+          (outcome == argmax(probs) by construction).
+        - "human" / "rollout_oracle" / etc. for real-calibration against
+          an independently observed label.
+
+        When constructed directly (rather than via
+        `expected_calibration_error`), the field defaults to "unknown"
+        so downstream consumers cannot accidentally read an
+        internal-consistency result as if it were real calibration.
     """
 
     ece: float
@@ -87,7 +93,7 @@ class CalibrationResult:
     n_records: int
     n_bins: int
     notes: str = ""
-    outcome_source: str = "argmax(probs)"
+    outcome_source: str = "unknown"
 
 
 def _validate_inputs(

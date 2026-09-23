@@ -138,22 +138,38 @@ M3, M4) and 3 new issues (calibration regimes, KL/NLL aggregation,
 split determinism + hash scope). All 9 are now resolved in the current
 working tree. See PHASE9_DESIGN.md for the full reconciled design.
 
-### Phase 9.1 (next)
+### Phase 9.1: real-backend smoke (DONE)
 
-End-to-end smoke against a real BOCoDe backend with `simple_regret`
-reported for at least Branin + Ackley + Hartmann. Without that, Phase 9
-remains "framework skeleton" status, not "Phase 9 done".
+`scripts/run_hybrid_smoke.py` runs HybridPolicy vs RulePolicy on
+BocodeBotorchBackend across Branin + Ackley + Hartmann × seeds
+{0, 1, 2} × total_budget in {10, 30}. tau_conf = 0.5 (fixed, not tuned).
 
-```bash
-# to be written: scripts/run_hybrid_smoke.py
-uv run python scripts/run_hybrid_smoke.py \
-    --problem branin --seed 0 --budget 30 \
-    --system1 laya --router tau_conf=0.5 --system2 rule
-```
+**Acceptance criteria (from codex gpt-6-sol review 2026-09-23):**
+1. All 36 runs complete without exceptions. ✓
+2. Per-step action and evaluation cost obey factory + budget constraints. ✓
+3. Routing-count sum equals decision-step count for every Hybrid run. ✓
+4. Per problem: at least one Hybrid trajectory actually executes an evaluation. ✓
+5. Finite `simple_regret = known_optimum - best_value` reported for
+   Branin (literature-known optimum). Other problems report best_value
+   only because the BOCoDe parameterizations (Ackley53 10-D, Hartmann
+   6-D) do not match the textbook functions.
+
+**Results on commit `98b595c`** (36 runs, all passed acceptance):
+- Branin / budget=30 / hybrid: best_value = -0.4150, simple_regret = +0.0171
+- Branin / budget=30 / rule:   best_value = -2.3702, simple_regret = +1.9723
+- Hartmann / budget=30 / hybrid best_value = +2.8489 (vs rule +1.6605)
+- Ackley / budget=30 / hybrid best_value = -20.283 (vs rule -20.412)
+
+Detailed JSON: `runs/phase9_1_smoke.json`.
+
+**Not a performance claim.** This smoke does NOT assert that
+HybridPolicy beats RulePolicy — paired multi-seed comparison needs a
+larger evaluation plan.
 
 ### Phase 9.3 (later)
 
 Fine-tune a typed-decision base model on rollout data using
 proper-scoring-rule loss (avoids the utility-hacking failure mode
 observed in Phase 8.5 / 8.6A). Reference implementation candidate
-deferred until Phase 9.1 reports its first real-backend smoke.
+deferred until the framework skeleton's real-backend smoke is
+validated end-to-end (now done in Phase 9.1).

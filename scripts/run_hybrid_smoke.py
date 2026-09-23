@@ -70,6 +70,7 @@ class StepRecord:
     round: int
     action_type: str
     route_name: str
+    n_new_samples: int
 
 
 @dataclass
@@ -106,12 +107,48 @@ class _FakeLayaSurrogateAcquisition:
         }}}
 
 
-def _make_hybrid(seed: int) -> HybridPolicy:
-    """Build a HybridPolicy backed by the deterministic Laya stub."""
-    laya = LayaPolicy(agent=_FakeLayaSurrogateAcquisition(), seed=seed)
+class _FakeLayaUniform:
+    """A zero-shot Laya stub that returns a uniform distribution across
+    the offered candidates. Confidence is set to the uniform value
+    (= 1 / K) so any router with `tau_conf > 1/K` will escalate.
+
+    Used to exercise the System-2 return path on a real backend.
+    """
+
+    def predict(self, state, questions):
+        offered = questions["next_action"]["criteria"]
+        n = max(len(offered), 1)
+        probs = {name: 1.0 / n for name in offered}
+        # argmax-stable choice: pick the first key deterministically.
+        chosen = next(iter(offered))
+        return {"answers": {"next_action": {
+            "type": "choice", "choice": chosen,
+            "probabilities": probs, "confidence": 1.0 / n,
+        }}}
+
+
+def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
+                 laya_agent: Any = None) -> HybridPolicy:
+    """Build a HybridPolicy backed by a deterministic Laya stub.
+
+    Parameters
+    ----------
+    tau_conf : float
+        Confidence threshold for the router. With the default
+        `_FakeLayaSurrogateAcquisition` stub (delta distribution,
+        confidence = 1.0), the router will always route via System-1
+        (1.0 is not strictly less than any tau_conf ≤ 1.0). With
+        `_FakeLayaUniform` (uniform distribution, confidence = 1/K),
+        the router escalates as long as tau_conf > 1/K.
+    laya_agent : object
+        Laya agent (predict callable). Defaults to the deterministic
+        surrogate_acquisition stub.
+    """
+    agent = laya_agent if laya_agent is not None else _FakeLayaSurrogateAcquisition()
+    laya = LayaPolicy(agent=agent, seed=seed)
     return HybridPolicy(
         system1=laya,
-        router=ConfidenceRouter(tau_conf=0.5),
+        router=ConfidenceRouter(tau_conf=tau_conf),
         system2=FallbackSystem2(),
     )
 
@@ -143,26 +180,47 @@ def _best_value(backend: BocodeBotorchBackend) -> float:
 
 def _run_hybrid(
     problem: str, seed: int, total_budget: int, n_init: int,
+    *, tau_conf: float = 0.5, policy_name: str = "hybrid",
+    laya_agent: Any = None,
 ) -> RunResult:
     backend = _build_backend(problem, seed, n_init)
-    hybrid = _make_hybrid(seed)
+    hybrid = _make_hybrid(seed, tau_conf=tau_conf, laya_agent=laya_agent)
     loop = DecisionLoop(backend, total_budget=total_budget)
     trajectory = loop.run(hybrid)
 
+    # Per codex re-review: assert history lengths BEFORE zipping to
+    # prevent silent truncation if the two histories disagree.
+    assert len(trajectory.steps) == len(hybrid.history), (
+        f"trajectory.steps ({len(trajectory.steps)}) != "
+        f"hybrid.history ({len(hybrid.history)})"
+    )
+
     steps: list[StepRecord] = []
+    total_samples_consumed = 0
     for tr_step, hb_step in zip(trajectory.steps, hybrid.history):
+        n_new = tr_step.result.n_new_samples
+        total_samples_consumed += n_new
         steps.append(StepRecord(
             round=tr_step.round,
             action_type=tr_step.action.type.value,
             route_name=hb_step.route.name,
+            n_new_samples=n_new,
         ))
+    # Per codex: per-step evaluation cost obeys budget. The total
+    # samples consumed by the run must not exceed the available budget
+    # (n_init + total_budget; n_init is covered by the bootstrap batch).
+    bootstrap_budget = n_init
+    assert total_samples_consumed <= total_budget + bootstrap_budget, (
+        f"total samples consumed {total_samples_consumed} exceeds "
+        f"budget {total_budget} + bootstrap {bootstrap_budget}"
+    )
 
     best = _best_value(backend)
     opt = KNOWN_OPTIMA.get(problem)
     simple_regret = (opt - best) if opt is not None else None
     return RunResult(
         problem=problem, seed=seed, total_budget=total_budget,
-        policy_name="hybrid", steps=steps,
+        policy_name=policy_name, steps=steps,
         best_value=best,
         termination_reason=trajectory.termination_reason.value,
         n_evaluations=_count_evaluations(backend),
@@ -179,7 +237,10 @@ def _run_rule(
     trajectory = loop.run(rule)
 
     steps = [
-        StepRecord(round=s.round, action_type=s.action.type.value, route_name="rule")
+        StepRecord(
+            round=s.round, action_type=s.action.type.value,
+            route_name="rule", n_new_samples=s.result.n_new_samples,
+        )
         for s in trajectory.steps
     ]
     best = _best_value(backend)
@@ -245,6 +306,38 @@ def _acceptance_check(runs: list[RunResult]) -> tuple[bool, list[str]]:
             errors.append(
                 f"{r.problem}/seed={r.seed}/hybrid: routing sum {sys1}+{sys2} != steps {len(r.steps)}"
             )
+    # Forced-escalate runs must use System-2 on every step.
+    for r in [r for r in runs if r.policy_name == "hybrid_forced_escalate"]:
+        sys2 = sum(1 for s in r.steps if s.route_name == "system2")
+        if sys2 != len(r.steps):
+            errors.append(
+                f"{r.problem}/seed={r.seed}/forced-escalate: "
+                f"only {sys2}/{len(r.steps)} steps went via System-2"
+            )
+    # Forced-escalate runs must execute at least one evaluation on
+    # every problem (proves the System-2 path works end-to-end).
+    for problem in {"Branin", "Hartmann", "Ackley"}:
+        forced_runs = [
+            r for r in runs
+            if r.problem == problem and r.policy_name == "hybrid_forced_escalate"
+        ]
+        if not forced_runs:
+            errors.append(f"{problem}: no forced-escalate runs recorded")
+            continue
+        if not any(r.n_evaluations > 0 for r in forced_runs):
+            errors.append(
+                f"{problem}: forced-escalate hybrid executed 0 evaluations"
+            )
+    # Per-step budget invariant: total samples consumed never exceeds
+    # n_init + total_budget for any run (regardless of policy).
+    for r in runs:
+        total = sum(s.n_new_samples for s in r.steps)
+        bootstrap = 5  # n_init default
+        if total > r.total_budget + bootstrap:
+            errors.append(
+                f"{r.problem}/seed={r.seed}/{r.policy_name}: "
+                f"step samples {total} > budget {r.total_budget}+{bootstrap}"
+            )
     return (len(errors) == 0), errors
 
 
@@ -263,7 +356,7 @@ def main() -> int:
     for problem in args.problems:
         for seed in args.seeds:
             for budget in args.budgets:
-                # Hybrid policy
+                # Hybrid policy (normal router: tau_conf=0.5)
                 try:
                     runs.append(_run_hybrid(problem, seed, budget, args.n_init))
                 except Exception as exc:
@@ -276,6 +369,28 @@ def main() -> int:
                         known_optimum=KNOWN_OPTIMA.get(problem),
                     ))
                     print(f"  HYBRID {problem} seed={seed} budget={budget}: EXCEPTION: {exc}",
+                          file=sys.stderr)
+                # Forced-escalate Hybrid: uniform Laya stub + tau_conf=1.0
+                # forces every step to escalate to System-2, exercising
+                # that path on a real backend. Without this, the
+                # deterministic delta stub's confidence (1.0) keeps the
+                # router at System-1 for every step.
+                try:
+                    runs.append(_run_hybrid(
+                        problem, seed, budget, args.n_init,
+                        tau_conf=1.0, policy_name="hybrid_forced_escalate",
+                        laya_agent=_FakeLayaUniform(),
+                    ))
+                except Exception as exc:
+                    runs.append(RunResult(
+                        problem=problem, seed=seed, total_budget=budget,
+                        policy_name="hybrid_forced_escalate", steps=[],
+                        best_value=float("-inf"),
+                        termination_reason="exception",
+                        n_evaluations=0, simple_regret=None,
+                        known_optimum=KNOWN_OPTIMA.get(problem),
+                    ))
+                    print(f"  HYBRID-FORCED {problem} seed={seed} budget={budget}: EXCEPTION: {exc}",
                           file=sys.stderr)
                 # Rule policy (paired baseline)
                 try:

@@ -166,9 +166,10 @@ class HybridPolicy:
         # at runtime when an n_samples overshoot hits the budget.
         factory_action = factory_candidates[action_id]
         params = dict(action.params)
-        if "n_samples" in params and action.type != factory_action.type:
-            # Different action types — param semantics differ.
-            pass
+        # Per codex re-review: also validate that the chosen action's
+        # parameters are budget-valid (e.g. n_samples ≤ remaining_budget).
+        # Without this, the ID check passes but execute_action raises
+        # at runtime when an n_samples overshoot hits the budget.
         if "n_samples" in params and params["n_samples"] > state.resource.remaining_budget:
             raise ValueError(
                 f"system1 action {action_id!r} requests n_samples="
