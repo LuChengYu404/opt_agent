@@ -323,5 +323,13 @@ def test_real_branin_rollout_finds_different_utilities() -> None:
     assert utilities["stop"] == 0.0
     # RETRAIN costs a fit (negative utility via w_fit * 1) but no eval.
     assert utilities["retrain"] < 0
+    # SURROGATE_ACQUISITION should also have negative utility from the implicit
+    # fit cost (Brannin was initialized without GP; first SURROGATE_ACQUISITION
+    # triggers 1 fit).
+    fits = {r.action_id: r.n_model_fits for r in out.results}
+    assert fits["surrogate"] == 1
+    assert fits["retrain"] == 1
+    assert fits["global"] == 0
+    assert fits["stop"] == 0
     # Backend must be restored.
     assert len(be.get_history()) == 5

@@ -25,6 +25,9 @@ from typing import Any, Mapping
 class ActionType(str, Enum):
     GLOBAL_EXPLORATION = "global_exploration"
     LOCAL_EXPLOITATION = "local_exploitation"
+    UNCERTAINTY_SAMPLING = "uncertainty_sampling"
+    ERROR_GUIDED_SAMPLING = "error_guided_sampling"
+    BOUNDARY_SAMPLING = "boundary_sampling"
     SURROGATE_ACQUISITION = "surrogate_acquisition"
     RETRAIN_SURROGATE = "retrain_surrogate"
     STOP = "stop"
@@ -80,6 +83,19 @@ _PARAM_SCHEMAS: dict[ActionType, dict[str, Any]] = {
         "step": lambda n, v: _strictly_positive_finite_float(n, v, hi=1.0),
         "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
     },
+    ActionType.UNCERTAINTY_SAMPLING: {
+        "n_samples": _positive_int,
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.ERROR_GUIDED_SAMPLING: {
+        "n_samples": _positive_int,
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.BOUNDARY_SAMPLING: {
+        "n_samples": _positive_int,
+        "tol": lambda n, v: _finite_float(n, v, 0.0, 0.5),
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
     ActionType.SURROGATE_ACQUISITION: {},
     ActionType.RETRAIN_SURROGATE: {},
     ActionType.STOP: {},
@@ -88,6 +104,9 @@ _PARAM_SCHEMAS: dict[ActionType, dict[str, Any]] = {
 _ALLOWED_PARAMS: dict[ActionType, set[str]] = {
     ActionType.GLOBAL_EXPLORATION: {"n_samples", "seed"},
     ActionType.LOCAL_EXPLOITATION: {"step", "seed"},
+    ActionType.UNCERTAINTY_SAMPLING: {"n_samples", "seed"},
+    ActionType.ERROR_GUIDED_SAMPLING: {"n_samples", "seed"},
+    ActionType.BOUNDARY_SAMPLING: {"n_samples", "tol", "seed"},
     ActionType.SURROGATE_ACQUISITION: set(),
     ActionType.RETRAIN_SURROGATE: set(),
     ActionType.STOP: set(),
@@ -146,10 +165,15 @@ class ActionResult:
         The action that was executed (echo for logging).
     n_new_samples : int
         How many new samples were added to the backend (0 for RETRAIN / STOP).
+    n_model_fits : int
+        How many GP fits were triggered. SURROGATE_ACQUISITION triggers 1
+        implicit fit when the surrogate is not yet fitted; RETRAIN_SURROGATE
+        always triggers 1 fit; other actions trigger 0.
     should_stop : bool
         True iff action.type == STOP. Caller should break its loop.
     """
 
     action: OptimizationAction
     n_new_samples: int
-    should_stop: bool
+    n_model_fits: int = 0
+    should_stop: bool = False

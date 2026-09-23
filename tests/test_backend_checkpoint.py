@@ -58,18 +58,24 @@ def test_checkpoint_restores_history_bit_for_bit() -> None:
     assert torch.equal(actual.constraints, expected.constraints)
 
 
-def test_checkpoint_invalidates_fitted_state() -> None:
-    """Phase 5: BoTorch GP is not pickled, so restore() must clear _fitted."""
+def test_checkpoint_preserves_fitted_state_with_gp_model() -> None:
+    """Phase 6 correction: restore() rehydrates the GP model from pickled
+    state_dict, so is_fitted remains True and propose() works without refit.
+    """
     be = initialized_backend()
     be.fit()
     assert be.is_fitted
     cp = be.checkpoint()
 
+    # Mutate backend.
+    be.evaluate(torch.tensor([[0.0, 7.5]], dtype=torch.double))
+
+    # Restore.
     be.restore(cp)
-    # _fitted flag is reset; caller must refit before propose().
-    assert not be.is_fitted
-    with pytest.raises(RuntimeError, match="fitted"):
-        be.propose(n=1)
+    assert be.is_fitted  # GP model was rehydrated
+    # propose() works without explicit refit.
+    x_new = be.propose(n=1)
+    assert x_new.shape == (1, 2)
 
 
 def test_checkpoint_is_clone_not_view() -> None:
@@ -100,27 +106,28 @@ def test_checkpoint_independent_of_caller_mutation() -> None:
 def test_two_restores_produce_same_history_after_one_more_step() -> None:
     """BoTorch GP fit is non-deterministic across calls (scipy_minimize
     non-reproducible); we test history equivalence instead of step equivalence.
+
+    With Phase 6 correction, GP state IS preserved across restores — so the
+    new candidate should be bit-identical.
     """
     be = initialized_backend()
     be.fit()
     cp = be.checkpoint()
 
-    # First restore + step.
+    # First restore + step (no explicit refit needed; GP state restored).
     be.restore(cp)
-    be.fit()
     be.evaluate(be.propose())
     h1 = be.get_history()
 
     # Second restore + step.
     be.restore(cp)
-    be.fit()
     be.evaluate(be.propose())
     h2 = be.get_history()
 
-    # Same number of samples; same initial samples (from checkpoint).
-    assert h1.X.shape[0] == h2.X.shape[0]
-    assert torch.equal(h1.X[: cp.X.shape[0]], h2.X[: cp.X.shape[0]])
-    assert torch.equal(h1.objectives[: cp.X.shape[0]], h2.objectives[: cp.X.shape[0]])
+    # With GP state preserved across restore, the proposed candidate should
+    # be bit-identical.
+    assert torch.equal(h1.X[-1:], h2.X[-1:])
+    assert torch.equal(h1.objectives[-1:], h2.objectives[-1:])
 
 
 def test_restore_atomic_on_backend_id_mismatch() -> None:

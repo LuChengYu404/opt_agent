@@ -111,6 +111,11 @@ class UnifiedBackend(ABC):
         ...
 
     @abstractmethod
+    def predict(self, X: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Posterior mean and std at X. Requires is_fitted. Std shape [n, 1]."""
+        ...
+
+    @abstractmethod
     def checkpoint(self) -> "Checkpoint":
         ...
 
@@ -305,6 +310,32 @@ class BocodeBotorchBackend(UnifiedBackend):
             self._history_cons.clone(),
         )
 
+    def predict(self, X: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Posterior mean and std at X. Requires is_fitted.
+
+        Returns
+        -------
+        (mean, std) : tuple of tensors, each shape [n, 1].
+        """
+        if not self._fitted or self._model is None:
+            raise RuntimeError(
+                "Backend not fitted — call fit() before predict()."
+            )
+        if X.ndim != 2:
+            raise ValueError(f"predict expects [n, d]; got shape {tuple(X.shape)}")
+        from botorch.posteriors import GPyTorchPosterior
+
+        self._model.eval()
+        with torch.no_grad():
+            posterior = self._model.posterior(X)
+            mean = posterior.mean
+            # variance → std; ensure shape [n, 1]
+            variance = posterior.variance
+            if variance.ndim == 1:
+                variance = variance.unsqueeze(-1)
+            std = variance.clamp(min=0.0).sqrt()
+        return mean.detach(), std.detach()
+
     @property
     def is_fitted(self) -> bool:
         return self._fitted
@@ -329,20 +360,36 @@ class BocodeBotorchBackend(UnifiedBackend):
     # -- checkpoint / restore (Phase 5) ------------------------------------
 
     def checkpoint(self) -> "Checkpoint":
-        """Snapshot history tensors + problem id/bounds + fitted state.
+        """Snapshot history tensors + problem id/bounds + fitted GP + RNG.
 
-        Returned tensors are cloned at the Python level: subsequent mutation
-        of the checkpoint's tensors does not affect the backend. Note that the
-        Checkpoint dataclass is frozen=True so the field references cannot be
-        rebound, but the tensor contents can still be mutated in-place by the
-        caller — restore() also clones internally, so this is safe.
+        Returned tensors are clones; the GP state_dict and torch RNG state
+        are pickled to bytes so the checkpoint is fully self-contained.
+
+        For counterfactual rollout fairness, every candidate must restart from
+        an EXACTLY identical backend state. This includes the fitted GP model
+        and the torch RNG state.
         """
+        from io import BytesIO
+
         from opt_agent.backend.checkpoint import Checkpoint
 
         if self._problem is None or self._history_X is None:
             raise RuntimeError("Backend not initialized — call initialize() first.")
         problem_id = type(self._problem).__name__
         bounds_list = [(float(b[0]), float(b[1])) for b in self._problem.bounds]
+
+        # Pickle the GP state_dict if fitted (Phase 6 correction: full restore).
+        model_bytes: bytes | None = None
+        if self._fitted and self._model is not None:
+            buf = BytesIO()
+            torch.save(self._model.state_dict(), buf)
+            model_bytes = buf.getvalue()
+
+        # Pickle torch RNG state.
+        rng_buf = BytesIO()
+        torch.save(torch.random.get_rng_state(), rng_buf)
+        rng_bytes = rng_buf.getvalue()
+
         return Checkpoint(
             backend_id=type(self).__module__ + "." + type(self).__name__,
             problem_id=problem_id,
@@ -351,18 +398,24 @@ class BocodeBotorchBackend(UnifiedBackend):
             objectives=self._history_obj.detach().clone(),
             constraints=self._history_cons.detach().clone(),
             fitted=self._fitted,
-            rng_state=None,  # Phase 5 placeholder; BOCoDe RNG capture deferred
+            model_state_dict=model_bytes,
+            torch_rng_state=rng_bytes,
         )
 
     def restore(self, cp: "Checkpoint") -> None:
-        """Restore history tensors from checkpoint.
+        """Restore history tensors + fitted GP + RNG state from checkpoint.
 
         Atomic: if `cp` does not match this backend's class, raise ValueError
-        before touching any state. Preserves the fitted state if `cp.fitted`
-        is True — but Phase 5 implementation clears the GP model (we don't
-        pickle BoTorch state); caller must call `fit()` again to re-fit on
-        the restored history before proposing.
+        before touching any state.
+
+        If `cp.fitted` is True and `cp.model_state_dict` is provided, the GP
+        model is rehydrated from the pickled state_dict so subsequent propose()
+        calls see the exact same surrogate. The torch RNG state is restored
+        from `cp.torch_rng_state` so any subsequent random operations are
+        reproducible from the checkpoint point.
         """
+        from io import BytesIO
+
         from opt_agent.backend.checkpoint import Checkpoint
 
         if not isinstance(cp, Checkpoint):
@@ -382,8 +435,6 @@ class BocodeBotorchBackend(UnifiedBackend):
             self._problem = bocode.get_problem(cp.problem_id)()
 
         # Atomic: validate shape BEFORE touching backend state.
-        # Clone tensors inside cp first so caller-mutation of cp tensors
-        # cannot affect the restored history.
         X = cp.X.detach().clone()
         obj = cp.objectives.detach().clone()
         cons = cp.constraints.detach().clone()
@@ -392,14 +443,46 @@ class BocodeBotorchBackend(UnifiedBackend):
                 f"Checkpoint shape mismatch: X={tuple(X.shape)}, "
                 f"obj={tuple(obj.shape)}, cons={tuple(cons.shape)}"
             )
-        # All checks passed — now commit.
+
+        # Restore history tensors.
         self._history_X = X
         self._history_obj = obj
         self._history_cons = cons
-        # Phase 5 policy: do NOT pickle BoTorch's GP state (fragile).
-        # Caller must refit() before propose(). The cp.fitted flag is preserved
-        # in the Checkpoint for serialization purposes but the backend requires
-        # an explicit refit before reuse.
-        self._fitted = False
-        self._model = None
-        self._mll = None
+
+        # Restore fitted GP model (Phase 6 correction: full restore).
+        if cp.fitted and cp.model_state_dict is not None:
+            from botorch.models import SingleTaskGP
+            from gpytorch.mlls import ExactMarginalLogLikelihood
+
+            # Rebuild a fresh SingleTaskGP with the restored history, then
+            # load the saved state_dict. SingleTaskGP requires the train_X/Y
+            # at construction to be the same as when state_dict was saved.
+            self._model = SingleTaskGP(X, obj)
+            self._mll = ExactMarginalLogLikelihood(self._model.likelihood, self._model)
+            try:
+                state = torch.load(
+                    BytesIO(cp.model_state_dict), weights_only=False
+                )
+                self._model.load_state_dict(state)
+                self._fitted = True
+            except Exception:
+                # Fallback: GP state could not be rehydrated. Invalidate.
+                self._model = None
+                self._mll = None
+                self._fitted = False
+        else:
+            self._model = None
+            self._mll = None
+            self._fitted = False
+
+        # Restore torch RNG state.
+        if cp.torch_rng_state is not None:
+            try:
+                rng_state = torch.load(
+                    BytesIO(cp.torch_rng_state), weights_only=False
+                )
+                torch.random.set_rng_state(rng_state)
+            except Exception:
+                # RNG state is best-effort; do not fail restore if it cannot
+                # be restored.
+                pass

@@ -1,6 +1,7 @@
-"""OptimizationState dataclass tree (Phase 2).
+"""OptimizationState dataclass tree (Phase 2 + Phase 6 extension).
 
-Per MASTER_PLAN.md §7 and codex (gpt-5.6-sol) review 2025-09-23.
+Per MASTER_PLAN.md §7 and codex (gpt-5.6-sol) review 2025-09-23 + Phase 6
+correction (added coverage / uncertainty / error / boundary fields).
 
 Conventions
 -----------
@@ -8,13 +9,14 @@ Conventions
   best_value = objectives.max(); recent_improvement > 0 means improving.
 - All dataclasses are frozen=True so JSON serialization is trivial and
   extract_state() output is immutable across callers.
-- Posterior-derived surrogate fields (predicted_best_mean, posterior_std_mean,
-  posterior_std_max) are deferred until the backend exposes a public predict()
-  API (Phase 5/6).
+- SurrogateState posterior fields are populated when backend.is_fitted; when
+  not fitted, validation_rmse / mean_uncertainty / max_uncertainty are NaN
+  and is_current is False.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Optional
 
@@ -23,11 +25,16 @@ from typing import Optional
 class SamplingState:
     n_samples: int
     dimension: int
+    min_pairwise_distance: float  # smallest distance between any two sampled points
+    boundary_coverage: float     # fraction of samples within `tol` of any bounds edge
 
 
 @dataclass(frozen=True)
 class SurrogateState:
-    is_current: bool  # True iff backend.is_fitted
+    is_current: bool            # True iff backend.is_fitted
+    validation_rmse: float      # RMSE of one-step GP predictions on history (NaN if not fitted)
+    mean_uncertainty: float     # mean posterior std on a Sobol grid (NaN if not fitted)
+    max_uncertainty: float      # max posterior std on the same grid (NaN if not fitted)
 
 
 @dataclass(frozen=True)
@@ -49,8 +56,6 @@ class ResourceState:
 @dataclass(frozen=True)
 class HistoryState:
     last_action: Optional[str]
-    # last_reward is intentionally omitted in Phase 2 — deferred to Phase 7
-    # when reward semantics are defined for counterfactual rollouts.
 
 
 @dataclass(frozen=True)

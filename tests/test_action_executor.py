@@ -61,6 +61,7 @@ def test_global_exploration_adds_samples() -> None:
     )
 
     assert result.n_new_samples == 3
+    assert result.n_model_fits == 0
     assert result.should_stop is False
     assert backend.evaluate_calls == 1
     assert len(backend.get_history()) == 5  # 2 initial + 3
@@ -101,6 +102,7 @@ def test_surrogate_acquisition_fits_proposes_and_evaluates() -> None:
     assert backend.propose_calls == 1
     assert backend.evaluate_calls == 1
     assert result.n_new_samples == 1
+    assert result.n_model_fits == 1  # implicit fit counted
     assert torch.equal(
         backend.last_evaluated, torch.tensor([[0.25, 0.25]], dtype=torch.double)
     )
@@ -109,7 +111,7 @@ def test_surrogate_acquisition_fits_proposes_and_evaluates() -> None:
 def test_surrogate_acquisition_skips_fit_when_current() -> None:
     backend = RecordingBackend(fitted=True)
 
-    execute_action(
+    result = execute_action(
         backend,
         state_for(backend),
         OptimizationAction(ActionType.SURROGATE_ACQUISITION),
@@ -118,6 +120,7 @@ def test_surrogate_acquisition_skips_fit_when_current() -> None:
     assert backend.fit_calls == 0
     assert backend.propose_calls == 1
     assert backend.evaluate_calls == 1
+    assert result.n_model_fits == 0  # no fit needed, not counted
 
 
 def test_retrain_does_not_evaluate() -> None:
@@ -133,6 +136,7 @@ def test_retrain_does_not_evaluate() -> None:
     assert backend.evaluate_calls == 0
     assert len(backend.get_history()) == 2
     assert result.n_new_samples == 0
+    assert result.n_model_fits == 1
 
 
 def test_stop_is_noop_and_signals_caller() -> None:

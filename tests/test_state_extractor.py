@@ -88,6 +88,16 @@ class _FakeBackend(UnifiedBackend):
     def get_history(self) -> EvaluationBatch:
         return self._history
 
+    @property
+    def bounds(self) -> torch.Tensor:
+        return torch.tensor([[0.0, 0.0], [1.0, 1.0]], dtype=torch.double)
+
+    def predict(self, X: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        n = X.shape[0]
+        return torch.zeros((n, 1), dtype=torch.double), torch.full(
+            (n, 1), 0.5, dtype=torch.double
+        )
+
     def checkpoint(self):
         from opt_agent.backend.checkpoint import Checkpoint
         return Checkpoint(
@@ -98,7 +108,8 @@ class _FakeBackend(UnifiedBackend):
             objectives=self._history.objectives.detach().clone(),
             constraints=self._history.constraints.detach().clone(),
             fitted=self._fitted,
-            rng_state=None,
+            model_state_dict=None,
+            torch_rng_state=None,
         )
 
     def restore(self, cp) -> None:

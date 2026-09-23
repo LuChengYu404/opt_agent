@@ -1,11 +1,12 @@
 """Checkpoint / Restore for UnifiedBackend (Phase 5).
 
-Per codex (gpt-5.6-sol) review 2025-09-23:
-  - Checkpoint scope = history tensors + problem_id/bounds (NOT a pickle of
-    the full backend / GP).
-  - restore() preserves fitted state if backend was fitted at checkpoint time
-    — BoTorch's GP fit is deterministic from history + RNG, and we want
-    subsequent propose() calls to reuse the GP without refitting.
+Per codex (gpt-5.6-sol) review 2025-09-23 + Phase 6 correction:
+  - Checkpoint scope = history tensors + problem_id/bounds + GP state_dict +
+    torch RNG state. NOT a pickle of the full backend.
+  - restore() preserves fitted state INCLUDING the fitted GP model — the GP
+    state_dict is rehydrated so subsequent propose() calls see the same
+    surrogate without a refit. This is critical for counterfactual rollout
+    fairness: every candidate must start from the EXACT same backend state.
   - restore() is atomic: on mismatch, raise BEFORE touching any backend state.
   - Returned tensors are clones (caller mutation does not affect checkpoint).
 """
@@ -20,7 +21,7 @@ import torch
 
 @dataclass(frozen=True)
 class Checkpoint:
-    """Point-in-time snapshot of an optimization backend's history.
+    """Point-in-time snapshot of an optimization backend.
 
     Fields
     ------
@@ -34,8 +35,12 @@ class Checkpoint:
     objectives : torch.Tensor [n, m]
     constraints : torch.Tensor [n, c]
     fitted : bool
-        Whether the surrogate was fitted at checkpoint time. Restore preserves
-        this — fitted state is deterministic from history + RNG.
+        Whether the surrogate was fitted at checkpoint time.
+    model_state_dict : Optional[bytes]
+        Pickled BoTorch GP state_dict (when fitted=True). Allows restore to
+        rehydrate the exact GP without refitting.
+    torch_rng_state : Optional[bytes]
+        Pickled torch RNG state. Restored before any subsequent random ops.
     """
     backend_id: str
     problem_id: str
@@ -44,4 +49,5 @@ class Checkpoint:
     objectives: torch.Tensor
     constraints: torch.Tensor
     fitted: bool
-    rng_state: Optional[bytes] = None  # torch RNG state pickled (Phase 5 placeholder)
+    model_state_dict: Optional[bytes] = None
+    torch_rng_state: Optional[bytes] = None

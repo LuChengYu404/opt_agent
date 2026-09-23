@@ -32,11 +32,7 @@ from typing import Callable, Optional
 import numpy as np
 
 from opt_agent.actions.executor import execute_action
-from opt_agent.actions.models import (
-    ActionResult,
-    ActionType,
-    OptimizationAction,
-)
+from opt_agent.actions.models import OptimizationAction
 from opt_agent.backend.bocode_botorch import UnifiedBackend
 from opt_agent.backend.checkpoint import Checkpoint
 from opt_agent.rollout.utility import UtilityWeights, compute_utility
@@ -193,8 +189,7 @@ class CounterfactualRollout:
 
                 result = execute_action(self.backend, branch_state, action)
                 n_new += result.n_new_samples
-                if action.type == ActionType.RETRAIN_SURROGATE:
-                    n_fits += 1
+                n_fits += result.n_model_fits
 
                 next_state = extract_state(
                     self.backend,

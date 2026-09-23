@@ -96,6 +96,12 @@ class RecordingBackend(UnifiedBackend):
     def get_history(self) -> EvaluationBatch:
         return self._history
 
+    def predict(self, X: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        n = X.shape[0]
+        mean = X.sum(dim=-1, keepdim=True) / 2  # matches synthetic objective
+        std = torch.full((n, 1), 0.1, dtype=torch.double)
+        return mean, std
+
     def checkpoint(self):
         from opt_agent.backend.checkpoint import Checkpoint
         return Checkpoint(
@@ -106,7 +112,8 @@ class RecordingBackend(UnifiedBackend):
             objectives=self._history.objectives.detach().clone(),
             constraints=self._history.constraints.detach().clone(),
             fitted=self._fitted,
-            rng_state=None,
+            model_state_dict=None,
+            torch_rng_state=None,
         )
 
     def restore(self, cp) -> None:
@@ -122,7 +129,8 @@ class RecordingBackend(UnifiedBackend):
             constraints=cp.constraints.detach().clone(),
             feasible=torch.ones((cp.X.shape[0], 1), dtype=torch.bool),
         )
-        self._fitted = False  # Phase 5: GP model not pickled
+        # RecordingBackend doesn't store a GP model; restore just sets fitted=False.
+        self._fitted = False
 
 
 class FixedPolicy:
