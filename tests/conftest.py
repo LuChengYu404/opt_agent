@@ -91,7 +91,15 @@ class RecordingBackend(UnifiedBackend):
 
     def propose(self, n: int = 1) -> torch.Tensor:
         self.propose_calls += 1
-        return self._propose_value.clone()
+        # Return a slightly perturbed point each call so different candidates
+        # don't all evaluate the same point.
+        base = self._propose_value.clone()
+        if self.propose_calls > 1:
+            base = base + torch.tensor(
+                [[0.01 * self.propose_calls, 0.0]], dtype=torch.double
+            )
+            base = base.clamp(min=0.0, max=1.0)
+        return base
 
     def get_history(self) -> EvaluationBatch:
         return self._history

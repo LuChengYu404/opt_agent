@@ -26,6 +26,7 @@ Phase 6 specifics (per codex review):
 from __future__ import annotations
 
 import math
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
@@ -59,6 +60,8 @@ class CounterfactualResult:
     n_new_samples: int
     n_model_fits: int
     delta_optimization: float
+    delta_surrogate: float       # NaN if no surrogate metric before/after
+    delta_coverage: float        # NaN if no coverage delta computable
     utility: float
     metrics: dict[str, float] = field(default_factory=dict)
     trajectory_tail: tuple = field(default_factory=tuple)
@@ -126,6 +129,14 @@ class CounterfactualRollout:
     ) -> RolloutOutput:
         if not candidates:
             raise ValueError("candidates must not be empty")
+        # Reject duplicate action_ids — they would collide in results dict.
+        ids = [c.action_id for c in candidates]
+        duplicates = [i for i, c in Counter(ids).items() if c > 1]
+        if duplicates:
+            raise ValueError(
+                f"duplicate action_id in candidates: {duplicates}. "
+                f"Each candidate must have a unique id."
+            )
         if len(candidates) * self.horizon > self.max_rollout_steps:
             raise ValueError(
                 f"rollout step cap exceeded: {len(candidates)} candidates × "
@@ -204,9 +215,29 @@ class CounterfactualRollout:
         except ValueError as exc:
             status, error = "invalid", str(exc)
 
+        # Phase 7: Δopt = best_after − best_before (positive = improvement).
         delta_opt = branch_state.optimization.best_value - state.optimization.best_value
+
+        # Phase 7: Δsurrogate = validation_rmse_before − validation_rmse_after
+        # (positive = surrogate improved). NaN if either side is NaN.
+        rs_before = state.surrogate.validation_rmse
+        rs_after = branch_state.surrogate.validation_rmse
+        if math.isfinite(rs_before) and math.isfinite(rs_after):
+            delta_surrogate = float(rs_before - rs_after)
+        else:
+            delta_surrogate = float("nan")
+
+        # Phase 7: Δcoverage = boundary_coverage_after − boundary_coverage_before
+        # (positive = more boundary coverage).
+        delta_coverage = float(
+            branch_state.sampling.boundary_coverage
+            - state.sampling.boundary_coverage
+        )
+
         utility = compute_utility(
             delta_optimization=delta_opt,
+            delta_surrogate=delta_surrogate,
+            delta_coverage=delta_coverage,
             n_new_samples=n_new,
             n_model_fits=n_fits,
             weights=self.weights,
@@ -218,10 +249,16 @@ class CounterfactualRollout:
             n_new_samples=n_new,
             n_model_fits=n_fits,
             delta_optimization=float(delta_opt),
+            delta_surrogate=float(delta_surrogate),
+            delta_coverage=float(delta_coverage),
             utility=float(utility),
             metrics={
                 "best_before": float(state.optimization.best_value),
                 "best_after": float(branch_state.optimization.best_value),
+                "rmse_before": float(rs_before),
+                "rmse_after": float(rs_after),
+                "boundary_coverage_before": float(state.sampling.boundary_coverage),
+                "boundary_coverage_after": float(branch_state.sampling.boundary_coverage),
             },
             trajectory_tail=tuple(steps),
             error=error,
@@ -243,8 +280,17 @@ def to_gold_probs(
     results: tuple[CounterfactualResult, ...],
     *,
     temperature: float = 1.0,
+    include_invalid_as_zero: bool = False,
 ) -> dict[str, float]:
-    """Convert CounterfactualResult utilities into softmax probabilities."""
+    """Convert CounterfactualResult utilities into softmax probabilities.
+
+    Parameters
+    ----------
+    include_invalid_as_zero : bool
+        If True, invalid candidates are included in the output dict with
+        probability 0.0 (preserves aligned vocabulary). Default False: only
+        valid candidates are returned (vocabulary may shrink).
+    """
     if not results:
         raise ValueError("results must not be empty")
     if not math.isfinite(temperature) or temperature <= 0:
@@ -253,7 +299,10 @@ def to_gold_probs(
         )
     valid = [r for r in results if r.status == "valid"]
     if not valid:
-        raise ValueError("no valid candidate actions")
+        if not include_invalid_as_zero:
+            raise ValueError("no valid candidate actions")
+        # All invalid; emit zeros so vocabulary is preserved.
+        return {r.action_id: 0.0 for r in results}
     utilities = np.asarray([r.utility for r in valid], dtype=np.float64)
     if not np.isfinite(utilities).all():
         raise ValueError("valid utilities must be finite")
@@ -261,7 +310,12 @@ def to_gold_probs(
     z -= z.max()
     probabilities = np.exp(z)
     probabilities /= probabilities.sum()
-    return {
+    valid_probs = {
         r.action_id: float(p)
         for r, p in zip(valid, probabilities, strict=True)
     }
+    if include_invalid_as_zero:
+        for r in results:
+            if r.status != "valid":
+                valid_probs[r.action_id] = 0.0
+    return valid_probs
