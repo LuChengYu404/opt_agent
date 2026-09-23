@@ -1,0 +1,15 @@
+[project]
+name = "opt-agent-v3"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "bocode>=1.0.1",
+    "botorch>=0.18.1",
+    "gpytorch>=1.15.2",
+    "numpy>=2.5.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

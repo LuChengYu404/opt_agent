@@ -1,0 +1,112 @@
+"""Shared pytest fixtures and stubs for opt_agent tests.
+
+`RecordingBackend` was originally in tests/test_action_executor.py. Codex review
+(2025-09-23) suggested moving it here so test_decision_loop.py can reuse it.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import torch
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from opt_agent.backend.bocode_botorch import (  # noqa: E402
+    EvaluationBatch,
+    UnifiedBackend,
+)
+
+
+class RecordingBackend(UnifiedBackend):
+    """Stub backend that records all calls and returns synthetic data.
+
+    Initial history = 2 points at [[0,0],[1,1]] with objectives [-0.5, -1.0].
+    Sobol step from seed=0 with d=2 yields candidate [0.5, 0.5].
+    """
+
+    def __init__(
+        self,
+        fitted: bool = False,
+        fail_evaluate: bool = False,
+        propose_value: torch.Tensor | None = None,
+    ) -> None:
+        X = torch.tensor([[0.0, 0.0], [1.0, 1.0]], dtype=torch.double)
+        obj = torch.tensor([[-0.5], [-1.0]], dtype=torch.double)
+        self._history = EvaluationBatch(
+            X=X,
+            objectives=obj,
+            constraints=torch.zeros((2, 0), dtype=torch.double),
+            feasible=torch.ones((2, 1), dtype=torch.bool),
+        )
+        self._fitted = fitted
+        self._fail_evaluate = fail_evaluate
+        self.fit_calls = 0
+        self.propose_calls = 0
+        self.evaluate_calls = 0
+        self.last_evaluated: torch.Tensor | None = None
+        self._propose_value = propose_value or torch.tensor(
+            [[0.25, 0.25]], dtype=torch.double
+        )
+
+    @property
+    def is_fitted(self) -> bool:
+        return self._fitted
+
+    @property
+    def bounds(self) -> torch.Tensor:
+        return torch.tensor([[0.0, 0.0], [1.0, 1.0]], dtype=torch.double)
+
+    def initialize(self, config):
+        raise NotImplementedError
+
+    def evaluate(self, X: torch.Tensor) -> EvaluationBatch:
+        self.evaluate_calls += 1
+        if self._fail_evaluate:
+            raise RuntimeError("synthetic evaluation failure")
+        n = X.shape[0]
+        new_X = torch.cat([self._history.X, X], dim=0)
+        new_obj = torch.cat(
+            [self._history.objectives, X.sum(dim=-1, keepdim=True) / 2], dim=0
+        )
+        new_cons = torch.zeros((new_X.shape[0], 0), dtype=torch.double)
+        new_feas = torch.ones((new_X.shape[0], 1), dtype=torch.bool)
+        self._history = EvaluationBatch(
+            X=new_X, objectives=new_obj, constraints=new_cons, feasible=new_feas
+        )
+        self._fitted = False
+        self.last_evaluated = X
+        return EvaluationBatch(
+            X=X.clone(),
+            objectives=new_obj[-n:],
+            constraints=new_cons[-n:],
+            feasible=new_feas[-n:],
+        )
+
+    def fit(self) -> None:
+        self.fit_calls += 1
+        self._fitted = True
+
+    def propose(self, n: int = 1) -> torch.Tensor:
+        self.propose_calls += 1
+        return self._propose_value.clone()
+
+    def get_history(self) -> EvaluationBatch:
+        return self._history
+
+
+class FixedPolicy:
+    """Returns a pre-set action. Tracks call count."""
+
+    def __init__(self, action) -> None:
+        self.action = action
+        self.calls = 0
+
+    def reset(self) -> None:
+        self.calls = 0
+
+    def select_action(self, state, backend=None):
+        self.calls += 1
+        return self.action
