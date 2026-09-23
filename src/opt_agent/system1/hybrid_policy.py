@@ -171,6 +171,15 @@ class HybridPolicy:
                 f"{params['n_samples']} but only "
                 f"{state.resource.remaining_budget} budget remains."
             )
+        # Phase 12: register the current state with the router so an
+        # OOD-aware router can consult the OOD detector. Routers that
+        # accept a `state` parameter (per OODAwareRouter.update) are
+        # notified; the base Router Protocol's update() is a 3-arg
+        # online-learning hook and must NOT be called here.
+        import inspect
+        update_sig = inspect.signature(self._router.update)
+        if "state" in update_sig.parameters:
+            self._router.update(state=state)  # type: ignore[call-arg]
         route = self._router.route(probs)
         if route.name == "system1":
             chosen = action

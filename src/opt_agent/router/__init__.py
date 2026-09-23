@@ -8,9 +8,13 @@ Per codex gpt-6-sol review 2026-09-23 (major M3):
   - Threshold is a flow parameter (`tau_conf`); it must be tuned on the
     calibration split and reported on an independent test split, not
     hard-coded by the call site.
+  - Phase 12: OODAwareRouter adds a second escalation signal — when
+    the current BO state is itself out-of-distribution, the router
+    escalates even if System-1's confidence is artificially high.
 """
 
 from opt_agent.router.base import Route, Router
 from opt_agent.router.confidence import ConfidenceRouter
+from opt_agent.router.ood_aware import OODAwareRouter
 
-__all__ = ["Route", "Router", "ConfidenceRouter"]
+__all__ = ["Route", "Router", "ConfidenceRouter", "OODAwareRouter"]
