@@ -390,6 +390,40 @@ def test_llm_system2_drops_out_of_range_step() -> None:
     assert s.fallback_count == 1
 
 
+def test_llm_system2_drops_overflow_n_samples() -> None:
+    """`n_samples: 1e309` would raise OverflowError in `int(v)`. The
+    parser catches it and drops the override with a fallback note."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": 1e309}, "overflow n_samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    # The candidate's default n_samples wins; no crash.
+    assert decision.action.params["n_samples"] >= 1
+    assert s.fallback_count == 1
+    assert "unrepresentable" in decision.reasoning
+
+
+def test_llm_system2_step_drop_keeps_valid_overrides() -> None:
+    """Per codex gpt-6-sol 2026-09-24: if the LLM supplies BOTH a
+    failing `step=5.0` and a valid `seed=7`, only the failing step is
+    dropped; the seed override must still apply."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "local_exploitation", {"step": 5.0, "seed": 7}, "mixed overrides",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    # step falls back to the candidate default (0.1).
+    assert decision.action.params["step"] == pytest.approx(0.1)
+    # seed override survives (seed=7 is valid).
+    assert decision.action.params["seed"] == 7
+    assert s.fallback_count == 1
+    # The fallback note records the dropped step but not the seed.
+    assert "step" in decision.reasoning
+    assert "seed" not in decision.reasoning.split("LLM overrides")[1].split(";")[0] \
+        if "LLM overrides" in decision.reasoning else True
+
+
 def test_llm_system2_fallback_count_increments_on_unparseable() -> None:
     s = LLMSystem2(client=_FakeClient(body={
         "id": "x",
