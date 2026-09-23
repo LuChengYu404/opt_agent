@@ -392,14 +392,16 @@ def _acceptance_check(runs: list[RunResult], *, n_init: int) -> tuple[bool, list
                 f"beyond n_init={n_init}"
             )
     # Per-step budget invariant: total samples consumed across decision
-    # steps never exceeds the remaining budget (n_init is the bootstrap
-    # batch and is NOT counted here).
+    # steps never exceeds the post-bootstrap budget (the n_init samples
+    # are consumed by initialize() before any decision step runs).
     for r in runs:
         total = sum(s.n_new_samples for s in r.steps)
-        if total > r.total_budget:
+        post_bootstrap = r.total_budget - n_init
+        if total > post_bootstrap:
             errors.append(
                 f"{r.problem}/seed={r.seed}/{r.policy_name}: "
-                f"decision-step samples {total} > budget {r.total_budget}"
+                f"decision-step samples {total} > post-bootstrap budget "
+                f"{post_bootstrap} (= total_budget {r.total_budget} - n_init {n_init})"
             )
     return (len(errors) == 0), errors
 

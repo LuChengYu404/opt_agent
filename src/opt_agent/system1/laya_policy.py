@@ -103,6 +103,7 @@ class LayaPolicy:
         self._agent = agent
         self.last_decision: LayaDecision | None = None
         self.decisions: list[LayaDecision] = []
+        self._mismatched_choice_count = 0
 
     def reset(self) -> None:
         self.last_decision = None
@@ -161,6 +162,17 @@ class LayaPolicy:
         if total <= 0:
             raise ValueError("Laya probabilities must have positive total mass")
         probabilities = {name: value / total for name, value in probabilities.items()}
+        # Per codex gpt-6-sol review 2026-09-24: the LLM's `choice` and the
+        # `probabilities` dict are independent inputs — the agent might
+        # emit a choice that doesn't match argmax(probabilities). Treat
+        # that as a model-side inconsistency: trust the probabilities
+        # (deterministic argmax) over the LLM's stated choice. This
+        # keeps the System-1 → System-2 handoff well-defined: the
+        # recorded `decision.action` is always the argmax action.
+        argmax_action = max(probabilities, key=probabilities.get)
+        if selected != argmax_action:
+            self._mismatched_choice_count += 1
+            selected = argmax_action
         confidence = float(answer.get("confidence", probabilities[selected]))
         if not math.isfinite(confidence) or not 0 <= confidence <= 1:
             raise ValueError("Laya confidence must lie in [0, 1]")

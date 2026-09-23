@@ -223,8 +223,12 @@ class LLMSystem2(System2Policy):
                 reason=f"LLM returned unknown action_id={action_id!r}",
             )
         # Use the candidate's params as the base; LLM `params` are
-        # overrides filtered through `_ALLOWED_PARAMS` and a budget
-        # check on `n_samples`.
+        # overrides filtered through `_ALLOWED_PARAMS`, a budget
+        # check on `n_samples`, and a TYPE check on numeric values.
+        # Per codex gpt-6-sol review 2026-09-24: a non-numeric value
+        # (e.g. `n_samples: "2"`) must NOT raise TypeError mid-build;
+        # it is dropped with a `fallback:` note so the loop stays
+        # running.
         base = candidates[action_id]
         merged = dict(base.params)
         params = parsed.get("params") or {}
@@ -237,10 +241,27 @@ class LLMSystem2(System2Policy):
             if k not in allowed:
                 overrides_dropped.append(f"{k}=not_allowed")
                 continue
-            if k == "n_samples" and v > remaining_budget:
-                overrides_dropped.append(f"n_samples={v}>budget={remaining_budget}")
+            if not isinstance(v, (int, float)) or isinstance(v, bool):
+                overrides_dropped.append(f"{k}=not_numeric({type(v).__name__})")
                 continue
-            merged[k] = v
+            # Preserve the original Python type for downstream validators:
+            # OptimizationAction requires ints for n_samples / seed.
+            v_typed = int(v) if isinstance(v, int) and not isinstance(v, bool) else float(v)
+            if k == "n_samples":
+                if v_typed > remaining_budget:
+                    overrides_dropped.append(
+                        f"n_samples={v_typed}>budget={remaining_budget}"
+                    )
+                    continue
+                if v_typed <= 0:
+                    overrides_dropped.append(
+                        f"n_samples={v_typed}<=0"
+                    )
+                    continue
+            elif v_typed < 0:
+                overrides_dropped.append(f"{k}={v_typed}<0")
+                continue
+            merged[k] = v_typed
             overrides_applied.append(k)
         reasoning = str(parsed.get("reasoning", ""))
         if overrides_dropped:

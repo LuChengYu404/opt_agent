@@ -273,6 +273,60 @@ def test_llm_system2_drops_disallowed_param_keys() -> None:
     assert s.fallback_count == 1  # fake_param was dropped
 
 
+def test_llm_system2_drops_non_numeric_n_samples() -> None:
+    """Per codex gpt-6-sol 2026-09-24: a non-numeric `n_samples`
+    (e.g. the LLM emits "2" as a string) must NOT raise TypeError;
+    it is dropped with a fallback note."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": "2"}, "string n_samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert decision.action.type == ActionType.GLOBAL_EXPLORATION
+    # The string "2" was dropped — candidate default n_samples=2 wins.
+    assert decision.action.params["n_samples"] == 2
+    assert s.fallback_count == 1
+    assert "n_samples=not_numeric" in decision.reasoning
+
+
+def test_llm_system2_drops_zero_n_samples() -> None:
+    """n_samples <= 0 makes no semantic sense and is dropped."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": 0}, "zero samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert decision.action.params["n_samples"] >= 1
+    assert s.fallback_count == 1
+    assert "n_samples=0<=0" in decision.reasoning or "n_samples=0.0<=0" in decision.reasoning
+
+
+def test_llm_system2_drops_negative_seed() -> None:
+    """Negative numeric seeds are dropped (seed must be non-negative)."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"seed": -1}, "negative seed",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    # Default seed (positive, from candidate) wins.
+    assert decision.action.params["seed"] >= 0
+    assert s.fallback_count == 1
+    assert "seed=-1<0" in decision.reasoning or "seed=-1.0<0" in decision.reasoning
+
+
+def test_llm_system2_drops_boolean_n_samples() -> None:
+    """Booleans pass the isinstance(int,float) check; we exclude them
+    explicitly because True/False as n_samples makes no sense."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": True}, "bool n_samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert decision.action.params["n_samples"] != True
+    assert decision.action.params["n_samples"] >= 1
+    assert s.fallback_count == 1
+
+
 def test_llm_system2_fallback_count_increments_on_unparseable() -> None:
     s = LLMSystem2(client=_FakeClient(body={
         "id": "x",
