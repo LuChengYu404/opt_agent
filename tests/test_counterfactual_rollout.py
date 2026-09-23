@@ -319,8 +319,9 @@ def test_real_branin_rollout_finds_different_utilities() -> None:
     )
 
     utilities = {r.action_id: r.utility for r in out.results}
-    # STOP should have utility 0 (cost 0, delta_opt 0).
-    assert utilities["stop"] == 0.0
+    # STOP has zero cost + small Δopt, but Phase 8.5 adds a negative
+    # w_stop_opportunity * remaining_budget_ratio penalty.
+    assert utilities["stop"] <= 0
     # RETRAIN costs a fit (negative utility via w_fit * 1) but no eval.
     assert utilities["retrain"] < 0
     # SURROGATE_ACQUISITION should also have negative utility from the implicit

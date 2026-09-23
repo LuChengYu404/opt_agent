@@ -224,12 +224,17 @@ def _do_boundary_sampling(backend: UnifiedBackend, action: OptimizationAction) -
     span = (bounds[1] - bounds[0]).clamp(min=1e-12)
     dist_to_edge = torch.minimum(grid - bounds[0], bounds[1] - grid) / span
     nearest = dist_to_edge.min(dim=-1).values
-    # Keep only those within tol (or top-n if fewer than n_samples qualify).
+    # Phase 8.5 fix: select points whose `nearest < tol`, not "first n non-zero".
+    # Previously `nearest.argwhere()[:n_samples]` returned the first n indices of
+    # the Sobol grid regardless of their actual distance to the edge — making
+    # BOUNDARY_SAMPLING identical to GLOBAL_EXPLORATION.
     mask = nearest < tol
-    if mask.sum() < n_samples:
-        # not enough near-boundary points — take the top-n closest.
-        top_idx = nearest.argsort()[:n_samples]
+    qualifying = mask.nonzero(as_tuple=False).flatten()
+    if qualifying.numel() >= n_samples:
+        # Take the qualifying indices, sorted by distance to edge (closest first).
+        top_idx = qualifying[nearest[qualifying].argsort()[:n_samples]]
     else:
-        top_idx = nearest.argwhere()[:n_samples].flatten()
+        # Fallback: not enough near-boundary points — take the n closest overall.
+        top_idx = nearest.argsort()[:n_samples]
     selected = grid[top_idx]
     backend.evaluate(selected)

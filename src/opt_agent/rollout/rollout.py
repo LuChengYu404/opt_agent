@@ -113,14 +113,22 @@ class CounterfactualRollout:
         utility_weights: UtilityWeights | None = None,
         continuation_policy_factory: ContinuationFactory | None = None,
         max_rollout_steps: int = 200,
+        optimization_scale: float = 1.0,
+        evaluation_scale: float = 1.0,
+        fit_scale: float = 1.0,
     ) -> None:
         if horizon < 1:
             raise ValueError(f"horizon must be >= 1; got {horizon}")
+        if min(optimization_scale, evaluation_scale, fit_scale) <= 0:
+            raise ValueError("utility scales must be positive")
         self.backend = backend
         self.horizon = horizon
         self.weights = utility_weights or UtilityWeights()
         self.continuation_policy_factory = continuation_policy_factory or _default_factory
         self.max_rollout_steps = max_rollout_steps
+        self.optimization_scale = optimization_scale
+        self.evaluation_scale = evaluation_scale
+        self.fit_scale = fit_scale
 
     def rollout(
         self,
@@ -241,6 +249,11 @@ class CounterfactualRollout:
             n_new_samples=n_new,
             n_model_fits=n_fits,
             weights=self.weights,
+            optimization_scale=self.optimization_scale,
+            evaluation_scale=self.evaluation_scale,
+            fit_scale=self.fit_scale,
+            is_stop=(candidate.action.type.name == "STOP"),
+            remaining_budget_ratio=branch_state.resource.remaining_budget_ratio,
         )
         return CounterfactualResult(
             action_id=candidate.action_id,

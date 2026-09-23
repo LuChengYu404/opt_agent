@@ -42,16 +42,29 @@ def _min_pairwise_distance(X: torch.Tensor) -> float:
 
 
 def _boundary_coverage(X: torch.Tensor, bounds: torch.Tensor, tol: float) -> float:
-    """Fraction of samples within `tol` of any bound edge, normalized to bounds range."""
+    """Fraction of samples within `tol` of any bounds edge.
+
+    Phase 8.5 fix: validate bounds span > 0, validate samples are inside bounds,
+    and use unit-cube normalized distance so the result is affine-invariant.
+
+    Note (per codex): this is a "boundary-fraction" metric, NOT a true
+    boundary coverage metric. Duplicates at one corner still score highly,
+    and baseline increases with dimension. A grid-based fill-distance metric
+    would be more rigorous but is out of scope for Phase 8.5.
+    """
     if X.shape[0] == 0:
         return 0.0
-    span = (bounds[1] - bounds[0]).clamp(min=1e-12)
-    # Distance to nearest bound, normalized by span.
-    dist_to_lo = (X - bounds[0]) / span
-    dist_to_hi = (bounds[1] - X) / span
-    nearest = torch.minimum(dist_to_lo, dist_to_hi).clamp(min=0.0)
-    near = (nearest < tol).any(dim=-1)  # [n]
-    return float(near.float().mean().item())
+    if not 0.0 <= tol <= 0.5:
+        raise ValueError(f"tol must be in [0, 0.5]; got {tol}")
+    span = bounds[1] - bounds[0]
+    if torch.any(span <= 0):
+        raise ValueError("bounds must have positive span")
+    unit = (X - bounds[0]) / span
+    eps = 10 * torch.finfo(unit.dtype).eps
+    if torch.any((unit < -eps) | (unit > 1.0 + eps)):
+        raise ValueError("samples lie outside bounds")
+    near = ((unit <= tol) | (unit >= 1.0 - tol)).any(dim=-1)
+    return float(near.to(torch.double).mean().item())
 
 
 def _validation_rmse(backend: UnifiedBackend) -> float:
