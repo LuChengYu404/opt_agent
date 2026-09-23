@@ -12,6 +12,7 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import math
 import random
@@ -25,6 +26,7 @@ from opt_agent.actions import (
 )
 from opt_agent.actions.models import ActionResult
 from opt_agent.backend.bocode_botorch import BackendConfig, UnifiedBackend
+from opt_agent.backend.checkpoint import Checkpoint
 from opt_agent.dataset.decision_record import DecisionRecord, _json_safe
 from opt_agent.loop.policies import RandomPolicy, RulePolicy
 from opt_agent.rollout import (
@@ -202,6 +204,9 @@ class DatasetGenerator:
                     temperature=self.config.temperature,
                     include_invalid_as_zero=True,
                 )
+                # Preserve the complete decision point, including a fitted GP
+                # and RNG state. History alone cannot faithfully replay it.
+                replay_checkpoint = backend.checkpoint()
                 yield self._make_record(
                     problem=problem,
                     problem_seed=problem_seed,
@@ -215,6 +220,7 @@ class DatasetGenerator:
                     optimization_scale=optimization_scale,
                     evaluation_scale=evaluation_scale,
                     fit_scale=fit_scale,
+                    replay_checkpoint=replay_checkpoint,
                 )
 
             # Behavior policy — NEVER samples from gold_probs.
@@ -243,7 +249,29 @@ class DatasetGenerator:
         optimization_scale: float,
         evaluation_scale: float,
         fit_scale: float,
+        replay_checkpoint: Checkpoint | None = None,
     ) -> DecisionRecord:
+        # Phase 8.6B: serialize enough backend state for exact replay.
+        replay_meta: dict = {}
+        if replay_checkpoint is not None:
+            cp = replay_checkpoint
+            replay_meta = {
+                "backend_X": cp.X.detach().cpu().tolist(),
+                "backend_objectives": cp.objectives.detach().cpu().tolist(),
+                "backend_constraints": cp.constraints.detach().cpu().tolist(),
+                "backend_id": cp.backend_id,
+                "backend_problem_id": cp.problem_id,
+                "backend_problem_bounds": cp.problem_bounds,
+                "backend_fitted": cp.fitted,
+                "backend_model_state_b64": (
+                    base64.b64encode(cp.model_state_dict).decode("ascii")
+                    if cp.model_state_dict is not None else None
+                ),
+                "backend_rng_state_b64": (
+                    base64.b64encode(cp.torch_rng_state).decode("ascii")
+                    if cp.torch_rng_state is not None else None
+                ),
+            }
         return DecisionRecord(
             id=f"{problem.lower()}:{problem_seed}:{trajectory_id}:{step}",
             problem={
@@ -279,11 +307,12 @@ class DatasetGenerator:
                 "trajectory_id": int(trajectory_id),
                 "step": int(step),
                 "run_seed": int(run_seed),
-                "utility_version": "phase8.6a",
+                "utility_version": "phase8.6b",
                 "optimization_scale": float(optimization_scale),
                 "evaluation_scale": float(evaluation_scale),
                 "fit_scale": float(fit_scale),
                 "horizon": int(self.config.horizon),
                 "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+                **replay_meta,
             },
         )

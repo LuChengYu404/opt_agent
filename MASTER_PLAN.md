@@ -1573,6 +1573,14 @@ Engineering Transfer
 
 > 不进入下一阶段。
 
+### 2026-09-23 执行顺序调整
+
+Phase 8.6B 的三步 rollout 标签在 Branin 上未通过完整预算的终局效果检验。
+这个问题保留为后续研究方向，详见 `PROGRESS.md`。当前先完成双模型和路由的
+工程闭环：Phase 9 可接入 Laya zero-shot 参考基线，随后接入 System-2 与
+Router，并运行完整预算对照。基于这些暂定标签的 System-1 监督训练及性能
+提升结论，仍需通过独立种子的终局评估后才能成立。
+
 ---
 
 ## 32. 当前第一个 Milestone

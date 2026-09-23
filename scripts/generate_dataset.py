@@ -4,6 +4,7 @@ Usage:
     uv run python scripts/generate_dataset.py runs/dataset.jsonl
     uv run python scripts/generate_dataset.py runs/dataset.jsonl --quick
     uv run python scripts/generate_dataset.py runs/dataset.jsonl --force
+    uv run python scripts/generate_dataset.py runs/dataset.jsonl --seeds 10 --horizon 3
 
 Per codex (gpt-5.6-sol) review 2025-09-23:
   - Atomic write: write to .tmp, then rename on success.
@@ -32,13 +33,25 @@ def main() -> int:
                         help="Use a minimal spec for fast smoke testing.")
     parser.add_argument("--force", action="store_true",
                         help="Overwrite existing output file.")
+    parser.add_argument("--seeds", type=int, default=1,
+                        help="Number of independent problem seeds (0 through N-1).")
+    parser.add_argument("--horizon", type=int, default=1,
+                        help="Counterfactual actions per branch.")
+    parser.add_argument("--trajectories-per-seed", type=int, default=1)
     args = parser.parse_args()
+    if min(args.seeds, args.horizon, args.trajectories_per_seed) < 1:
+        parser.error("--seeds, --horizon and --trajectories-per-seed must be positive")
 
     if args.output.exists() and not args.force:
         print(f"error: {args.output} exists; pass --force to replace it", file=sys.stderr)
         return 1
 
-    spec = DatasetConfig()
+    spec = replace(
+        DatasetConfig(),
+        seeds=tuple(range(args.seeds)),
+        horizon=args.horizon,
+        trajectories_per_problem_seed=args.trajectories_per_seed,
+    )
     if args.quick:
         spec = replace(
             spec,

@@ -14,11 +14,14 @@ from opt_agent.dataset.generator import (
 )
 from opt_agent.dataset.validation import (
     EXPLORATION_ACTIONS,
+    Gate2Result,
     MassGateResult,
     OracleResult,
     aggregate_mass,
     affine_rescaling_test,
+    gate2_stability,
     oracle_test,
+    oracle_test_from_record,
     phase_of,
 )
 
@@ -28,6 +31,7 @@ __all__ = [
     "DatasetStats",
     "DecisionRecord",
     "EXPLORATION_ACTIONS",
+    "Gate2Result",
     "MassGateResult",
     "OracleResult",
     "aggregate_mass",
@@ -35,8 +39,10 @@ __all__ = [
     "analyze_dataset",
     "derive_run_seed",
     "full_candidates",
+    "gate2_stability",
     "iter_jsonl",
     "oracle_test",
+    "oracle_test_from_record",
     "phase_of",
     "validate_record",
     "write_jsonl",

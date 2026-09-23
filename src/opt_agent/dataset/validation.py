@@ -17,6 +17,7 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
 
 from __future__ import annotations
 
+import base64
 import math
 import random
 import statistics
@@ -25,6 +26,7 @@ from dataclasses import dataclass
 from typing import Callable, Iterable
 
 import numpy as np
+import torch
 
 from opt_agent.actions import (
     ActionType,
@@ -153,6 +155,8 @@ def _run_arm(
     before each arm; we just consume the backend as-is from `initial_state`.
     """
     current = initial_state
+    if current.resource.remaining_budget <= 0:
+        return float(current.optimization.best_value), 0
     for step in range(max_actions):
         action = first_action if step == 0 else choose_next(current, backend)
         result = execute_action(backend, current, action)
@@ -182,10 +186,14 @@ def oracle_test(
     random_replicates: int = 5,
     max_actions: int = 50,
 ) -> OracleResult:
-    """Run gold / stop / uniform / behavior arms from the decision point.
+    """Compare first actions with the same RulePolicy continuation.
 
     The backend is restored to its pre-call state at the end (try/finally).
     """
+    if not math.isfinite(objective_scale) or objective_scale <= 0:
+        raise ValueError("objective_scale must be finite and positive")
+    if random_replicates < 1:
+        raise ValueError("random_replicates must be positive")
     base = backend.checkpoint()
     total_budget = int(state.resource.total_budget)
     specs = {x["action_id"]: x for x in record.candidate_actions}
@@ -195,15 +203,18 @@ def oracle_test(
         spec = specs[action_id]
         return OptimizationAction(ActionType(spec["type"]), dict(spec["params"]))
 
+    continuation_seed = derive_seed(int(record.metadata["run_seed"]), 1)
+    def choose_continuation(s, b):
+        return RulePolicy(seed=continuation_seed).select_action(s, b)
+
     try:
         # Gold: gold top action, then RulePolicy continuation.
-        gold_rule = RulePolicy(seed=derive_seed(int(record.metadata["run_seed"]), 1))
         _restore_backend(backend, base)
         gold = _run_arm(
             backend,
             initial_state=state,
             first_action=action_from_id(gold_id),
-            choose_next=lambda s, b: gold_rule.select_action(s, b),
+            choose_next=choose_continuation,
             total_budget=total_budget,
             max_actions=max_actions,
         )
@@ -218,7 +229,8 @@ def oracle_test(
             total_budget=total_budget,
             max_actions=max_actions,
         )
-        # Uniform + behavior: random pick at every step.
+        # Baselines differ only in their first action; all non-STOP arms then
+        # use the same continuation, isolating the decision being evaluated.
         uniform_results: list[float] = []
         behavior_results: list[float] = []
         for rep in range(random_replicates):
@@ -229,7 +241,7 @@ def oracle_test(
                 backend,
                 initial_state=state,
                 first_action=u_policy.select_action(state, backend),
-                choose_next=lambda s, b, p=u_policy: p.select_action(s, b),
+                choose_next=choose_continuation,
                 total_budget=total_budget,
                 max_actions=max_actions,
             )
@@ -251,7 +263,7 @@ def oracle_test(
                 backend,
                 initial_state=state,
                 first_action=choose_behavior(state, backend),
-                choose_next=choose_behavior,
+                choose_next=choose_continuation,
                 total_budget=total_budget,
                 max_actions=max_actions,
             )[0])
@@ -272,6 +284,110 @@ def oracle_test(
         )
     finally:
         backend.restore(base)
+
+
+# ---------------------------------------------------------------------------
+# Gate 4 — replayable oracle test (Phase 8.6B)
+# ---------------------------------------------------------------------------
+
+
+def oracle_test_from_record(
+    record: DecisionRecord,
+    *,
+    random_replicates: int = 5,
+    max_actions: int = 200,
+    backend_factory: Callable | None = None,
+) -> OracleResult:
+    """Replay a DecisionRecord's backend state and run the oracle test.
+
+    The record must contain a complete backend checkpoint. A fresh backend
+    restores that checkpoint before the paired oracle arms are run.
+
+    Parameters
+    ----------
+    backend_factory : Callable | None
+        Optional factory returning a fresh backend. Defaults to a
+        BocodeBotorchBackend reconstructed with the problem id from the record.
+    """
+    from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
+    from opt_agent.backend.checkpoint import Checkpoint
+
+    meta = record.metadata
+    required = (
+        "backend_X", "backend_objectives", "backend_constraints",
+        "backend_id", "backend_problem_id", "backend_problem_bounds",
+        "backend_fitted", "backend_model_state_b64", "backend_rng_state_b64",
+    )
+    for key in required:
+        if key not in meta:
+            raise ValueError(
+                f"record {record.id!r} missing {key!r} in metadata. "
+                "Re-generate dataset with Phase 8.6B replay support."
+            )
+
+    X = torch.tensor(meta["backend_X"], dtype=torch.double)
+    Y = torch.tensor(meta["backend_objectives"], dtype=torch.double)
+    C = torch.tensor(meta["backend_constraints"], dtype=torch.double)
+
+    fitted = bool(meta["backend_fitted"])
+    model_bytes = (
+        base64.b64decode(meta["backend_model_state_b64"], validate=True)
+        if meta["backend_model_state_b64"] is not None else None
+    )
+    rng_bytes = (
+        base64.b64decode(meta["backend_rng_state_b64"], validate=True)
+        if meta["backend_rng_state_b64"] is not None else None
+    )
+    if fitted and model_bytes is None:
+        raise ValueError(f"record {record.id!r} has fitted GP but no model state")
+    if rng_bytes is None:
+        raise ValueError(f"record {record.id!r} has no RNG state")
+
+    problem_id = str(meta["backend_problem_id"])
+    if backend_factory is None:
+        backend = BocodeBotorchBackend()
+        backend.initialize(BackendConfig(
+            problem_id=problem_id,
+            seed=int(record.problem["seed"]),
+            n_init=1,
+        ))
+    else:
+        backend = backend_factory()
+    backend.restore(Checkpoint(
+        backend_id=str(meta["backend_id"]),
+        problem_id=problem_id,
+        problem_bounds=[tuple(b) for b in meta["backend_problem_bounds"]],
+        X=X, objectives=Y, constraints=C,
+        fitted=fitted,
+        model_state_dict=model_bytes,
+        torch_rng_state=rng_bytes,
+    ))
+
+    state = extract_state(
+        backend,
+        total_budget=int(record.state["resource"]["total_budget"]),
+        last_action=record.state["history"].get("last_action"),
+    )
+    if state.sampling.n_samples != int(record.state["sampling"]["n_samples"]):
+        raise ValueError(f"record {record.id!r} replay sample count differs")
+    if not math.isclose(
+        state.optimization.best_value,
+        float(record.state["optimization"]["best_value"]),
+        rel_tol=1e-9,
+        abs_tol=1e-9,
+    ):
+        raise ValueError(f"record {record.id!r} replay best value differs")
+    if state.surrogate.is_current != bool(record.state["surrogate"]["is_current"]):
+        raise ValueError(f"record {record.id!r} replay surrogate status differs")
+    objective_scale = float(meta.get("optimization_scale", 1.0))
+    return oracle_test(
+        backend,
+        state,
+        record,
+        objective_scale=objective_scale,
+        random_replicates=random_replicates,
+        max_actions=max_actions,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -370,3 +486,115 @@ def _summarize_by_problem_phase(rows: list[dict]) -> list[dict]:
             "mean_js": statistics.fmean(jss),
         })
     return out
+
+
+# ---------------------------------------------------------------------------
+# Gate 2 — multi-seed stability (Phase 8.6B)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Gate2Result:
+    """Per-problem, per-phase stability report.
+
+    Per the codex Phase 9 gate:
+      - ≥ 10 independent seeds
+      - per-seed stability of top-action distribution
+      - point estimate or seed-clustered CI > 0 for adjusted_lift
+    """
+    problems: dict[str, dict[str, dict]]  # problem → phase → stats
+    per_seed_lift: dict[tuple[str, str, int], float]  # (problem, phase, seed)
+    total_seeds: int  # minimum independent seed count across problems
+    min_phase_seeds: int
+    pass_: bool
+
+    def summary(self) -> str:
+        lines = [
+            f"Gate 2 — multi-seed stability ({self.total_seeds} seeds/problem; "
+            f"minimum {self.min_phase_seeds} seeds/phase)"
+        ]
+        for problem, phases in self.problems.items():
+            for phase, stats in phases.items():
+                lines.append(
+                    f"  {problem} {phase}: n_records={stats['n_records']}, "
+                    f"top_action={stats['top_action']!r}, "
+                    f"top_action_share={stats['top_action_share']:.2f}, "
+                    f"mean_adj_lift={stats['mean_adjusted_lift']:.3f}"
+                )
+        lines.append(f"  pass = {self.pass_}")
+        return "\n".join(lines)
+
+
+def gate2_stability(records: list[DecisionRecord]) -> Gate2Result:
+    """Compute Gate 2 stability metrics from a multi-seed dataset.
+
+    Per (problem, phase):
+      - n_records: count of records
+      - top_action: most-frequent gold argmax
+      - top_action_share: fraction of records with that argmax
+      - mean_adjusted_lift: average of log-lift across records
+
+    Pass criterion: at least 10 independent seeds per problem, at least 5
+    seeds in every observed nonterminal phase, and the same top action in
+    at least 60% of seed-level mean probability distributions. Multiple
+    trajectories from one seed count as one independent observation.
+    """
+    by_problem_phase_seed: dict[tuple[str, str, int], list[DecisionRecord]] = (
+        defaultdict(list)
+    )
+    for r in records:
+        phase = phase_of(r)
+        key = (r.problem["family"], phase, int(r.problem["seed"]))
+        by_problem_phase_seed[key].append(r)
+
+    per_seed_lift: dict[tuple[str, str, int], float] = {}
+    by_problem_phase: dict[tuple[str, str], list[tuple[int, list[DecisionRecord]]]] = defaultdict(list)
+    for (problem, phase, seed), recs in by_problem_phase_seed.items():
+        if phase != "terminal":
+            by_problem_phase[(problem, phase)].append((seed, recs))
+
+    grouped: dict[str, dict[str, dict]] = defaultdict(dict)
+    for (problem, phase), seed_groups in sorted(by_problem_phase.items()):
+        top_counts: dict[str, int] = defaultdict(int)
+        seed_lifts: list[float] = []
+        for seed, recs in seed_groups:
+            action_ids = recs[0].gold_probs.keys()
+            mean_probs = {
+                action: statistics.fmean(r.gold_probs[action] for r in recs)
+                for action in action_ids
+            }
+            top_counts[max(mean_probs, key=mean_probs.get)] += 1
+            lift = statistics.fmean(_lift(r.gold_probs)[1] for r in recs)
+            per_seed_lift[(problem, phase, seed)] = lift
+            seed_lifts.append(lift)
+        top_action, top_count = max(top_counts.items(), key=lambda kv: kv[1])
+        grouped[problem][phase] = {
+            "n_records": sum(len(recs) for _, recs in seed_groups),
+            "n_seeds": len(seed_groups),
+            "top_action": top_action,
+            "top_action_share": top_count / len(seed_groups),
+            "mean_adjusted_lift": statistics.fmean(seed_lifts),
+        }
+
+    min_phase_seeds = min(
+        (stats["n_seeds"] for phases in grouped.values() for stats in phases.values()),
+        default=0,
+    )
+    seeds_by_problem: dict[str, set[int]] = defaultdict(set)
+    for (problem, phase, seed) in by_problem_phase_seed:
+        if phase != "terminal":
+            seeds_by_problem[problem].add(seed)
+    min_seeds = min((len(seeds) for seeds in seeds_by_problem.values()), default=0)
+    concentration_ok = all(
+        stats["top_action_share"] >= 0.6
+        for phases in grouped.values() for stats in phases.values()
+    )
+    pass_ = min_seeds >= 10 and min_phase_seeds >= 5 and concentration_ok
+
+    return Gate2Result(
+        problems=dict(grouped),
+        per_seed_lift=per_seed_lift,
+        total_seeds=min_seeds,
+        min_phase_seeds=min_phase_seeds,
+        pass_=pass_,
+    )

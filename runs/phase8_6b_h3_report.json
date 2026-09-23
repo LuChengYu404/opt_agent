@@ -1,0 +1,870 @@
+{
+  "dataset": "runs/phase8_6b_h3_10seed.jsonl",
+  "gate2": {
+    "min_phase_seeds": 7,
+    "min_problem_seeds": 10,
+    "pass": false,
+    "problems": {
+      "ackley": {
+        "early": {
+          "mean_adjusted_lift": 1.330871833952719,
+          "n_records": 20,
+          "n_seeds": 10,
+          "top_action": "local_exploitation",
+          "top_action_share": 0.7
+        },
+        "late": {
+          "mean_adjusted_lift": 0.17253446589307347,
+          "n_records": 14,
+          "n_seeds": 7,
+          "top_action": "local_exploitation",
+          "top_action_share": 0.7142857142857143
+        },
+        "mid": {
+          "mean_adjusted_lift": 0.39070313135507534,
+          "n_records": 31,
+          "n_seeds": 9,
+          "top_action": "local_exploitation",
+          "top_action_share": 0.5555555555555556
+        }
+      },
+      "branin": {
+        "early": {
+          "mean_adjusted_lift": 0.5219160879591914,
+          "n_records": 17,
+          "n_seeds": 10,
+          "top_action": "retrain_surrogate",
+          "top_action_share": 0.4
+        },
+        "late": {
+          "mean_adjusted_lift": 0.042943739609528124,
+          "n_records": 19,
+          "n_seeds": 9,
+          "top_action": "local_exploitation",
+          "top_action_share": 0.4444444444444444
+        },
+        "mid": {
+          "mean_adjusted_lift": 0.2184384222002032,
+          "n_records": 50,
+          "n_seeds": 10,
+          "top_action": "retrain_surrogate",
+          "top_action_share": 0.8
+        }
+      },
+      "hartmann": {
+        "early": {
+          "mean_adjusted_lift": 3.1577646839169384,
+          "n_records": 14,
+          "n_seeds": 10,
+          "top_action": "retrain_surrogate",
+          "top_action_share": 0.7
+        },
+        "late": {
+          "mean_adjusted_lift": 0.26373981254043055,
+          "n_records": 15,
+          "n_seeds": 9,
+          "top_action": "local_exploitation",
+          "top_action_share": 0.4444444444444444
+        },
+        "mid": {
+          "mean_adjusted_lift": 1.5967210829186924,
+          "n_records": 46,
+          "n_seeds": 10,
+          "top_action": "surrogate_acquisition",
+          "top_action_share": 0.4
+        }
+      }
+    }
+  },
+  "gate3": {
+    "adjusted_lift_mean": 1.6701842019429496,
+    "pass": true,
+    "seed_rows": [
+      {
+        "adjusted_lift": 0.45849970966624487,
+        "problem": "branin",
+        "raw": 0.4412688772590957,
+        "seed": 0
+      },
+      {
+        "adjusted_lift": 0.4778378882783759,
+        "problem": "branin",
+        "raw": 0.4442811920269475,
+        "seed": 1
+      },
+      {
+        "adjusted_lift": 0.49348595845894083,
+        "problem": "branin",
+        "raw": 0.44563106278746095,
+        "seed": 2
+      },
+      {
+        "adjusted_lift": 0.6821468738707297,
+        "problem": "branin",
+        "raw": 0.47518318572408125,
+        "seed": 3
+      },
+      {
+        "adjusted_lift": 0.5884892686496876,
+        "problem": "branin",
+        "raw": 0.42438751974323263,
+        "seed": 4
+      },
+      {
+        "adjusted_lift": 0.4927605186992272,
+        "problem": "branin",
+        "raw": 0.4477833961658872,
+        "seed": 5
+      },
+      {
+        "adjusted_lift": 0.539670725019082,
+        "problem": "branin",
+        "raw": 0.4299799124542565,
+        "seed": 6
+      },
+      {
+        "adjusted_lift": 0.6044234098623313,
+        "problem": "branin",
+        "raw": 0.47260517336690533,
+        "seed": 7
+      },
+      {
+        "adjusted_lift": 0.44847847194359336,
+        "problem": "branin",
+        "raw": 0.438238083404465,
+        "seed": 8
+      },
+      {
+        "adjusted_lift": 0.4333680551437018,
+        "problem": "branin",
+        "raw": 0.4339053595117972,
+        "seed": 9
+      },
+      {
+        "adjusted_lift": 1.3227524024236166,
+        "problem": "hartmann",
+        "raw": 0.4712867050068943,
+        "seed": 0
+      },
+      {
+        "adjusted_lift": 3.8638787164899995,
+        "problem": "hartmann",
+        "raw": 0.14160474856730637,
+        "seed": 1
+      },
+      {
+        "adjusted_lift": 0.43336805514331234,
+        "problem": "hartmann",
+        "raw": 0.41760836697938936,
+        "seed": 2
+      },
+      {
+        "adjusted_lift": 13.029685535798848,
+        "problem": "hartmann",
+        "raw": 0.9927710908157097,
+        "seed": 3
+      },
+      {
+        "adjusted_lift": 4.54430386391991,
+        "problem": "hartmann",
+        "raw": 0.08496981784007987,
+        "seed": 4
+      },
+      {
+        "adjusted_lift": 0.4333680551437018,
+        "problem": "hartmann",
+        "raw": 0.4339053595117972,
+        "seed": 5
+      },
+      {
+        "adjusted_lift": 6.371089645130083,
+        "problem": "hartmann",
+        "raw": 0.43278658141016013,
+        "seed": 6
+      },
+      {
+        "adjusted_lift": 0.6477980404226205,
+        "problem": "hartmann",
+        "raw": 0.28934352499091026,
+        "seed": 7
+      },
+      {
+        "adjusted_lift": 0.43336805514100285,
+        "problem": "hartmann",
+        "raw": 0.34156105260635805,
+        "seed": 8
+      },
+      {
+        "adjusted_lift": 0.4980344695562865,
+        "problem": "hartmann",
+        "raw": 0.42031253652162126,
+        "seed": 9
+      },
+      {
+        "adjusted_lift": 2.234026314938563,
+        "problem": "ackley",
+        "raw": 0.6956723902973488,
+        "seed": 0
+      },
+      {
+        "adjusted_lift": 1.8133657624177586,
+        "problem": "ackley",
+        "raw": 0.477409791808575,
+        "seed": 1
+      },
+      {
+        "adjusted_lift": 0.6134102431263904,
+        "problem": "ackley",
+        "raw": 0.4516899867784215,
+        "seed": 2
+      },
+      {
+        "adjusted_lift": 0.6987629987207111,
+        "problem": "ackley",
+        "raw": 0.3562903534003122,
+        "seed": 3
+      },
+      {
+        "adjusted_lift": 1.8679375306129467,
+        "problem": "ackley",
+        "raw": 0.46084304482795746,
+        "seed": 4
+      },
+      {
+        "adjusted_lift": 1.4958786521483425,
+        "problem": "ackley",
+        "raw": 0.4763540658522857,
+        "seed": 5
+      },
+      {
+        "adjusted_lift": 1.5700003563931428,
+        "problem": "ackley",
+        "raw": 0.38687062506601844,
+        "seed": 6
+      },
+      {
+        "adjusted_lift": 0.7937690975328275,
+        "problem": "ackley",
+        "raw": 0.5219948536741809,
+        "seed": 7
+      },
+      {
+        "adjusted_lift": 0.39586805514361045,
+        "problem": "ackley",
+        "raw": 0.4095713361590554,
+        "seed": 8
+      },
+      {
+        "adjusted_lift": 1.8256993284928986,
+        "problem": "ackley",
+        "raw": 0.6104513857200279,
+        "seed": 9
+      }
+    ]
+  },
+  "gate4": {
+    "pass": false,
+    "rows": [
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 2.731977073547649,
+          "stop": 4.500325711251407,
+          "uniform": 0.6829942683869099
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:0:0:0",
+        "seed": 0,
+        "terminal": {
+          "behavior": -20.07900971424346,
+          "gold": -19.026761926893315,
+          "stop": -20.76010655041534,
+          "uniform": -19.28982387373085
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.5629315002639671,
+          "stop": 4.403782904163241,
+          "uniform": 0.29678546258881905
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:1:0:0",
+        "seed": 1,
+        "terminal": {
+          "behavior": -19.902101290669798,
+          "gold": -19.76291863629578,
+          "stop": -20.8517370690908,
+          "uniform": -19.83629770363055
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": -0.3992357332391588,
+          "stop": 0.2719024747343255,
+          "uniform": -0.26500809164446565
+        },
+        "gold_action": "global_exploration",
+        "record_id": "ackley:2:0:0",
+        "seed": 2,
+        "terminal": {
+          "behavior": -20.318540831095575,
+          "gold": -20.470308176720682,
+          "stop": -20.57367045976213,
+          "uniform": -20.369566756828885
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.7714398154557992,
+          "stop": 2.451207860762689,
+          "uniform": 1.6476548121343684
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:3:0:0",
+        "seed": 3,
+        "terminal": {
+          "behavior": -19.8213342200353,
+          "gold": -19.575392718904173,
+          "stop": -20.35685840006584,
+          "uniform": -20.10067893012057
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 3.5515204385253885,
+          "uniform": 0.7103040877050736
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "ackley:4:0:0",
+        "seed": 4,
+        "terminal": {
+          "behavior": -19.164198773203527,
+          "gold": -19.164198773203527,
+          "stop": -20.38231144777378,
+          "uniform": -19.407821308117576
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": -0.16945775087319445,
+          "stop": 0.6543826550976047,
+          "uniform": -0.3858258705202863
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:5:0:0",
+        "seed": 5,
+        "terminal": {
+          "behavior": -20.544875249021786,
+          "gold": -20.585355274603543,
+          "stop": -20.741674041270237,
+          "uniform": -20.493189286159307
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": -0.07675825231689007,
+          "stop": 1.4937979795333367,
+          "uniform": -0.0994826518133373
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:6:0:0",
+        "seed": 6,
+        "terminal": {
+          "behavior": -20.672911221186475,
+          "gold": -20.689399557470477,
+          "stop": -21.01028027952268,
+          "uniform": -20.66802982368927
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.7621099668587193,
+          "stop": 0.7621099668587193,
+          "uniform": 0.7621099668587193
+        },
+        "gold_action": "uncertainty_sampling",
+        "record_id": "ackley:7:0:0",
+        "seed": 7,
+        "terminal": {
+          "behavior": -20.569390955182058,
+          "gold": -20.26477694598313,
+          "stop": -20.569390955182058,
+          "uniform": -20.569390955182058
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.20627277455235848,
+          "stop": 1.0313638727617924,
+          "uniform": 0.8250910982094339
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "ackley:8:0:0",
+        "seed": 8,
+        "terminal": {
+          "behavior": -19.930268951453,
+          "gold": -19.820544793687638,
+          "stop": -20.369165582514455,
+          "uniform": -20.25944142474909
+        }
+      },
+      {
+        "family": "ackley",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 2.731634103594766,
+          "uniform": -0.8427978578173332
+        },
+        "gold_action": "uncertainty_sampling",
+        "record_id": "ackley:9:0:0",
+        "seed": 9,
+        "terminal": {
+          "behavior": -20.153354209081378,
+          "gold": -20.153354209081378,
+          "stop": -20.791563038873218,
+          "uniform": -19.95644605294113
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.023173347230440636,
+          "stop": 0.0,
+          "uniform": -0.0614986951480346
+        },
+        "gold_action": "boundary_sampling",
+        "record_id": "branin:0:0:0",
+        "seed": 0,
+        "terminal": {
+          "behavior": -2.684624743879038,
+          "gold": -3.5451956715421797,
+          "stop": -3.5451956715421797,
+          "uniform": -1.2613655192845183
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.11684070695629252,
+          "stop": 0.0,
+          "uniform": 0.0
+        },
+        "gold_action": "boundary_sampling",
+        "record_id": "branin:1:0:0",
+        "seed": 1,
+        "terminal": {
+          "behavior": -1.8668825826466389,
+          "gold": -10.440794431514274,
+          "stop": -10.440794431514274,
+          "uniform": -10.440794431514274
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.039722791837356136,
+          "stop": 0.08202417412321676,
+          "uniform": -0.015373398645241556
+        },
+        "gold_action": "boundary_sampling",
+        "record_id": "branin:2:0:0",
+        "seed": 2,
+        "terminal": {
+          "behavior": -1.4243652139352108,
+          "gold": -4.029447447134476,
+          "stop": -9.408719870284909,
+          "uniform": -3.02123614520515
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": 0.0021000035521465954,
+          "stop": 0.39633270146909727,
+          "uniform": -0.000856576060512375
+        },
+        "gold_action": "global_exploration",
+        "record_id": "branin:3:0:0",
+        "seed": 3,
+        "terminal": {
+          "behavior": -0.8128071187350911,
+          "gold": -0.7080038418674963,
+          "stop": -20.487477929560864,
+          "uniform": -0.665255353210766
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.026086940863597242,
+          "stop": 0.4394565369182053,
+          "uniform": 0.03139521238731982
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "branin:4:0:0",
+        "seed": 4,
+        "terminal": {
+          "behavior": -1.0084424470580202,
+          "gold": -1.4475097191028805,
+          "stop": -8.843968501136972,
+          "uniform": -1.9759200961664907
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.029031499660274455,
+          "stop": 0.0,
+          "uniform": -0.05359038319650436
+        },
+        "gold_action": "boundary_sampling",
+        "record_id": "branin:5:0:0",
+        "seed": 5,
+        "terminal": {
+          "behavior": -5.048699682212421,
+          "gold": -6.166340765051228,
+          "stop": -6.166340765051228,
+          "uniform": -4.103243281064019
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.0038270456884534026,
+          "stop": 0.45268054666953494,
+          "uniform": 0.18107221866781398
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "branin:6:0:0",
+        "seed": 6,
+        "terminal": {
+          "behavior": -1.446199664124293,
+          "gold": -1.5927747470734825,
+          "stop": -18.930348969864077,
+          "uniform": -8.52780443618972
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.0052206889372518024,
+          "stop": 0.5338779648795835,
+          "uniform": -0.018954893756615
+        },
+        "gold_action": "global_exploration",
+        "record_id": "branin:7:0:0",
+        "seed": 7,
+        "terminal": {
+          "behavior": -1.2291116589991493,
+          "gold": -1.4116654443255179,
+          "stop": -20.079976190763176,
+          "uniform": -0.7488625753327653
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.015194163390382777,
+          "stop": 0.06337711058462804,
+          "uniform": -0.013367069765482208
+        },
+        "gold_action": "uncertainty_sampling",
+        "record_id": "branin:8:0:0",
+        "seed": 8,
+        "terminal": {
+          "behavior": -0.41976886427739935,
+          "gold": -1.442694851851872,
+          "stop": -5.709470966384887,
+          "uniform": -0.5427754097924634
+        }
+      },
+      {
+        "family": "branin",
+        "gains": {
+          "behavior": -0.0016199806970643757,
+          "stop": 0.0,
+          "uniform": -0.005165552144127163
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "branin:9:0:0",
+        "seed": 9,
+        "terminal": {
+          "behavior": -1.5743756886827067,
+          "gold": -1.6863752547656183,
+          "stop": -1.6863752547656183,
+          "uniform": -1.3292477903647844
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 1.9160763240962926,
+          "stop": 3.7039472665593047,
+          "uniform": 1.419029013858959
+        },
+        "gold_action": "local_exploitation",
+        "record_id": "hartmann:0:0:0",
+        "seed": 0,
+        "terminal": {
+          "behavior": 1.868532050067167,
+          "gold": 2.6233669477555264,
+          "stop": 1.16420343697261,
+          "uniform": 2.0643429636779427
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": -0.9269378237300775,
+          "stop": 6.3276861171490335,
+          "uniform": 0.26958745004445245
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:1:0:0",
+        "seed": 1,
+        "terminal": {
+          "behavior": 1.8788293261250224,
+          "gold": 1.707712944865774,
+          "stop": 0.5395971097024564,
+          "uniform": 1.657946037416814
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": -0.09628034582374898,
+          "stop": 0.0,
+          "uniform": -0.3851213832949955
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:2:0:0",
+        "seed": 2,
+        "terminal": {
+          "behavior": 1.64303063227212,
+          "gold": 1.5873356996328105,
+          "stop": 1.5873356996328105,
+          "uniform": 1.8101154301900482
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 3.9080439013541595,
+          "stop": 28.5883869245286,
+          "uniform": 8.828727709615778
+        },
+        "gold_action": "uncertainty_sampling",
+        "record_id": "hartmann:3:0:0",
+        "seed": 3,
+        "terminal": {
+          "behavior": 2.4353777206480687,
+          "gold": 2.7826567466369565,
+          "stop": 0.24221774023183704,
+          "uniform": 1.998112857901706
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 2.043459426760932,
+          "stop": 14.167439566109186,
+          "uniform": 0.8722240407404113
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:4:0:0",
+        "seed": 4,
+        "terminal": {
+          "behavior": 1.869535914797853,
+          "gold": 2.1241074707805425,
+          "stop": 0.3591460101304693,
+          "uniform": 2.0154469178432355
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 0.0,
+          "uniform": -0.11088349890932774
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:5:0:0",
+        "seed": 5,
+        "terminal": {
+          "behavior": 1.7246157970650198,
+          "gold": 1.7246157970650198,
+          "stop": 1.7246157970650198,
+          "uniform": 1.7975646163577832
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 2.400238802516625,
+          "stop": 9.568567892551146,
+          "uniform": 5.424928231707374
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:6:0:0",
+        "seed": 6,
+        "terminal": {
+          "behavior": 1.6719977033959978,
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.1614337028472455
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 0.0,
+          "uniform": 0.0
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:7:0:0",
+        "seed": 7,
+        "terminal": {
+          "behavior": 1.0433253651180032,
+          "gold": 1.0433253651180032,
+          "stop": 1.0433253651180032,
+          "uniform": 1.0433253651180032
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 0.0,
+          "uniform": -0.5683514420278077
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:8:0:0",
+        "seed": 8,
+        "terminal": {
+          "behavior": 1.2462240479521303,
+          "gold": 1.2462240479521303,
+          "stop": 1.2462240479521303,
+          "uniform": 1.4972767365910173
+        }
+      },
+      {
+        "family": "hartmann",
+        "gains": {
+          "behavior": 0.0,
+          "stop": 0.0,
+          "uniform": -0.2698104625548878
+        },
+        "gold_action": "retrain_surrogate",
+        "record_id": "hartmann:9:0:0",
+        "seed": 9,
+        "terminal": {
+          "behavior": 1.5264441118766279,
+          "gold": 1.5264441118766279,
+          "stop": 1.5264441118766279,
+          "uniform": 1.687257075582858
+        }
+      }
+    ],
+    "summary": {
+      "ackley": {
+        "comparisons": {
+          "behavior": {
+            "ci95": [
+              0.0034137994264199834,
+              1.0231161934230288
+            ],
+            "mean_gain": 0.4389279394249249,
+            "positive_seeds": 5
+          },
+          "stop": {
+            "ci95": [
+              1.3258322639655755,
+              3.1865311656948228
+            ],
+            "mean_gain": 2.185202796728327,
+            "positive_seeds": 10
+          },
+          "uniform": {
+            "ci95": [
+              -0.10237373234909448,
+              0.7640616196861748
+            ],
+            "mean_gain": 0.3331825224087902,
+            "positive_seeds": 6
+          }
+        },
+        "n_seeds": 10
+      },
+      "branin": {
+        "comparisons": {
+          "behavior": {
+            "ci95": [
+              -0.04871528965064536,
+              -0.01015047432494697
+            ],
+            "mean_gain": -0.025861716170896675,
+            "positive_seeds": 1
+          },
+          "stop": {
+            "ci95": [
+              0.062375816030015886,
+              0.3255392063787935
+            ],
+            "mean_gain": 0.19677490346442658,
+            "positive_seeds": 6
+          },
+          "uniform": {
+            "ci95": [
+              -0.027211263432832773,
+              0.04854023125183817
+            ],
+            "mean_gain": 0.004366086233861654,
+            "positive_seeds": 2
+          }
+        },
+        "n_seeds": 10
+      },
+      "hartmann": {
+        "comparisons": {
+          "behavior": {
+            "ci95": [
+              0.0892858154542466,
+              1.8492177482695087
+            ],
+            "mean_gain": 0.9244600285174183,
+            "positive_seeds": 4
+          },
+          "stop": {
+            "ci95": [
+              1.589625400970018,
+              12.068123381526343
+            ],
+            "mean_gain": 6.235602776689727,
+            "positive_seeds": 5
+          },
+          "uniform": {
+            "ci95": [
+              0.023023653161737743,
+              3.5270020343630244
+            ],
+            "mean_gain": 1.5480329659179957,
+            "positive_seeds": 5
+          }
+        },
+        "n_seeds": 10
+      }
+    }
+  },
+  "n_records": 226
+}
