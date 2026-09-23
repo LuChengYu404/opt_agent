@@ -7,6 +7,7 @@ dependencies = [
     "botorch>=0.18.1",
     "gpytorch>=1.15.2",
     "numpy>=2.5.3",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]

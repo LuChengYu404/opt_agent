@@ -1,0 +1,4143 @@
+{
+  "config": {
+    "problems": [
+      "Branin",
+      "Hartmann",
+      "Ackley"
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "budgets": [
+      10,
+      30
+    ],
+    "n_init": 5,
+    "tau_conf": 0.5,
+    "known_optima": {
+      "Branin": -0.397887,
+      "Ackley": null,
+      "Hartmann": null
+    }
+  },
+  "summary": {
+    "Branin/hybrid/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -3.9618767318928736,
+      "best_value_max": -0.6100277427470733,
+      "best_value_min": -9.408719870284909,
+      "simple_regret_mean": 3.5639897318928733,
+      "any_evaluation": true,
+      "steps_mean": 5.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Branin/hybrid_forced_escalate/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -7.798236657780454,
+      "best_value_max": -3.5451956715421797,
+      "best_value_min": -10.440794431514274,
+      "simple_regret_mean": 7.4003496577804535,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Branin/rule/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -7.798236657780454,
+      "best_value_max": -3.5451956715421797,
+      "best_value_min": -10.440794431514274,
+      "simple_regret_mean": 7.4003496577804535,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Branin/hybrid/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -0.4149876499710559,
+      "best_value_max": -0.3982964992428908,
+      "best_value_min": -0.4462091855585548,
+      "simple_regret_mean": 0.017100649971055943,
+      "any_evaluation": true,
+      "steps_mean": 25.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Branin/hybrid_forced_escalate/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -2.3701732420397272,
+      "best_value_max": -1.6863752547656183,
+      "best_value_min": -3.5572618887069245,
+      "simple_regret_mean": 1.9722862420397274,
+      "any_evaluation": true,
+      "steps_mean": 14.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Branin/rule/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -2.3701732420397272,
+      "best_value_max": -1.6863752547656183,
+      "best_value_min": -3.5572618887069245,
+      "simple_regret_mean": 1.9722862420397274,
+      "any_evaluation": true,
+      "steps_mean": 14.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/hybrid/b10": {
+      "n_seeds": 3,
+      "best_value_mean": 1.350369836757127,
+      "best_value_max": 1.868532050067167,
+      "best_value_min": 0.595241760571404,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 5.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Hartmann/hybrid_forced_escalate/b10": {
+      "n_seeds": 3,
+      "best_value_mean": 1.5378116770342165,
+      "best_value_max": 1.7246157970650198,
+      "best_value_min": 1.16420343697261,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/rule/b10": {
+      "n_seeds": 3,
+      "best_value_mean": 1.097045415435959,
+      "best_value_max": 1.5873356996328105,
+      "best_value_min": 0.5395971097024564,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/hybrid/b30": {
+      "n_seeds": 3,
+      "best_value_mean": 2.8489010954882468,
+      "best_value_max": 3.2259831432106596,
+      "best_value_min": 2.59219563232677,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 25.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Hartmann/hybrid_forced_escalate/b30": {
+      "n_seeds": 3,
+      "best_value_mean": 1.8673848696460258,
+      "best_value_max": 1.868532050067167,
+      "best_value_min": 1.866811279435455,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 13.333333333333334,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/rule/b30": {
+      "n_seeds": 3,
+      "best_value_mean": 1.660522459151584,
+      "best_value_max": 1.868532050067167,
+      "best_value_min": 1.2462240479521303,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 13.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/hybrid/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -20.65140089378818,
+      "best_value_max": -20.528795152511606,
+      "best_value_min": -20.8517370690908,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 5.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Ackley/hybrid_forced_escalate/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -20.6856728474342,
+      "best_value_max": -20.57367045976213,
+      "best_value_min": -20.741674041270237,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/rule/b10": {
+      "n_seeds": 3,
+      "best_value_mean": -20.722360523374387,
+      "best_value_max": -20.57367045976213,
+      "best_value_min": -20.8517370690908,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/hybrid/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -20.28291598219534,
+      "best_value_max": -20.004437300386364,
+      "best_value_min": -20.50180819994382,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 25.0,
+      "termination_reasons": [
+        "budget_exhausted"
+      ]
+    },
+    "Ackley/hybrid_forced_escalate/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -20.402096438118132,
+      "best_value_max": -20.338747080921394,
+      "best_value_min": -20.528795152511606,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 14.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/rule/b30": {
+      "n_seeds": 3,
+      "best_value_mean": -20.41223593864915,
+      "best_value_max": -20.338747080921394,
+      "best_value_min": -20.528795152511606,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 13.666666666666666,
+      "termination_reasons": [
+        "stop"
+      ]
+    }
+  },
+  "acceptance": {
+    "passed": true,
+    "errors": []
+  },
+  "runs": [
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -0.6100277427470733,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": 0.21214074274707329,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -3.5451956715421797,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": 3.14730867154218,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -3.5451956715421797,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": 3.14730867154218,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -0.4004572651117222,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": 0.002570265111722203,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -1.6863752547656183,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": 1.2884882547656185,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 13,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -1.6863752547656183,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": 1.2884882547656185,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 13
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -1.8668825826466389,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": 1.468995582646639,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -10.440794431514274,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": 10.042907431514273,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -10.440794431514274,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": 10.042907431514273,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -0.3982964992428908,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": 0.0004094992428907984,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -1.8668825826466389,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 15,
+      "simple_regret": 1.468995582646639,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 15,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 14,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -1.8668825826466389,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 15,
+      "simple_regret": 1.468995582646639,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 15
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 13,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 14,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -9.408719870284909,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": 9.010832870284908,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -9.408719870284909,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": 9.010832870284908,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -9.408719870284909,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": 9.010832870284908,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -0.4462091855585548,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": 0.04832218555855483,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -3.5572618887069245,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 14,
+      "simple_regret": 3.1593748887069246,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 14,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -3.5572618887069245,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 14,
+      "simple_regret": 3.1593748887069246,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 14
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 1.868532050067167,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.16420343697261,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.16420343697261,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 2.59219563232677,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.868532050067167,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 14,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.868532050067167,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 14
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 0.595241760571404,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.7246157970650198,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 0.5395971097024564,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 2.7285245109273113,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.866811279435455,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 13,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.2462240479521303,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 13
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 1.5873356996328105,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.7246157970650198,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.5873356996328105,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 3.2259831432106596,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.866811279435455,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 13,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.866811279435455,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 12,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 12
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.528795152511606,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.50180819994382,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.528795152511606,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 14,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.528795152511606,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 14
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.8517370690908,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.8517370690908,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.34250244625584,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.338747080921394,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 14,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.369165582514455,
+      "termination_reason": "stop",
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 13
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.57367045976213,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 5,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.57367045976213,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.57367045976213,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.004437300386364,
+      "termination_reason": "budget_exhausted",
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 25,
+        "system2": 0,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 2,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 3,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 4,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 5,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 6,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 11,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 12,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 13,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 14,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 15,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 16,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 17,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 18,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 19,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 20,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 21,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 22,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 23,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        },
+        {
+          "round": 24,
+          "action": "surrogate_acquisition",
+          "route": "system1"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.338747080921394,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 14,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 7,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 10,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "total_budget": 30,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.338747080921394,
+      "termination_reason": "stop",
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 14
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 2,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 3,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 4,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 5,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 6,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 7,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 8,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 9,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 10,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 11,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 12,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 13,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    }
+  ]
+}

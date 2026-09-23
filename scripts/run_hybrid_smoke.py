@@ -37,6 +37,11 @@ import torch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+# Load .env from project root before importing any module that reads
+# DEEPSEEK_API_KEY (per project convention).
+from dotenv import load_dotenv  # noqa: E402
+load_dotenv(ROOT / ".env")
+
 from opt_agent.actions import ActionType  # noqa: E402
 from opt_agent.backend.bocode_botorch import (  # noqa: E402
     BackendConfig,
