@@ -1,0 +1,147 @@
+"""HybridPolicy — Phase 9 selective-reasoning glue.
+
+Combines a System-1 (`decide(state) -> (action, probabilities, ...)`),
+a `Router`, and a `System2Policy` behind the existing `Policy` protocol so
+`DecisionLoop.run(policy)` can drive it unchanged.
+
+Per codex gpt-6-sol review 2026-09-23 (major M4):
+  - DecisionLoop is left intact. HybridPolicy implements `select_action`
+    so it can be passed to `DecisionLoop(backend).run(policy)`.
+  - Each step: ask system1 for an action + probability distribution;
+    let the router decide whether to escalate; if so, delegate to
+    system2. Routing metadata is recorded on `last_route` for analysis.
+
+The system1 callable must return an object with `.action` (OptimizationAction)
+and `.probabilities` (dict[str, float]). `LayaPolicy.decide()` already
+satisfies this. For RulePolicy / RandomPolicy that lack `decide()`, use
+`adapt_policy_as_system1(...)` below.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
+
+from opt_agent.actions import OptimizationAction
+from opt_agent.loop.policies import Policy
+from opt_agent.router import Route, Router
+from opt_agent.state import OptimizationState
+from opt_agent.system2 import System2Policy
+
+
+@runtime_checkable
+class System1Decider(Protocol):
+    """Anything with a `decide(state) -> (action, probabilities, ...)`.
+
+    Implemented by `LayaPolicy` directly. For stub policies, use
+    `adapt_policy_as_system1`.
+    """
+
+    def decide(self, state: OptimizationState) -> object: ...
+
+
+@dataclass(frozen=True)
+class HybridStep:
+    """One step's worth of routing metadata.
+
+    Attributes
+    ----------
+    route : Route
+        The router's decision for this step.
+    system1_action : OptimizationAction
+        The action System-1 would have taken (recorded even on escalation
+        so we can study the gap between system-1 and system-2 outputs).
+    chosen_action : OptimizationAction
+        The action actually returned to the DecisionLoop.
+    """
+
+    route: Route
+    system1_action: OptimizationAction
+    chosen_action: OptimizationAction
+
+
+def adapt_policy_as_system1(policy: Policy) -> System1Decider:
+    """Wrap a Policy-only system1 (RandomPolicy, RulePolicy, ...) as a
+    System1Decider with delta probabilities (1.0 on the chosen action).
+
+    The probabilities here are not calibrated; they simply reflect the
+    policy's argmax. Calibration metrics should NOT be run on the
+    resulting distribution.
+    """
+
+    class _Adapter:
+        def __init__(self, p: Policy) -> None:
+            self._policy = p
+            self.last_probabilities: dict[str, float] = {}
+
+        def decide(self, state: OptimizationState) -> object:
+            action = self._policy.select_action(state)
+            probs = {action.type.value: 1.0}
+            self.last_probabilities = probs
+            return _DecisionLike(action=action, probabilities=probs)
+
+    return _Adapter(policy)
+
+
+@dataclass(frozen=True)
+class _DecisionLike:
+    action: OptimizationAction
+    probabilities: dict[str, float]
+
+
+class HybridPolicy:
+    """Selective-reasoning policy: System-1 + Router + System-2.
+
+    Implements `Policy` so `DecisionLoop.run(policy)` is unchanged.
+    """
+
+    def __init__(
+        self,
+        system1: System1Decider,
+        router: Router,
+        system2: System2Policy,
+    ) -> None:
+        if not isinstance(system1, System1Decider):
+            raise TypeError(
+                "system1 must implement .decide(state) returning an "
+                "object with .action and .probabilities; use "
+                "adapt_policy_as_system1(policy) to wrap a Policy-only one."
+            )
+        self._system1 = system1
+        self._router = router
+        self._system2 = system2
+        self.last_step: HybridStep | None = None
+        self.history: list[HybridStep] = []
+
+    def select_action(
+        self, state: OptimizationState, backend=None
+    ) -> OptimizationAction:
+        decision = self._system1.decide(state)
+        try:
+            action = decision.action
+            probs = dict(decision.probabilities)
+        except AttributeError as exc:
+            raise RuntimeError(
+                "system1.decide() must return an object with .action and "
+                ".probabilities"
+            ) from exc
+        if not probs:
+            raise ValueError("system1 returned empty probabilities")
+        route = self._router.route(probs)
+        if route.name == "system1":
+            chosen = action
+        else:
+            chosen = self._system2.reason(state).action
+        self.last_step = HybridStep(
+            route=route, system1_action=action, chosen_action=chosen,
+        )
+        self.history.append(self.last_step)
+        return chosen
+
+    def reset(self) -> None:
+        self.last_step = None
+        self.history.clear()
+        # System-2 reset; System-1 and Router reset if they expose it.
+        self._system2.reset()
+        if hasattr(self._system1, "reset"):
+            self._system1.reset()
