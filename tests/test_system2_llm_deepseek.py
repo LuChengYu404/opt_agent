@@ -327,6 +327,69 @@ def test_llm_system2_drops_boolean_n_samples() -> None:
     assert s.fallback_count == 1
 
 
+def test_llm_system2_coerces_float_n_samples_to_int() -> None:
+    """Per codex gpt-6-sol 2026-09-24: a float `n_samples: 2.0` from
+    the LLM must be coerced to int (NOT raise ValueError inside
+    OptimizationAction.__post_init__). The action's n_samples
+    validator requires int; the parser coerces by key."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"n_samples": 2.0}, "float n_samples",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert isinstance(decision.action.params["n_samples"], int)
+    assert decision.action.params["n_samples"] == 2
+    # No fallback — the value is valid after coercion.
+    assert s.fallback_count == 0
+
+
+def test_llm_system2_coerces_float_seed_to_int() -> None:
+    """Per codex gpt-6-sol 2026-09-24: a float `seed: 0.0` must be
+    coerced to int (seed validator requires int)."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "global_exploration", {"seed": 0.0}, "float seed",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert isinstance(decision.action.params["seed"], int)
+    assert decision.action.params["seed"] == 0
+
+
+def test_llm_system2_coerces_step_and_tol_to_float() -> None:
+    """Per-action float-typed params (step in local_exploitation,
+    tol in boundary_sampling) must coerce int to float so the float
+    validator accepts them."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "local_exploitation", {"step": 1}, "int step",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert isinstance(decision.action.params["step"], float)
+    assert decision.action.params["step"] == 1.0
+
+
+def test_llm_system2_coerces_tol_to_float_in_boundary_sampling() -> None:
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "boundary_sampling", {"tol": 0}, "int tol",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    assert isinstance(decision.action.params["tol"], float)
+
+
+def test_llm_system2_drops_out_of_range_step() -> None:
+    """step must be in [0.001, 1.0] per `_PARAM_SCHEMAS`. A float outside
+    the range is dropped rather than crashing on construction."""
+    s = LLMSystem2(client=_FakeClient(body=_body_with(
+        "local_exploitation", {"step": 5.0}, "step too large",
+    )), _skip_key_check=True)
+    state = _state_with_budget(20)
+    decision = s.reason(state)
+    # The candidate's step (0.1) survives; the override is dropped.
+    assert decision.action.params["step"] == pytest.approx(0.1)
+    assert s.fallback_count == 1
+
+
 def test_llm_system2_fallback_count_increments_on_unparseable() -> None:
     s = LLMSystem2(client=_FakeClient(body={
         "id": "x",

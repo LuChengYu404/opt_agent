@@ -235,6 +235,16 @@ class LLMSystem2(System2Policy):
         if not isinstance(params, Mapping):
             params = {}
         allowed = _ALLOWED_PARAMS[base.type]
+        # Per-action-type param schema: which keys must be int vs float.
+        # Mirrors `_PARAM_SCHEMAS` in `actions.models` without importing
+        # the private constant — kept in sync by convention.
+        int_keys = {
+            ActionType.GLOBAL_EXPLORATION: frozenset({"n_samples", "seed"}),
+            ActionType.LOCAL_EXPLOITATION: frozenset({"seed"}),
+            ActionType.UNCERTAINTY_SAMPLING: frozenset({"n_samples", "seed"}),
+            ActionType.ERROR_GUIDED_SAMPLING: frozenset({"n_samples", "seed"}),
+            ActionType.BOUNDARY_SAMPLING: frozenset({"n_samples", "seed"}),
+        }.get(base.type, frozenset())
         overrides_applied: list[str] = []
         overrides_dropped: list[str] = []
         for k, v in params.items():
@@ -244,9 +254,16 @@ class LLMSystem2(System2Policy):
             if not isinstance(v, (int, float)) or isinstance(v, bool):
                 overrides_dropped.append(f"{k}=not_numeric({type(v).__name__})")
                 continue
-            # Preserve the original Python type for downstream validators:
-            # OptimizationAction requires ints for n_samples / seed.
-            v_typed = int(v) if isinstance(v, int) and not isinstance(v, bool) else float(v)
+            # Per codex gpt-6-sol 2026-09-24: coerce the numeric override
+            # to the type the action validator expects (int for
+            # n_samples / seed, float for step / tol). Without this
+            # coercion, `n_samples: 2.0` raises
+            # `ValueError("'n_samples' must be int; got float")` inside
+            # OptimizationAction.__post_init__ and the loop crashes.
+            if k in int_keys:
+                v_typed: int | float = int(v)
+            else:
+                v_typed = float(v)
             if k == "n_samples":
                 if v_typed > remaining_budget:
                     overrides_dropped.append(
@@ -271,7 +288,38 @@ class LLMSystem2(System2Policy):
                 f"fallback: dropped LLM overrides [{note}]; "
                 + (reasoning or "kept candidate defaults")
             )
-        return OptimizationAction(base.type, merged), reasoning
+        # Defensive construction: OptimizationAction's range validators
+        # (e.g. step in (0, 1.0], tol in (0, 0.1], n_samples > 0) may
+        # still reject overrides that passed our type / budget checks.
+        # If construction raises, drop offending overrides one by one
+        # and retry until the action builds — per codex gpt-6-sol
+        # review 2026-09-24.
+        try:
+            action = OptimizationAction(base.type, merged)
+        except (ValueError, TypeError) as exc:
+            dropped_for_construction: list[str] = []
+            merged = dict(base.params)
+            for k in overrides_applied:
+                try:
+                    action = OptimizationAction(base.type, merged)
+                    break
+                except (ValueError, TypeError):
+                    dropped_for_construction.append(k)
+                    merged.pop(k, None)
+                    if k == "n_samples":
+                        # Re-derive from the candidate factory's
+                        # default so the action is budget-valid.
+                        merged["n_samples"] = min(2, remaining_budget)
+            else:
+                # All overrides dropped; construct with base.
+                action = OptimizationAction(base.type, merged)
+            self.fallback_count += 1
+            reasoning = (
+                f"fallback: dropped overrides that failed action "
+                f"validation [{','.join(dropped_for_construction)}]; "
+                + reasoning
+            )
+        return action, reasoning
 
     def _last_resort(
         self,
