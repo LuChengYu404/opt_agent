@@ -12,16 +12,32 @@ from opt_agent.dataset.generator import (
     derive_run_seed,
     full_candidates,
 )
+from opt_agent.dataset.validation import (
+    EXPLORATION_ACTIONS,
+    MassGateResult,
+    OracleResult,
+    aggregate_mass,
+    affine_rescaling_test,
+    oracle_test,
+    phase_of,
+)
 
 __all__ = [
     "DatasetConfig",
     "DatasetGenerator",
     "DatasetStats",
     "DecisionRecord",
+    "EXPLORATION_ACTIONS",
+    "MassGateResult",
+    "OracleResult",
+    "aggregate_mass",
+    "affine_rescaling_test",
     "analyze_dataset",
     "derive_run_seed",
     "full_candidates",
     "iter_jsonl",
+    "oracle_test",
+    "phase_of",
     "validate_record",
     "write_jsonl",
 ]

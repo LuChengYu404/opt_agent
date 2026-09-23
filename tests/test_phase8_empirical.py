@@ -208,6 +208,63 @@ def test_analyze_dataset_smoke(tmp_path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Phase 8.5 wiring fixes (codex-flagged)
+# ---------------------------------------------------------------------------
+
+
+def test_dataset_generator_wires_scales_into_rollout() -> None:
+    """Codex-flagged bug: generator must pass scales to CounterfactualRollout."""
+    import dataclasses
+    spec = _small_spec()
+    # Set non-default scales to verify they reach the rollout.
+    spec = dataclasses.replace(spec,
+        optimization_scale=2.0,
+        evaluation_scale=30.0,
+        fit_scale=7.0,
+    )
+    seen = []
+
+    from opt_agent.dataset import generator as generator_module
+    original_rollout = generator_module.CounterfactualRollout
+
+    class _Spy(original_rollout):
+        def __init__(self, backend, **kwargs):
+            seen.append({
+                "optimization_scale": kwargs.get("optimization_scale"),
+                "evaluation_scale": kwargs.get("evaluation_scale"),
+                "fit_scale": kwargs.get("fit_scale"),
+            })
+            super().__init__(backend, **kwargs)
+
+    generator_module.CounterfactualRollout = _Spy
+    try:
+        list(DatasetGenerator(spec, backend_factory=_real_backend_factory).generate())
+    finally:
+        generator_module.CounterfactualRollout = original_rollout
+
+    assert seen, "CounterfactualRollout was never called"
+    assert seen[0]["optimization_scale"] == 2.0
+    assert seen[0]["evaluation_scale"] == 30.0
+    assert seen[0]["fit_scale"] == 7.0
+
+
+def test_generated_state_preserves_last_action() -> None:
+    """Codex-flagged bug: state.history.last_action should NOT be None on records
+    emitted after at least one behavior action has executed."""
+    spec = _small_spec()
+    records = list(DatasetGenerator(spec, backend_factory=_real_backend_factory).generate())
+    assert records
+    # First record (step=0, no behavior yet): last_action is None.
+    assert records[0].state["history"]["last_action"] is None
+    # Some later record: last_action must be populated by a prior behavior step.
+    populated = [r for r in records[1:] if r.state["history"]["last_action"] is not None]
+    assert populated, (
+        "Expected at least one record after the first to have last_action set; "
+        "generator is not passing the prior action name to extract_state."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Driver script smoke
 # ---------------------------------------------------------------------------
 

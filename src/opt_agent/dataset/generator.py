@@ -104,6 +104,10 @@ class DatasetConfig:
     utility_weights: UtilityWeights = field(default_factory=UtilityWeights)
     temperature: float = 1.0
     random_action_rate: float = 0.2  # 20% random, 80% rule
+    # Phase 8.5 oracle-gate: scales passed through to CounterfactualRollout.
+    optimization_scale: float = 1.0
+    evaluation_scale: float = 1.0
+    fit_scale: float = 1.0
 
 
 BackendFactory = Callable[[], UnifiedBackend]
@@ -146,11 +150,13 @@ class DatasetGenerator:
         rule = RulePolicy(seed=run_seed)
         random_policy = RandomPolicy(seed=run_seed)
         behavior_rng = random.Random(run_seed)
+        last_action_name: str | None = None  # Phase 8.5 fix: track for state.history.last_action
 
         for step in range(self.config.max_actions):
             state = extract_state(
                 backend,
                 total_budget=self.config.total_budget,
+                last_action=last_action_name,
             )
 
             # Decision point?
@@ -160,6 +166,9 @@ class DatasetGenerator:
                     backend,
                     horizon=self.config.horizon,
                     utility_weights=self.config.utility_weights,
+                    optimization_scale=self.config.optimization_scale,
+                    evaluation_scale=self.config.evaluation_scale,
+                    fit_scale=self.config.fit_scale,
                 ).rollout(state, cands)
                 probs = to_gold_probs(
                     output.results,
@@ -185,6 +194,7 @@ class DatasetGenerator:
                 action = rule.select_action(state, backend)
 
             result: ActionResult = execute_action(backend, state, action)
+            last_action_name = action.type.value
             if result.should_stop:
                 break
 
