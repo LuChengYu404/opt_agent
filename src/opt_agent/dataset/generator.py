@@ -6,13 +6,15 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
   - Decision points are extracted at every Nth step (sparse by default).
   - Candidates are the FULL action vocabulary (8 actions) per record; ids
     are deterministic to ensure aligned vocabulary across records.
+  - `derive_run_seed` uses SHA-256 of problem name (NOT Python's built-in
+    `hash()`, which varies with PYTHONHASHSEED across processes).
 """
 
 from __future__ import annotations
 
 import hashlib
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Callable, Iterable, Iterator
 
 from opt_agent.actions import (
@@ -78,10 +80,21 @@ def derive_seed(*parts: int) -> int:
     return int.from_bytes(h.digest()[:4], "little") & 0x7FFFFFFF
 
 
+def derive_run_seed(problem: str, problem_seed: int, trajectory_id: int) -> int:
+    """Process-stable seed combining (problem_name, problem_seed, trajectory_id).
+
+    Uses SHA-256 of the problem name to avoid Python's built-in `hash()`
+    which depends on PYTHONHASHSEED and varies across processes.
+    """
+    digest = hashlib.sha256(problem.encode("utf-8")).digest()
+    problem_key = int.from_bytes(digest[:8], "little")
+    return derive_seed(problem_seed, trajectory_id, problem_key)
+
+
 @dataclass(frozen=True)
 class DatasetConfig:
-    problems: list[str] = field(default_factory=lambda: ["Branin", "Hartmann", "Ackley"])
-    seeds: list[int] = field(default_factory=lambda: [0])
+    problems: tuple[str, ...] = ("Branin", "Hartmann", "Ackley")
+    seeds: tuple[int, ...] = (0,)
     n_init: int = 5
     total_budget: int = 30
     trajectories_per_problem_seed: int = 1
@@ -123,7 +136,7 @@ class DatasetGenerator:
         problem_seed: int,
         trajectory_id: int,
     ) -> Iterator[DecisionRecord]:
-        run_seed = derive_seed(problem_seed, trajectory_id, hash(problem) & 0xFFFF)
+        run_seed = derive_run_seed(problem, problem_seed, trajectory_id)
         backend = self.backend_factory()
         backend.initialize(BackendConfig(
             problem_id=problem,
