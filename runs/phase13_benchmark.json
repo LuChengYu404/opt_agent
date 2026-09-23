@@ -1,0 +1,701 @@
+{
+  "config": {
+    "problems": [
+      "Branin",
+      "Ackley",
+      "Hartmann"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "budgets": [
+      10,
+      30
+    ],
+    "n_init": 5,
+    "tau_conf": 0.5,
+    "known_optima": {
+      "Branin": -0.397887
+    }
+  },
+  "summary": {
+    "Branin/hybrid": {
+      "n_seeds": 10,
+      "best_value_mean": -1.7724157671727618,
+      "best_value_std": 2.6413577024592256,
+      "best_value_max": -0.3982964992428908,
+      "best_value_min": -9.408719870284909,
+      "n_evaluations_mean": 20.0,
+      "simple_regret_mean": 1.3745287671727617,
+      "simple_regret_std": 2.641357702459225,
+      "success_rate_branin_within_1e-2": 0.4,
+      "paired_t_hybrid_vs_rule": 2.4106644239514887
+    },
+    "Branin/rule": {
+      "n_seeds": 10,
+      "best_value_mean": -5.6635906673784415,
+      "best_value_std": 5.7421243759461555,
+      "best_value_max": -0.6239031375188535,
+      "best_value_min": -20.042615924471214,
+      "n_evaluations_mean": 16.5,
+      "simple_regret_mean": 5.265703667378442,
+      "simple_regret_std": 5.7421243759461555,
+      "success_rate_branin_within_1e-2": 0.0,
+      "paired_t_hybrid_vs_rule": null
+    },
+    "Ackley/hybrid": {
+      "n_seeds": 10,
+      "best_value_mean": -20.17405489884827,
+      "best_value_std": 0.5461736306988061,
+      "best_value_max": -19.164198773203527,
+      "best_value_min": -20.8517370690908,
+      "n_evaluations_mean": 20.0,
+      "simple_regret_mean": null,
+      "simple_regret_std": 0.0,
+      "success_rate_branin_within_1e-2": null,
+      "paired_t_hybrid_vs_rule": 1.6226823835895812
+    },
+    "Ackley/rule": {
+      "n_seeds": 10,
+      "best_value_mean": -20.35909792991669,
+      "best_value_std": 0.4354008584376772,
+      "best_value_max": -19.164198773203527,
+      "best_value_min": -20.8517370690908,
+      "n_evaluations_mean": 16.5,
+      "simple_regret_mean": null,
+      "simple_regret_std": 0.0,
+      "success_rate_branin_within_1e-2": null,
+      "paired_t_hybrid_vs_rule": null
+    },
+    "Hartmann/hybrid": {
+      "n_seeds": 10,
+      "best_value_mean": 2.1018502259010825,
+      "best_value_std": 0.9225754515973529,
+      "best_value_max": 3.2259831432106596,
+      "best_value_min": 0.5821486290699978,
+      "n_evaluations_mean": 20.0,
+      "simple_regret_mean": null,
+      "simple_regret_std": 0.0,
+      "success_rate_branin_within_1e-2": null,
+      "paired_t_hybrid_vs_rule": 3.824997188975643
+    },
+    "Hartmann/rule": {
+      "n_seeds": 10,
+      "best_value_mean": 1.4179810636020622,
+      "best_value_std": 0.8278998834777207,
+      "best_value_max": 2.685536654110887,
+      "best_value_min": 0.24221774023183704,
+      "n_evaluations_mean": 16.5,
+      "simple_regret_mean": null,
+      "simple_regret_std": 0.0,
+      "success_rate_branin_within_1e-2": null,
+      "paired_t_hybrid_vs_rule": null
+    }
+  },
+  "runs": [
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": -0.6100277427470733,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.21214074274707329
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": -3.5451956715421797,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": 3.14730867154218
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": -0.4004572651117222,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.002570265111722203
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": -1.6863752547656183,
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "termination_reason": "stop",
+      "simple_regret": 1.2884882547656185
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": -1.8668825826466389,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 1.468995582646639
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": -10.440794431514274,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": 10.042907431514273
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": -0.3982964992428908,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.0004094992428907984
+    },
+    {
+      "problem": "Branin",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": -1.8668825826466389,
+      "n_evaluations": 26,
+      "n_steps": 15,
+      "termination_reason": "stop",
+      "simple_regret": 1.468995582646639
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": -9.408719870284909,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 9.010832870284908
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": -9.408719870284909,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": 9.010832870284908
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": -0.4462091855585548,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.04832218555855483
+    },
+    {
+      "problem": "Branin",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": -3.5572618887069245,
+      "n_evaluations": 27,
+      "n_steps": 14,
+      "termination_reason": "stop",
+      "simple_regret": 3.1593748887069246
+    },
+    {
+      "problem": "Branin",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": -2.5258844476156916,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 2.1279974476156918
+    },
+    {
+      "problem": "Branin",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": -20.042615924471214,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": 19.644728924471213
+    },
+    {
+      "problem": "Branin",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": -0.4072716726831178,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.009384672683117823
+    },
+    {
+      "problem": "Branin",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": -0.6239031375188535,
+      "n_evaluations": 27,
+      "n_steps": 17,
+      "termination_reason": "stop",
+      "simple_regret": 0.22601613751885352
+    },
+    {
+      "problem": "Branin",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": -1.2534880107221849,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.8556010107221849
+    },
+    {
+      "problem": "Branin",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": -4.210669901611623,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": 3.812782901611623
+    },
+    {
+      "problem": "Branin",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": -0.4069203951148346,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": 0.009033395114834586
+    },
+    {
+      "problem": "Branin",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": -1.2534880107221849,
+      "n_evaluations": 27,
+      "n_steps": 15,
+      "termination_reason": "stop",
+      "simple_regret": 0.8556010107221849
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": -20.528795152511606,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": -20.741674041270237,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": -20.50180819994382,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": -20.528795152511606,
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": -20.8517370690908,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": -20.8517370690908,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": -20.34250244625584,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": -20.369165582514455,
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": -20.57367045976213,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": -20.57367045976213,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": -20.004437300386364,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": -20.338747080921394,
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": -20.30460040706254,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": -20.320339846059486,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": -20.30460040706254,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": -20.320339846059486,
+      "n_evaluations": 27,
+      "n_steps": 14,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": -19.164198773203527,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": -20.38231144777378,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": -19.164198773203527,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Ackley",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": -19.164198773203527,
+      "n_evaluations": 27,
+      "n_steps": 15,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": 1.868532050067167,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": 1.16420343697261,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "policy": "hybrid",
+      "best_value": 2.59219563232677,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "policy": "rule",
+      "best_value": 1.868532050067167,
+      "n_evaluations": 26,
+      "n_steps": 14,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": 0.595241760571404,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": 0.5395971097024564,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "policy": "hybrid",
+      "best_value": 2.7285245109273113,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 1,
+      "policy": "rule",
+      "best_value": 1.2462240479521303,
+      "n_evaluations": 27,
+      "n_steps": 13,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": 1.5873356996328105,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": 1.5873356996328105,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "policy": "hybrid",
+      "best_value": 3.2259831432106596,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 2,
+      "policy": "rule",
+      "best_value": 1.866811279435455,
+      "n_evaluations": 26,
+      "n_steps": 12,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": 1.8242863895426586,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": 0.24221774023183704,
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 3,
+      "policy": "hybrid",
+      "best_value": 3.006289396567739,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 3,
+      "policy": "rule",
+      "best_value": 2.685536654110887,
+      "n_evaluations": 26,
+      "n_steps": 17,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": 0.5821486290699978,
+      "n_evaluations": 10,
+      "n_steps": 5,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": 0.3591460101304693,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination_reason": "stop",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 4,
+      "policy": "hybrid",
+      "best_value": 3.007965047094304,
+      "n_evaluations": 30,
+      "n_steps": 25,
+      "termination_reason": "budget_exhausted",
+      "simple_regret": null
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 4,
+      "policy": "rule",
+      "best_value": 2.6202066077848007,
+      "n_evaluations": 27,
+      "n_steps": 19,
+      "termination_reason": "stop",
+      "simple_regret": null
+    }
+  ]
+}

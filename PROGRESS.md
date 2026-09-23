@@ -207,3 +207,77 @@ separate evaluation plan; this is documented in PHASE9_DESIGN.md.
 
 Phase 9.3 (typed-decision model fine-tuning) is the next milestone
 but is not required for closing Phase 9.
+
+## Phase 10 status: DONE (Calibration / OOD)
+
+- **`src/opt_agent/system1/ood.py`**: `StateOODDetector` is a
+  z-score detector on a fixed set of budget-normalized features
+  (sample_fraction, stagnation_per_sample, remaining_budget_ratio,
+  is_current, relative_improvement). Per-feature mean/std are cached
+  from a calibration corpus; `score(state)` returns `OODScore` with
+  per-feature z-scores plus a fraction-of-features-above-threshold
+  score. The `relative_improvement` feature rescales by
+  `max(|best_value|, 1.0)` so cross-problem records with the same
+  relative progress map to the same feature value.
+- **`src/opt_agent/metrics/temperature.py`**: `TemperatureCalibrator`
+  fits a single scalar `T` that minimizes NLL on the calibration
+  split; `.transform(probs)` returns the rescaled distribution.
+  Preserves argmax (T scaling is monotonic over softmax).
+- 18 new tests in `tests/test_ood_and_temperature.py` covering
+  fit/score/transform edge cases, NaN handling, budget-cap behaviour,
+  and argmax preservation.
+
+## Phase 11 status: DONE (System-2 stack)
+
+- `FallbackSystem2` (Phase 9.0) — deterministic RulePolicy baseline.
+- `LLMSystem2` (Phase 9.1 v3+v6) — DeepSeek Chat Completions
+  adapter with JSON / markdown-fence / regex response parsing,
+  params preservation (candidate defaults as base, LLM `params`
+  as filtered overrides), budget validation, fallback bookkeeping,
+  and System-1 top-action last-resort preference.
+
+## Phase 12 status: DONE (Selective-reasoning Router)
+
+- **`src/opt_agent/router/ood_aware.py`**: `OODAwareRouter` wraps a
+  `ConfidenceRouter` and a `StateOODDetector`. Decision order:
+  1. confidence gate (cheap, per-step);
+  2. OOD gate (uses the detector's own cutoff as the single source
+     of truth — no separate router-level threshold);
+  3. trust System-1.
+- `HybridPolicy.select_action` now calls `router.update(state)` for
+  routers that accept a `state` parameter (per `inspect.signature`
+  check, so the base `Router` Protocol's 3-arg `update(probs, chosen,
+  reward)` is not accidentally invoked).
+- 7 new tests in `tests/test_router_ood_aware.py`.
+
+## Phase 13 status: DONE (Benchmark harness)
+
+- **`scripts/run_benchmark.py`**: cross-problem × cross-seed ×
+  cross-policy harness. Reports per-(problem, seed, policy)
+  best_value / simple_regret / n_evaluations, plus aggregated
+  per-(problem, policy) stats with paired t-test against RulePolicy.
+- **60/60 runs PASS** on Branin + Ackley + Hartmann × seeds {0..4}
+  × total_budget in {10, 30} × {hybrid, rule}. Results in
+  `runs/phase13_benchmark.json`.
+- Empirical observation (NOT a performance claim):
+  - Branin: hybrid mean best -1.77 (succ 40%) vs rule -5.66 (succ 0%),
+    paired t = +2.41.
+  - Ackley: hybrid best -20.17 vs rule -20.36, paired t = +1.62.
+  - Hartmann: hybrid best +2.10 vs rule +1.42, paired t = +3.82.
+- 5 new tests in `tests/test_benchmark_runner.py` covering the
+  aggregation logic and an end-to-end subprocess invocation.
+
+## Phase 14 status: PLACEHOLDER (Engineering transfer)
+
+- **`scripts/run_engineering_transfer.py`**: placeholder that
+  documents the two engineering-transfer paths (real engineering
+  simulator integration vs BOCoDe engineering-problem allowlist
+  expansion). Neither path is implemented today; the project has
+  no vehicle-suspension simulator in its dependency graph and
+  `BocodeBotorchBackend`'s allowlist is currently synthetic-only
+  ({Branin, Hartmann, Ackley}).
+- Phase 13's synthetic benchmark is the only meaningful empirical
+  baseline today; engineering transfer is deferred until a real
+  engineering backend is available.
+
+## Phase 10–14 cumulative test count: 298/298.
