@@ -88,6 +88,34 @@ class _FakeBackend(UnifiedBackend):
     def get_history(self) -> EvaluationBatch:
         return self._history
 
+    def checkpoint(self):
+        from opt_agent.backend.checkpoint import Checkpoint
+        return Checkpoint(
+            backend_id=type(self).__module__ + "." + type(self).__name__,
+            problem_id="FakeBackend",
+            problem_bounds=[(0.0, 1.0), (0.0, 1.0)],
+            X=self._history.X.detach().clone(),
+            objectives=self._history.objectives.detach().clone(),
+            constraints=self._history.constraints.detach().clone(),
+            fitted=self._fitted,
+            rng_state=None,
+        )
+
+    def restore(self, cp) -> None:
+        from opt_agent.backend.checkpoint import Checkpoint
+        if not isinstance(cp, Checkpoint):
+            raise ValueError("restore expects Checkpoint")
+        expected = type(self).__module__ + "." + type(self).__name__
+        if cp.backend_id != expected:
+            raise ValueError(f"backend_id mismatch: {cp.backend_id} vs {expected}")
+        self._history = EvaluationBatch(
+            X=cp.X.detach().clone(),
+            objectives=cp.objectives.detach().clone(),
+            constraints=cp.constraints.detach().clone(),
+            feasible=torch.ones((cp.X.shape[0], 1), dtype=torch.bool),
+        )
+        self._fitted = False
+
 
 # ---------------------------------------------------------------------------
 # Core 4 acceptance tests (per codex)

@@ -21,9 +21,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import torch
+
+if TYPE_CHECKING:
+    from opt_agent.backend.checkpoint import Checkpoint
 
 
 # ---------------------------------------------------------------------------
@@ -105,6 +108,14 @@ class UnifiedBackend(ABC):
 
     @abstractmethod
     def get_history(self) -> EvaluationBatch:
+        ...
+
+    @abstractmethod
+    def checkpoint(self) -> "Checkpoint":
+        ...
+
+    @abstractmethod
+    def restore(self, cp: "Checkpoint") -> None:
         ...
 
 
@@ -314,3 +325,81 @@ class BocodeBotorchBackend(UnifiedBackend):
         else:
             feasible = torch.ones((X.shape[0], 1), dtype=torch.bool, device=X.device)
         return EvaluationBatch(X=X, objectives=obj, constraints=cons, feasible=feasible)
+
+    # -- checkpoint / restore (Phase 5) ------------------------------------
+
+    def checkpoint(self) -> "Checkpoint":
+        """Snapshot history tensors + problem id/bounds + fitted state.
+
+        Returned tensors are cloned at the Python level: subsequent mutation
+        of the checkpoint's tensors does not affect the backend. Note that the
+        Checkpoint dataclass is frozen=True so the field references cannot be
+        rebound, but the tensor contents can still be mutated in-place by the
+        caller — restore() also clones internally, so this is safe.
+        """
+        from opt_agent.backend.checkpoint import Checkpoint
+
+        if self._problem is None or self._history_X is None:
+            raise RuntimeError("Backend not initialized — call initialize() first.")
+        problem_id = type(self._problem).__name__
+        bounds_list = [(float(b[0]), float(b[1])) for b in self._problem.bounds]
+        return Checkpoint(
+            backend_id=type(self).__module__ + "." + type(self).__name__,
+            problem_id=problem_id,
+            problem_bounds=bounds_list,
+            X=self._history_X.detach().clone(),
+            objectives=self._history_obj.detach().clone(),
+            constraints=self._history_cons.detach().clone(),
+            fitted=self._fitted,
+            rng_state=None,  # Phase 5 placeholder; BOCoDe RNG capture deferred
+        )
+
+    def restore(self, cp: "Checkpoint") -> None:
+        """Restore history tensors from checkpoint.
+
+        Atomic: if `cp` does not match this backend's class, raise ValueError
+        before touching any state. Preserves the fitted state if `cp.fitted`
+        is True — but Phase 5 implementation clears the GP model (we don't
+        pickle BoTorch state); caller must call `fit()` again to re-fit on
+        the restored history before proposing.
+        """
+        from opt_agent.backend.checkpoint import Checkpoint
+
+        if not isinstance(cp, Checkpoint):
+            raise ValueError(
+                f"restore() expects Checkpoint; got {type(cp).__name__}"
+            )
+        expected_backend_id = type(self).__module__ + "." + type(self).__name__
+        if cp.backend_id != expected_backend_id:
+            raise ValueError(
+                f"Checkpoint backend_id mismatch: expected {expected_backend_id}, "
+                f"got {cp.backend_id!r}. Refusing to restore."
+            )
+
+        # Re-instantiate the problem if the problem_id changed.
+        if self._problem is None or type(self._problem).__name__ != cp.problem_id:
+            import bocode  # bocode uses __getattr__ magic
+            self._problem = bocode.get_problem(cp.problem_id)()
+
+        # Atomic: validate shape BEFORE touching backend state.
+        # Clone tensors inside cp first so caller-mutation of cp tensors
+        # cannot affect the restored history.
+        X = cp.X.detach().clone()
+        obj = cp.objectives.detach().clone()
+        cons = cp.constraints.detach().clone()
+        if X.ndim != 2 or obj.shape[0] != X.shape[0] or cons.shape[0] != X.shape[0]:
+            raise ValueError(
+                f"Checkpoint shape mismatch: X={tuple(X.shape)}, "
+                f"obj={tuple(obj.shape)}, cons={tuple(cons.shape)}"
+            )
+        # All checks passed — now commit.
+        self._history_X = X
+        self._history_obj = obj
+        self._history_cons = cons
+        # Phase 5 policy: do NOT pickle BoTorch's GP state (fragile).
+        # Caller must refit() before propose(). The cp.fitted flag is preserved
+        # in the Checkpoint for serialization purposes but the backend requires
+        # an explicit refit before reuse.
+        self._fitted = False
+        self._model = None
+        self._mll = None
