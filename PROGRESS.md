@@ -107,3 +107,53 @@ hypotheses, not a diagnosis of our true-oracle counterfactual setup.
 .venv/bin/python scripts/validate_phase8_6b.py runs/phase8_6b_h3_10seed.jsonl --output runs/phase8_6b_h3_report.json --random-replicates 5
 .venv/bin/python scripts/phase9_baselines.py runs/phase8_6b_h3_10seed.jsonl
 ```
+
+## Phase 9.0: framework skeleton (250/250 tests)
+
+The Hybrid Agent glue from MASTER_PLAN §24 is now in place:
+
+- **System-1**: `LayaPolicy.decide(state)` returns `(action, probabilities,
+  confidence)` over budget-valid candidates from a shared factory
+  (`actions.candidate_actions_for_state`).
+- **System-2 stub**: `FallbackSystem2` delegates to `RulePolicy` — STOP is
+  only returned when the baseline itself chooses STOP (regression test
+  guards the M2 finding).
+- **Router**: `ConfidenceRouter` uses only `max(choice_probs)` vs
+  `tau_conf`. `predict_score` and `predict_noul` are deliberately NOT
+  consulted — those heads have no calibration targets yet.
+- **HybridPolicy**: implements the existing `Policy` Protocol and is
+  passed directly to `DecisionLoop.run(policy)`. The DecisionLoop
+  constructor is unchanged.
+- **Calibration metrics**: ECE / Brier / NLL / reliability with explicit
+  docstring on the two regimes (internal-consistency vs real-calibration).
+- **Decision metrics**: top-1 / top-k / KL / NLL-vs-gold with explicit
+  `n_infinite_kl` / `n_infinite_nll` counts so a single +inf record can
+  no longer hide behind a clean mean.
+- **Dataset splits**: 5-way split (60/10/10/20 + OOD) with sorted-family
+  iteration for cross-process determinism; `physical_state_hash` hashes
+  only `record.state` (no problem seed, no candidate params).
+
+Codex gpt-6-sol review (2026-09-23) flagged 6 findings (C1, C2, M1, M2,
+M3, M4) and 3 new issues (calibration regimes, KL/NLL aggregation,
+split determinism + hash scope). All 9 are now resolved in the current
+working tree. See PHASE9_DESIGN.md for the full reconciled design.
+
+### Phase 9.1 (next)
+
+End-to-end smoke against a real BOCoDe backend with `simple_regret`
+reported for at least Branin + Ackley + Hartmann. Without that, Phase 9
+remains "framework skeleton" status, not "Phase 9 done".
+
+```bash
+# to be written: scripts/run_hybrid_smoke.py
+uv run python scripts/run_hybrid_smoke.py \
+    --problem branin --seed 0 --budget 30 \
+    --system1 laya --router tau_conf=0.5 --system2 rule
+```
+
+### Phase 9.3 (later)
+
+Fine-tune a typed-decision base model on rollout data using
+proper-scoring-rule loss (avoids the utility-hacking failure mode
+observed in Phase 8.5 / 8.6A). Reference implementation candidate
+deferred until Phase 9.1 reports its first real-backend smoke.

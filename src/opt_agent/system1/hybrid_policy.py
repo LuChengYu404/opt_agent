@@ -127,6 +127,16 @@ class HybridPolicy:
             ) from exc
         if not probs:
             raise ValueError("system1 returned empty probabilities")
+        # Verify the system-1 action is among the offered candidates.
+        # This is a contract guard per codex M1: action_id must come from
+        # the shared candidate factory, not be invented post hoc.
+        action_id = action.type.value
+        if action_id not in probs:
+            raise ValueError(
+                f"system1 action {action_id!r} is not in its own probability "
+                f"distribution {sorted(probs)}; check that the candidate "
+                f"factory and the model output share the same vocabulary."
+            )
         route = self._router.route(probs)
         if route.name == "system1":
             chosen = action

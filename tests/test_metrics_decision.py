@@ -161,7 +161,8 @@ def test_aggregate_skips_infinite_in_mean() -> None:
     Record 1 has probs == gold (KL=0, NLL=0).
     Record 2 has probs on "b" while gold has zero mass on "b" → KL=inf, NLL=inf.
     Mean of finite KLs = 0.0 (only record 1 contributes); mean of finite
-    NLLs = 0.0 likewise. The infinities are dropped, not propagated.
+    NLLs = 0.0 likewise. The infinities are dropped, not propagated —
+    but their COUNTS are exposed via `n_infinite_kl` / `n_infinite_nll`.
     """
     probs = [{"a": 1.0, "b": 0.0}, {"a": 0.0, "b": 1.0}]
     gold = [{"a": 1.0, "b": 0.0}, {"a": 1.0, "b": 0.0}]
@@ -171,6 +172,10 @@ def test_aggregate_skips_infinite_in_mean() -> None:
     # Mean of finite NLLs (just record 1's 0.0) = 0.0.
     assert result.nll_mean == pytest.approx(0.0)
     assert result.top_one_agreement == 0.5  # 1 of 2 records agrees
+    # The infinity counts are exposed explicitly.
+    assert result.n_infinite_kl == 1
+    assert result.n_infinite_nll == 1
+    assert result.n_records == 2
 
 
 def test_aggregate_all_infinite_returns_infinity() -> None:
@@ -181,3 +186,5 @@ def test_aggregate_all_infinite_returns_infinity() -> None:
     assert math.isinf(result.kl_mean)
     assert math.isinf(result.nll_mean)
     assert result.n_records == 1
+    assert result.n_infinite_kl == 1
+    assert result.n_infinite_nll == 1

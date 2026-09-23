@@ -90,6 +90,12 @@ def assign_splits(
     3. Remaining pairs: within each family, sort seeds, shuffle with the
        caller's `seed`, and assign by cumulative mid-point ratios.
 
+    Determinism
+    -----------
+    Families are iterated in SORTED order so the assignment is independent
+    of `set` iteration order (which can vary across Python processes).
+    Seeds within each family are also sorted before shuffling.
+
     Returns
     -------
     Mapping from (family, seed) → Split. The same key always maps to
@@ -108,14 +114,18 @@ def assign_splits(
     for r in records:
         pairs.add(family_seed_of(r))
 
+    # Iterate families in sorted order for cross-process determinism.
     by_family: dict[str, list[int]] = defaultdict(list)
     for fam, sd in pairs:
         by_family[fam].append(sd)
+    family_order = sorted(by_family)
+    for fam in family_order:
+        by_family[fam] = sorted(by_family[fam])
 
     assignments: dict[tuple[str, int], Split] = {}
 
     # 1. OOD families first (deterministic; no shuffling).
-    for fam in by_family:
+    for fam in family_order:
         if fam in ood_families:
             for sd in by_family[fam]:
                 assignments[(fam, sd)] = Split.OOD
@@ -129,16 +139,15 @@ def assign_splits(
         cumulative.append(running)
 
     rng = random.Random(seed)
-    for fam, seeds in by_family.items():
+    for fam in family_order:
         if fam in ood_families:
             continue
-        in_dist = sorted(s for s in seeds if (fam, s) not in assignments)
+        in_dist = [s for s in by_family[fam] if (fam, s) not in assignments]
         rng.shuffle(in_dist)
         n = len(in_dist)
         if n == 0:
             continue
         for idx, sd in enumerate(in_dist):
-            # Midpoint rule: spread seeds as evenly as possible.
             target_ratio = (idx + 0.5) / n
             chosen_idx = 0
             for i, cum in enumerate(cumulative):
@@ -169,18 +178,22 @@ def split_records(
 
 
 def physical_state_hash(record: DecisionRecord) -> str:
-    """SHA-256 hex digest over the canonical (problem, state, candidates)
-    representation.
+    """SHA-256 hex digest over the BO state alone.
 
-    The hash intentionally EXCLUDES rollout_results, gold_probs, and
-    replay checkpoint metadata. Those are labels / supervision artifacts
-    and must not feed into physics-only grouping.
+    The hash covers ONLY `record.state` (sampling, surrogate, optimization,
+    resource, history) — the physics of the BO process. It deliberately
+    EXCLUDES:
+
+    - `record.problem` (contains the trajectory seed — not physics)
+    - `record.candidate_actions` (contains action parameters and a seed
+      offset from `derive_seed`)
+    - `record.gold_probs` (a rollout soft target, not physics)
+    - `record.rollout_results` (label / supervision)
+    - `record.metadata` (labels + replay checkpoint metadata)
+
+    Two records hash equal iff their BO state is physically identical.
     """
-    payload = {
-        "problem": record.problem,
-        "state": record.state,
-        "candidate_actions": record.candidate_actions,
-    }
+    payload = {"state": record.state}
     canonical = json.dumps(
         payload, sort_keys=True, separators=(",", ":"), allow_nan=False,
         default=str,

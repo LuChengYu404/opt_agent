@@ -1,15 +1,28 @@
 """Calibration metrics for System-1 probability outputs.
 
-Per MASTER_PLAN §13 + codex gpt-6-sol review 2026-09-23:
-- Calibration here measures INTERNAL consistency between a model's
-  predicted distribution and the model's own argmax outcome. This is NOT
-  real-world accuracy (which requires a separate held-out label source).
-- 15-bin default with optional override; per-bin counts reported so small
-  samples don't masquerade as calibration evidence.
+⚠️  IMPORTANT: outcome source matters ⚠️
+--------------------------------------
+`expected_calibration_error(probs, outcomes)` interprets `outcomes[i]` as
+the OBSERVED label for record i. Two regimes:
 
-The unit of analysis is (probs, outcome) where `outcome` is typically
-`argmax(probs)` for self-consistency or a separately observed label for
-agreement metrics. When you need the latter, use `decision.py` instead.
+  1. **Internal consistency** (default for diagnostics here): pass
+     `outcomes[i] = argmax(probs[i])`. Then per-record accuracy is
+     always 1.0, so ECE collapses to the average gap between
+     `max(probs)` and 1.0. This measures "is the model confident about
+     its own choice?" — NOT real calibration against a ground truth.
+
+  2. **Real calibration**: pass an INDEPENDENTLY observed label
+     (human annotation, oracle gap from rollout, etc.). ECE then
+     measures agreement between confidence and real accuracy.
+
+Do NOT confuse the two. Code reading "ECE = 0.05" must know which regime
+it came from. For agreement-style metrics against `gold_probs`, use
+`decision.py:aggregate_decision_metrics` instead.
+
+Per MASTER_PLAN §13 + codex gpt-6-sol review 2026-09-23:
+- 15-bin default with optional override.
+- Per-bin counts reported so small samples don't masquerade as
+  calibration evidence.
 """
 
 from __future__ import annotations

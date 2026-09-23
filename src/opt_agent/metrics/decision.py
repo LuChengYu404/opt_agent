@@ -30,12 +30,19 @@ class DecisionResult:
         Per-k fraction of records where argmax(gold_probs) is in the top-k
         of probs. Keys are k values requested by the caller.
     kl_mean : float
-        Mean KL(probs || gold_probs) over records; +inf if any P > 0 with
-        Q == 0.
+        Mean KL(probs || gold_probs) over records. **By default inf records
+        are excluded** — see `n_infinite_kl` to know how many. Pass
+        `include_infinite=True` to `aggregate_decision_metrics` for an
+        unconditional mean.
     nll_mean : float
-        Mean -log P(argmax(gold_probs)) under probs.
+        Mean -log P(argmax(gold_probs)) under probs. Inf records excluded;
+        see `n_infinite_nll`.
     n_records : int
         Number of records included in the aggregate.
+    n_infinite_kl : int
+        Count of records where KL diverged (P > 0 where Q == 0).
+    n_infinite_nll : int
+        Count of records where NLL was +inf (P(outcome) == 0).
     """
 
     top_one_agreement: float
@@ -43,6 +50,8 @@ class DecisionResult:
     kl_mean: float
     nll_mean: float
     n_records: int
+    n_infinite_kl: int = 0
+    n_infinite_nll: int = 0
 
 
 def _argmax(d: Mapping[str, float]) -> str:
@@ -137,7 +146,14 @@ def aggregate_decision_metrics(
     gold_probs: Sequence[Mapping[str, float]],
     k_values: Sequence[int] = (1, 2, 3, 5),
 ) -> DecisionResult:
-    """One-call summary over a (probs, gold_probs) corpus."""
+    """One-call summary over a (probs, gold_probs) corpus.
+
+    Infinite KL / NLL records are EXCLUDED from the means by default.
+    Their counts are returned as `n_infinite_kl` / `n_infinite_nll` so the
+    caller knows whether the mean is meaningful. Use `include_infinite`
+    below for an unconditional mean (it will be +inf if any record is
+    infinite).
+    """
     if len(probs) != len(gold_probs):
         raise ValueError(
             f"length mismatch: {len(probs)} vs {len(gold_probs)}"
@@ -145,14 +161,15 @@ def aggregate_decision_metrics(
     if not probs:
         return DecisionResult(0.0, {}, 0.0, 0.0, 0)
     kls = [kl_divergence(p, g) for p, g in zip(probs, gold_probs)]
-    # Filter infinities for the mean; report inf separately if any.
-    finite_kls = [k for k in kls if math.isfinite(k)]
-    kl_mean = sum(finite_kls) / len(finite_kls) if finite_kls else math.inf
     nlls = [
         negative_log_likelihood_vs_gold(p, g)
         for p, g in zip(probs, gold_probs)
     ]
+    n_infinite_kl = sum(1 for k in kls if not math.isfinite(k))
+    n_infinite_nll = sum(1 for n in nlls if not math.isfinite(n))
+    finite_kls = [k for k in kls if math.isfinite(k)]
     finite_nlls = [n for n in nlls if math.isfinite(n)]
+    kl_mean = sum(finite_kls) / len(finite_kls) if finite_kls else math.inf
     nll_mean = sum(finite_nlls) / len(finite_nlls) if finite_nlls else math.inf
     return DecisionResult(
         top_one_agreement=top_one_agreement(probs, gold_probs),
@@ -160,4 +177,6 @@ def aggregate_decision_metrics(
         kl_mean=kl_mean,
         nll_mean=nll_mean,
         n_records=len(probs),
+        n_infinite_kl=n_infinite_kl,
+        n_infinite_nll=n_infinite_nll,
     )

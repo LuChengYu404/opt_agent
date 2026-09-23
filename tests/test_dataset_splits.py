@@ -226,6 +226,54 @@ def test_physical_state_hash_changes_with_state() -> None:
     assert physical_state_hash(rec1) != physical_state_hash(rec2)
 
 
+def test_physical_state_hash_excludes_problem_seed() -> None:
+    """Different problem.seed must NOT change the hash (problem.seed is
+    not part of the physical BO state)."""
+    rec1 = _record("branin", 0, step=2)
+    rec2 = DecisionRecord(
+        id=rec1.id,
+        problem={"family": "branin", "dimension": 2, "seed": 999},  # different
+        state=rec1.state,
+        candidate_actions=rec1.candidate_actions,
+        gold_probs=rec1.gold_probs,
+        rollout_results=rec1.rollout_results,
+        temperature=rec1.temperature, metadata=rec1.metadata,
+    )
+    assert physical_state_hash(rec1) == physical_state_hash(rec2)
+
+
+def test_physical_state_hash_excludes_candidate_actions() -> None:
+    """Different candidate params must NOT change the hash (candidate
+    factory output is a policy artifact, not physics)."""
+    rec1 = _record("branin", 0, step=2)
+    rec2 = DecisionRecord(
+        id=rec1.id, problem=rec1.problem, state=rec1.state,
+        candidate_actions=[{"action_id": "global_exploration",
+                            "params": {"n_samples": 99, "seed": 0}}],
+        gold_probs=rec1.gold_probs,
+        rollout_results=rec1.rollout_results,
+        temperature=rec1.temperature, metadata=rec1.metadata,
+    )
+    assert physical_state_hash(rec1) == physical_state_hash(rec2)
+
+
+def test_assign_splits_uses_sorted_family_order() -> None:
+    """Per codex: family iteration order must be SORTED so assignments are
+    independent of `set` iteration order (which varies across Python
+    processes). Same input + same seed must always produce the same output."""
+    corpus = _ten_seed_corpus()
+    # Run twice with identical inputs.
+    a = assign_splits(corpus, seed=0)
+    b = assign_splits(corpus, seed=0)
+    assert a == b
+    # Running with shuffled record order should give the same result.
+    import random
+    shuffled = list(corpus)
+    random.Random(99).shuffle(shuffled)
+    c = assign_splits(shuffled, seed=0)
+    assert a == c
+
+
 # ---------------------------------------------------------------------------
 # gold_probs_kind
 # ---------------------------------------------------------------------------

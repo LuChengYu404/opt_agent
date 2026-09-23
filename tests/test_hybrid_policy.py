@@ -39,7 +39,13 @@ class _FakeDecision:
 
 
 class _FakeSystem1:
-    """A scripted system1: returns whatever probabilities/choices we ask."""
+    """A scripted system1: returns whatever probabilities/choices we ask.
+
+    Per codex M1: the action_id keys in the probability distribution MUST
+    match the action_id used in the returned OptimizationAction. The fake
+    uses real action_ids (ActionType.value strings), not placeholders,
+    so we exercise HybridPolicy's contract validation.
+    """
 
     def __init__(self, sequence: list[tuple[ActionType, dict[str, float]]]) -> None:
         # sequence[i] = (action_type, probabilities for step i)
@@ -49,9 +55,22 @@ class _FakeSystem1:
     def decide(self, state: OptimizationState) -> _FakeDecision:
         action_type, probs = self._sequence[self._idx % len(self._sequence)]
         self._idx += 1
+        # Re-key the probabilities so the action_type's id is guaranteed
+        # to be in the distribution (matches the candidate factory
+        # vocabulary).
+        real_probs = {
+            action_type.value: probs.get(action_type.value, 0.0)
+            for _ in range(1)
+        }
+        # Spread remaining mass across the union of the user's keys.
+        other_keys = [k for k in probs if k != action_type.value]
+        if other_keys:
+            share = (1.0 - real_probs[action_type.value]) / len(other_keys)
+            for k in other_keys:
+                real_probs[k] = probs[k] * share
         return _FakeDecision(
             action=OptimizationAction(action_type),
-            probabilities=probs,
+            probabilities=real_probs,
         )
 
 

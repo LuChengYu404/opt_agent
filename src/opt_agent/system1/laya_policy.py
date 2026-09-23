@@ -11,7 +11,11 @@ import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Protocol
 
-from opt_agent.actions import ActionType, OptimizationAction
+from opt_agent.actions import (
+    ActionType,
+    OptimizationAction,
+    candidate_actions_for_state,
+)
 from opt_agent.backend.bocode_botorch import UnifiedBackend
 from opt_agent.state import OptimizationState
 
@@ -21,15 +25,15 @@ class _LayaAgent(Protocol):
         ...
 
 
-_DESCRIPTIONS: dict[ActionType, str] = {
-    ActionType.GLOBAL_EXPLORATION: "Evaluate new space-filling points across the search domain.",
-    ActionType.LOCAL_EXPLOITATION: "Evaluate a small perturbation of the best observed point.",
-    ActionType.UNCERTAINTY_SAMPLING: "Evaluate where the surrogate predicts high uncertainty.",
-    ActionType.ERROR_GUIDED_SAMPLING: "Evaluate near a point with high surrogate residual.",
-    ActionType.BOUNDARY_SAMPLING: "Evaluate points near the search-domain boundary.",
-    ActionType.SURROGATE_ACQUISITION: "Evaluate the surrogate acquisition function's proposed point.",
-    ActionType.RETRAIN_SURROGATE: "Refit the surrogate without using an evaluation.",
-    ActionType.STOP: "Stop optimization and return the best observed point.",
+_DESCRIPTIONS: dict[str, str] = {
+    "global_exploration": "Evaluate new space-filling points across the search domain.",
+    "local_exploitation": "Evaluate a small perturbation of the best observed point.",
+    "uncertainty_sampling": "Evaluate where the surrogate predicts high uncertainty.",
+    "error_guided_sampling": "Evaluate near a point with high surrogate residual.",
+    "boundary_sampling": "Evaluate points near the search-domain boundary.",
+    "surrogate_acquisition": "Evaluate the surrogate acquisition function's proposed point.",
+    "retrain_surrogate": "Refit the surrogate without using an evaluation.",
+    "stop": "Stop optimization and return the best observed point.",
 }
 
 
@@ -60,39 +64,13 @@ def _state_payload(state: OptimizationState) -> dict[str, Any]:
 
 
 def _candidate_actions(state: OptimizationState, seed: int) -> dict[str, OptimizationAction]:
-    remaining = state.resource.remaining_budget
-    if remaining <= 0:
-        return {ActionType.STOP.value: OptimizationAction(ActionType.STOP)}
-    action_seed = seed + state.sampling.n_samples
-    choices = {
-        ActionType.GLOBAL_EXPLORATION.value: OptimizationAction(
-            ActionType.GLOBAL_EXPLORATION,
-            {"n_samples": min(2, remaining), "seed": action_seed},
-        ),
-        ActionType.UNCERTAINTY_SAMPLING.value: OptimizationAction(
-            ActionType.UNCERTAINTY_SAMPLING, {"n_samples": 1, "seed": action_seed},
-        ),
-        ActionType.BOUNDARY_SAMPLING.value: OptimizationAction(
-            ActionType.BOUNDARY_SAMPLING,
-            {"n_samples": min(2, remaining), "tol": 0.05, "seed": action_seed},
-        ),
-        ActionType.SURROGATE_ACQUISITION.value: OptimizationAction(
-            ActionType.SURROGATE_ACQUISITION
-        ),
-        ActionType.STOP.value: OptimizationAction(ActionType.STOP),
-    }
-    if state.sampling.n_samples:
-        choices[ActionType.LOCAL_EXPLOITATION.value] = OptimizationAction(
-            ActionType.LOCAL_EXPLOITATION, {"step": 0.1, "seed": action_seed}
-        )
-        choices[ActionType.ERROR_GUIDED_SAMPLING.value] = OptimizationAction(
-            ActionType.ERROR_GUIDED_SAMPLING, {"n_samples": 1, "seed": action_seed}
-        )
-    if not state.surrogate.is_current:
-        choices[ActionType.RETRAIN_SURROGATE.value] = OptimizationAction(
-            ActionType.RETRAIN_SURROGATE
-        )
-    return choices
+    """Build budget-valid candidates via the shared factory.
+
+    Per codex M1: a single factory owns candidate construction so the
+    action_id vocabulary stays aligned with `full_candidates` and any
+    other System-1 implementation.
+    """
+    return candidate_actions_for_state(state, seed=seed)
 
 
 @dataclass(frozen=True)
@@ -146,7 +124,7 @@ class LayaPolicy:
     def decide(self, state: OptimizationState) -> LayaDecision:
         choices = _candidate_actions(state, self.seed)
         if state.resource.remaining_budget <= 0:
-            decision = LayaDecision(choices[ActionType.STOP.value], {"stop": 1.0}, 1.0)
+            decision = LayaDecision(choices["stop"], {"stop": 1.0}, 1.0)
             self.last_decision = decision
             self.decisions.append(decision)
             return decision
@@ -160,7 +138,7 @@ class LayaPolicy:
                     "surrogate reliability, and whether stopping is justified."
                 ),
                 "criteria": {
-                    action_id: _DESCRIPTIONS[action.type]
+                    action_id: _DESCRIPTIONS[action.type.value]
                     for action_id, action in choices.items()
                 },
             }

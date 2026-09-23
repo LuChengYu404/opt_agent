@@ -1,16 +1,16 @@
-# Phase 9: Hybrid Agent Framework Design
+# Phase 9: Hybrid Agent Framework — Status & Updated Design
 
-> **Status**: PLAN for external review
+> **Status**: design reconciled with implementation after codex gpt-6-sol reviews
 > **Date**: 2026-09-23
-> **Reviewer**: codex `gpt-6-sol` (upgraded from `gpt-5.6-sol`)
-> **Scope**: Phase 9 System-1 + Calibration + Router + System-2 stub
-> **Reference**: [MASTER_PLAN.md §24](MASTER_PLAN.md) Hybrid Agent; §20 software architecture
+> **Reviewers**: codex `gpt-5.6-sol` (Phase 8.6B) → `gpt-6-sol` (Phase 9.0, 9.1)
+> **Last reviewed commit**: `5f79257` (Phase 9 framework skeleton, 235/235 tests)
+> **Now**: `HEAD` after codex re-review fixes (250/250 tests)
 
 ---
 
 ## 1. Background
 
-### 1.1 Current state (Phase 0–8 complete, Phase 8.6B pending commit)
+### 1.1 Current state (Phase 0–8 complete, Phase 9 framework skeleton committed)
 
 | Phase | Module | Status |
 |---|---|---|
@@ -20,16 +20,17 @@
 | 7 | Utility + DecisionDataset JSONL + Generator | ✅ 117 tests |
 | 8 | Empirical validation (revealed STOP bias) | ✅ 125 tests |
 | 8.5 | Utility fix + oracle gate machinery | ✅ 136 tests |
-| **8.6A** | **Scale wiring fix → Gate 3 PASS (+1.2 ~ +1.6 on 10-seed)** | **✅ 145 tests** |
-| **8.6B** | **Gate 2/4 machinery + replay history metadata** | **✅ 7 tests, uncommitted** |
+| 8.6A | Scale wiring fix → Gate 3 PASS | ✅ 145 tests |
+| 8.6B | Gate 2/4 machinery + replay history + LayaPolicy | ✅ 157 tests |
+| **9.0 framework skeleton** | **metrics + splits + system2 + router + HybridPolicy** | **✅ 250 tests** |
 
-`runs/phase8_6b_h3_10seed.jsonl` empirical reality (per PROGRESS.md):
-- Gate 2 (stable action preference): FAIL
-- Gate 3 (early exploration mass): PASS (point estimate)
-- Gate 4 (terminal optimization advantage): FAIL
-- **Known issue**: utility misspecification → reward hacking (STOP bias → retrain bias) — **deferred to Phase 8.7+, not Phase 9 blocker**
+`runs/phase8_6b_h3_10seed.jsonl` empirical reality (PROGRESS.md):
+- Gate 2 (stable action preference): **FAIL**
+- Gate 3 (early exploration mass): **PASS** (point estimate, +1.2 ~ +1.6)
+- Gate 4 (terminal optimization advantage): **FAIL**
+- **Known issue**: utility misspecification → reward hacking — **deferred to Phase 8.7+, not Phase 9 blocker**
 
-### 1.2 Phase 9 goal (per MASTER_PLAN §23 + §24)
+### 1.2 Phase 9 scope (per MASTER_PLAN §23 + §24)
 
 Build a working **Hybrid Agent skeleton**:
 
@@ -47,313 +48,260 @@ Optimization State
 ```
 
 **Phase 9 minimum scope** (build only what the experiment needs, per §27):
-- Typed-decision System-1 interface + ≥1 working implementation
-- Calibration metrics (ECE, Brier, NLL, reliability)
+- Typed-decision System-1 interface (LayaPolicy already production-ready)
+- Calibration metrics (ECE / Brier / NLL / reliability)
 - Confidence-based Router
-- System-2 stub (no real LLM call yet)
-- End-to-end closed-loop eval entry point
+- System-2 stub (delegates to RulePolicy, no real LLM call)
+- End-to-end closed-loop eval entry point via HybridPolicy
 
-### 1.3 Why typed decision primitives (the unifying contract)
+### 1.3 Architecture decision: real System-1 adapter over new Protocol
 
-Three reference implementations share one interface pattern — **typed decision primitives**:
+Phase 9.0 delivers a **shared candidate factory** (`actions.candidate_actions_for_state`)
+plus a **typed-decision adapter** for Laya (`system1.laya_policy.LayaPolicy`). The
+adapter exposes a `decide(state) → (action, probabilities, confidence)` triple that
+serves as the canonical System-1 interface in this codebase. It aligns with the
+Jev/NanoJev/RL-Agent typed-decision-primitive contract (choice / score / noul)
+but only `choice` is wired in Phase 9.0 — `score` and `noul` remain unwired
+because the underlying checkpoints have no calibration targets yet.
 
-| Primitive | Input | Output | Maps to our setting |
-|---|---|---|---|
-| `choice` | K candidates (K ∈ [2, 255]) | `{candidate: prob}` full distribution | **Select action** (5–7 actions) |
-| `score` | 2–10 ordered levels | `{level: prob}` + expected value | **Confidence / urgency** |
-| `noul` | boolean question | single P(true) | **Should escalate to System-2?** |
+**A separate "TypedDecisionSystem1" Protocol is NOT introduced.** The existing
+`Policy` Protocol + the `LayaPolicy.decide()` triple give us everything we need
+without inventing a parallel abstraction. `HybridPolicy` accepts any object
+that satisfies `decide(state) → (action, probabilities, ...)` (via
+`System1Decider`) and adapts bare `Policy` objects with
+`adapt_policy_as_system1`.
 
-Reference implementations:
-- **Jev** (TypeSafe, commercial API)
-- **NanoJev** (TianyuCodings, MIT, Qwen3-0.6B backbone)
-- **RL Agent / System 1** (arXiv:2503.23303, 2510.01237, Apache 2.0, ModernBERT-large backbone)
+### 1.4 Future fine-tuning plan (Phase 9.3, deferred)
 
-Writing our `TypedDecisionSystem1` Protocol **once** lets us swap any implementation later without refactoring.
+After Phase 9.0–9.2 close the framework skeleton, Phase 9.3 will fine-tune a
+real typed-decision checkpoint on rollout data. The candidate is a base model
+that supports the typed-decision primitive API with released weights under a
+permissive license. The exact choice is deferred until the smoke harness
+runs against a real BOCoDe backend and we can compare candidates on (a)
+license permissiveness, (b) set-attention over dynamic candidate vocabulary,
+and (c) calibration availability on the calibration split.
 
-### 1.4 Reference architecture choice: RL Agent / System 1
-
-| Criterion | RL Agent | NanoJev | Jev API |
-|---|---|---|---|
-| License | **Apache 2.0** | MIT | Commercial |
-| Fine-tunable | **Yes (base weights released)** | Yes (train from scratch) | **No** |
-| Training paradigm | **RLCD (proper scoring rules)** | Supervised CE on gold_probs | N/A |
-| Calibration built-in | **Yes (proper scoring rules enforce)** | Depends on training data | Black box |
-| Backbone size | **421M (ModernBERT-large)** | 0.6B (Qwen3) | Unknown |
-| Latency | **~35ms** | ~50–100ms | API latency |
-| Reward-hack resistance | **High** (no dependency on utility proxy) | Low (CE optimizes gold_probs which is utility-derived) | N/A |
-
-**Decision**: design against `RL Agent / System 1` as reference architecture, with `MockTypedSystem1` as Phase 9.1 placeholder. NanoJev remains as fallback if RLCD training proves unstable.
+This plan deliberately does NOT commit to a specific paper, model card, or
+license claim — earlier versions of this document cited references that did
+not verify to the cited model, and codex review flagged that as a C1
+finding. References will be re-added with verified URLs in Phase 9.3.
 
 ---
 
 ## 2. Interface Contracts
 
-### 2.1 `TypedDecisionSystem1` Protocol
+### 2.1 System-1: LayaPolicy + DecisionLike
 
 ```python
-from typing import Protocol
-from dataclasses import dataclass
+from opt_agent.system1.laya_policy import LayaPolicy, LayaDecision
 
 @dataclass(frozen=True)
-class StateFeatures:
-    """Canonical state encoding passed to System-1.
-    Sub-states per MASTER_PLAN §7: sampling / surrogate / optimization / resource / history.
+class LayaDecision:
+    action: OptimizationAction
+    probabilities: dict[str, float]
+    confidence: float
+
+class LayaPolicy:
+    def decide(self, state: OptimizationState) -> LayaDecision: ...
+    def select_action(self, state, backend=None) -> OptimizationAction: ...
+    def reset(self) -> None: ...
+```
+
+`LayaPolicy.decide()` is the canonical System-1 contract. Its probability
+distribution is built from the shared candidate factory
+(`actions.candidate_actions_for_state`), so the action_id vocabulary is
+stable across LayaPolicy, the dataset generator (`full_candidates`), and
+any future System-1 implementation.
+
+### 2.2 Shared candidate factory
+
+```python
+from opt_agent.actions import candidate_actions_for_state
+
+def candidate_actions_for_state(
+    state: OptimizationState, *, seed: int = 0,
+) -> dict[str, OptimizationAction]:
+    """Build budget-valid candidates as {action_id: OptimizationAction}.
+
+    Per codex M1: a single factory owns candidate construction so the
+    action_id vocabulary stays aligned across System-1 implementations.
     """
-    sampling: dict[str, float]
-    surrogate: dict[str, float]
-    optimization: dict[str, float]
-    resource: dict[str, float]
-    history: dict[str, float]
-    raw: dict                       # original JSON state for free-form fields
-
-class TypedDecisionSystem1(Protocol):
-    """Reference contract: RL Agent / System 1 typed decision primitives.
-    All outputs are FULL distributions, never argmax-only.
-    """
-
-    def predict_choice(
-        self,
-        state: StateFeatures,
-        candidates: list[str],
-    ) -> dict[str, float]:
-        """Choice type: K-way probability distribution over candidates.
-
-        Contract:
-          - All probabilities ≥ 0
-          - Probabilities sum to 1.0 within tolerance
-          - Returns one entry per candidate in `candidates`
-          - Candidates must be 2 ≤ K ≤ 255 (matches NanoJev/RL Agent limits)
-        """
-        ...
-
-    def predict_score(
-        self,
-        state: StateFeatures,
-        legend: dict[int, str],
-    ) -> dict[int, float]:
-        """Score type: probability distribution over ordered rubric levels.
-
-        Contract:
-          - Returns one entry per key in `legend`
-          - Probabilities sum to 1.0
-          - Returns expectation (float) via `predict_score_expectation`
-        """
-        ...
-
-    def predict_score_expectation(
-        self,
-        state: StateFeatures,
-        legend: dict[int, str],
-    ) -> float:
-        """Expected value E[level] under predict_score distribution."""
-        ...
-
-    def predict_noul(
-        self,
-        state: StateFeatures,
-        question: str,
-    ) -> float:
-        """Noul type: P(true) for a boolean question.
-        Used for: 'Should we escalate to System-2?'
-        """
-        ...
 ```
 
-### 2.2 `System2Policy` Protocol (stub)
+Filter rules: budget <= 0 → only `stop`; budget > 0 → at least one
+sampling action + `stop` (so early termination is always offered);
+local actions only when `n_samples > 0`; `retrain_surrogate` only when
+the surrogate is not yet fitted.
+
+### 2.3 System-2: FallbackSystem2
 
 ```python
-class System2Policy(Protocol):
-    """High-level reasoning fallback. Phase 9 ships as stub only."""
+from opt_agent.system2 import FallbackSystem2, System2Decision
 
-    def reason(
-        self,
-        state: StateFeatures,
-        recent_history: list[str],
-        candidates: list[str],
-        remaining_budget: int,
-    ) -> tuple[str, dict, float]:
-        """Return (action_name, action_params, confidence).
+@dataclass(frozen=True)
+class System2Decision:
+    action: OptimizationAction
+    confidence: float       # 0.0 for STOP, 1.0 otherwise
+    reasoning: str = ""
 
-        Phase 9.1: FallbackSystem2 returns ("stop", {}, 1.0) by default.
-        Phase 11: replaced by Tau/LLM harness.
-        """
-        ...
+class FallbackSystem2:
+    def __init__(self, *, baseline: RulePolicy | None = None): ...
+    def reason(self, state, *, recent_actions=(), remaining_budget=None) -> System2Decision: ...
+    def reset(self) -> None: ...
 ```
 
-### 2.3 `Router` Protocol
+Per codex M2: the fallback MUST delegate to a real baseline (RulePolicy
+here) and MUST NOT default to STOP. STOP is returned only when the
+baseline itself returns STOP (i.e., remaining_budget ≤ 4). A regression
+test (`test_fallback_drives_decision_loop_through_multiple_actions`)
+verifies this by ensuring at least 2 non-STOP actions occur before the
+loop terminates.
+
+### 2.4 Router: ConfidenceRouter
 
 ```python
-class Router(Protocol):
-    """Decides whether to use System-1 (fast) or System-2 (deep)."""
+from opt_agent.router import ConfidenceRouter, Route
 
-    def route(
-        self,
-        state: StateFeatures,
-        system1_output: dict,            # TypedDecisionSystem1 outputs
-    ) -> tuple[str, float]:             # ("system1" | "system2", confidence)
-        ...
+@dataclass(frozen=True)
+class Route:
+    name: Literal["system1", "system2"]
+    confidence: float
+    reason: str
 
-    def update(self, state: StateFeatures, action: str, reward: float) -> None:
-        """Optional online learning of routing thresholds."""
-        ...
+class ConfidenceRouter:
+    def __init__(self, *, tau_conf: float = 0.5): ...
+    def route(self, probabilities: dict[str, float]) -> Route: ...
+    def update(self, probabilities, chosen, reward) -> None: ...
+    def stats(self) -> dict[str, int]: ...
 ```
 
-Phase 9 ships `ConfidenceRouter`: `route` based on `predict_score` expectation (low confidence → System-2) and `predict_noul` (high escalate probability → System-2).
+Per codex M3: the first-version router uses ONLY `max(probabilities.values())`
+against `tau_conf`. `predict_score` and `predict_noul` are NOT consulted —
+those heads have no calibration targets in the current models.
 
-### 2.4 Calibration metrics
+### 2.5 HybridPolicy: the glue
 
 ```python
-def expected_calibration_error(
-    probs: list[dict[str, float]],
-    outcomes: list[str],
-    n_bins: int = 15,
-) -> float:
-    """ECE: weighted avg |bin_confidence - bin_accuracy|."""
-    ...
+from opt_agent.system1 import HybridPolicy
 
-def brier_score(
-    probs: dict[str, float],
-    outcome: str,
-    candidates: list[str],
-) -> float:
-    """Multi-class Brier: sum over candidates of (p_i - 1[outcome=i])^2."""
-    ...
-
-def negative_log_likelihood(
-    probs: dict[str, float],
-    outcome: str,
-) -> float:
-    """NLL = -log P(outcome)."""
-    ...
-
-def reliability_diagram_data(
-    probs: list[dict[str, float]],
-    outcomes: list[str],
-    n_bins: int = 15,
-) -> list[tuple[float, float, int]]:
-    """Returns [(bin_confidence, bin_accuracy, bin_count), ...] for plotting."""
-    ...
+class HybridPolicy:
+    def __init__(self, system1, router, system2): ...
+    def select_action(self, state, backend=None) -> OptimizationAction: ...
+    def reset(self) -> None: ...
 ```
 
-Per MASTER_PLAN §13: also need `C(s) = max_a P(a|s)` (confidence) and `H(s) = -Σ P(a|s) log P(a|s)` (entropy). These are derived utilities, not separate metrics.
+Per step:
+1. `decision = system1.decide(state)`
+2. Validate `decision.action.type.value ∈ decision.probabilities` (contract guard).
+3. `route = router.route(decision.probabilities)`
+4. If `route.name == "system1"` → return `decision.action`.
+5. Else → return `system2.reason(state).action`.
+
+`HybridPolicy` implements the existing `Policy` Protocol, so it can be
+passed directly to `DecisionLoop.run(policy)` — the DecisionLoop
+constructor is NOT modified (per codex M4).
+
+### 2.6 Calibration metrics
+
+```python
+from opt_agent.metrics import (
+    expected_calibration_error, brier_score, negative_log_likelihood,
+    reliability_diagram_data, top_one_agreement, kl_divergence,
+    aggregate_decision_metrics, CalibrationResult, DecisionResult,
+)
+```
+
+`expected_calibration_error(probs, outcomes, n_bins=15)` — `outcome` is the
+**observed** label for each record. There are two regimes (see module
+docstring):
+
+1. **Internal consistency**: `outcomes[i] = argmax(probs[i])`. Per-record
+   accuracy is 1.0, so ECE collapses to the gap between `max(probs)` and
+   1.0. This measures confidence-in-its-own-choice, NOT real calibration.
+2. **Real calibration**: pass an INDEPENDENTLY observed label (human
+   annotation, oracle gap from rollout). ECE then measures agreement
+   between confidence and real accuracy.
+
+Per codex new-issue-2: `aggregate_decision_metrics` reports
+`n_infinite_kl` / `n_infinite_nll` so the caller knows how many records
+were excluded from `kl_mean` / `nll_mean`. A single +inf record can no
+longer make a corpus look perfect.
 
 ---
 
-## 3. Module Structure
-
-### 3.1 New files
+## 3. Module Structure (current)
 
 ```
 src/opt_agent/
-├── system1/
-│   ├── __init__.py
-│   ├── typed_decision.py        # TypedDecisionSystem1 Protocol + StateFeatures
-│   ├── mock_typed.py            # MockTypedSystem1 — uniform/zero baseline
-│   ├── mlp_typed.py             # MLPTypedSystem1 — adapter from phase9_baselines.py
-│   └── rl_agent.py              # Phase 9.3 only: fine-tuned RL Agent adapter
-├── system2/
-│   ├── __init__.py
-│   ├── base.py                  # System2Policy Protocol
-│   └── fallback.py              # FallbackSystem2 — returns ("stop", {}, 1.0)
-├── router/
-│   ├── __init__.py
-│   ├── base.py                  # Router Protocol
-│   └── confidence.py            # ConfidenceRouter — uses System-1 confidence/entropy/noul
-└── metrics/
-    ├── __init__.py
-    ├── calibration.py           # ECE / Brier / NLL / reliability
-    └── decision.py              # top-1, top-k, KL vs gold_probs
-
-src/opt_agent/dataset/
-└── splits.py                    # 5-way split: train / dev / calibration / test / ood
-                                  # also: gold_probs_kind, physical_state_hash fields
-
-src/opt_agent/loop/
-└── decision_loop.py             # UPDATED: accepts (system1, router, system2) trio
+├── actions/                        # Research core: candidate factory
+│   ├── factory.py                  # NEW — shared candidate_actions_for_state
+│   ├── models.py                   # OptimizationAction, ActionType, _ALLOWED_PARAMS
+│   └── executor.py
+├── backend/                        # Engineering infra: BoTorch + checkpoint
+├── state/                          # Research core: OptimizationState + extract_state
+├── dataset/                        # Research core: DecisionRecord + generation + splits
+│   ├── splits.py                   # NEW — 5-way split + physical_state_hash + gold_probs_kind
+│   └── ...
+├── rollout/                        # Research core: counterfactual + utility
+├── loop/                           # Research core: DecisionLoop + base policies
+│   └── policies.py                 # RandomPolicy + RulePolicy (DecisionLoop is NOT modified)
+├── system1/                        # Research core
+│   ├── laya_policy.py              # Production-ready LayaPolicy (decide / select_action / reset)
+│   └── hybrid_policy.py            # NEW — HybridPolicy + System1Decider + adapt_policy_as_system1
+├── system2/                        # Research core: stub for Phase 11
+│   ├── base.py                     # NEW — System2Decision + System2Policy Protocol
+│   └── fallback.py                 # NEW — FallbackSystem2 (delegates RulePolicy, NOT STOP)
+├── router/                         # Research core
+│   ├── base.py                     # NEW — Route dataclass + Router Protocol
+│   └── confidence.py               # NEW — ConfidenceRouter (max(probs) vs tau_conf)
+├── metrics/                        # Research core: calibration + decision metrics
+│   ├── calibration.py              # NEW — ECE/Brier/NLL/reliability (with regime docstring)
+│   └── decision.py                 # NEW — top-1/KL/NLL-vs-gold (with inf counts)
+└── benchmark/                      # Engineering infra (deferred)
 
 tests/
-├── test_system1_typed.py        # Contract tests for Protocol
-├── test_system1_mock.py         # Mock implementation behavior
-├── test_system1_mlp.py          # MLP training smoke
-├── test_system2_fallback.py     # Stub behavior
-├── test_router_confidence.py    # Routing thresholds
-├── test_metrics_calibration.py  # ECE/Brier/NLL mathematical correctness
-├── test_dataset_splits.py       # 5-way split integrity + hash uniqueness
-└── test_decision_loop_hybrid.py # End-to-end: state → system1 → router → action
+├── test_actions_factory.py         # NEW — 12 tests
+├── test_metrics_calibration.py     # NEW — 20 tests
+├── test_metrics_decision.py        # NEW — 16 tests
+├── test_dataset_splits.py          # NEW — 21 tests (incl. sorted family + hash scope)
+├── test_system2_fallback.py        # NEW — 6 tests (incl. STOP regression)
+├── test_router_confidence.py       # NEW — 11 tests
+├── test_hybrid_policy.py           # NEW — 7 tests (incl. end-to-end)
+└── test_laya_policy.py             # 5 tests (pre-existing)
 ```
-
-### 3.2 Module boundaries (research core vs engineering infrastructure)
-
-Per MASTER_PLAN §28–29:
-
-| Module | Boundary | Justification |
-|---|---|---|
-| `system1/` | **Research core** | Decision supervision + policy architecture |
-| `system2/` | Research core | Reasoning strategy |
-| `router/` | Research core | Selective reasoning (RQ3) |
-| `metrics/calibration.py` | Research core | Confidence calibration is §13's RQ3 dependency |
-| `dataset/splits.py` | Research core | OOD split is RQ2's transfer test |
-| `loop/decision_loop.py` (update) | Research core | Closed-loop eval entry |
-| `system1/rl_agent.py` (Phase 9.3) | Engineering infra (wrap) | Wrap external checkpoint |
 
 ---
 
-## 4. Implementation Steps (priority order)
+## 4. Implementation Steps (status)
 
-Each step ends with `pytest -q` passing and a commit.
+| Step | Description | Status |
+|---|---|---|
+| **0** | `metrics/calibration.py` + `metrics/decision.py` + tests | ✅ Done (36 tests) |
+| **1** | `dataset/splits.py` + tests | ✅ Done (21 tests, with sorted-family + hash-scope fixes) |
+| **2** | `actions/factory.py` + tests | ✅ Done (12 tests) |
+| **3** | `system2/{base,fallback}.py` + tests | ✅ Done (6 tests) |
+| **4** | `router/{base,confidence}.py` + tests | ✅ Done (11 tests) |
+| **5** | `system1/hybrid_policy.py` + tests | ✅ Done (7 tests, with action-id contract guard) |
+| **6** | LayaPolicy refactored to use shared candidate factory | ✅ Done |
+| **7** | `tests/test_hybrid_policy.py` end-to-end on RecordingBackend | ✅ Done (smoke only; real BO deferred) |
+| **8** | **End-to-end on real BOCoDe backend** (Branin + Ackley + Hartmann, simple_regret) | ⏸ Deferred to Phase 9.1 |
+| **9** | Commit framework skeleton + design doc | ⏳ Pending this PR |
 
-### Step 1 — `metrics/calibration.py` + `tests/test_metrics_calibration.py`
-- Pure functions, no I/O
-- ECE / Brier / NLL / reliability + small synthetic tests
-- Independent of everything else → unblocks router + system1 work
-- ~50 LOC + ~80 LOC tests
+### 4.1 Phase 9.1 follow-up: real-backend smoke
 
-### Step 2 — `dataset/splits.py` + `tests/test_dataset_splits.py`
-- 5-way split (train / dev / calibration / test / ood)
-- `physical_state_hash` (SHA256 over canonical state JSON)
-- `gold_probs_kind` provenance field
-- OOD split: by `problem.family` (held-out problem family)
-- Wire into `dataset/generator.py` if not already
-- ~80 LOC + ~100 LOC tests
+```bash
+uv run python scripts/run_hybrid_smoke.py \
+    --problem branin --seed 0 --budget 30 \
+    --system1 laya --router tau_conf=0.5 --system2 rule
+```
 
-### Step 3 — `system1/typed_decision.py` (Protocol + StateFeatures)
-- Pure Protocol, no logic
-- `StateFeatures` dataclass to canonicalize state extraction
-- ~40 LOC + ~50 LOC tests
+Expected outputs:
+- `simple_regret = known_optimum - best_value` (Branin optimum = -0.397887)
+- Per-step routing stats (system1 count / system2 count)
+- Calibration diagnostics on argmax-outcomes (with regime tag in the docstring)
 
-### Step 4 — `system1/mock_typed.py` + `tests/test_system1_mock.py`
-- Uniform choice, mid-level score, neutral noul
-- Deterministic via injected seed
-- Verify Protocol contract compliance (probabilities sum to 1, etc.)
-- ~50 LOC + ~80 LOC tests
-
-### Step 5 — `system1/mlp_typed.py` + `tests/test_system1_mlp.py`
-- Adapter wrapping `phase9_baselines.py` MLP
-- `train(jsonl_path)` + `save(path)` + `load(path)`
-- Smoke: train on Branin-only 10-seed dataset, verify top-1 agreement > uniform
-- ~120 LOC + ~120 LOC tests
-
-### Step 6 — `system2/base.py` + `system2/fallback.py` + `tests/test_system2_fallback.py`
-- `FallbackSystem2` returns `("stop", {}, 1.0)`
-- Phase 11 will swap in Tau harness — placeholder interface only
-- ~30 LOC + ~30 LOC tests
-
-### Step 7 — `router/confidence.py` + `tests/test_router_confidence.py`
-- Threshold-based: `route` based on `predict_score_expectation < τ_conf` OR `predict_noul > τ_escalate`
-- Configurable thresholds (not hard-coded)
-- ~40 LOC + ~60 LOC tests
-
-### Step 8 — `loop/decision_loop.py` upgrade + `tests/test_decision_loop_hybrid.py`
-- `DecisionLoop(system1, router, system2)` constructor
-- Per step: extract state → `system1.predict_*` → `router.route` → action
-- Closed-loop run: returns `RunResult(state_trajectory, action_trajectory, simple_regret, calibration_stats)`
-- **End-to-end smoke**: Branin 10-seed → 1 trajectory → assert `len(actions) > 0` and `simple_regret < 1.0` (well-defined vs known optimum -0.397887)
-- ~80 LOC change + ~100 LOC tests
-
-### Step 9 — Integration: commit Phase 8.6B + Phase 9 skeleton
-- Two separate commits per work-flow rule
-- Phase 8.6B first (already-tested)
-- Phase 9 skeleton second
+This is the acceptance test that takes Phase 9 from "framework skeleton
+passes tests" to "Phase 9 done".
 
 ---
 
@@ -363,26 +311,36 @@ Each step ends with `pytest -q` passing and a commit.
 
 | Category | Purpose | Example |
 |---|---|---|
-| **Contract tests** | Any `TypedDecisionSystem1` impl must satisfy | `test_predict_choice_probs_sum_to_one` (parametrized over impls) |
-| **Mathematical correctness** | Calibration metrics match known formulas | `test_ece_uniform_distribution` (should be ~0) |
-| **Smoke training** | MLP trains without NaN, top-1 agreement > uniform | `test_mlp_top1_above_uniform` |
-| **Integration** | Full pipeline state → action works | `test_decision_loop_branin_smoke` |
-| **Determinism** | Same seed → same output | `test_mlp_predict_deterministic` |
+| **Contract tests** | Protocol/interface invariants | `test_hybrid_rejects_system1_without_decide` |
+| **Mathematical correctness** | Metrics match known formulas | `test_ece_delta_probs_self_consistent_is_zero` |
+| **Filtering invariants** | Candidate factory budget + surrogate rules | `test_factory_returns_only_stop_when_budget_exhausted` |
+| **Cross-process determinism** | Split assignment is RNG-seed-stable | `test_assign_splits_uses_sorted_family_order` |
+| **Regression tests** | Lock in codex M1/M2/M3/M4 fixes | `test_fallback_drives_decision_loop_through_multiple_actions` |
+| **End-to-end smoke** | Full DecisionLoop.run(policy) | `test_hybrid_drives_decision_loop_end_to_end` |
 
-### 5.2 Coverage targets
+### 5.2 Acceptance threshold (gold_probs is NOT optimization benefit)
 
-- All Protocol methods: 100% covered
-- Calibration metrics: edge cases (K=2, K=255, uniform, degenerate)
-- Closed-loop test: 1 problem × 1 seed smoke, not full benchmark
-- All Phase 9 tests must pass before any commit
+Per codex C2: `gold_probs` is a rollout soft target, NOT a ground-truth
+"correct action". Training a System-1 on `gold_probs` and reporting
+`top-1 > uniform` is a label-fit diagnostic, NOT evidence that the
+model produces a better optimizer. The acceptance tests for Phase 9
+**must** separate the two:
 
-### 5.3 Non-goals for Phase 9
+- **Diagnostic (cheap)**: `top_one_agreement`, `top_k_agreement`, `kl_mean`
+  against `gold_probs` — only meaningful for interface & label-fit sanity.
+- **Acceptance (real)**: `simple_regret = known_optimum - best_value` on a
+  real BOCoDe problem with `HybridPolicy` driving `DecisionLoop.run(1)`.
+  Computed in the evaluation layer, NOT in the metrics module.
 
-- ❌ Real LLM System-2 (Phase 11)
-- ❌ Engineering problem transfer (Phase 14)
-- ❌ OOD detector sophistication (basic hash-based OOD split only)
-- ❌ Multi-agent or multi-policy ensemble
-- ❌ Online learning / production deployment
+Until simple_regret on real BO problems is reported, Phase 9 is
+"framework skeleton" status, NOT "Phase 9 done".
+
+### 5.3 Coverage targets
+
+- 250/250 tests passing as of this commit.
+- Phase 9.1 adds ≥1 simple_regret smoke test per problem family
+  (Branin / Ackley / Hartmann).
+- Total target: ≥ 255 tests.
 
 ---
 
@@ -390,78 +348,100 @@ Each step ends with `pytest -q` passing and a commit.
 
 ### 6.1 Reward hacking / utility misspecification (KNOWN, deferred)
 
-**Issue**: utility misspecification (Phase 8.5 STOP bias → Phase 8.6A retrain bias) is a real research problem documented in PROGRESS.md. Naive CE training on `gold_probs` would propagate this bias to System-1.
+`utility` reward is a 4-term soft target that exhibits reward-hacking
+patterns (STOP bias → retrain bias, see PROGRESS.md). Phase 9.0 uses
+the existing `gold_probs` for diagnostic label-fit only. Future training
+will use proper-scoring-rule loss (per RL Agent / System 1 reference) or
+direct simple_regret credit assignment.
 
-**Mitigation**: Phase 9 System-1 design separates **reward source** from **decision model**:
-- `MLPTypedSystem1.train()` accepts `reward_source: Literal["gold_probs", "simple_regret", "rlcd_proper_score"]`
-- Default `reward_source="simple_regret"` once simple_regret is exposed in `RunResult` (Step 8)
-- RLCD path (Phase 9.3) is reward-source-agnostic by design
+### 6.2 Calibration metric regimes (KNOWN, documented)
 
-**Status**: Known issue, NOT Phase 9 blocker. Phase 8.7+ work.
+`expected_calibration_error` accepts any `outcome` source. Using
+`outcome = argmax(probs)` measures internal consistency, not real
+calibration. The function's docstring warns about this; the aggregate
+result includes `n_records` and `notes` so downstream consumers know
+which regime the metric came from.
 
-### 6.2 RL Agent base checkpoint assumptions
+### 6.3 Aggregate KL/NLL hiding failures (FIXED)
 
-**Risk**: RL Agent was trained on human-labeled data (support triage, banking intents, etc.) — fine-tuning is necessary but training stability is unverified for our domain.
+`aggregate_decision_metrics` now exposes `n_infinite_kl` and
+`n_infinite_nll` counts. A single +inf record can no longer be hidden
+behind a "kl_mean=0" headline.
 
-**Mitigation**: Phase 9.3 (RL Agent fine-tuning) gated on Phase 9.1–9.2 success; NanoJev fallback ready.
+### 6.4 Split determinism across processes (FIXED)
 
-### 6.3 DecisionLoop backward compatibility
+`assign_splits` now iterates families in SORTED order and seeds within
+each family are also sorted before shuffling. Identical input + seed
+yields identical assignments regardless of `set` iteration order.
 
-**Risk**: Updating `DecisionLoop` constructor may break Phase 4–6 tests.
+### 6.5 physical_state_hash scope (FIXED)
 
-**Mitigation**: Add `DecisionLoop` overload that accepts `policy` (legacy) OR `(system1, router, system2)` (new). Legacy path preserved.
+`physical_state_hash` now hashes ONLY `record.state`. Previous version
+included `record.problem` (trajectory seed — not physics) and
+`record.candidate_actions` (factory output — not physics). The narrower
+hash means "two records hash equal iff their BO state is physically
+identical".
 
-### 6.4 Dataset split schema migration
+### 6.6 HybridPolicy contract guard (FIXED)
 
-**Risk**: Adding `split` / `gold_probs_kind` / `physical_state_hash` to `DecisionRecord` may invalidate existing JSONL files.
-
-**Mitigation**: New fields are optional (default None / empty); existing JSONL loads correctly. Validation warns but does not fail.
-
----
-
-## 7. Phase 9.3 Follow-up (RL Agent fine-tuning)
-
-After Phase 9.1–9.2 skeleton works:
-
-1. **Download RL Agent base checkpoint** from HuggingFace (Apache 2.0)
-2. **Adapt `system1/rl_agent.py`**:
-   - Wrap ModernBERT backbone + decision heads
-   - State encoding: serialize `StateFeatures` to JSON, embed via ModernBERT tokenizer
-   - Set attention over candidate [MASK] tokens
-3. **Training loop**:
-   - Loss: `RLCD(policy_gradient + proper_scoring_rules)` — uses simple regret per closed-loop run
-   - Two-LR: backbone 1e-5, decision head 1e-4
-   - Calibration: ECE / Brier / NLL on held-out calibration split
-4. **Evaluation**:
-   - Closed-loop: Branin + Ackley + Hartmann × 10 seeds × 3 horizons
-   - Comparison: `MockTypedSystem1` baseline + `MLPTypedSystem1` + `RLAgentTypedSystem1`
-   - Metrics: simple regret, ECE, NLL, LLM call rate (System-2 usage %)
+`HybridPolicy.select_action` validates that
+`system1_action.type.value ∈ system1_probabilities`. A model that emits
+a probability distribution on a vocabulary different from the candidate
+factory's vocabulary now fails loudly instead of producing silent
+mismatches in the loop.
 
 ---
 
-## 8. Acceptance Criteria (Phase 9 done = all of these)
+## 7. Future fine-tuning plan (Phase 9.3)
 
-- [ ] All 9 implementation steps have passing tests
-- [ ] `tests/test_decision_loop_hybrid.py` runs end-to-end on Branin 10-seed
-- [ ] `MockTypedSystem1` and `MLPTypedSystem1` both satisfy `TypedDecisionSystem1` Protocol (verified by contract tests)
-- [ ] DecisionLoop backward-compatible (Phase 4–6 tests still pass)
-- [ ] Phase 8.6B committed separately
-- [ ] Total test count: ≥ 165 (current 151 + ~14 new Phase 9 tests)
-- [ ] External review by codex `gpt-6-sol` signed off
-- [ ] PROGRESS.md updated with Phase 9 status
+After Phase 9.0–9.2 close:
+
+1. Run the simple_regret smoke harness on real BOCoDe problems with
+   `HybridPolicy(LayaPolicy(FakeLaya), ConfidenceRouter, FallbackSystem2)`.
+2. Pick a real typed-decision base model with permissive license and
+   released weights that supports the `choice / score / noul` primitive
+   API.
+3. Fine-tune the decision head on rollout data using a proper-scoring-rule
+   loss (avoids the utility-hacking failure mode observed in Phase 8.5/8.6).
+4. Replace `LayaPolicy(FakeLaya)` with the fine-tuned adapter.
+
+Step 1 is the immediate Phase 9.1 gate; steps 2–4 are Phase 9.3.
+
+---
+
+## 8. Acceptance Criteria (Phase 9 done)
+
+- [x] All 9 framework-skeleton steps have passing tests (250/250 currently)
+- [x] `HybridPolicy` drives `DecisionLoop.run(policy)` end-to-end
+- [x] `LayaPolicy` is the production-ready zero-shot System-1 adapter
+- [x] DecisionLoop constructor is unchanged
+- [x] Codex gpt-6-sol findings C1, C2, M1, M2, M3, M4 resolved (or
+      PARTIAL → FIXED where partial was accepted)
+- [x] New codex issues (calibration regimes, KL inf count, split
+      determinism, hash scope, HybridPolicy contract guard) resolved
+- [ ] **Phase 9.1**: end-to-end smoke on real BOCoDe backend with
+      `simple_regret` reported for at least Branin + Ackley + Hartmann
+- [ ] **Phase 9.3**: fine-tuned typed-decision model replaces
+      `LayaPolicy(FakeLaya)` in the smoke harness
 
 ---
 
 ## 9. Open Questions for codex `gpt-6-sol`
 
-1. **Is the Protocol interface set complete?** Should we add `predict_score_with_legend_validation` or similar safety wrappers?
-2. **Mock vs real System-1 split**: do we want a separate `BaseTypedSystem1` ABC, or is duck-typing via Protocol enough?
-3. **Calibration bin count**: 15 is the standard. Should we support per-record dynamic binning?
-4. **Dataset split ratio**: train/dev/calibration/test/ood — any standard ratio (e.g., 60/10/10/10/10) or should we adopt NanoJev's exact split sizes?
-5. **DecisionLoop return type**: `RunResult` with `simple_regret` field — is `simple_regret = known_optimum - best_value` (we know Branin optimum is -0.397887) the right semantics?
-6. **Reward source default**: should `MLPTypedSystem1.train()` default to `"simple_regret"` (requires Phase 9.2 closed-loop runs) or `"gold_probs"` (works immediately but inherits hack)?
-7. **Router threshold initial values**: what's a reasonable starting point for `τ_conf` and `τ_escalate`?
-
----
-
-**End of plan. Awaiting codex `gpt-6-sol` review.**
+1. **Real-backend smoke methodology**: should Phase 9.1 use the same
+   `RecordingBackend` shape but driven by a real BOCoDe Branin problem
+   behind the scenes, or wire `BocodeBotorchBackend` into the harness
+   from the start?
+2. **ConfidenceRouter threshold tuning**: the docstring says tau_conf
+   should be tuned on the calibration split. Is it acceptable to fix
+   tau_conf=0.5 for Phase 9.1 and tune it in Phase 9.3, or do you want
+   the tuning step included in 9.1?
+3. **Laya adapter vs zero-shot baseline reporting**: Phase 9.1 smoke
+   will report simple_regret for the HybridPolicy with `LayaPolicy
+   (FakeLaya)` as the System-1. Is reporting the no-LLM `RulePolicy`
+   baseline in the same table acceptable, or should we ship a separate
+   baselines script?
+4. **End-to-end smoke granularity**: should Phase 9.1 ship a smoke
+   script (`scripts/run_hybrid_smoke.py`) as the contract surface, or
+   is a pytest entry point (`tests/test_hybrid_smoke_real.py`) enough
+   for now?
