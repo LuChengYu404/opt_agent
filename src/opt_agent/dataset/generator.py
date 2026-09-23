@@ -24,6 +24,7 @@ from opt_agent.actions import (
     OptimizationAction,
     execute_action,
 )
+from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
 from opt_agent.actions.models import ActionResult
 from opt_agent.backend.bocode_botorch import BackendConfig, UnifiedBackend
 from opt_agent.backend.checkpoint import Checkpoint
@@ -38,39 +39,27 @@ from opt_agent.rollout.utility import UtilityWeights
 from opt_agent.state import OptimizationState, extract_state
 
 
-# Phase 7 default: full action vocabulary with sensible default params.
-# id mirrors action type so records align across calls.
-_PHASE7_CANDIDATE_SPECS: list[tuple[str, ActionType, dict]] = [
-    ("global_exploration",  ActionType.GLOBAL_EXPLORATION,    {"n_samples": 2}),
-    ("local_exploitation",  ActionType.LOCAL_EXPLOITATION,    {"step": 0.1}),
-    ("uncertainty_sampling", ActionType.UNCERTAINTY_SAMPLING, {"n_samples": 1}),
-    ("error_guided_sampling", ActionType.ERROR_GUIDED_SAMPLING, {"n_samples": 1}),
-    ("boundary_sampling",   ActionType.BOUNDARY_SAMPLING,     {"n_samples": 2, "tol": 0.05}),
-    ("surrogate_acquisition", ActionType.SURROGATE_ACQUISITION, {}),
-    ("retrain_surrogate",   ActionType.RETRAIN_SURROGATE,     {}),
-    ("stop",                ActionType.STOP,                  {}),
-]
-
-
 def full_candidates(seed: int = 0) -> list[Candidate]:
-    """Return the Phase 7 default 8-action candidate set.
+    """Return the unfiltered 8-action candidate set used by the dataset.
 
-    Only actions that accept `seed` (per `_ALLOWED_PARAMS`) get it. Other
-    actions (STOP / RETRAIN_SURROGATE / SURROGATE_ACQUISITION) ignore seed.
+    Per codex M1: this reads `actions.factory.ALL_CANDIDATE_SPECS` — the
+    SINGLE source of truth for the action vocabulary. The runtime factory
+    (`actions.candidate_actions_for_state`) filters this same list by
+    state. There is no second 8-action list anywhere in the codebase.
     """
-    _SEED_ACCEPTING = {
-        ActionType.GLOBAL_EXPLORATION,
-        ActionType.LOCAL_EXPLOITATION,
-        ActionType.UNCERTAINTY_SAMPLING,
-        ActionType.ERROR_GUIDED_SAMPLING,
-        ActionType.BOUNDARY_SAMPLING,
-    }
     out: list[Candidate] = []
-    for action_id, action_type, params in _PHASE7_CANDIDATE_SPECS:
+    for action_id, action_type, params in ALL_CANDIDATE_SPECS:
         merged = dict(params)
-        if action_type in _SEED_ACCEPTING:
+        if "seed" in params or action_type in {
+            ActionType.GLOBAL_EXPLORATION, ActionType.LOCAL_EXPLOITATION,
+            ActionType.UNCERTAINTY_SAMPLING, ActionType.ERROR_GUIDED_SAMPLING,
+            ActionType.BOUNDARY_SAMPLING,
+        }:
             merged["seed"] = seed
-        out.append(Candidate(action_id=action_id, action=OptimizationAction(action_type, merged)))
+        out.append(Candidate(
+            action_id=action_id,
+            action=OptimizationAction(action_type, merged),
+        ))
     return out
 
 

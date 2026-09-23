@@ -216,3 +216,27 @@ def test_hybrid_with_laya_policy_smoke() -> None:
     for step in hybrid.history[:2]:
         assert step.route.name == "system1"
         assert step.chosen_action.type == step.system1_action.type
+
+
+def test_hybrid_rejects_action_not_in_factory_vocabulary() -> None:
+    """Per codex M1: HybridPolicy must cross-check that the chosen
+    action_id is in the state-filtered candidate factory vocabulary,
+    not just in the model-claimed probability distribution.
+
+    Construct a state where the factory excludes `local_exploitation`
+    (n_samples == 0). A system1 that nonetheless returns local_exploitation
+    must be rejected with a clear factory-vocabulary message.
+    """
+    state = _state_with_budget(20)
+    # Force n_samples=0 so the factory omits local_exploitation /
+    # error_guided_sampling. RecordingBackend's default state has
+    # n_samples=2; we override here.
+    object.__setattr__(state.sampling, "n_samples", 0)
+    s1 = _FakeSystem1([(ActionType.LOCAL_EXPLOITATION,
+                         {"local_exploitation": 1.0})])
+    policy = HybridPolicy(
+        system1=s1, router=ConfidenceRouter(tau_conf=0.5),
+        system2=FallbackSystem2(),
+    )
+    with pytest.raises(ValueError, match="not in the state-filtered candidate factory"):
+        policy.select_action(state)

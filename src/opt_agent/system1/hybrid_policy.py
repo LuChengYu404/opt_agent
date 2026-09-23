@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
-from opt_agent.actions import OptimizationAction
+from opt_agent.actions import OptimizationAction, candidate_actions_for_state
 from opt_agent.loop.policies import Policy
 from opt_agent.router import Route, Router
 from opt_agent.state import OptimizationState
@@ -128,14 +128,27 @@ class HybridPolicy:
         if not probs:
             raise ValueError("system1 returned empty probabilities")
         # Verify the system-1 action is among the offered candidates.
-        # This is a contract guard per codex M1: action_id must come from
-        # the shared candidate factory, not be invented post hoc.
+        # Per codex M1: action_id must come from the shared candidate
+        # factory, not be invented post hoc. We cross-check both:
+        #   (a) the system-1 vocabulary (probs.keys()), AND
+        #   (b) the state-filtered factory vocabulary
+        #       (candidate_actions_for_state(state)).keys()
+        # so a model that emits its own vocabulary cannot drift from
+        # the factory's vocabulary.
         action_id = action.type.value
         if action_id not in probs:
             raise ValueError(
                 f"system1 action {action_id!r} is not in its own probability "
                 f"distribution {sorted(probs)}; check that the candidate "
                 f"factory and the model output share the same vocabulary."
+            )
+        factory_candidates = candidate_actions_for_state(state, seed=0)
+        if action_id not in factory_candidates:
+            raise ValueError(
+                f"system1 action {action_id!r} is not in the state-filtered "
+                f"candidate factory's vocabulary "
+                f"{sorted(factory_candidates)}; the model is selecting an "
+                f"action that is not budget-valid for the current state."
             )
         route = self._router.route(probs)
         if route.name == "system1":

@@ -178,11 +178,11 @@ def split_records(
 
 
 def physical_state_hash(record: DecisionRecord) -> str:
-    """SHA-256 hex digest over the BO state alone.
+    """SHA-256 hex digest over the BO state summary alone.
 
     The hash covers ONLY `record.state` (sampling, surrogate, optimization,
-    resource, history) — the physics of the BO process. It deliberately
-    EXCLUDES:
+    resource, history) — the SUMMARY fields the state extractor emits.
+    It deliberately EXCLUDES:
 
     - `record.problem` (contains the trajectory seed — not physics)
     - `record.candidate_actions` (contains action parameters and a seed
@@ -191,7 +191,12 @@ def physical_state_hash(record: DecisionRecord) -> str:
     - `record.rollout_results` (label / supervision)
     - `record.metadata` (labels + replay checkpoint metadata)
 
-    Two records hash equal iff their BO state is physically identical.
+    Important caveat: the state extractor emits a SUMMARY (sample count,
+    coverage, best_value, etc.) and does NOT include the full observation
+    history. Two records with different observed points and target values
+    can therefore hash equal. Treat this hash as a BO-summary key, not as
+    a full-history equivalence proof. Use it to dedup records that share
+    the same BO summary, NOT to merge distinct optimization histories.
     """
     payload = {"state": record.state}
     canonical = json.dumps(

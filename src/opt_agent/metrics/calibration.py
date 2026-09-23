@@ -73,6 +73,13 @@ class CalibrationResult:
         Number of bins requested (regardless of how many were non-empty).
     notes : str
         Free-form warning, e.g. "small-sample warning: n=12, n_bins=15".
+    outcome_source : str
+        Describes how `outcome` was derived for each record. Common
+        values: "argmax(probs)" (internal-consistency regime), "human"
+        (independent human label), "rollout_oracle" (oracle gap from
+        rollout). Downstream consumers MUST check this to interpret the
+        ECE: an ECE computed with outcome_source="argmax(probs)" only
+        measures confidence-in-its-own-choice, NOT real calibration.
     """
 
     ece: float
@@ -80,6 +87,7 @@ class CalibrationResult:
     n_records: int
     n_bins: int
     notes: str = ""
+    outcome_source: str = "argmax(probs)"
 
 
 def _validate_inputs(
@@ -107,6 +115,8 @@ def expected_calibration_error(
     probs: Sequence[Mapping[str, float]],
     outcomes: Sequence[str],
     n_bins: int = 15,
+    *,
+    outcome_source: str = "argmax(probs)",
 ) -> CalibrationResult:
     """Compute Expected Calibration Error of (probs, outcome) pairs.
 
@@ -114,10 +124,23 @@ def expected_calibration_error(
     Per-record accuracy = 1.0 if argmax(probs) == outcome else 0.0.
 
     ECE = sum_bins (count_bin / N) * |conf_bin - acc_bin|.
+
+    Parameters
+    ----------
+    probs, outcomes, n_bins
+        See module docstring for the regime discussion.
+    outcome_source : str
+        Free-form tag describing how `outcomes` was derived. Recorded on
+        the returned `CalibrationResult` so downstream reports can
+        distinguish the internal-consistency regime from real
+        calibration against an independent label.
     """
     _validate_inputs(probs, outcomes, n_bins)
     if not probs:
-        return CalibrationResult(ece=0.0, bins=(), n_records=0, n_bins=n_bins)
+        return CalibrationResult(
+            ece=0.0, bins=(), n_records=0, n_bins=n_bins,
+            outcome_source=outcome_source,
+        )
 
     confidences: list[float] = []
     accuracies: list[float] = []
@@ -161,7 +184,8 @@ def expected_calibration_error(
     if n < n_bins * 5:
         notes = f"small-sample warning: n={n}, n_bins={n_bins}"
     return CalibrationResult(
-        ece=ece, bins=tuple(bins), n_records=n, n_bins=n_bins, notes=notes,
+        ece=ece, bins=tuple(bins), n_records=n, n_bins=n_bins,
+        notes=notes, outcome_source=outcome_source,
     )
 
 

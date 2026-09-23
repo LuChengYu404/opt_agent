@@ -148,11 +148,11 @@ def aggregate_decision_metrics(
 ) -> DecisionResult:
     """One-call summary over a (probs, gold_probs) corpus.
 
-    Infinite KL / NLL records are EXCLUDED from the means by default.
-    Their counts are returned as `n_infinite_kl` / `n_infinite_nll` so the
-    caller knows whether the mean is meaningful. Use `include_infinite`
-    below for an unconditional mean (it will be +inf if any record is
-    infinite).
+    Infinite KL / NLL records are EXCLUDED from the means. Their counts
+    are returned as `n_infinite_kl` / `n_infinite_nll` so the caller
+    knows whether the mean is meaningful. To get an unconditional mean,
+    call `kl_divergence` / `negative_log_likelihood_vs_gold` per record
+    yourself — if any is +inf, the mean will be +inf.
     """
     if len(probs) != len(gold_probs):
         raise ValueError(
