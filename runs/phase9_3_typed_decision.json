@@ -1,0 +1,420 @@
+{
+  "config": {
+    "problems": [
+      "Branin",
+      "Ackley",
+      "Hartmann"
+    ],
+    "seeds": [
+      0
+    ],
+    "budgets": [
+      10
+    ],
+    "n_init": 5,
+    "tau_conf": 0.5,
+    "system1": "typed-decision",
+    "system1_checkpoint": "runs/typed_decision_v1.pt",
+    "system2": "fallback",
+    "known_optima": {
+      "Branin": -0.397887,
+      "Ackley": null,
+      "Hartmann": null
+    }
+  },
+  "summary": {
+    "Branin/hybrid/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -3.5451956715421797,
+      "best_value_max": -3.5451956715421797,
+      "best_value_min": -3.5451956715421797,
+      "simple_regret_mean": 3.14730867154218,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Branin/hybrid_forced_escalate/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -3.5451956715421797,
+      "best_value_max": -3.5451956715421797,
+      "best_value_min": -3.5451956715421797,
+      "simple_regret_mean": 3.14730867154218,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Branin/rule/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -3.5451956715421797,
+      "best_value_max": -3.5451956715421797,
+      "best_value_min": -3.5451956715421797,
+      "simple_regret_mean": 3.14730867154218,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/hybrid/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -20.741674041270237,
+      "best_value_max": -20.741674041270237,
+      "best_value_min": -20.741674041270237,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/hybrid_forced_escalate/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -20.741674041270237,
+      "best_value_max": -20.741674041270237,
+      "best_value_min": -20.741674041270237,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Ackley/rule/b10": {
+      "n_seeds": 1,
+      "best_value_mean": -20.741674041270237,
+      "best_value_max": -20.741674041270237,
+      "best_value_min": -20.741674041270237,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/hybrid/b10": {
+      "n_seeds": 1,
+      "best_value_mean": 1.16420343697261,
+      "best_value_max": 1.16420343697261,
+      "best_value_min": 1.16420343697261,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/hybrid_forced_escalate/b10": {
+      "n_seeds": 1,
+      "best_value_mean": 1.16420343697261,
+      "best_value_max": 1.16420343697261,
+      "best_value_min": 1.16420343697261,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    },
+    "Hartmann/rule/b10": {
+      "n_seeds": 1,
+      "best_value_mean": 1.16420343697261,
+      "best_value_max": 1.16420343697261,
+      "best_value_min": 1.16420343697261,
+      "simple_regret_mean": null,
+      "any_evaluation": true,
+      "steps_mean": 2.0,
+      "termination_reasons": [
+        "stop"
+      ]
+    }
+  },
+  "acceptance": {
+    "passed": true,
+    "errors": []
+  },
+  "runs": [
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -3.5451956715421797,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": 3.14730867154218,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -3.5451956715421797,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": 3.14730867154218,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Branin",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -3.5451956715421797,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": 3.14730867154218,
+      "known_optimum": -0.397887,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Ackley",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": -20.741674041270237,
+      "termination_reason": "stop",
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "global_exploration",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid",
+      "system2_kind": "fallback",
+      "best_value": 1.16420343697261,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "hybrid_forced_escalate",
+      "system2_kind": "fallback",
+      "best_value": 1.16420343697261,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 2,
+        "rule": 0
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "system2"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "system2"
+        }
+      ]
+    },
+    {
+      "problem": "Hartmann",
+      "seed": 0,
+      "total_budget": 10,
+      "policy": "rule",
+      "system2_kind": "fallback",
+      "best_value": 1.16420343697261,
+      "termination_reason": "stop",
+      "n_evaluations": 6,
+      "n_steps": 2,
+      "simple_regret": null,
+      "known_optimum": null,
+      "route_distribution": {
+        "system1": 0,
+        "system2": 0,
+        "rule": 2
+      },
+      "llm_stats": null,
+      "steps": [
+        {
+          "round": 0,
+          "action": "surrogate_acquisition",
+          "route": "rule"
+        },
+        {
+          "round": 1,
+          "action": "stop",
+          "route": "rule"
+        }
+      ]
+    }
+  ]
+}
