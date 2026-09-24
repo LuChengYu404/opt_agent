@@ -7,6 +7,10 @@ from opt_agent.system1.hybrid_policy import (
     adapt_policy_as_system1,
 )
 from opt_agent.system1.laya_policy import LayaDecision, LayaPolicy
+from opt_agent.system1.typed_decision_policy import (
+    TypedDecisionOutput,
+    TypedDecisionPolicy,
+)
 
 __all__ = [
     "LayaDecision",
@@ -14,5 +18,7 @@ __all__ = [
     "HybridPolicy",
     "HybridStep",
     "System1Decider",
+    "TypedDecisionOutput",
+    "TypedDecisionPolicy",
     "adapt_policy_as_system1",
 ]
