@@ -153,7 +153,7 @@ def _make_system1(system1_kind: str, system1_checkpoint: str | None) -> Any:
     raise ValueError(f"unknown system1 kind: {system1_kind!r}")
 
 
-def _make_system2(system2_kind: str) -> Any:
+def _make_system2(system2_kind: str, *, seed: int = 0) -> Any:
     """Build a System-2 policy for the smoke run.
 
     `fallback` (default): deterministic FallbackSystem2 (delegates to
@@ -173,7 +173,8 @@ def _make_system2(system2_kind: str) -> Any:
                 "LLMSystem2 unavailable; install httpx to enable the "
                 "deepseek system-2 backend."
             ) from exc
-        return LLMSystem2(timeout_s=20.0, max_tokens=256, temperature=0.2)
+        return LLMSystem2(timeout_s=20.0, max_tokens=256, temperature=0.2,
+                          candidate_seed=seed)
     raise ValueError(f"unknown system2 kind: {system2_kind!r}")
 
 
@@ -231,7 +232,7 @@ def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
     return HybridPolicy(
         system1=s1,
         router=ConfidenceRouter(tau_conf=tau_conf),
-        system2=_make_system2(system2_kind),
+        system2=_make_system2(system2_kind, seed=seed),
     )
 
 

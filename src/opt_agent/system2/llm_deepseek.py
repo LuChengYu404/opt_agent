@@ -69,6 +69,10 @@ class LLMSystem2(System2Policy):
     LLM emits an invalid id, we fall back to the highest-confidence
     System-1 action (defensive — never crash the loop because of an LLM
     typo).
+
+    Pass ``candidate_seed`` from the problem run when comparing independent
+    seeds; otherwise exploration candidates at the same sample count reuse
+    the same deterministic points.
     """
 
     def __init__(
@@ -80,6 +84,7 @@ class LLMSystem2(System2Policy):
         timeout_s: float = 30.0,
         max_tokens: int = 256,
         temperature: float = 0.2,
+        candidate_seed: int = 0,
         client: Any = None,
         _skip_key_check: bool = False,
     ) -> None:
@@ -96,6 +101,9 @@ class LLMSystem2(System2Policy):
         self.timeout_s = timeout_s
         self.max_tokens = max_tokens
         self.temperature = temperature
+        if isinstance(candidate_seed, bool) or not isinstance(candidate_seed, int) or candidate_seed < 0:
+            raise ValueError("candidate_seed must be a non-negative integer")
+        self.candidate_seed = candidate_seed
         self._client = client  # injectable for tests
         self.last_stats: DeepSeekCallStats | None = None
         self.call_count = 0
@@ -355,7 +363,7 @@ class LLMSystem2(System2Policy):
         recent_actions: tuple[str, ...] = (),
         remaining_budget: int | None = None,
     ) -> System2Decision:
-        candidates = candidate_actions_for_state(state, seed=0)
+        candidates = candidate_actions_for_state(state, seed=self.candidate_seed)
         # If only STOP is offered (budget exhausted), short-circuit.
         if set(candidates) == {"stop"}:
             return System2Decision(

@@ -227,6 +227,21 @@ def _body_with(action_id: str, params: dict, reasoning: str = "x") -> dict:
     }
 
 
+def test_llm_system2_candidate_seed_varies_by_run() -> None:
+    """Independent runs must not share a fixed exploratory candidate seed."""
+    state = _state_with_budget(20)
+    body = _body_with("global_exploration", {})
+    first = LLMSystem2(
+        candidate_seed=17, client=_FakeClient(body=body), _skip_key_check=True,
+    ).reason(state)
+    second = LLMSystem2(
+        candidate_seed=29, client=_FakeClient(body=body), _skip_key_check=True,
+    ).reason(state)
+    assert first.action.params["seed"] == 17 + state.sampling.n_samples
+    assert second.action.params["seed"] == 29 + state.sampling.n_samples
+    assert first.action.params["seed"] != second.action.params["seed"]
+
+
 def test_llm_system2_preserves_candidate_defaults_when_params_empty() -> None:
     """If the LLM emits an empty params dict, the candidate's defaults
     (seed, n_samples, ...) must NOT be replaced by an empty set."""
