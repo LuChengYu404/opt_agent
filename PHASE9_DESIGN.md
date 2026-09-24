@@ -4,7 +4,11 @@
 > **Date**: 2026-09-23
 > **Reviewers**: codex `gpt-5.6-sol` (Phase 8.6B) → `gpt-6-sol` (Phase 9.0, 9.1)
 > **Last reviewed commit**: `5f79257` (Phase 9 framework skeleton, 235/235 tests)
-> **Now**: `HEAD` after codex re-review fixes (250/250 tests)
+> **At that review**: framework fixes had 250/250 passing tests
+> **Current status correction (2026-09-24)**: This is a historical framework
+> design snapshot. Phase 9.3 training and integration were implemented, but
+> the reported closed-loop gain was invalid: the trained System-1 executed
+> zero actions. See `PROGRESS.md` for the corrected paired rerun.
 
 ---
 
@@ -28,7 +32,8 @@
 - Gate 2 (stable action preference): **FAIL**
 - Gate 3 (early exploration mass): **PASS** (point estimate, +1.2 ~ +1.6)
 - Gate 4 (terminal optimization advantage): **FAIL**
-- **Known issue**: utility misspecification → reward hacking — **deferred to Phase 8.7+, not Phase 9 blocker**
+- **Known issue**: rollout-label terminal advantage fails under RulePolicy
+  continuation; the cause is not yet established.
 
 ### 1.2 Phase 9 scope (per MASTER_PLAN §23 + §24)
 
@@ -71,9 +76,9 @@ that satisfies `decide(state) → (action, probabilities, ...)` (via
 `System1Decider`) and adapts bare `Policy` objects with
 `adapt_policy_as_system1`.
 
-### 1.4 Future fine-tuning plan (Phase 9.3, deferred)
+### 1.4 Original fine-tuning plan (historical)
 
-After Phase 9.0–9.2 close the framework skeleton, Phase 9.3 will fine-tune a
+At the time this design was written, Phase 9.3 planned to fine-tune a
 real typed-decision checkpoint on rollout data. The candidate is a base model
 that supports the typed-decision primitive API with released weights under a
 permissive license. The exact choice is deferred until the smoke harness
@@ -425,11 +430,12 @@ Step 1 is the immediate Phase 9.1 gate; steps 2–4 are Phase 9.3.
       `DEEPSEEK_API_KEY` loaded from .env via python-dotenv)
 - [x] Phase 9.1 v9 (commit `78ae839`): all codex review-12
       findings fixed → final APPROVE verdict
-- [ ] **Phase 9.3**: fine-tuned typed-decision model replaces
-      `LayaPolicy(FakeLaya)` in the smoke harness — DEFERRED (no
-      GPU budget + no licensed base checkpoint selected yet)
+- [x] **Phase 9.3 integration**: a trained typed-decision checkpoint can run
+      through the smoke harness.
+- [ ] **Phase 9.3 performance**: a held-out comparison with actual System-1
+      action use establishes whether the trained model improves optimization.
 
-**Status: Phase 9 DONE** (approved by codex gpt-6-sol on commit `78ae839`).
+**Status: Phase 9 framework complete; learned-policy performance open.**
 
 ---
 

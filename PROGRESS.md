@@ -18,6 +18,10 @@ problem; 226 records; horizon 3):
 | 3: early exploration mass | Pass (point estimate) | Adjusted lift = 1.67; this is not a seed-clustered confidence-interval pass. |
 | 4: terminal optimization advantage | Fail | On Branin, top-label action vs behavior has mean normalized gain -0.0259, bootstrap 95% interval [-0.0487, -0.0102]. |
 
+The Gate 4 result is conditional on RulePolicy taking over after the first
+action. RulePolicy stops when at most four evaluations remain, so this test
+does not establish a policy-independent ranking of first actions.
+
 The full result, including per-seed paired outcomes, is in
 `runs/phase8_6b_h3_report.json`. Removing standalone retraining from the saved
 candidate results does not repair the Branin outcome; see
@@ -70,9 +74,11 @@ uv run --extra laya python scripts/run_laya_baseline.py \
 
 **Observed:** The horizon-3 top `gold_probs` action has unstable top-action
 preferences across seeds and underperforms the behavior-first-action control
-on Branin in paired full-budget continuations. Removing standalone retraining
-from candidate results does not fix the Branin result. This is a label-validity
-warning, not yet a diagnosis of reward hacking or a trained-model failure.
+on Branin in paired RulePolicy continuations. Removing standalone retraining
+from candidate results does not fix the Branin result. This is a conditional
+label-validity warning, not a diagnosis of reward hacking or a trained-model
+failure. Follow-up work on the research branch found that changing the
+continuation can change the first-action ranking.
 
 **Questions for later work:**
 
@@ -259,6 +265,8 @@ but is not required for closing Phase 9.
 - **60/60 runs PASS** on Branin + Ackley + Hartmann × seeds {0..4}
   × total_budget in {10, 30} × {hybrid, rule}. Results in
   `runs/phase13_benchmark.json`.
+- This harness uses `_FakeLaya`, which always proposes surrogate acquisition;
+  these runs do not measure a learned System-1 or real Laya policy.
 - Empirical observation (NOT a performance claim):
   - Branin: hybrid mean best -1.77 (succ 40%) vs rule -5.66 (succ 0%),
     paired t = +2.41.
@@ -282,12 +290,12 @@ but is not required for closing Phase 9.
 
 ## Phase 10–14 cumulative test count: 298/298.
 
-## Phase 9.3: typed-decision model fine-tuning (DONE)
+## Phase 9.3: typed-decision model trained; optimization benefit unverified
 
 Per user confirmation that a GPU is available, Phase 9.3 was no
 longer DEFERRED. We fine-tuned a Jev-style typed-decision model on
-Phase 8.6B rollout data and ran a closed-loop comparison against
-RulePolicy.
+Phase 8.6B rollout data and ran a closed-loop integration smoke against
+RulePolicy. The original performance interpretation was invalid.
 
 **Architecture** (`src/opt_agent/system1/typed_decision.py`):
 - ModernBERT-base encoder (~125M params, Apache 2.0).
@@ -301,25 +309,26 @@ RulePolicy.
 - Phase 8.6B corpus (226 records from `runs/phase8_6b_h3_10seed.jsonl`).
 - 5 epochs on RTX 3090, ~20s total. Final KL loss: 0.2044.
 
-**Empirical closed-loop comparison** (commit bqfy09u1x,
-3 seeds × 1 budget × 3 problems × 3 policies = 27 runs):
+**Corrected closed-loop audit** (Branin, Ackley, Hartmann × seeds 0–2,
+budget 30; 27 runs): in the original `runs/phase9_3_typed_multi.json`,
+the normal hybrid routed **0 of 129 decisions to System-1**. Every action
+came from `FallbackSystem2`, so the apparent Branin and Hartmann gains
+cannot be attributed to the trained model. The original harness also used
+RulePolicy seed 0 inside the fallback while the standalone RulePolicy used
+the experiment seed. On the first hybrid run, loading the model after backend
+initialization changed the global torch RNG before optimization began.
 
-| Problem | typed-decision hybrid | forced_escalate | RulePolicy |
-|---|---|---|---|
-| **Branin** (b=30) | **-1.97 ± 1.25** (regret +1.58) | -2.37 ± 0.84 (regret +1.97) | -2.37 ± 0.84 (regret +1.97) |
-| **Ackley** (b=30) | -20.40 ± 0.09 | -20.40 ± 0.09 | -20.41 ± 0.08 |
-| **Hartmann** (b=30) | **+1.87 ± 0.001** | +1.87 ± 0.001 | +1.66 ± 0.29 |
+After passing the same experiment seed to the fallback and constructing the
+model before initializing the backend, the rerun in
+`runs/phase9_3_typed_multi_seed_corrected.json` has **0 of 122 normal-hybrid
+decisions routed to System-1**. Every paired hybrid and RulePolicy trajectory
+now has the same action sequence and terminal best value. Mean best value
+for each policy is -2.3702 on Branin, -20.4122 on Ackley, and +1.6605 on
+Hartmann. The smoke acceptance still passes because it checks integration,
+not a learned-policy gain.
 
-The trained typed-decision model beats RulePolicy on both Branin
-(~20% better regret) and Hartmann (~12% better, with markedly lower
-variance). Ackley is a wash — Ackley53 10-D is multimodal and the
-short rollout data does not teach the model a clear advantage.
-
-**Tests**: 319/319 (was 311 + 8 new typed-decision tests).
-
-**Phase 9 status**: COMPLETE. Framework skeleton + real-backend smoke
-+ 真实 DeepSeek API + 真实 typed-decision fine-tuned model. Codex
-gpt-6-sol APPROVED on commit `78ae839`. Phase 9.3 closed
-(retroactively) on commit `dc6d0be` + `78ae839` (smoke framework)
-and `bqfy09u1x` (typed-decision integration + empirical
-comparison).
+The model and integration path exist, but Phase 9.3's optimization benefit
+remains unverified. A valid performance test must first make the router use
+the trained System-1 on a measurable fraction of decisions, then compare
+paired outcomes on held-out seeds. The earlier raw report is retained for
+audit and must not be cited as a learned-model improvement.

@@ -164,7 +164,7 @@ def _make_system2(system2_kind: str, *, seed: int = 0) -> Any:
     Token usage and per-call latency are recorded on the instance.
     """
     if system2_kind == "fallback":
-        return FallbackSystem2()
+        return FallbackSystem2(baseline=RulePolicy(seed=seed))
     if system2_kind == "deepseek":
         try:
             from opt_agent.system2 import LLMSystem2
@@ -269,13 +269,16 @@ def _run_hybrid(
     system1_checkpoint: str | Path | None = None,
     system2_kind: str = "fallback",
 ) -> RunResult:
-    backend = _build_backend(problem, seed, n_init)
+    # Loading a trained System-1 checkpoint constructs torch modules and
+    # consumes the global RNG. Initialize the paired backend afterward so
+    # each policy starts from the same problem/seed RNG state.
     hybrid = _make_hybrid(
         seed, tau_conf=tau_conf, laya_agent=laya_agent,
         system1_kind=system1_kind,
         system1_checkpoint=system1_checkpoint,
         system2_kind=system2_kind,
     )
+    backend = _build_backend(problem, seed, n_init)
     loop = DecisionLoop(backend, total_budget=total_budget)
     trajectory = loop.run(hybrid)
 
@@ -549,6 +552,12 @@ def main() -> int:
 
     summary = _summarize(runs)
     passed, errors = _acceptance_check(runs, n_init=args.n_init)
+    normal_hybrid_runs = [r for r in runs if r.policy_name == "hybrid"]
+    normal_hybrid_steps = sum(len(r.steps) for r in normal_hybrid_runs)
+    normal_hybrid_system1_steps = sum(
+        s.route_name == "system1"
+        for r in normal_hybrid_runs for s in r.steps
+    )
 
     payload = {
         "config": {
@@ -564,6 +573,10 @@ def main() -> int:
         },
         "summary": summary,
         "acceptance": {"passed": passed, "errors": errors},
+        "policy_usage": {
+            "normal_hybrid_system1_steps": normal_hybrid_system1_steps,
+            "normal_hybrid_total_steps": normal_hybrid_steps,
+        },
         "runs": [
             {
                 "problem": r.problem, "seed": r.seed,
@@ -602,6 +615,8 @@ def main() -> int:
               f"(max={s['best_value_max']:+.4f}) regret={regret} "
               f"any_eval={s['any_evaluation']} steps~{s['steps_mean']:.1f} "
               f"terms={s['termination_reasons']}")
+    print(f"Normal-hybrid System-1 actions: "
+          f"{normal_hybrid_system1_steps}/{normal_hybrid_steps}")
     print()
     if passed:
         print("ACCEPTANCE: PASSED")

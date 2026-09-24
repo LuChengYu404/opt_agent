@@ -79,6 +79,19 @@ def test_fallback_uses_stagnation_rule() -> None:
     assert decision.action.type == ActionType.GLOBAL_EXPLORATION
 
 
+def test_hybrid_smoke_fallback_matches_same_seed_rule_policy() -> None:
+    """Paired hybrid and RulePolicy runs must use the same exploration seed."""
+    from scripts.run_hybrid_smoke import _make_system2
+    from opt_agent.loop.policies import RulePolicy
+
+    state = _state_via_backend(remaining_budget=20)
+    object.__setattr__(state.optimization, "stagnation_steps", 5)
+    fallback_action = _make_system2("fallback", seed=17).reason(state).action
+    rule_action = RulePolicy(seed=17).select_action(state)
+    assert fallback_action == rule_action
+    assert fallback_action.params["seed"] == 17 + state.sampling.n_samples
+
+
 # ---------------------------------------------------------------------------
 # End-to-end: FallbackSystem2 as a DecisionLoop policy via a wrapper
 # ---------------------------------------------------------------------------
