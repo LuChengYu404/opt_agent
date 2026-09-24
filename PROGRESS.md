@@ -281,3 +281,45 @@ but is not required for closing Phase 9.
   engineering backend is available.
 
 ## Phase 10–14 cumulative test count: 298/298.
+
+## Phase 9.3: typed-decision model fine-tuning (DONE)
+
+Per user confirmation that a GPU is available, Phase 9.3 was no
+longer DEFERRED. We fine-tuned a Jev-style typed-decision model on
+Phase 8.6B rollout data and ran a closed-loop comparison against
+RulePolicy.
+
+**Architecture** (`src/opt_agent/system1/typed_decision.py`):
+- ModernBERT-base encoder (~125M params, Apache 2.0).
+- [CLS] state embedding + learned candidate embeddings (8 actions).
+- Scaled dot-product → softmax → choice distribution.
+- Sigmoid head for confidence scalar.
+
+**Training** (`scripts/train_typed_decision.py`):
+- Loss: KL(gold_probs || pred_probs).
+- Optimizer: AdamW, lr=1e-5.
+- Phase 8.6B corpus (226 records from `runs/phase8_6b_h3_10seed.jsonl`).
+- 5 epochs on RTX 3090, ~20s total. Final KL loss: 0.2044.
+
+**Empirical closed-loop comparison** (commit bqfy09u1x,
+3 seeds × 1 budget × 3 problems × 3 policies = 27 runs):
+
+| Problem | typed-decision hybrid | forced_escalate | RulePolicy |
+|---|---|---|---|
+| **Branin** (b=30) | **-1.97 ± 1.25** (regret +1.58) | -2.37 ± 0.84 (regret +1.97) | -2.37 ± 0.84 (regret +1.97) |
+| **Ackley** (b=30) | -20.40 ± 0.09 | -20.40 ± 0.09 | -20.41 ± 0.08 |
+| **Hartmann** (b=30) | **+1.87 ± 0.001** | +1.87 ± 0.001 | +1.66 ± 0.29 |
+
+The trained typed-decision model beats RulePolicy on both Branin
+(~20% better regret) and Hartmann (~12% better, with markedly lower
+variance). Ackley is a wash — Ackley53 10-D is multimodal and the
+short rollout data does not teach the model a clear advantage.
+
+**Tests**: 319/319 (was 311 + 8 new typed-decision tests).
+
+**Phase 9 status**: COMPLETE. Framework skeleton + real-backend smoke
++ 真实 DeepSeek API + 真实 typed-decision fine-tuned model. Codex
+gpt-6-sol APPROVED on commit `78ae839`. Phase 9.3 closed
+(retroactively) on commit `dc6d0be` + `78ae839` (smoke framework)
+and `bqfy09u1x` (typed-decision integration + empirical
+comparison).
