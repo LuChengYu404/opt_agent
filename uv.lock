@@ -1247,6 +1247,7 @@ dependencies = [
     { name = "bocode" },
     { name = "botorch" },
     { name = "gpytorch" },
+    { name = "httpx" },
     { name = "numpy" },
     { name = "python-dotenv" },
 ]
@@ -1267,6 +1268,7 @@ requires-dist = [
     { name = "bocode", specifier = ">=1.0.1" },
     { name = "botorch", specifier = ">=0.18.1" },
     { name = "gpytorch", specifier = ">=1.15.2" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "httpx", extras = ["socks"], marker = "extra == 'laya'", specifier = ">=0.27" },
     { name = "laya", marker = "extra == 'laya'", specifier = ">=0.3.6" },
     { name = "numpy", specifier = ">=2.5.3" },
