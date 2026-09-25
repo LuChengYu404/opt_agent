@@ -36,6 +36,10 @@ from opt_agent.actions.executor import execute_action
 from opt_agent.actions.models import OptimizationAction
 from opt_agent.backend.bocode_botorch import UnifiedBackend
 from opt_agent.backend.checkpoint import Checkpoint
+from opt_agent.rollout.specs import (
+    ContinuationPolicySpec,
+    build_continuation_policy,
+)
 from opt_agent.rollout.utility import UtilityWeights, compute_utility
 from opt_agent.state import OptimizationState, extract_state
 
@@ -79,13 +83,15 @@ class RolloutOutput:
 # ---------------------------------------------------------------------------
 
 
-ContinuationFactory = Callable[[], "PolicyLike"]
-
-
 class PolicyLike:
     """Structural type — actual policies from opt_agent.loop.policies."""
 
     def select_action(self, state, backend=None) -> OptimizationAction: ...
+
+
+# Default continuation policy: a fresh rule policy. Used when caller passes
+# None for `continuation_spec`.
+DEFAULT_CONTINUATION_SPEC = ContinuationPolicySpec(name="rule", seed=0)
 
 
 class CounterfactualRollout:
@@ -95,11 +101,17 @@ class CounterfactualRollout:
     ----------
     backend : UnifiedBackend
     horizon : int
-        How many action steps to simulate per branch (≥1).
+        How many action steps to simulate per branch (≥1). Per codex Q-T1
+        (2026-09-25): horizon is a plain int. To simulate until the budget
+        is exhausted, the caller passes `state.resource.remaining_budget` as
+        the horizon value — this keeps `CounterfactualRollout` free of
+        special "until exhausted" semantics.
     utility_weights : UtilityWeights
-    continuation_policy_factory : Callable[[], PolicyLike] | None
-        Factory producing a fresh policy for H>1 follow-up steps. Defaults to
-        RulePolicy() if None.
+    continuation_spec : ContinuationPolicySpec | None
+        Spec describing the policy used for follow-up steps when horizon > 1.
+        Defaults to `DEFAULT_CONTINUATION_SPEC` (rule). Per codex Q-T2, the
+        spec's name/seed/extras must be recorded in dataset metadata so that
+        any record can be replayed with a different continuation.
     max_rollout_steps : int
         Hard cap on total (candidates × horizon) evaluations to prevent
         runaway computation.
@@ -111,7 +123,7 @@ class CounterfactualRollout:
         *,
         horizon: int = 1,
         utility_weights: UtilityWeights | None = None,
-        continuation_policy_factory: ContinuationFactory | None = None,
+        continuation_spec: ContinuationPolicySpec | None = None,
         max_rollout_steps: int = 200,
         optimization_scale: float = 1.0,
         evaluation_scale: float = 1.0,
@@ -127,7 +139,7 @@ class CounterfactualRollout:
         self.backend = backend
         self.horizon = horizon
         self.weights = utility_weights or UtilityWeights()
-        self.continuation_policy_factory = continuation_policy_factory or _default_factory
+        self.continuation_spec = continuation_spec or DEFAULT_CONTINUATION_SPEC
         self.max_rollout_steps = max_rollout_steps
         self.optimization_scale = optimization_scale
         self.evaluation_scale = evaluation_scale
@@ -198,7 +210,8 @@ class CounterfactualRollout:
         status = "valid"
         error: Optional[str] = None
         policy = (
-            self.continuation_policy_factory() if self.horizon > 1 else None
+            build_continuation_policy(self.continuation_spec)
+            if self.horizon > 1 else None
         )
         try:
             action = candidate.action
@@ -284,12 +297,6 @@ class CounterfactualRollout:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-
-def _default_factory() -> PolicyLike:
-    """Default continuation policy: a fresh RulePolicy."""
-    from opt_agent.loop.policies import RulePolicy
-    return RulePolicy()
 
 
 def to_gold_probs(

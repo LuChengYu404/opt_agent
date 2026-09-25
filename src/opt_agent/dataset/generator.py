@@ -35,6 +35,7 @@ from opt_agent.rollout import (
     CounterfactualRollout,
     to_gold_probs,
 )
+from opt_agent.rollout.specs import ContinuationPolicySpec, spec_to_metadata
 from opt_agent.rollout.utility import UtilityWeights
 from opt_agent.state import OptimizationState, extract_state
 
@@ -105,6 +106,17 @@ class DatasetConfig:
     optimization_scale: float | None = None
     evaluation_scale: float | None = None
     fit_scale: float | None = None
+    # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
+    # `CounterfactualRollout` for follow-up steps and recorded in metadata
+    # so records can be replayed with a different continuation. Default:
+    # "on_policy" matching the dataset's behavior mix.
+    continuation_spec: ContinuationPolicySpec = field(
+        default_factory=lambda: ContinuationPolicySpec(
+            name="on_policy",
+            seed=0,
+            extras={"rule_weight": 0.8},
+        )
+    )
 
 
 BackendFactory = Callable[[], UnifiedBackend]
@@ -184,6 +196,7 @@ class DatasetGenerator:
                     backend,
                     horizon=self.config.horizon,
                     utility_weights=self.config.utility_weights,
+                    continuation_spec=self.config.continuation_spec,
                     optimization_scale=optimization_scale,
                     evaluation_scale=evaluation_scale,
                     fit_scale=fit_scale,
@@ -301,6 +314,20 @@ class DatasetGenerator:
                 "evaluation_scale": float(evaluation_scale),
                 "fit_scale": float(fit_scale),
                 "horizon": int(self.config.horizon),
+                # Sprint 0: full utility_weights (not just w_stop_opportunity)
+                # and continuation_policy spec, so any record is replayable
+                # with different config (per codex Q-T2 2026-09-25).
+                "utility_weights": {
+                    "w_optimization": float(self.config.utility_weights.w_optimization),
+                    "w_surrogate": float(self.config.utility_weights.w_surrogate),
+                    "w_coverage": float(self.config.utility_weights.w_coverage),
+                    "w_evaluation": float(self.config.utility_weights.w_evaluation),
+                    "w_fit": float(self.config.utility_weights.w_fit),
+                    "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+                },
+                "continuation_policy": spec_to_metadata(self.config.continuation_spec),
+                # Keep w_stop_opportunity for backward compatibility with
+                # Phase 8.6B readers. New code should use utility_weights.
                 "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
                 **replay_meta,
             },

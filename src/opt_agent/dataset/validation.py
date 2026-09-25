@@ -13,6 +13,11 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
     long-trajectory domination.
   - Affine test must transform actual evaluated objectives, not just
     the utility argument.
+
+Sprint 0 addition (per codex Q-T2 2026-09-25):
+  - `replay_with_config` re-runs any record with a different config
+    (continuation_spec / utility_weights / horizon / temperature) without
+    re-running the trajectory that produced the record.
 """
 
 from __future__ import annotations
@@ -33,9 +38,13 @@ from opt_agent.actions import (
     OptimizationAction,
     execute_action,
 )
+from opt_agent.backend.checkpoint import Checkpoint
 from opt_agent.dataset.decision_record import DecisionRecord
 from opt_agent.dataset.generator import derive_seed
 from opt_agent.loop.policies import RandomPolicy, RulePolicy
+from opt_agent.rollout.rollout import RolloutOutput
+from opt_agent.rollout.specs import ContinuationPolicySpec, spec_from_metadata
+from opt_agent.rollout.utility import UtilityWeights
 from opt_agent.state import extract_state
 
 
@@ -598,3 +607,189 @@ def gate2_stability(records: list[DecisionRecord]) -> Gate2Result:
         min_phase_seeds=min_phase_seeds,
         pass_=pass_,
     )
+
+
+# ---------------------------------------------------------------------------
+# Sprint 0 — replay_with_config (per codex Q-T2 2026-09-25)
+# ---------------------------------------------------------------------------
+
+
+def _reconstruct_checkpoint(record: DecisionRecord) -> Checkpoint:
+    """Build a `Checkpoint` from a record's replay metadata.
+
+    Shared between `replay_with_config` and any future replay-based gate.
+    Raises `ValueError` if required keys are missing or the model / RNG state
+    is absent when needed.
+    """
+    from opt_agent.backend.checkpoint import Checkpoint
+
+    meta = record.metadata
+    required = (
+        "backend_X", "backend_objectives", "backend_constraints",
+        "backend_id", "backend_problem_id", "backend_problem_bounds",
+        "backend_fitted", "backend_model_state_b64", "backend_rng_state_b64",
+    )
+    missing = [k for k in required if k not in meta]
+    if missing:
+        raise ValueError(
+            f"record {record.id!r} missing replay keys {missing}. "
+            "Re-generate dataset with Sprint 0 / Phase 8.6B replay support."
+        )
+
+    X = torch.tensor(meta["backend_X"], dtype=torch.double)
+    Y = torch.tensor(meta["backend_objectives"], dtype=torch.double)
+    C = torch.tensor(meta["backend_constraints"], dtype=torch.double)
+
+    fitted = bool(meta["backend_fitted"])
+    model_bytes = (
+        base64.b64decode(meta["backend_model_state_b64"], validate=True)
+        if meta["backend_model_state_b64"] is not None else None
+    )
+    rng_bytes = (
+        base64.b64decode(meta["backend_rng_state_b64"], validate=True)
+        if meta["backend_rng_state_b64"] is not None else None
+    )
+    if fitted and model_bytes is None:
+        raise ValueError(f"record {record.id!r} has fitted GP but no model state")
+    if rng_bytes is None:
+        raise ValueError(f"record {record.id!r} has no RNG state")
+    return Checkpoint(
+        backend_id=str(meta["backend_id"]),
+        problem_id=str(meta["backend_problem_id"]),
+        problem_bounds=[tuple(b) for b in meta["backend_problem_bounds"]],
+        X=X, objectives=Y, constraints=C,
+        fitted=fitted,
+        model_state_dict=model_bytes,
+        torch_rng_state=rng_bytes,
+    )
+
+
+def _weights_from_metadata(meta: dict) -> UtilityWeights:
+    """Reconstruct `UtilityWeights` from `metadata["utility_weights"]`.
+
+    Falls back to Phase 8.6B single-key format (`w_stop_opportunity` only)
+    for backward compatibility with records generated before Sprint 0.
+    """
+    uw = meta.get("utility_weights")
+    if isinstance(uw, dict) and uw:
+        return UtilityWeights(
+            w_optimization=float(uw.get("w_optimization", 1.0)),
+            w_surrogate=float(uw.get("w_surrogate", 0.0)),
+            w_coverage=float(uw.get("w_coverage", 0.0)),
+            w_evaluation=float(uw.get("w_evaluation", 1.0)),
+            w_fit=float(uw.get("w_fit", 0.5)),
+            w_stop_opportunity=float(uw.get("w_stop_opportunity", 0.75)),
+        )
+    # Legacy fallback (Phase 8.6B and earlier).
+    return UtilityWeights(w_stop_opportunity=float(meta.get("w_stop_opportunity", 0.75)))
+
+
+def _candidates_from_record(record: DecisionRecord) -> list:
+    """Reconstruct the candidate list from `record.candidate_actions`."""
+    from opt_agent.rollout.rollout import Candidate
+    return [
+        Candidate(
+            action_id=ca["action_id"],
+            action=OptimizationAction(ActionType(ca["type"]), dict(ca["params"])),
+        )
+        for ca in record.candidate_actions
+    ]
+
+
+def replay_with_config(
+    record: DecisionRecord,
+    *,
+    continuation_spec: ContinuationPolicySpec | None = None,
+    utility_weights: UtilityWeights | None = None,
+    horizon: int | None = None,
+    temperature: float | None = None,
+    backend_factory: Callable | None = None,
+) -> RolloutOutput:
+    """Replay a `DecisionRecord` with a new (or original) rollout config.
+
+    Loads the record's base checkpoint into a fresh backend, then runs
+    `CounterfactualRollout` with the supplied (or original) config on the
+    same candidate list. This is the Sprint 0 mechanism for the Q-S5
+    diagnostic matrix: re-run any record with different
+    {continuation_spec × utility_weights × horizon} without re-running
+    the trajectory that produced the record.
+
+    Parameters
+    ----------
+    record : DecisionRecord
+        Must contain Sprint 0 / Phase 8.6B replay metadata
+        (`backend_X`, ..., `backend_model_state_b64`, `backend_rng_state_b64`).
+    continuation_spec : ContinuationPolicySpec | None
+        Override for the continuation policy. Defaults to the spec recorded
+        in `record.metadata["continuation_policy"]`.
+    utility_weights : UtilityWeights | None
+        Override for utility weights. Defaults to the weights recorded in
+        `record.metadata["utility_weights"]` (or Phase 8.6B legacy fallback).
+    horizon : int | None
+        Override for rollout horizon. Defaults to `record.metadata["horizon"]`.
+    temperature : float | None
+        Recorded alongside the output for convenience (not used in this
+        function — `gold_probs` are computed by the caller via `to_gold_probs`
+        from the returned `RolloutOutput`).
+    backend_factory : Callable | None
+        Optional factory returning a fresh `UnifiedBackend`. Defaults to a
+        `BocodeBotorchBackend` initialized with the problem from the record.
+
+    Returns
+    -------
+    RolloutOutput
+        New rollout results from the supplied config. The original record is
+        not mutated. The backend is restored to its pre-call state.
+    """
+    from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
+    from opt_agent.rollout.rollout import CounterfactualRollout
+
+    meta = record.metadata
+    # Validate replay metadata FIRST so the user sees the missing-keys error
+    # before any other metadata access (e.g. `meta["horizon"]`).
+    base = _reconstruct_checkpoint(record)
+
+    spec = continuation_spec if continuation_spec is not None else spec_from_metadata(
+        meta.get("continuation_policy")
+    )
+    weights = utility_weights if utility_weights is not None else _weights_from_metadata(meta)
+    h = horizon if horizon is not None else int(meta["horizon"])
+
+    # Reconstruct backend.
+    problem_id = str(meta["backend_problem_id"])
+    if backend_factory is None:
+        backend = BocodeBotorchBackend()
+        backend.initialize(BackendConfig(
+            problem_id=problem_id,
+            seed=int(record.problem["seed"]),
+            n_init=1,
+        ))
+    else:
+        backend = backend_factory()
+    try:
+        backend.restore(base)
+        state = extract_state(
+            backend,
+            total_budget=int(record.state["resource"]["total_budget"]),
+            last_action=record.state["history"].get("last_action"),
+        )
+        if state.sampling.n_samples != int(record.state["sampling"]["n_samples"]):
+            raise ValueError(
+                f"record {record.id!r} replay sample count differs "
+                f"({state.sampling.n_samples} vs "
+                f"{record.state['sampling']['n_samples']})"
+            )
+        candidates = _candidates_from_record(record)
+        rollout = CounterfactualRollout(
+            backend,
+            horizon=h,
+            utility_weights=weights,
+            continuation_spec=spec,
+            optimization_scale=float(meta.get("optimization_scale", 1.0)),
+            evaluation_scale=float(meta.get("evaluation_scale", 1.0)),
+            fit_scale=float(meta.get("fit_scale", 1.0)),
+        )
+        return rollout.rollout(state, candidates)
+    finally:
+        # Always leave the backend at the original base state.
+        backend.restore(base)

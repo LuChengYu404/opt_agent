@@ -27,6 +27,43 @@ The full result, including per-seed paired outcomes, is in
 candidate results does not repair the Branin outcome; see
 `runs/phase8_6b_h3_no_retrain_report.json`.
 
+## Phase 8.6C: Q-S5 horizon diagnosis (per codex Q-T1/Q-T2 2026-09-25)
+
+Sprint 0 (`src/opt_agent/rollout/specs.py`,
+`src/opt_agent/loop/policies.py::{UniformPolicy,OnPolicyMix}`,
+`src/opt_agent/dataset/validation.py::replay_with_config`,
+`tests/test_sprint0_replay.py`) made any record replayable with
+different (utility_weights, horizon, continuation_policy) without
+re-generating the dataset. Total tests: 346/346 passing.
+
+`scripts/diagnose_qs5.py` then ran a 3×5 control-variable matrix
+(3 utility variants × 5 horizons, continuation fixed at `rule`) on
+30 records sampled from `runs/phase8_6b_h3_10seed.jsonl`, totaling
+450 (record, config) pairs. When the top action changed under a
+config, paired full-budget oracle test was run (D2 = β).
+
+**Headline finding**: Horizon, not utility weights, is the dominant
+factor in Gate 4. Going from horizon=3 (the dataset's default) to
+horizon=`remaining_budget` flips the top action on ~50% of records
+and improves mean terminal gain vs STOP from ~+0.0 to +4.5
+(normalized by per-problem objective std).
+
+| Config | N | Changed | Mean gain vs STOP (new) | Mean gain vs STOP (orig) | Pass (new > STOP) |
+| --- | --- | --- | --- | --- | --- |
+| `original_h3` (dataset default) | 30 | 1 | +0.0 | +0.0 | 0/1 |
+| `original_h10` | 30 | 15 | **+4.51** | +3.31 | **7/15** |
+| `original_hfull` | 30 | 15 | **+4.49** | +3.30 | **7/15** |
+| `delta_best_h10` | 30 | 22 | +3.09 | +2.27 | 10/22 |
+| `no_stop_pen_h10` | 30 | 23 | +2.91 | +2.19 | 4/23 |
+
+Implication: the counterfactual teacher is NOT mis-specified in
+direction. The dataset's horizon=3 was too short to differentiate
+actions on terminal regret. Phase 8.6D (regenerate dataset with
+horizon = `remaining_budget`) is expected to make Gate 4 PASS.
+
+Full report: `runs/phase8_6c_qs5_diagnosis.md`.
+JSON: `runs/phase8_6c_qs5_diagnosis.json`.
+
 ## Phase 9: exploratory baseline entry point
 
 `scripts/phase9_baselines.py` holds out seeds 8 and 9 and compares uniform,

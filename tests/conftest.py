@@ -13,6 +13,9 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+# Add project root so `scripts` package is importable from tests
+# (scripts/__init__.py exists, but the directory needs to be on sys.path).
+sys.path.insert(0, str(ROOT))
 
 from opt_agent.backend.bocode_botorch import (  # noqa: E402
     EvaluationBatch,

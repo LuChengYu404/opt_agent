@@ -18,7 +18,7 @@ from opt_agent.router import (  # noqa: E402
 from opt_agent.system1.ood import StateOODDetector  # noqa: E402
 
 # Reuse the state builder from the OOD tests.
-from tests.test_ood_and_temperature import _state, _calibration_corpus  # noqa: E402
+from test_ood_and_temperature import _state, _calibration_corpus  # noqa: E402
 
 
 @pytest.fixture
