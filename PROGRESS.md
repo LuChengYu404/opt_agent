@@ -1,5 +1,244 @@
 # Current research status
 
+## Phase 9.8: Jev executable-criteria effect test (2026-09-26)
+
+We compared two real `jev-1.13.0` Choice prompts: both used the same English
+narrative state, BO backend, action factory, budget 30, five initial points,
+single-thread numerics, and five problem families. The only prompt change was
+the Choice question: new criteria describe executable actions and their fixed
+parameters/costs, and a short instruction says Jev only selects an option.
+We ran paired seeds 20–24 (development, already
+used in prompt design) and then froze the prompts for seeds 30–34 (fresh
+confirmation). RuleFullBudget and a local `always_surrogate` policy were run
+on the same initial states; `always_surrogate` always selects the factory's
+`surrogate_acquisition` action and makes no Jev calls.
+
+Fresh seeds 30–34, mean terminal best over five seeds per family (higher is
+better):
+
+| Problem | RuleFullBudget | AlwaysSurrogate | Jev legacy criteria | Jev executable criteria | New minus old |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Branin | -0.6847 | -0.4033 | -0.4249 | -0.4033 | +0.0216 |
+| Ackley | -20.4177 | -20.1676 | -20.1480 | -20.2318 | -0.0838 |
+| Hartmann | +1.6525 | +2.9292 | +2.5000 | +2.9081 | +0.4081 |
+| SixHumpCamel | +0.4279 | +0.9520 | +0.6408 | +0.9318 | +0.2910 |
+| Rastrigin | -117.4571 | -123.1102 | -117.5033 | -114.9256 | +2.5777 |
+
+Fresh paired wins/ties/losses of executable versus legacy are Branin 4/0/1,
+Ackley 1/3/1, Hartmann 3/1/1, SixHumpCamel 3/0/2, and Rastrigin 2/3/0.
+The exact five-seed bootstrap intervals for the mean paired difference cross
+zero for Ackley and Hartmann; these small, exploratory samples do not warrant
+a general significance claim. Development seeds show the same positive mean
+direction for Branin, Hartmann, and SixHumpCamel, but a negative direction
+for Ackley and Rastrigin. In the fresh set, executable Jev outperformed the
+rule baseline on all five family means. This is a useful prompt/backend
+combination, but not a demonstration that Jev's state-dependent selection is
+better than a fixed surrogate-acquisition policy: AlwaysSurrogate equalled
+Branin and slightly exceeded executable Jev on Ackley, Hartmann, and
+SixHumpCamel. Jev exceeded it on fresh Rastrigin, while AlwaysSurrogate
+exceeded Jev on development Rastrigin.
+
+The new descriptions greatly changed the action mix. On fresh seeds, Jev
+selected `surrogate_acquisition` 477/552 times (86.4%) and
+`global_exploration` 75/552 times; legacy Jev selected surrogate acquisition
+254/501 times, global exploration 184, surrogate refit 57, and four other
+actions six times. The executable version used all 25 available new
+evaluations on every trajectory and avoided explicit refits and early stops.
+Its 552 API calls and 542,259 input tokens exceeded legacy's 501 calls and
+347,836 input tokens: mostly because one-point surrogate acquisition needs
+more decision rounds than two-point global exploration, plus longer criteria.
+
+Artifacts: `runs/phase9_7_jev_executable_5x5.json`,
+`runs/phase9_7_jev_executable_fresh_5x5.json`,
+`runs/phase9_7_jev_legacy_fresh_5x5.json`,
+`runs/phase9_7_always_surrogate_5x5.json`,
+`runs/phase9_7_always_surrogate_fresh_5x5.json`, and
+`runs/phase9_7_jev_criteria_full_comparison.json`. The earlier development
+legacy report is `runs/phase9_6_jev_narrative_5x5.json`.
+
+## Phase 9.7: executable Jev action descriptions (2026-09-26)
+
+The Jev Choice criteria now describe each **already constructed** action:
+its fixed call parameters, exact number of objective evaluations, and
+whether it fits or uses the current surrogate. `retrain_surrogate` explicitly
+says it creates no new observation and that surrogate-based sampling can
+fit automatically; `stop` says it leaves unused evaluation budget behind.
+Jev still selects one action ID only. The action factory and executor retain
+control of parameter values and execution. Descriptions are built from the
+same `OptimizationAction` objects returned to the loop, including budget
+capping when fewer evaluations remain.
+
+`JevPolicy(criteria_format="legacy")` and runner `--criteria-format legacy`
+reproduce the earlier option wording; the new default is `executable`.
+The runner logs this field and refuses to resume a report made with a
+different criteria format. A real one-call smoke with narrative state and
+`jev-1.13.0` succeeded; Jev chose `global_exploration` with factory parameters
+`n_samples=2, seed=25`. This smoke verifies API compatibility only. Phase 9.5
+and 9.6 performance numbers used legacy option wording and cannot be
+attributed to the new wording. A paired evaluation is still needed to measure
+its policy effect.
+
+## Phase 9.6: Jev state-interface ablation (2026-09-26)
+
+Jev's documented `state` accepts a string or structured JSON; `Choice` still
+selects from named options. The Phase 9.5 request used a terse numeric object
+with little explanation of BO concepts. `JevPolicy` and
+`scripts/run_jev_baseline.py` now support `state_format=narrative` /
+`--state-format narrative`, while preserving `structured` for replication.
+The English narrative explains objective direction, evaluation cost, budget,
+stagnation, boundary fraction, and surrogate diagnostics. It also includes
+the most recent observed objective value, which the structured baseline did
+not include. The action set, option descriptions, question instruction,
+backend, seeds, budget, and resolved Jev model were held fixed. Therefore
+this compares interface content, **not language format alone**. `--direct`
+bypasses a broken local HTTPS proxy; it does not change the API payload.
+
+Five problems × seeds 20–24 × budget 30 were rerun with narrative state and
+`jev-1.13.0` (higher terminal best is better):
+
+| Problem | Structured Jev | Narrative Jev | Paired wins / ties / losses |
+| --- | ---: | ---: | ---: |
+| Branin | -1.6525 | -0.4413 | 5 / 0 / 0 |
+| Ackley | -19.9699 | -19.7528 | 3 / 2 / 0 |
+| Hartmann | +1.6078 | +2.3885 | 4 / 0 / 1 |
+| SixHumpCamel | +0.1467 | +0.2273 | 3 / 2 / 0 |
+| Rastrigin | -117.1514 | -113.4134 | 2 / 1 / 2 |
+
+The structured request selected `global_exploration` in all 325 decisions.
+The narrative request used `global_exploration` 187 times,
+`surrogate_acquisition` 248, `retrain_surrogate` 52, and four other actions
+five times. It made 492 API calls and used 341,334 input tokens, versus
+325 calls and 219,301 tokens for structured state; fitting the surrogate
+adds decision rounds without consuming objective evaluations. One Rastrigin
+trajectory stopped after 24 of 25 available new evaluations. The mean gain
+there is unstable across seeds, and five reused development seeds are not a
+fresh confirmation set. This is evidence that the previous request content
+was consequential, not evidence that Jev or natural-language input is
+universally better. The interface should be frozen before a fresh-seed
+confirmation, and repeated surrogate-refit and early-stop decisions need
+explicit analysis.
+
+Sara/lenz is a different architecture: Sara is a reasoning agent that can
+consume natural-language priors and inspect or change a structured BO
+backend; lenz itself exposes a structured CLI and trial log. Our Jev
+adapter is a single-step Choice policy over predefined actions. Converting
+its state to prose does not give it Sara's tool access or rich prior context.
+
+Artifacts: `runs/phase9_6_jev_narrative_5x5.json` and
+`runs/phase9_6_jev_state_interface_ablation.json`. References:
+https://docs.typesafe.ai/concepts/state,
+https://docs.typesafe.ai/primitives/choice, and
+https://arxiv.org/html/2608.00316.
+
+## Phase 9.5: real Jev and aligned System-1 baselines (2026-09-26)
+
+The user supplied `JEV_API` in `.env`. `src/opt_agent/system1/jev_policy.py`
+calls TypeSafe's real `/v1/systemone` Choice endpoint with the same BO state
+summary and candidate descriptions as `LayaPolicy`. It validates the returned
+choice/probabilities, tolerates small displayed-probability rounding error,
+uses the shared budget-valid candidate factory, and records model version,
+confidence, token usage, and call latency. No API key is written to reports.
+The live smoke returned `jev-1.13.0`; three adapter contract tests pass.
+The benchmark response reports `jev-1.13.0` throughout. The reusable runner
+now pins that version by default; this run requested `jev-latest` before the
+pin was added, and the resolved version was logged on every decision.
+
+`scripts/run_jev_baseline.py`, `scripts/run_laya_multi_seed.py`, and
+`scripts/evaluate_trained_system1.py` ran five synthetic families × seeds
+20–24 × budget 30 with five initial evaluations. All three harnesses use
+`torch.set_num_threads(1)`; their RuleFullBudget terminal baselines agree
+exactly on all 25 problem/seed pairs. This matters because BoTorch's
+surrogate-acquisition numerics produced small cross-harness differences
+under differing thread settings. The Jev runner saves each completed pair
+and supports `--resume` after an interruption.
+
+| Problem | RuleFullBudget | Real Jev zero-shot | Local Laya zero-shot | Trained rule imitation | Trained no-fit rollout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Branin | -0.4442 | -1.6525 | -9.2830 | -0.6399 | -9.2830 |
+| Ackley | -20.0156 | -19.9699 | -19.6091 | -20.0156 | -19.6091 |
+| Hartmann | +2.1661 | +1.6078 | +0.9820 | +2.1661 | +0.9820 |
+| SixHumpCamel | +0.3516 | +0.1467 | -1.0844 | +0.1039 | -1.0844 |
+| Rastrigin | -111.0417 | -117.1514 | -129.9954 | -111.0417 | -125.7123 |
+
+Values are mean terminal best objective over five paired seeds; larger is
+better. These are descriptive development results with only five seeds per
+family. Branin's Jev paired raw gain vs RuleFullBudget is negative on all
+five seeds (mean -1.2070; seed-bootstrap 95% interval [-1.6504,-0.7637]).
+Ackley's small Jev mean gain (+0.0457) has an interval spanning zero.
+
+Under this fixed zero-shot question, **real Jev chose `global_exploration`
+in all 325 decisions**. Replaying an always-global policy with matching
+seeds and single-thread settings reproduced all 25 Jev terminal results
+exactly. Jev used 219,301 input tokens; mean observed API latency was
+0.321 s per decision. Laya chose `error_guided_sampling` 600/625 times and
+`uncertainty_sampling` 25/625 times. Its local checkpoint emitted an invalid
+temperature warning, so its confidence should not be treated as calibrated.
+The trained no-fit System-1 also chose error-guided sampling for all 625
+decisions; its outcomes equal Laya's on four families, but differ on
+Rastrigin because Laya switches to uncertainty sampling in 25 steps.
+
+The actionable finding was **action collapse under this structured state and
+Choice wording**, including for a real hosted Jev model. Phase 9.6 tests a
+more explanatory request; fresh-seed testing remains to be done.
+
+Artifacts: `runs/phase9_5_jev_zero_shot_5x5_threads1.json`,
+`runs/phase9_5_laya_zero_shot_5x5.json`,
+`runs/phase9_5_trained_system1_5x5.json`, and
+`runs/phase9_5_system1_baseline_comparison.json`. The earlier Jev file
+without `threads1` is retained only for auditing the thread-control fix.
+
+## Phase 9.4: real System-1 retraining and forced-route audit (2026-09-26)
+
+`scripts/train_system1_compare.py` trained two **JevStyleSystem1** checkpoints
+from the Phase 8.6D corpus with seed-disjoint training (0–7; 179 records) and
+validation (8–9; 47 records). `rule_full_budget` is a rule-imitation anchor;
+`no_fit` uses the saved on-policy rollout branches rescored without fit cost.
+Neither target is an oracle optimal-action label. The checkpoints are
+`runs/typed_decision_rule_full_v2.pt` and `runs/typed_decision_no_fit_v2.pt`.
+
+Validation top-1: rule imitation 47/47 (best epoch 4); no-fit rollout
+16/47 = 34.0% (best epoch 4). The no-fit model's validation accuracy is
+close to its most frequent validation class and offers no evidence that it
+learned a useful state-dependent action ranking.
+
+`TypedDecisionPolicy` now uses state-filtered factory candidates, returns
+the complete parameterized action, and threads the experiment seed into
+candidate construction. This fixes a latent invalid-action path and makes
+paired policy comparisons use the same action seed. The adapter regression
+test and all nine `tests/test_typed_decision.py` tests pass.
+
+`scripts/evaluate_trained_system1.py` forced each trained model onto the
+System-1 route and compared it with RuleFullBudget, using budget 30, five
+problem families, and seeds 10–14 (75 trajectories). All trained-model
+steps routed to System-1: 405 rule-imitation steps and 625 no-fit steps.
+This is a **System-1-only diagnostic with local fallback**, not an evaluation
+of selective routing or the real LLM System-2. Seeds 10–14 were already
+used in earlier proxy-student development analyses, so they are not a fresh
+final paper test set.
+
+| Problem | RuleFullBudget mean best | Rule imitation mean best | No-fit mean best |
+| --- | ---: | ---: | ---: |
+| Branin | -2.3703 | -3.0138 | -9.3264 |
+| Ackley | -20.2235 | -20.2235 | -20.4331 |
+| Hartmann | +1.9852 | +1.9852 | +1.5481 |
+| SixHumpCamel | +0.3611 | +0.3611 | -1.0101 |
+| Rastrigin | -112.8066 | -112.8066 | -141.8847 |
+
+Rule imitation matches the rule's terminal best in 24/25 paired runs;
+the one worse Branin run diverges after a late `global_exploration` choice.
+The no-fit model selects `error_guided_sampling` for all 625 decisions,
+consumes the full budget, and is worse in mean terminal best on all five
+families. This reproduces the closed-loop continuation concern with the
+**actual trained System-1**, rather than the earlier small diagnostic MLP.
+The rule-imitation checkpoint is a functional warm start, but there is still
+no demonstrated learned optimization gain. The no-fit checkpoint should not
+be used as an improved policy. Full actions and paired outcomes are in
+`runs/phase9_4_trained_system1_heldout.json`.
+
+Next research step: collect labels on states visited by the real System-1,
+with a terminal objective and a matched continuation, then evaluate a
+calibrated router with genuine System-2 calls on new seeds.
+
 ## Phase 8.6B: implemented, empirical gates still open
 
 The dataset generator now saves the full backend checkpoint needed to replay a
@@ -26,6 +265,123 @@ The full result, including per-seed paired outcomes, is in
 `runs/phase8_6b_h3_report.json`. Removing standalone retraining from the saved
 candidate results does not repair the Branin outcome; see
 `runs/phase8_6b_h3_no_retrain_report.json`.
+
+## Phase 8.6D: long-horizon utility ablation (2026-09-26)
+
+The full-horizon dataset (`runs/phase8_6d_hfull_10seed.jsonl`, 226 records)
+still fails Gates 2 and 4. Its Branin first decision is STOP on 6/10 seeds;
+the Gate 4 mean normalized gain over the behavior-first-action control is
+-0.0331, bootstrap 95% interval [-0.0656, -0.0031]. Gate 3's positive
+aggregate point estimate does not establish a terminal improvement.
+
+`scripts/ablate_phase8_6d_utility.py` ranked the same saved rollout branches
+under six utility variants, then replayed each selected first action with the
+Gate 4 RulePolicy continuation. It also repeated the ranking with RulePolicy
+continuation during label generation, matching the terminal test. Both runs
+use the same 30 first-decision records (three problems × seeds 0–9), so they
+are exploratory ablations on the development seeds, not held-out policy tests.
+
+| Branin label continuation: RulePolicy | First-step STOP | Mean new evaluations under Gate 4 | Mean terminal best | Normalized gain vs behavior (95% interval) |
+| --- | ---: | ---: | ---: | ---: |
+| Current utility | 6/10 | 8.6 | -4.04 | -0.0326 [-0.0655, -0.0029] |
+| No evaluation cost | 0/10 | 21.8 | -3.07 | -0.0181 [-0.0445, +0.0032] |
+| No fit cost | 2/10 | 17.1 | -1.51 | +0.0080 [-0.0093, +0.0340] |
+| No evaluation or fit cost | 0/10 | 21.8 | -2.24 | -0.0012 [-0.0346, +0.0301] |
+| No STOP penalty | 10/10 | 0.0 | -10.53 | -0.2226 [-0.3401, -0.0967] |
+
+Removing fit cost improves Branin's paired normalized outcome over current
+utility by +0.0407 [0.0042, 0.0810], but its gain over behavior is not
+established with ten seeds. Ackley remains unchanged in terminal outcome under
+the cost ablations; Hartmann's no-fit improvement under matched RulePolicy
+comes from one seed. No variant passes all Gate 4 comparisons. The same
+qualitative STOP pattern appears when ranking the saved `on_policy` branches.
+
+Results: `runs/phase8_6d_utility_ablation.json` (saved `on_policy` branches),
+`runs/phase8_6d_utility_ablation_rule.json` (matched RulePolicy branches).
+These replay only the first action from a stored state; they do not evaluate
+a deployed, repeatedly acting System-1 policy.
+
+## Phase 8.6E: held-out closed-loop student and expanded scenarios (2026-09-26)
+
+`scripts/evaluate_no_fit_student.py` trains two 64-hidden-unit state-only MLPs
+on hard top-action labels from the 8.6D saved rollouts: current utility and
+the no-fit-cost ablation. Training uses seeds 0–7 (179 records), model
+selection uses seeds 8–9 (47 records), and the closed-loop benchmark uses
+unseen seeds 10–19. The students see only `OptimizationState` features at
+evaluation time, not counterfactual or future objective values. Validation
+top-1 agreement is 0.489 for current labels and 0.383 for no-fit labels.
+
+The backend's audited synthetic allowlist now includes SixHumpCamel (2-D)
+and Rastrigin (10-D); both pass one-step fit/propose/evaluate tests. The
+benchmark covers five problems × budgets {15, 30} × ten new seeds × four
+policies (`RulePolicy`, `RuleFullBudget`, current-label student, no-fit student):
+400 completed trajectories. `RuleFullBudget` is the same rule with its early
+STOP threshold set to zero, isolating the value of using the remaining budget.
+
+| Problem, budget 30 | No-fit student mean terminal best | Paired normalized gain vs RulePolicy (95% bootstrap interval) | Gain vs full-budget rule |
+| --- | ---: | ---: | ---: |
+| Branin | -2.61 | +0.0252 [-0.0174, +0.0722] | -0.0039 |
+| Ackley | -20.40 | -1.2211 [-2.1755, -0.3616] | -1.2211 |
+| Hartmann | +1.69 | -3.9529 [-13.6532, +2.0168] | -4.6439 |
+| SixHumpCamel | +0.04 | -0.0151 [-0.0329, -0.0019] | -0.0151 |
+| Rastrigin | -128.94 | -0.6727 [-1.2481, -0.1974] | -0.7585 |
+
+The no-fit student selects no first-step STOP and consumes the full budget
+in every benchmark scenario. That fixes the immediate STOP collapse seen in
+the current-label student (10/10 Branin first-step STOP at each budget), but
+does not establish a general optimization gain. Branin's apparent gain over
+ordinary RulePolicy is matched or exceeded by simply letting RulePolicy use
+the full budget. Ackley at budget 30 and both added problem families show
+degradation. The additional seeds 15–19 retain those negative directions.
+Hartmann's per-seed normalization is especially sensitive to a small initial
+objective standard deviation (as low as 0.035 in the five-seed pilot); raw
+mean terminal values and per-seed outcomes must be read alongside normalized
+means. Budget-15 results and all 400 trajectories are in
+`runs/phase8_6d_heldout_student_10seed.json`.
+
+Conclusion: the no-fit utility reduces premature STOP but its learned action
+ranking does not transfer reliably. The state-only student is exploratory and
+should not be treated as a deployable improvement over RulePolicy.
+
+## Phase 8.6F: first-action versus continuation diagnosis (2026-09-26)
+
+`scripts/diagnose_continuation_effect.py` ran a 2×2 paired intervention on
+the same held-out seeds 10–19 at budget 30: first action from the no-fit
+student or full-budget RulePolicy, then all later actions from the student or
+full-budget RulePolicy. All four arms use the full evaluation budget. This
+separates first-action quality from the policy used after that decision.
+
+| Problem | Student first, then Rule: normalized gain vs Rule→Rule | Student continuation after student first: gain vs student→Rule |
+| --- | ---: | ---: |
+| Ackley | +0.0252 [-0.2198, +0.3409] | -1.2463 [-2.2590, -0.3654] |
+| Branin | +0.0001 [-0.0418, +0.0486] | -0.0040 [-0.0261, +0.0266] |
+| Hartmann | -0.7630 [-2.4809, +0.6230] | -3.8809 [-12.3981, +1.6493] |
+| SixHumpCamel | -0.0087 [-0.0171, -0.0016] | -0.0064 [-0.0230, +0.0045] |
+| Rastrigin | -0.0404 [-0.2742, +0.1296] | -0.7180 [-1.4308, -0.1977] |
+
+Ackley's student first action alone is not the observed source of the
+full-loop deficit; the student's continuation is. Rastrigin shows the same
+direction. SixHumpCamel also has a harmful first action. With a Rule first
+action, switching to student continuation hurts Branin (-0.0732, interval
+[-0.1255, -0.0261]) and SixHumpCamel (-0.0256, interval [-0.0525, -0.0046]).
+The interaction between first and later policies matters, so these contrasts
+are not additive.
+
+The trajectory logs show repeated actions: at budget 30, the no-fit student
+chooses `boundary_sampling` 130 times across ten Ackley runs and 130 times
+across ten Hartmann runs; on Rastrigin it chooses `error_guided_sampling` 98
+times and `boundary_sampling` 66 times. `boundary_sampling` explicitly selects
+points near domain edges. BOCoDe's installed Ackley and Rastrigin problems
+place their optima at the box center, making this repetition a plausible
+mechanism for poor outcomes. This is an observed policy behavior plus a
+mechanistic hypothesis, not a proof that every boundary sample is harmful.
+
+The fixed RulePolicy continuation in Gate 4 evaluates a first action under
+that continuation. It cannot establish that a learned policy repeatedly
+acting in the closed loop is good. The fixed Rule continuation itself does
+not explain the held-out full-loop degradation: for Ackley and Rastrigin it
+substantially mitigates the deficit. Full results:
+`runs/phase8_6d_continuation_effect.json` (200 paired trajectories).
 
 ## Phase 8.6C: Q-S5 horizon diagnosis (per codex Q-T1/Q-T2 2026-09-25)
 
@@ -60,6 +416,11 @@ Implication: the counterfactual teacher is NOT mis-specified in
 direction. The dataset's horizon=3 was too short to differentiate
 actions on terminal regret. Phase 8.6D (regenerate dataset with
 horizon = `remaining_budget`) is expected to make Gate 4 PASS.
+
+**Subsequent result:** Phase 8.6D did not pass Gate 4. The +4.49 result above
+is conditional on top-action changes, compares mainly against STOP, and is
+dominated by Hartmann; the Branin changed-record mean gain against behavior
+was still about -0.011. See the Phase 8.6D ablation above.
 
 Full report: `runs/phase8_6c_qs5_diagnosis.md`.
 JSON: `runs/phase8_6c_qs5_diagnosis.json`.
@@ -320,7 +681,7 @@ but is not required for closing Phase 9.
   expansion). Neither path is implemented today; the project has
   no vehicle-suspension simulator in its dependency graph and
   `BocodeBotorchBackend`'s allowlist is currently synthetic-only
-  ({Branin, Hartmann, Ackley}).
+  ({Branin, Hartmann, Ackley, SixHumpCamel, Rastrigin}).
 - Phase 13's synthetic benchmark is the only meaningful empirical
   baseline today; engineering transfer is deferred until a real
   engineering backend is available.
