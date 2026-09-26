@@ -30,7 +30,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from opt_agent.dataset import iter_jsonl, phase_of
+from opt_agent.dataset import iter_jsonl
+from opt_agent.dataset.validation import phase_of_ratio
 
 ACTIONS = (
     "global_exploration", "local_exploitation", "uncertainty_sampling",
@@ -63,6 +64,8 @@ def _process_record(record_dict: dict, scale_scheme: str,
         new_scale = family_scales[family]["mean"]
     elif scale_scheme == "total_budget":
         new_scale = float(md.get("total_budget", 30.0))
+    elif scale_scheme == "robust_iqr":
+        new_scale = family_scales[family]["robust_sd_iqr"]
     else:
         raise ValueError(f"unknown scheme {scale_scheme}")
 
@@ -114,57 +117,93 @@ def _process_record(record_dict: dict, scale_scheme: str,
 
 
 def phase_of_from_dict(record_dict: dict) -> str:
-    """Reproduce validation.phase_of without instantiating DecisionRecord."""
+    """Canonical phase via shared validation.phase_of_ratio."""
     state = record_dict.get("state", {})
     resource = state.get("resource", {})
     ratio = float(resource.get("remaining_budget_ratio", 0.0))
-    # Same boundaries as validation.phase_of_ratio (Phase 8.6B).
-    if ratio > 0.7:
-        return "early"
-    if ratio > 0.3:
-        return "mid"
-    if ratio > 0.0:
-        return "late"
-    return "terminal"
+    return phase_of_ratio(ratio)
 
 
 def compute_family_scales(records: list[dict]) -> dict[str, dict[str, float]]:
-    """Per-family median / mean of optimization_scale."""
+    """Per-family statistics of optimization_scale.
+
+    Includes robust SD (IQR/1.349) as policy-independent reference scale.
+    Seed-equal versions compute per-seed median first, then summarize across
+    seeds — avoids long trajectories dominating.
+    """
     by_fam: dict[str, list[float]] = defaultdict(list)
+    by_fam_seed: dict[tuple[str, int], list[float]] = defaultdict(list)
     for r in records:
         s = float((r.get("metadata") or {}).get("optimization_scale", 0.0))
         if s > 0:
-            by_fam[r["problem"]["family"]].append(s)
+            fam = r["problem"]["family"]
+            by_fam[fam].append(s)
+            by_fam_seed[(fam, int(r["problem"]["seed"]))].append(s)
+
     out = {}
     for fam, vals in by_fam.items():
+        sorted_vals = sorted(vals)
+        n = len(sorted_vals)
+        # Robust SD via IQR (1.349 is the inverse normal-IQR constant).
+        if n >= 4:
+            q1, _, q3 = statistics.quantiles(sorted_vals, n=4, method="inclusive")
+            iqr = q3 - q1
+            robust_sd = iqr / 1.349 if iqr > 0 else statistics.fmean(vals)
+        else:
+            robust_sd = statistics.fmean(vals)
+        # Seed-equal median: per-seed median, then median across seeds.
+        seed_medians = [statistics.median(sv) for (f, _), sv in by_fam_seed.items()
+                        if f == fam]
+        seed_means = [statistics.fmean(sv) for (f, _), sv in by_fam_seed.items()
+                      if f == fam]
         out[fam] = {
             "median": statistics.median(vals),
             "mean": statistics.fmean(vals),
+            "robust_sd_iqr": robust_sd,
+            "seed_equal_median": statistics.median(seed_medians)
+                if seed_medians else statistics.median(vals),
+            "seed_equal_mean": statistics.fmean(seed_means)
+                if seed_means else statistics.fmean(vals),
             "min": min(vals),
             "max": max(vals),
             "n": len(vals),
+            "n_seeds": len(seed_medians),
         }
     return out
 
 
 def aggregate(rows: list[dict]) -> dict:
-    """Aggregate rows into per-family stats."""
+    """Aggregate rows into per-family stats.
+
+    Uses statistics.quantiles (inclusive method) for q90/q95.
+    Excludes terminal records (remaining_budget_ratio == 0) from the primary
+    decision-opportunity estimand; they're aggregated separately.
+    """
     by_fam: dict[str, list[dict]] = defaultdict(list)
+    by_fam_terminal: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
-        by_fam[r["family"]].append(r)
+        if r["phase"] == "terminal":
+            by_fam_terminal[r["family"]].append(r)
+        else:
+            by_fam[r["family"]].append(r)
     out = {}
     for fam, rs in by_fam.items():
         for key in ("ΔU", "R_sur", "R_stop", "u_star"):
             vals = [r[key] for r in rs if math.isfinite(r[key])]
             if not vals:
                 continue
-            q90 = (sorted(vals)[int(0.9 * len(vals))] if len(vals) >= 2
-                   else vals[0])
-            q95 = (sorted(vals)[int(0.95 * len(vals))] if len(vals) >= 2
-                   else vals[0])
-            prevalence_above_delta = sum(1 for v in vals if v > PRACTICAL_DELTA) / len(vals)
+            n = len(vals)
+            sorted_vals = sorted(vals)
+            # Use inclusive quantile method (matches numpy default).
+            if n >= 10:
+                q90 = statistics.quantiles(sorted_vals, n=10, method="inclusive")[8]
+                q95 = statistics.quantiles(sorted_vals, n=20, method="inclusive")[18]
+            else:
+                q90 = sorted_vals[min(int(0.9 * n), n - 1)]
+                q95 = sorted_vals[min(int(0.95 * n), n - 1)]
+            prevalence_above_delta = sum(1 for v in vals if v > PRACTICAL_DELTA) / n
             out.setdefault(fam, {})[key] = {
-                "n": len(vals),
+                "n": n,
                 "mean": statistics.fmean(vals),
                 "median": statistics.median(vals),
                 "min": min(vals),
@@ -173,16 +212,32 @@ def aggregate(rows: list[dict]) -> dict:
                 "q95": q95,
                 "prevalence_above_delta": prevalence_above_delta,
             }
+    # Terminal: report separately, smaller stats.
+    terminal_stats = {}
+    for fam, rs in by_fam_terminal.items():
+        for key in ("ΔU", "R_sur"):
+            vals = [r[key] for r in rs if math.isfinite(r[key])]
+            if vals:
+                terminal_stats.setdefault(fam, {})[key] = {
+                    "n": len(vals),
+                    "mean": statistics.fmean(vals),
+                    "median": statistics.median(vals),
+                }
+    if terminal_stats:
+        out["__terminal_summary__"] = terminal_stats
     return out
 
 
 def seed_equal_per_family(rows: list[dict]) -> dict:
-    """One number per (family, seed); report mean across seeds.
+    """One number per (family, seed); report summary across seeds.
 
-    This avoids long-trajectory records dominating.
+    Per-seed mean/median/prevalence first, then aggregate over seeds.
+    Excludes terminal records.
     """
     by_seed: dict[tuple[str, int], list[dict]] = defaultdict(list)
     for r in rows:
+        if r["phase"] == "terminal":
+            continue
         by_seed[(r["family"], r["seed"])].append(r)
     out: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     for (fam, seed), rs in by_seed.items():
@@ -190,9 +245,20 @@ def seed_equal_per_family(rows: list[dict]) -> dict:
             vals = [r[key] for r in rs if math.isfinite(r[key])]
             if vals:
                 out[fam][key].append(statistics.fmean(vals))
-    return {fam: {k: statistics.fmean(vs) if vs else float("nan")
-                   for k, vs in d.items()}
-            for fam, d in out.items()}
+    summary = {}
+    for fam, d in out.items():
+        summary[fam] = {}
+        for k, vs in d.items():
+            if not vs:
+                continue
+            summary[fam][k] = {
+                "mean_of_seed_means": statistics.fmean(vs),
+                "median_of_seed_means": statistics.median(vs),
+                "min": min(vs),
+                "max": max(vs),
+                "n_seeds": len(vs),
+            }
+    return summary
 
 
 def main() -> int:
@@ -215,7 +281,8 @@ def main() -> int:
         print(f"  {fam:14s} n={s['n']:>3d}  median={s['median']:.4f}  "
               f"mean={s['mean']:.4f}  min={s['min']:.4f}  max={s['max']:.4f}")
 
-    schemes = ("per_record", "family_median", "family_mean", "total_budget")
+    schemes = ("per_record", "family_median", "family_mean",
+               "robust_iqr", "total_budget")
     all_results = {}
     t0 = time.monotonic()
     for scheme in schemes:
@@ -259,12 +326,22 @@ def main() -> int:
             row.append(f"{d.get('mean', float('nan')):>16.4f}")
         print(" ".join(row))
 
+    # Collect all per-record rows (not aggregated) for downstream experiments.
+    # We re-run with multiprocessing once more on the canonical scheme (family_median).
+    with mp.Pool(args.workers) as pool:
+        all_rows_canonical = pool.starmap(
+            _process_record,
+            [(rd, "family_median", family_scales) for rd in record_dicts],
+        )
+    all_rows_canonical = [r for r in all_rows_canonical if r is not None]
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps({
         "dataset": str(args.dataset),
         "practical_delta": PRACTICAL_DELTA,
         "family_scales": family_scales,
         "results_by_scheme": all_results,
+        "per_record_canonical_scheme": all_rows_canonical,
     }, indent=2, default=str) + "\n")
     print(f"\nSaved: {args.output}")
     return 0

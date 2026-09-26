@@ -1,12 +1,13 @@
-# EXP-RQ1.3 — Decision Landscape Analysis (scale-sensitivity revised)
+# EXP-RQ1.3 — Decision Landscape Analysis (round 3, post-codex-revision-2)
 
 **Date**: 2026-09-26
 **Branch**: `exp/rq0.5-llm-system1` (off `main` @ eb7e113)
-**Status**: **Scale-robustness verified**; three-regime claim is more defensible than the original framing suggested
+**Status**: Round-3 bug fixes applied; per-record rows now stored; 5 scale schemes tested
 **Tools**:
 - `scripts/exp_rq1_3_decision_landscape.py` (initial pass, per-record scale)
-- `scripts/exp_rq1_3_scale_sensitivity.py` (multi-scheme, parallelized 32 cores)
-- Output: `runs/exp_rq1_3_scale_sensitivity.json`
+- `scripts/exp_rq1_3_scale_sensitivity.py` (round 2: 4 schemes, parallelized 32 cores)
+- `scripts/exp_rq1_3_scale_sensitivity.py` (round 3: 5 schemes incl. robust_iqr, terminal excluded, statistics.quantiles, per-record storage, canonical phase_of_ratio)
+- Output: `runs/exp_rq1_3_scale_sensitivity.json` (now contains `per_record_canonical_scheme` for downstream RandomForest probe)
 
 ## 1. Why this revision
 
@@ -26,15 +27,15 @@ Hartmann is the most variable. Branin/6HC are highly variable in absolute terms 
 
 ## 3. ΔU mean across scale schemes (the regime-stability test)
 
-| Family | per_record | **family_median** | family_mean | total_budget |
-|---|---|---|---|---|
-| ackley | 0.383 | **0.341** | 0.348 | 0.016 |
-| branin | 0.032 | **0.035** | 0.030 | 0.042 |
-| **hartmann** | 1.379 | **0.570** | 0.620 | 0.015 |
-| rastrigin | 0.383 | **0.338** | 0.310 | 0.240 |
-| sixhumpcamel | 0.023 | **0.022** | 0.022 | 0.021 |
+| Family | per_record | **family_median** | family_mean | robust_iqr | total_budget |
+|---|---|---|---|---|---|
+| ackley | 0.383 | **0.341** | 0.348 | 1.124 | 0.016 |
+| branin | 0.033 | **0.035** | 0.030 | 0.054 | 0.043 |
+| **hartmann** | 1.379 | **0.570** | 0.620 | 0.714 | 0.015 |
+| rastrigin | 0.388 | **0.342** | 0.314 | 0.576 | 0.243 |
+| sixhumpcamel | 0.023 | **0.022** | 0.022 | 0.037 | 0.021 |
 
-Bold = the most outlier-robust scheme.
+Bold = the most outlier-robust scheme. `robust_iqr` = IQR/1.349, a policy-independent family reference scale recommended by codex.
 
 ### Three findings on robustness
 
@@ -59,17 +60,17 @@ Bold = the most outlier-robust scheme.
 
 Rather than ask "is ΔU > 0?" (which is trivially yes), ask "what fraction of states have ΔU > 0.1 (a practically meaningful gap)?"
 
-### Prevalence above δ = 0.1 under family_median scale
+### Prevalence above δ = 0.1 under family_median scale (terminal excluded)
 
 | Family | ΔU prev(>δ) | R_sur prev(>δ) | Interpretation |
 |---|---|---|---|
 | **hartmann** | **60.87%** | 49.28% | Most states have meaningful opportunity |
 | ackley | 40.00% | 48.57% | Substantial fraction, but mean ΔU is small |
-| rastrigin | 41.89% | 44.59% | Same as Ackley |
-| branin | 6.17% | 12.35% | Almost no opportunity states |
+| rastrigin | 42.47% | 45.21% | Same as Ackley |
+| branin | 6.25% | 12.50% | Almost no opportunity states |
 | **sixhumpcamel** | **0.00%** | 0.00% | **No state exceeds δ = 0.1 in any scale scheme** |
 
-**SixHumpCamel has zero states where the best action beats the second-best by more than 0.1 utility units.** This is a strong negative result: the benchmark provides no opportunity for any policy to add value.
+**SixHumpCamel has zero states where the best action beats the second-best by more than 0.1 utility units.** This is a strong negative result: the benchmark provides no opportunity for any policy to add value. The `robust_iqr` scheme lifts this to 13.33%, but the magnitude (0.10-0.16 range) is at the threshold.
 
 ## 5. Quantile view (where the opportunity concentrates)
 
