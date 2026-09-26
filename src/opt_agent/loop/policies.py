@@ -15,6 +15,7 @@ import random
 from typing import Protocol
 
 from opt_agent.actions import ActionResult, ActionType, OptimizationAction
+from opt_agent.actions.factory import sample_params
 from opt_agent.backend.bocode_botorch import UnifiedBackend
 from opt_agent.state import OptimizationState
 
@@ -38,8 +39,6 @@ class RandomPolicy:
     RulePolicy mirrors the same logic (no point in proposing more than that).
     """
 
-    _TYPES_WITH_PARAMS = (ActionType.GLOBAL_EXPLORATION, ActionType.LOCAL_EXPLOITATION)
-
     def __init__(self, seed: int = 0) -> None:
         self._rng = random.Random(seed)
         self._initial_seed = seed
@@ -54,23 +53,11 @@ class RandomPolicy:
         if remaining <= 0:
             return OptimizationAction(ActionType.STOP)
 
-        # Pick type, weighted equally.
         action_type = self._rng.choice(list(ActionType))
-
-        if action_type == ActionType.GLOBAL_EXPLORATION:
-            max_n = min(3, remaining)
-            n_samples = self._rng.randint(1, max_n)
-            return OptimizationAction(
-                ActionType.GLOBAL_EXPLORATION,
-                {"n_samples": n_samples, "seed": self._rng.randint(0, 10_000)},
-            )
-        if action_type == ActionType.LOCAL_EXPLOITATION:
-            return OptimizationAction(
-                ActionType.LOCAL_EXPLOITATION,
-                {"step": round(self._rng.uniform(0.01, 0.2), 4),
-                 "seed": self._rng.randint(0, 10_000)},
-            )
-        return OptimizationAction(action_type)
+        params = sample_params(action_type, remaining, self._rng)
+        if not params:
+            return OptimizationAction(action_type)
+        return OptimizationAction(action_type, params)
 
 
 class RulePolicy:
@@ -125,14 +112,6 @@ class UniformPolicy:
          ERROR_GUIDED_SAMPLING, BOUNDARY_SAMPLING).
     """
 
-    _PARAM_TYPES = (
-        ActionType.GLOBAL_EXPLORATION,
-        ActionType.LOCAL_EXPLOITATION,
-        ActionType.UNCERTAINTY_SAMPLING,
-        ActionType.ERROR_GUIDED_SAMPLING,
-        ActionType.BOUNDARY_SAMPLING,
-    )
-
     def __init__(self, seed: int = 0) -> None:
         self._rng = random.Random(seed)
         self._initial_seed = seed
@@ -147,49 +126,10 @@ class UniformPolicy:
         if remaining <= 0:
             return OptimizationAction(ActionType.STOP)
         action_type = self._rng.choice(list(ActionType))
-        return self._build(action_type, remaining)
-
-    def _build(
-        self, action_type: ActionType, remaining: int
-    ) -> OptimizationAction:
-        if action_type == ActionType.GLOBAL_EXPLORATION:
-            n = self._rng.randint(1, min(3, remaining))
-            return OptimizationAction(
-                ActionType.GLOBAL_EXPLORATION,
-                {"n_samples": n, "seed": self._rng.randint(0, 10_000)},
-            )
-        if action_type == ActionType.LOCAL_EXPLOITATION:
-            return OptimizationAction(
-                ActionType.LOCAL_EXPLOITATION,
-                {
-                    "step": round(self._rng.uniform(0.01, 0.2), 4),
-                    "seed": self._rng.randint(0, 10_000),
-                },
-            )
-        if action_type == ActionType.UNCERTAINTY_SAMPLING:
-            n = self._rng.randint(1, min(3, remaining))
-            return OptimizationAction(
-                ActionType.UNCERTAINTY_SAMPLING,
-                {"n_samples": n, "seed": self._rng.randint(0, 10_000)},
-            )
-        if action_type == ActionType.ERROR_GUIDED_SAMPLING:
-            n = self._rng.randint(1, min(3, remaining))
-            return OptimizationAction(
-                ActionType.ERROR_GUIDED_SAMPLING,
-                {"n_samples": n, "seed": self._rng.randint(0, 10_000)},
-            )
-        if action_type == ActionType.BOUNDARY_SAMPLING:
-            n = self._rng.randint(1, min(3, remaining))
-            return OptimizationAction(
-                ActionType.BOUNDARY_SAMPLING,
-                {
-                    "n_samples": n,
-                    "tol": round(self._rng.uniform(0.01, 0.10), 4),
-                    "seed": self._rng.randint(0, 10_000),
-                },
-            )
-        # Param-free actions.
-        return OptimizationAction(action_type)
+        params = sample_params(action_type, remaining, self._rng)
+        if not params:
+            return OptimizationAction(action_type)
+        return OptimizationAction(action_type, params)
 
 
 class OnPolicyMix:

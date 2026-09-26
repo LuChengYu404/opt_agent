@@ -61,6 +61,48 @@ def _make(action_type: ActionType, params: dict, seed: int) -> OptimizationActio
     return OptimizationAction(action_type, merged)
 
 
+def sample_params(
+    action_type: ActionType,
+    remaining_budget: int,
+    rng: "random.Random",
+) -> dict:
+    """Generate a random parameter dict for an action that requires one.
+
+    Used by ``RandomPolicy`` and ``UniformPolicy`` (and any other
+    ablation policy that needs a budget-feasible random action). The
+    candidate vocabulary and per-action defaults are in
+    ``ALL_CANDIDATE_SPECS``; this function handles the four
+    parameterised sampling actions plus LOCAL_EXPLOITATION.
+
+    Param-free actions (``SURROGATE_ACQUISITION``, ``RETRAIN_SURROGATE``,
+    ``STOP``) return an empty dict — the caller should then ``_make`` it
+    directly without a ``sample_params`` step.
+    """
+    import random
+    if action_type == ActionType.GLOBAL_EXPLORATION:
+        n = rng.randint(1, min(3, remaining_budget))
+        return {"n_samples": n, "seed": rng.randint(0, 10_000)}
+    if action_type == ActionType.LOCAL_EXPLOITATION:
+        return {
+            "step": round(rng.uniform(0.01, 0.2), 4),
+            "seed": rng.randint(0, 10_000),
+        }
+    if action_type in (
+        ActionType.UNCERTAINTY_SAMPLING,
+        ActionType.ERROR_GUIDED_SAMPLING,
+    ):
+        n = rng.randint(1, min(3, remaining_budget))
+        return {"n_samples": n, "seed": rng.randint(0, 10_000)}
+    if action_type == ActionType.BOUNDARY_SAMPLING:
+        n = rng.randint(1, min(3, remaining_budget))
+        return {
+            "n_samples": n,
+            "tol": round(rng.uniform(0.01, 0.10), 4),
+            "seed": rng.randint(0, 10_000),
+        }
+    return {}
+
+
 def candidate_actions_for_state(
     state: OptimizationState, *, seed: int = 0,
 ) -> dict[str, OptimizationAction]:
