@@ -138,7 +138,6 @@ class LayaPolicy:
         self.decisions.append(decision)
         self.call_count += 1
         self.total_latency_s += latency
-        # input_tokens / output_tokens stay 0 (local SDK has no usage).
         return decision
 
     def select_action(
