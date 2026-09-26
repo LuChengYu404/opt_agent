@@ -835,3 +835,88 @@ mean normalized terminal gain).
 
 Full report: `runs/EXP_RQ1_2_REPORT.md`. Per-dataset JSON in
 `runs/exp_rq1_2_{h1,h3,hfull,h3_5family}_report.json`.
+
+## EXP-RQ1.3 + EXP-RQ0.5 merged (2026-09-26, pilot evidence base)
+
+Merged `exp/rq0.5-llm-system1` into `main` as commit `a13397e`.
+The merge consolidates a Decision Landscape pilot + LLM-as-System-1
+wiring + closed-loop terminal regret + RF utility regression, all
+reviewed by `gpt-5.6-sol` (3 rounds: REVISE → REVISE → REVISE → approve).
+
+### Decision Landscape 4-step chain (all closed, pilot-grade)
+
+**Step 1 — Decision Opportunity** (scale-robust):
+- 5 normalization schemes × 5 families; family_median is canonical
+- Three regimes survive qualitatively:
+  - **Flat**: Branin (adaptive-value 0.048), SixHumpCamel (0.015)
+  - **Heavy-tailed**: Rastrigin (0.368), Ackley (0.309)
+  - **Frequent opportunity**: Hartmann (0.684)
+- SixHumpCamel: 0% of states above δ=0.1 (clean negative control)
+- Decision Opportunity profile (codex metric): `adaptive-value =
+  E[max_a U] - max_a E[U]`
+
+**Step 2 — State Conditionality** (RandomForest utility regression):
+- Hartmann: RF regret 0.47 vs Surrogate 0.68 (−29%); suggestive pilot
+  (paired bootstrap CI [−0.038, 0.415], t p=0.141)
+- Rastrigin/Ackley: RF ≈ best-fixed (no state-conditional learnability
+  demonstrated with 10 seeds)
+- Surrogate is competitive on Hartmann (0.48 closed-loop regret) but
+  weak on Rastrigin (11.10 closed-loop regret)
+
+**Step 3 — Closed-loop terminal regret** (AlwaysSurrogate continuation):
+- 3 seeds × 5 families × 8 first-actions × budget=15; ~500s on 32 cores
+- Best first action across opportunity-rich families: `local_exploitation`
+  (not `global_exploration` as initially claimed)
+- Rastrigin: local=0.00 regret vs surrogate=11.10 (4.8× spread)
+- Hartmann: local=0.33 vs surrogate=0.48 (Surrogate competitive)
+- Ackley: local=0.005 vs surrogate=0.03
+
+**Step 4 — LLM value (EXP-RQ0.5)**:
+- Real DeepSeek-chat as System-1: beats AlwaysSurrogate by **+8.87
+  best_y** on Rastrigin (2 seeds × budget=20)
+- Closed-loop regret is consistent with this finding (mechanistic
+  plausibility, not causal validation — per-step action logs not saved)
+- 5-seed replication deferred
+
+### New infrastructure
+
+- `src/opt_agent/system1/llm_system1_policy.py` (~250 LOC): `LLMSystem1Policy`
+  with mode="llm" (real DeepSeek) and mode="mock" (deterministic heuristic)
+- `scripts/exp_rq1_3_scale_sensitivity.py` (5 scale schemes, parallelized)
+- `scripts/exp_rq1_3_bootstrap_ci.py` (seed-cluster bootstrap)
+- `scripts/exp_rq1_3_rf_probe.py` (multi-output RF utility regression)
+- `scripts/exp_rq1_3_closed_loop_regret.py` (paired closed-loop replay)
+- `scripts/exp_rq0_5_llm_system1.py` (LLM vs Rule vs Surrogate)
+
+### Code revisions (post-codex-round-2)
+
+- `validation.py`: `MassGateResult.seed_clustered_ci95`; bootstrap CI over
+  per-seed adjusted_lift (used when n_seeds ≥ 5)
+- `scripts/validate_phase8_6b.py`: report includes gate3 CI
+
+### Test status
+
+364/364 tests pass (full suite). No regressions from merge.
+
+### Deferred (out of scope for this merge)
+
+- 5-seed replication of EXP-RQ0.5 with per-step LLM action logging
+- Closed-loop with branched actions at every decision point
+- External baseline: lenz / PlugBO head-to-head
+- Family × dimension confound (2D/6D/10D): needs dimension-crossed benchmark
+- System-1/System-2 2×2 figure: needs quantitative "ambiguity" definition
+
+### File index (post-merge)
+
+```
+runs/EXP_RQ1_3_REPORT.md                       # canonical pilot report
+runs/EXP_RQ0_5_REPORT.md                       # LLM-as-System-1 pilot
+runs/exp_rq1_3_scale_sensitivity.json          # Step 1 (5 schemes)
+runs/exp_rq1_3_bootstrap_ci.json               # Step 1 CIs
+runs/exp_rq1_3_rf_probe.json                   # Step 2-3
+runs/exp_rq1_3_closed_loop_regret.json         # Step 3 closed-loop
+runs/exp_rq0_5_results.json                    # Step 4 raw results
+runs/phase8_6d_h3_10seed_5family.jsonl         # 354-record canonical dataset
+scripts/exp_rq1_3_*.py, scripts/exp_rq0_5_llm_system1.py
+src/opt_agent/system1/llm_system1_policy.py
+```
