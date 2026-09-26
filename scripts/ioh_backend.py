@@ -42,7 +42,13 @@ class IOHBackend:
     _counter: int = field(default=0, init=False)
 
     def initialize(self, problem, n_init: int = 5, seed: int = 0) -> None:
-        """Initialize with an ioh problem. n_init and seed are honored."""
+        """Initialize with an ioh problem. n_init and seed are honored.
+
+        Convention: IOH minimizes, but v3 framework assumes maximization.
+        We negate IOH values at storage time so `history.objectives.max()`
+        gives the best-seen (negated-min = max of negated). The LLM sees
+        correct maximization values; local_exploitation's argmax works.
+        """
         self.problem = problem
         self.dim = int(problem.meta_data.n_variables)
         # bounds.lb / bounds.ub may be scalars or per-dim arrays.
@@ -67,9 +73,12 @@ class IOHBackend:
         )
         # Evaluate IOH problems in batch (ioh supports vectorized).
         with torch.no_grad():
-            y0 = torch.tensor(
+            raw_y0 = torch.tensor(
                 [self.problem(x.cpu().numpy()) for x in X0], dtype=torch.double
             ).reshape(-1, 1)
+        # NEGATE so that maximization semantics hold throughout the
+        # downstream state extraction / LLM payload.
+        y0 = -raw_y0
         self._history_X = X0.detach().clone()
         self._history_y = y0.detach().clone()
         self._fitted = False
@@ -81,11 +90,13 @@ class IOHBackend:
         if not torch.isfinite(X).all():
             raise ValueError("non-finite X")
         with torch.no_grad():
-            new_y = torch.tensor(
+            raw_y = torch.tensor(
                 [self.problem(x.cpu().numpy()) for x in X], dtype=torch.double
             ).reshape(-1, 1)
+        # NEGATE for maximization semantics.
+        new_y = -raw_y
         self._history_X = torch.cat([self._history_X, X.detach()], dim=0)
-        self._history_y = torch.cat([self._history_y, new_y], dim=0)
+        self._history_y = torch.cat([self._history_y, new_y.detach()], dim=0)
         self._fitted = False
         return new_y.detach()
 
@@ -95,8 +106,9 @@ class IOHBackend:
         from botorch.fit import fit_gpytorch_mll
 
         X = self._history_X.detach().clone()
-        # IOH problems minimize; BoTorch maximizes. Negate.
-        Y = -self._history_y.detach().clone()
+        # history_y already stores -IOH_y; GP fits a maximization model
+        # directly on it. No negation needed here.
+        Y = self._history_y.detach().clone()
         self._model = SingleTaskGP(X, Y)
         self._mll = ExactMarginalLogLikelihood(self._model.likelihood, self._model)
         try:
@@ -123,9 +135,8 @@ class IOHBackend:
             torch.tensor(self.bounds_lb, dtype=torch.double),
             torch.tensor(self.bounds_ub, dtype=torch.double),
         ])
-        # IOH minimizes; we maximize -y in BoTorch GP, so best_f is the
-        # observed maximum of -y, which equals -min(y).
-        best_f = float(-self._history_y.min().item())
+        # history_y stores -IOH_y; max is the best (negated-min).
+        best_f = float(self._history_y.max().item())
         ei = LogExpectedImprovement(model=self._model, best_f=best_f)
         candidate, _ = optimize_acqf(
             acq_function=ei, bounds=bounds_t, q=1,
@@ -146,8 +157,9 @@ class IOHBackend:
             if var.ndim == 1:
                 var = var.unsqueeze(-1)
             std = var.clamp(min=0.0).sqrt()
-        # IOH minimizes, so flip sign: in IOH-space, lower y is better.
-        return -mean.detach(), std.detach()
+        # GP is fit on -IOH_y; posterior.mean is on the negated scale
+        # (= v3 maximizing scale). Return as-is.
+        return mean.detach(), std.detach()
 
     @property
     def bounds(self):

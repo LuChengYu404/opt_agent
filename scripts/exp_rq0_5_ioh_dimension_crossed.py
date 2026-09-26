@@ -103,7 +103,12 @@ class FrozenRouter:
 
 def run_one_ioh(policy, fid: int, dim: int, instance: int,
                 seed: int, budget: int = 30) -> dict:
-    """Run a single IOH trajectory. Returns per-step y values for AUC."""
+    """Run a single IOH trajectory. Returns per-step y values for AUC.
+
+    Note: history stores -IOH_y (maximization convention); y_opt is
+    the original IOH y_opt (minimum). We track both raw IOH (for
+    normalized regret) and negated (for trajectory logging).
+    """
     problem = ioh.get_problem(fid=fid, dimension=dim, instance=instance,
                               problem_class=ioh.ProblemClass.REAL)
     backend = IOHBackend()
@@ -113,17 +118,25 @@ def run_one_ioh(policy, fid: int, dim: int, instance: int,
         traj = loop.run(policy, max_rounds=budget + 5)
     except Exception as exc:
         return {"fid": fid, "dim": dim, "instance": instance, "seed": seed,
-                "error": repr(exc), "best_y": None, "y_trace": []}
+                "error": repr(exc), "best_y": None, "y_trace_neg": []}
 
     history = backend.get_history()
-    y_trace = history.objectives[:, 0].cpu().numpy().tolist()
-    best_y = float(min(y_trace))
+    # y_trace_neg is on the -IOH scale; max = best
+    y_trace_neg = history.objectives[:, 0].cpu().numpy().tolist()
+    best_y_neg = float(max(y_trace_neg))
+    # Original IOH scale (lower is better): y_raw = -y_neg
+    y_trace_raw = [-v for v in y_trace_neg]
+    best_y_raw = float(min(y_trace_raw))   # the better number, lower is better
+    y_init_best_raw = float(min(y_trace_raw[:5]))
+    y_opt_raw = float(problem.optimum.y) if problem.optimum is not None else None
+
     return {
         "fid": fid, "dim": dim, "instance": instance, "seed": seed,
-        "best_y": best_y,
-        "y_trace": y_trace,
-        "y_init_best": float(min(y_trace[:5])),
-        "y_opt": float(problem.optimum.y) if problem.optimum is not None else None,
+        # Report on the IOH-min scale (lower better) so numbers match user intuition.
+        "best_y": best_y_raw,
+        "y_trace": y_trace_raw,
+        "y_init_best": y_init_best_raw,
+        "y_opt": y_opt_raw,
         "problem_name": problem.meta_data.name,
     }
 
