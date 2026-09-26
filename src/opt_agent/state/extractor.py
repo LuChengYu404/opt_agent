@@ -44,9 +44,10 @@ def _boundary_tol() -> float:
 def _min_pairwise_distance(X: torch.Tensor) -> float:
     if X.shape[0] < 2:
         return float("inf")
-    diffs = X.unsqueeze(0) - X.unsqueeze(1)  # [n, n, d]
-    dists = diffs.norm(dim=-1)  # [n, n]
-    # Ignore self-distance (diagonal is 0).
+    # torch.cdist avoids the [n, n, d] intermediate the unsqueeze-sub
+    # form would allocate; same answer, ~10x less transient memory for
+    # n>=30 / d>=10.
+    dists = torch.cdist(X, X)
     n = X.shape[0]
     mask = ~torch.eye(n, dtype=torch.bool, device=X.device)
     return float(dists[mask].min().item())

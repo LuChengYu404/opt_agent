@@ -332,58 +332,18 @@ def oracle_test_from_record(
         BocodeBotorchBackend reconstructed with the problem id from the record.
     """
     from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
-    from opt_agent.backend.checkpoint import Checkpoint
 
-    meta = record.metadata
-    required = (
-        "backend_X", "backend_objectives", "backend_constraints",
-        "backend_id", "backend_problem_id", "backend_problem_bounds",
-        "backend_fitted", "backend_model_state_b64", "backend_rng_state_b64",
-    )
-    for key in required:
-        if key not in meta:
-            raise ValueError(
-                f"record {record.id!r} missing {key!r} in metadata. "
-                "Re-generate dataset with Phase 8.6B replay support."
-            )
-
-    X = torch.tensor(meta["backend_X"], dtype=torch.double)
-    Y = torch.tensor(meta["backend_objectives"], dtype=torch.double)
-    C = torch.tensor(meta["backend_constraints"], dtype=torch.double)
-
-    fitted = bool(meta["backend_fitted"])
-    model_bytes = (
-        base64.b64decode(meta["backend_model_state_b64"], validate=True)
-        if meta["backend_model_state_b64"] is not None else None
-    )
-    rng_bytes = (
-        base64.b64decode(meta["backend_rng_state_b64"], validate=True)
-        if meta["backend_rng_state_b64"] is not None else None
-    )
-    if fitted and model_bytes is None:
-        raise ValueError(f"record {record.id!r} has fitted GP but no model state")
-    if rng_bytes is None:
-        raise ValueError(f"record {record.id!r} has no RNG state")
-
-    problem_id = str(meta["backend_problem_id"])
+    cp = _reconstruct_checkpoint(record)
     if backend_factory is None:
         backend = BocodeBotorchBackend()
         backend.initialize(BackendConfig(
-            problem_id=problem_id,
+            problem_id=cp.problem_id,
             seed=int(record.problem["seed"]),
             n_init=1,
         ))
     else:
         backend = backend_factory()
-    backend.restore(Checkpoint(
-        backend_id=str(meta["backend_id"]),
-        problem_id=problem_id,
-        problem_bounds=[tuple(b) for b in meta["backend_problem_bounds"]],
-        X=X, objectives=Y, constraints=C,
-        fitted=fitted,
-        model_state_dict=model_bytes,
-        torch_rng_state=rng_bytes,
-    ))
+    backend.restore(cp)
 
     state = extract_state(
         backend,
@@ -401,7 +361,7 @@ def oracle_test_from_record(
         raise ValueError(f"record {record.id!r} replay best value differs")
     if state.surrogate.is_current != bool(record.state["surrogate"]["is_current"]):
         raise ValueError(f"record {record.id!r} replay surrogate status differs")
-    objective_scale = float(meta.get("optimization_scale", 1.0))
+    objective_scale = float(record.metadata.get("optimization_scale", 1.0))
     return oracle_test(
         backend,
         state,
@@ -685,15 +645,9 @@ def _weights_from_metadata(meta: dict) -> UtilityWeights:
     """
     uw = meta.get("utility_weights")
     if isinstance(uw, dict) and uw:
-        return UtilityWeights(
-            w_optimization=float(uw.get("w_optimization", 1.0)),
-            w_surrogate=float(uw.get("w_surrogate", 0.0)),
-            w_coverage=float(uw.get("w_coverage", 0.0)),
-            w_evaluation=float(uw.get("w_evaluation", 1.0)),
-            w_fit=float(uw.get("w_fit", 0.5)),
-            w_stop_opportunity=float(uw.get("w_stop_opportunity", 0.75)),
-        )
-    # Legacy fallback (Phase 8.6B and earlier).
+        return UtilityWeights.from_dict(uw)
+    # Legacy fallback (Phase 8.6B and earlier): only w_stop_opportunity
+    # was persisted; everything else uses the dataclass defaults.
     return UtilityWeights(w_stop_opportunity=float(meta.get("w_stop_opportunity", 0.75)))
 
 

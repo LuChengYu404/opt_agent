@@ -212,6 +212,7 @@ class BocodeBotorchBackend(UnifiedBackend):
 
         self._problem = prob
         bounds_t = self._bounds_to_tensor(prob.bounds)
+        self._bounds_tensor = bounds_t
         d = bounds_t.shape[1]
 
         torch.manual_seed(config.seed)
@@ -289,7 +290,7 @@ class BocodeBotorchBackend(UnifiedBackend):
         from botorch.optim import optimize_acqf
 
         assert self._model is not None and self._problem is not None
-        bounds_t = self._bounds_to_tensor(self._problem.bounds)
+        bounds_t = self.bounds
 
         best_f = self._history_obj.max().item()  # MAXIMIZE convention
         ei = LogExpectedImprovement(model=self._model, best_f=best_f)
@@ -344,9 +345,9 @@ class BocodeBotorchBackend(UnifiedBackend):
 
     @property
     def bounds(self) -> Optional[torch.Tensor]:
-        if self._problem is None:
-            return None
-        return self._bounds_to_tensor(self._problem.bounds)
+        """Bounds tensor [2, d]. Cached at ``initialize()`` time so this
+        property doesn't re-allocate on every BO step."""
+        return getattr(self, "_bounds_tensor", None)
 
     # -- internal -----------------------------------------------------------
 

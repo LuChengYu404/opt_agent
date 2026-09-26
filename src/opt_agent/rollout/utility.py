@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -46,6 +47,29 @@ class UtilityWeights:
     # actions in early phase; rises above them in late phase. Set to 0 to
     # disable the STOP opportunity penalty.
     w_stop_opportunity: float = 0.75
+
+    def to_dict(self) -> dict[str, float]:
+        """Single-source-of-truth dict form used by JSONL metadata."""
+        return {
+            "w_optimization": self.w_optimization,
+            "w_surrogate": self.w_surrogate,
+            "w_coverage": self.w_coverage,
+            "w_evaluation": self.w_evaluation,
+            "w_fit": self.w_fit,
+            "w_stop_opportunity": self.w_stop_opportunity,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "UtilityWeights":
+        """Reverse of ``to_dict``. Missing fields fall back to defaults."""
+        return cls(
+            w_optimization=float(data.get("w_optimization", 1.0)),
+            w_surrogate=float(data.get("w_surrogate", 0.0)),
+            w_coverage=float(data.get("w_coverage", 0.0)),
+            w_evaluation=float(data.get("w_evaluation", 1.0)),
+            w_fit=float(data.get("w_fit", 0.5)),
+            w_stop_opportunity=float(data.get("w_stop_opportunity", 0.75)),
+        )
 
 
 def compute_utility(
