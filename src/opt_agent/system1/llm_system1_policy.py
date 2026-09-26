@@ -249,6 +249,17 @@ class LLMSystem1Policy:
             probs = {action_id: 1.0}
         s = sum(probs.values()) or 1.0
         probs = {k: v / s for k, v in probs.items()}
+        # OpenAI-compatible APIs use different keys for token usage:
+        #   OpenAI proper:        prompt_tokens, completion_tokens
+        #   DeepSeek/Anthropic-compat: input_tokens, output_tokens
+        #   Some:                 total_tokens only
+        usage = body.get("usage", {}) or {}
+        in_tok = (usage.get("prompt_tokens")
+                  or usage.get("input_tokens")
+                  or 0)
+        out_tok = (usage.get("completion_tokens")
+                   or usage.get("output_tokens")
+                   or 0)
         return {
             "answers": {
                 "next_action": {
@@ -258,7 +269,8 @@ class LLMSystem1Policy:
                 }
             },
             "model": body.get("model", "unknown"),
-            "usage": body.get("usage", {}),
+            "usage": {"input_tokens": int(in_tok),
+                      "output_tokens": int(out_tok)},
         }
 
 

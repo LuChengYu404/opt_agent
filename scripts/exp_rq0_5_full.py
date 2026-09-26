@@ -157,16 +157,27 @@ def run_one(policy_factory, family: str, seed: int, budget: int,
         routing_log=list(getattr(policy, "routing_log", [])),
     )
     # Per-step log (per codex round-4).
-    history = backend.get_history()
+    # Per-step `current_best` and `n_samples_after` come from `step.next_state`,
+    # NOT the final history (bug fix per codex review).
     decisions = getattr(policy, "decisions", [])
+    # For wrappers like RoutingAwareMetaController, also check inner LLMs.
+    inner_decisions = []
+    if hasattr(policy, "llm") and hasattr(policy.llm, "decisions"):
+        inner_decisions.extend(policy.llm.decisions)
+    if hasattr(policy, "surrogate") and hasattr(policy.surrogate, "decisions"):
+        inner_decisions.extend(policy.surrogate.decisions)
+    decision_pool = decisions if decisions else inner_decisions
     for i, step in enumerate(traj.steps):
         action_id = step.action.type.value
         result.action_counts[action_id] = result.action_counts.get(action_id, 0) + 1
-        cur_best = float(history.objectives[:, 0].max().item())
-        # Capture per-step state features + policy decision info.
+        # Step-specific values from next_state.
+        cur_best = float(step.next_state.optimization.best_value)
+        n_samples_after = int(step.next_state.sampling.n_samples)
+        cur_best_total_after = float(step.next_state.optimization.best_value)
+        # Capture per-step policy decision info (from inner LLMs if wrapper).
         probs = confidence = model = latency_s = None
-        if i < len(decisions):
-            d = decisions[i]
+        if i < len(decision_pool):
+            d = decision_pool[i]
             probs = dict(d.probabilities) if hasattr(d, "probabilities") else None
             confidence = float(d.confidence) if hasattr(d, "confidence") else None
             model = str(d.model) if hasattr(d, "model") else None
@@ -178,9 +189,10 @@ def run_one(policy_factory, family: str, seed: int, budget: int,
             "n_new_samples": int(step.result.n_new_samples),
             "n_model_fits": int(step.result.n_model_fits),
             "current_best": cur_best,
+            "current_best_total": cur_best_total_after,
             "should_stop": bool(step.result.should_stop),
             "is_fitted_after": bool(backend.is_fitted),
-            "n_samples_after": int(len(history)),
+            "n_samples_after": n_samples_after,
             "latency_s": latency_s,
             "probs": probs,
             "confidence": confidence,
