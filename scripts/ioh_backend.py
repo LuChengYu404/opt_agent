@@ -102,6 +102,7 @@ class IOHBackend:
 
     def fit(self) -> None:
         from botorch.models import SingleTaskGP
+        from botorch.models.transforms import Normalize
         from gpytorch.mlls import ExactMarginalLogLikelihood
         from botorch.fit import fit_gpytorch_mll
 
@@ -109,6 +110,10 @@ class IOHBackend:
         # history_y already stores -IOH_y; GP fits a maximization model
         # directly on it. No negation needed here.
         Y = self._history_y.detach().clone()
+        # Normalize inputs to [0, 1] unit cube (BoTorch best practice).
+        # NOTE: Normalize transform state is not preserved through our
+        # custom checkpoint/restore; defer normalization until checkpoint
+        # boundary handling is updated.
         self._model = SingleTaskGP(X, Y)
         self._mll = ExactMarginalLogLikelihood(self._model.likelihood, self._model)
         try:

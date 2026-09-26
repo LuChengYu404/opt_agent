@@ -256,6 +256,7 @@ class BocodeBotorchBackend(UnifiedBackend):
 
         from botorch.fit import fit_gpytorch_mll
         from botorch.models import SingleTaskGP
+        from botorch.models.transforms import Normalize
         from gpytorch.mlls import ExactMarginalLogLikelihood
 
         X = self._history_X.detach().clone()
@@ -455,6 +456,7 @@ class BocodeBotorchBackend(UnifiedBackend):
         # Restore fitted GP model (Phase 6 correction: full restore).
         if cp.fitted and cp.model_state_dict is not None:
             from botorch.models import SingleTaskGP
+            from botorch.models.transforms import Normalize
             from gpytorch.mlls import ExactMarginalLogLikelihood
 
             # Rebuild a fresh SingleTaskGP with the restored history, then

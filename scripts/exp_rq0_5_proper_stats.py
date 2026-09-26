@@ -160,15 +160,12 @@ def main():
     # ----- Normalized BOCoDe aggregate (per-family, then mean) -----
     print()
     print("=" * 72)
-    print("BOCoDe NORMALIZED aggregate (per-family z-score, then mean)")
+    print("BOCoDe NORMALIZED aggregate (shared-scale z per family)")
     print("=" * 72)
-    # z-score per family using y_init_best and (rough) y_opt from problem.
-    # We don't have y_opt in BOCoDe; use family-level best_y from RulePolicy as
-    # an empirical approximation (or skip; this is post-hoc).
-    # We'll do simple within-family standardization (subtract mean, divide std)
-    # over seed-level means per policy.
-    print("\n(simple within-family std-normalized mean per policy, then mean across families):")
-    policy_family_means = defaultdict(lambda: defaultdict(list))
+    # Per-family, pool all (policy, seed) seed-means; compute a shared
+    # mean and std; z-score each (policy, seed) outcome; then mean z
+    # across families per policy.
+    pooled_per_fam = defaultdict(list)  # fam -> list of (policy, seed_mean)
     for fam in families:
         for p in ["RulePolicy", "AlwaysSurrogate", "LLMDeepSeek", "Jev", "RoutingAware"]:
             for s in range(10):
@@ -176,23 +173,23 @@ def main():
                       if r["family"] == fam and r["seed"] == s
                       and r["policy"] == p and r["best_y"] == r["best_y"]]
                 if ys:
-                    policy_family_means[p][fam].append(statistics.fmean(ys))
-    # Standardize per family.
-    norm_scores = defaultdict(dict)
-    for p in policy_family_means:
-        for fam in policy_family_means[p]:
-            vals = policy_family_means[p][fam]
-            if len(vals) < 2: continue
-            m = statistics.fmean(vals)
-            sd = statistics.stdev(vals)
-            if sd == 0: continue
-            for v in vals:
-                norm_scores[p][fam] = (v - m) / sd
-    # Mean across families per policy (each family contributes one std-normalized value).
-    print(f"\n{'policy':18s} {'mean_norm':>12s}")
-    for p in sorted(norm_scores):
-        mean_z = statistics.fmean(list(norm_scores[p].values()))
-        print(f"{p:18s} {mean_z:>12.4f}")
+                    pooled_per_fam[fam].append((p, statistics.fmean(ys)))
+    # Compute shared mean / std per family, then z-score each entry.
+    norm_per_policy = defaultdict(list)
+    for fam, entries in pooled_per_fam.items():
+        ys = [v for _, v in entries]
+        if len(ys) < 2: continue
+        m = statistics.fmean(ys)
+        sd = statistics.stdev(ys)
+        if sd == 0: continue
+        for p, v in entries:
+            z = (v - m) / sd
+            norm_per_policy[p].append(z)
+    print(f"\n{'policy':18s} {'mean_z':>10s} {'n':>5s}")
+    for p in ["RulePolicy", "AlwaysSurrogate", "LLMDeepSeek", "Jev", "RoutingAware"]:
+        if p in norm_per_policy:
+            zs = norm_per_policy[p]
+            print(f"{p:18s} {statistics.fmean(zs):>10.4f} {len(zs):>5d}")
 
 
 if __name__ == "__main__":
