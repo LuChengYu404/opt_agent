@@ -192,11 +192,16 @@ class DatasetGenerator:
             # Decision point?
             if step % self.config.decision_every_k_actions == 0:
                 cands = full_candidates(seed=derive_seed(run_seed, step))
+                # Sprint 0 fix: scale the rollout cap to candidates × horizon so
+                # long-horizon runs (e.g. horizon=total_budget) don't hit the
+                # default cap of 200.
+                rollout_cap = max(200, 8 * self.config.horizon + 32)
                 output = CounterfactualRollout(
                     backend,
                     horizon=self.config.horizon,
                     utility_weights=self.config.utility_weights,
                     continuation_spec=self.config.continuation_spec,
+                    max_rollout_steps=rollout_cap,
                     optimization_scale=optimization_scale,
                     evaluation_scale=evaluation_scale,
                     fit_scale=fit_scale,
