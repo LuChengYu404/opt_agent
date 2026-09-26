@@ -191,25 +191,25 @@ class DecisionLoop:
 # ---------------------------------------------------------------------------
 
 
-def _execute_and_extract(
+def execute_and_extract(
     backend: UnifiedBackend,
     state: OptimizationState,
     action: OptimizationAction,
     *,
     total_budget: int,
 ) -> tuple[OptimizationState, ActionResult]:
-    """Run execute_action then re-extract state. Return (next_state, result).
+    """Run ``execute_action`` then re-extract state.
 
-    STOP is special — does not require backend mutation, just echo state.
+    Used by DecisionLoop, CounterfactualRollout, and oracle replay arms.
+    The state-after-execute is whatever the backend has now plus the
+    just-applied action's label as ``last_action``.
     """
     result = execute_action(backend, state, action)
-    if result.should_stop:
-        # STOP doesn't mutate backend; next_state echoes the just-recorded action.
-        next_state = extract_state(
-            backend, total_budget=total_budget, last_action=action.type.value
-        )
-        return next_state, result
     next_state = extract_state(
-        backend, total_budget=total_budget, last_action=action.type.value
+        backend, total_budget=total_budget, last_action=action.type.value,
     )
     return next_state, result
+
+
+# Backwards-compatible alias for callers that imported the private name.
+_execute_and_extract = execute_and_extract

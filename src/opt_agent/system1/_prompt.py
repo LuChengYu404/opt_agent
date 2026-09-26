@@ -7,12 +7,21 @@ verbatim from ``laya_policy.py`` (``_DESCRIPTIONS``, ``_state_payload``) and
 no behavioural change. They are underscore-prefixed because they are
 implementation details of the System-1 adapters; downstream code consumes
 them only via ``LayaPolicy.decide()`` and ``JevPolicy.decide()``.
+
+Pass 2 of the simplify review collapses the Laya/Jev duplication:
+
+  - ``build_choice_request`` constructs the (state_arg, question) pair.
+  - ``validate_choice_response`` parses the LLM answer.
+  - Both policies use these helpers; their ``decide()`` methods shrink
+    to the transport-specific code (HTTP retry vs SDK call) plus
+    telemetry accounting.
 """
 
 from __future__ import annotations
 
 import math
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Literal, Mapping
 
 from opt_agent.actions import ActionType, OptimizationAction
 from opt_agent.state import OptimizationState
@@ -124,3 +133,112 @@ def _executable_criterion(action: OptimizationAction, state: OptimizationState) 
         f"{description}{parameter_text} Uses {n_evaluations} objective "
         f"evaluation{'s' if n_evaluations != 1 else ''}.{fit_text}"
     )
+
+
+@dataclass(frozen=True)
+class DecisionOutput:
+    """Single System-1 decision shape used by both ``LayaPolicy`` and
+    ``JevPolicy`` (and any future System-1 adapter).
+
+    Carries:
+      - ``action``: the chosen ``OptimizationAction`` from the factory's
+        budget-valid candidate pool.
+      - ``probabilities``: full distribution over the offered action ids.
+      - ``confidence``: scalar in [0, 1] (LLM-reported or sigmoid-derived).
+      - ``latency_s``, ``input_tokens``, ``output_tokens``, ``model``:
+        call telemetry. Local models set tokens to 0; the model field
+        carries the local ``model_id`` or the API-reported model.
+    """
+
+    action: OptimizationAction
+    probabilities: dict[str, float]
+    confidence: float
+    latency_s: float
+    input_tokens: int
+    output_tokens: int
+    model: str
+
+
+def build_choice_request(
+    state: OptimizationState,
+    choices: Mapping[str, OptimizationAction],
+    *,
+    state_format: Literal["structured", "narrative"] = "structured",
+    criteria_format: Literal["legacy", "executable"] = "executable",
+) -> tuple[Any, dict[str, Any]]:
+    """Construct the (state_arg, inner_question) pair used by both
+    LayaPolicy and JevPolicy.
+
+    ``state_arg`` is the state payload passed as the predict call's
+    ``state`` slot. ``inner_question`` is the dict that carries the
+    choice primitive (top-level ``"next_action"``); callers wrap it
+    with their own envelope (e.g. Jev nests under ``"questions"``).
+
+    Centralising this here means a tweak to either prompt shape applies
+    to both policies and there is no second copy of the instruction
+    suffix or criteria block to drift out of sync.
+    """
+    state_arg = (
+        _state_payload(state)
+        if state_format == "structured"
+        else _state_narrative(state)
+    )
+    criteria = {
+        name: (
+            _executable_criterion(action, state)
+            if criteria_format == "executable"
+            else _DESCRIPTIONS[name]
+        )
+        for name, action in choices.items()
+    }
+    instructions = (
+        "Choose the next action for maximizing the best observed objective "
+        "within the remaining evaluation budget. Consider exploration, "
+        "surrogate reliability, and whether stopping is justified."
+    ) + (
+        " Each option is a complete executable call with fixed parameters; "
+        "choose one option, without supplying parameters."
+        if criteria_format == "executable" else ""
+    )
+    return state_arg, {
+        "next_action": {
+            "type": "choice",
+            "instructions": instructions,
+            "criteria": criteria,
+        }
+    }
+
+
+def validate_choice_response(
+    raw: Mapping[str, Any],
+    choices: Mapping[str, OptimizationAction],
+) -> tuple[str, dict[str, float], float]:
+    """Parse the LLM answer into ``(selected_id, probabilities, confidence)``.
+
+    Validates that the answer shape matches the offered criteria, that the
+    probabilities are finite and non-negative, and that their sum is
+    within the published rounding tolerance. The reconcile-to-argmax
+    policy (used by ``LayaPolicy`` because its SDK's ``choice`` field is
+    independent of ``probabilities``) is left to the caller.
+    """
+    try:
+        answer = raw["answers"]["next_action"]
+        selected = answer["choice"]
+        raw_probs = answer["probabilities"]
+    except (KeyError, TypeError) as exc:
+        raise ValueError("Choice response missing 'answers.next_action' block") from exc
+    if selected not in choices:
+        raise ValueError("Choice response selected an unavailable action")
+    if not isinstance(raw_probs, Mapping) or set(raw_probs) != set(choices):
+        raise ValueError("Choice response probabilities do not match the offered actions")
+    probs = {name: float(raw_probs[name]) for name in choices}
+    if any(not math.isfinite(p) or p < 0 for p in probs.values()):
+        raise ValueError("Choice probabilities must be finite and non-negative")
+    total = sum(probs.values())
+    if not 0.95 <= total <= 1.05:
+        raise ValueError(f"Choice probability sum outside rounding tolerance: {total:.6f}")
+    probs = {name: value / total for name, value in probs.items()}
+    confidence = float(answer.get("confidence", probs[selected]))
+    if not math.isfinite(confidence) or not 0 <= confidence <= 1:
+        raise ValueError("Choice confidence must lie in [0, 1]")
+    return selected, probs, confidence

@@ -229,4 +229,6 @@ def test_jev_prompt_helpers_live_in_shared_module() -> None:
     from opt_agent.system1 import laya_policy  # noqa: E402
     src_laya = inspect.getsource(laya_policy)
     assert "from opt_agent.system1._prompt import" in src_laya
-    assert "from opt_agent.system1.jev_policy import JevDecision" in src_laya
+    # Both policies import the shared DecisionOutput (and JevDecision
+    # alias re-export) from _prompt, not from each other.
+    assert "from opt_agent.system1.jev_policy import" not in src_laya

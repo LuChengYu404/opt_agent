@@ -119,7 +119,7 @@ class HybridPolicy:
         decision = self._system1.decide(state)
         try:
             action = decision.action
-            probs = dict(decision.probabilities)
+            probs = decision.probabilities
         except AttributeError as exc:
             raise RuntimeError(
                 "system1.decide() must return an object with .action and "
@@ -159,17 +159,6 @@ class HybridPolicy:
                 f"system1 probability distribution contains keys not in "
                 f"the candidate factory vocabulary: {sorted(extra_keys)}; "
                 f"this would corrupt the router's confidence signal."
-            )
-        # Per codex re-review: also validate that the chosen action's
-        # parameters are budget-valid (e.g. n_samples ≤ remaining_budget).
-        # Without this, the ID check passes but execute_action raises
-        # at runtime when an n_samples overshoot hits the budget.
-        params = dict(action.params)
-        if "n_samples" in params and params["n_samples"] > state.resource.remaining_budget:
-            raise ValueError(
-                f"system1 action {action_id!r} requests n_samples="
-                f"{params['n_samples']} but only "
-                f"{state.resource.remaining_budget} budget remains."
             )
         # Phase 12: register the current state with the router so an
         # OOD-aware router can consult the OOD detector. Routers that

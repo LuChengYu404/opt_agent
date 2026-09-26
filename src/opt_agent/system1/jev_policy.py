@@ -2,37 +2,31 @@
 
 Uses TypeSafe's documented POST /v1/systemone contract. The legacy state and
 option descriptions remain available for reproducing earlier baselines.
+
+The transport (HTTP retry / token accounting) lives here; the prompt
+shape and Choice response validation are shared with ``LayaPolicy`` in
+``system1._prompt``. ``JevDecision`` is kept as an alias of the shared
+``DecisionOutput`` for callers that imported the older name.
 """
 
 from __future__ import annotations
 
-import math
 import os
 import time
-from dataclasses import dataclass
-from typing import Any, Literal, Mapping
+from typing import Any, Literal
 
 import httpx
 
 from opt_agent.actions import OptimizationAction, candidate_actions_for_state
 from opt_agent.state import OptimizationState
 from opt_agent.system1._prompt import (
-    _DESCRIPTIONS,
-    _executable_criterion,
-    _state_narrative,
-    _state_payload,
+    DecisionOutput,
+    build_choice_request,
+    validate_choice_response,
 )
 
-
-@dataclass(frozen=True)
-class JevDecision:
-    action: OptimizationAction
-    probabilities: dict[str, float]
-    confidence: float
-    latency_s: float
-    input_tokens: int
-    output_tokens: int
-    model: str
+# Backwards-compatible alias: callers and tests import JevDecision.
+JevDecision = DecisionOutput
 
 
 class JevPolicy:
@@ -64,7 +58,7 @@ class JevPolicy:
         self.criteria_format = criteria_format
         self._client = client or httpx.Client(timeout=timeout_s, trust_env=trust_env)
         self._owns_client = client is None
-        self.decisions: list[JevDecision] = []
+        self.decisions: list[DecisionOutput] = []
         self.call_count = 0
         self.total_input_tokens = 0
         self.total_output_tokens = 0
@@ -77,37 +71,20 @@ class JevPolicy:
         if self._owns_client:
             self._client.close()
 
-    def decide(self, state: OptimizationState) -> JevDecision:
+    def decide(self, state: OptimizationState) -> DecisionOutput:
         choices = candidate_actions_for_state(state, seed=self.seed)
         if state.resource.remaining_budget <= 0:
-            result = JevDecision(choices["stop"], {"stop": 1.0}, 1.0, 0.0, 0, 0, self.model)
+            result = DecisionOutput(
+                choices["stop"], {"stop": 1.0}, 1.0, 0.0, 0, 0, self.model,
+            )
             self.decisions.append(result)
             return result
-        payload = {
-            "model": self.model,
-            "state": (_state_payload(state) if self.state_format == "structured"
-                      else _state_narrative(state)),
-            "questions": {
-                "next_action": {
-                    "type": "choice",
-                    "instructions": (
-                        "Choose the next action for maximizing the best observed objective "
-                        "within the remaining evaluation budget. Consider exploration, "
-                        "surrogate reliability, and whether stopping is justified."
-                    ) + (
-                        " Each option is a complete executable call with fixed parameters; "
-                        "choose one option, without supplying parameters."
-                        if self.criteria_format == "executable" else ""
-                    ),
-                    "criteria": {
-                        name: (_executable_criterion(action, state)
-                               if self.criteria_format == "executable"
-                               else _DESCRIPTIONS[name])
-                        for name, action in choices.items()
-                    },
-                }
-            },
-        }
+        state_arg, inner = build_choice_request(
+            state, choices,
+            state_format=self.state_format,
+            criteria_format=self.criteria_format,
+        )
+        payload = {"model": self.model, "state": state_arg, "questions": inner}
         start = time.monotonic()
         for attempt in range(3):
             try:
@@ -131,33 +108,17 @@ class JevPolicy:
         latency = time.monotonic() - start
         response.raise_for_status()
         body = response.json()
-        try:
-            answer = body["answers"]["next_action"]
-            selected = answer["choice"]
-            raw_probs = answer["probabilities"]
-            confidence = float(answer["confidence"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError("Jev response lacks a valid Choice answer") from exc
-        if answer.get("type") != "choice" or selected not in choices:
-            raise ValueError("Jev returned an unavailable or non-Choice action")
-        if not isinstance(raw_probs, Mapping) or set(raw_probs) != set(choices):
-            raise ValueError("Jev probabilities do not match the offered actions")
-        probs = {name: float(raw_probs[name]) for name in choices}
-        if any(not math.isfinite(p) or p < 0 for p in probs.values()):
-            raise ValueError("Jev probabilities must be finite and nonnegative")
-        total = sum(probs.values())
-        # The hosted API sometimes rounds each of up to eight displayed
-        # probabilities to two decimals, so the displayed sum can differ
-        # slightly from one. Normalize for downstream routing and logging.
-        if not 0.95 <= total <= 1.05:
-            raise ValueError(f"Jev probability sum is outside rounding tolerance: {total:.6f}")
-        probs = {name: value / total for name, value in probs.items()}
-        if not math.isfinite(confidence) or not 0 <= confidence <= 1:
-            raise ValueError("Jev confidence must lie in [0, 1]")
+        # Strict: Jev must agree with its own probabilities, so an
+        # inconsistent answer is an error (unlike LayaPolicy's softer
+        # reconcile-to-argmax behavior).
+        selected, probs, confidence = validate_choice_response(body, choices)
+        # Jev must answer the Choice primitive (its API guarantees ``type=choice``).
+        if body.get("answers", {}).get("next_action", {}).get("type") != "choice":
+            raise ValueError("Jev returned a non-Choice answer type")
         if probs[selected] + 0.021 < max(probs.values()):
             raise ValueError("Jev Choice is inconsistent with its probabilities")
         usage = body.get("usage", {})
-        result = JevDecision(
+        result = DecisionOutput(
             choices[selected], probs, confidence, latency,
             int(usage.get("input_tokens", 0)), int(usage.get("output_tokens", 0)),
             str(body.get("model", self.model)),
