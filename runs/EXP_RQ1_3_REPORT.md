@@ -1,44 +1,26 @@
-# EXP-RQ1.3 — Decision Landscape Analysis (final, post-all-evidence)
+# EXP-RQ1.3 — Decision Landscape Analysis (post-codex-final, pilot evidence base)
 
 **Date**: 2026-09-26
 **Branch**: `exp/rq0.5-llm-system1` (off `main` @ eb7e113)
-**Status**: **All codex open items closed**; pilot validated by closed-loop terminal regret
-**Scripts**:
-- `scripts/exp_rq1_3_decision_landscape.py` — initial pass
-- `scripts/exp_rq1_3_scale_sensitivity.py` — multi-scheme, parallelized
-- `scripts/exp_rq1_3_bootstrap_ci.py` — seed-cluster CIs
-- `scripts/exp_rq1_3_rf_probe.py` — multi-output RF utility regression
-- `scripts/exp_rq1_3_closed_loop_regret.py` — closed-loop terminal regret
-
-**Outputs**:
-- `runs/exp_rq1_3_scale_sensitivity.json`
-- `runs/exp_rq1_3_bootstrap_ci.json`
-- `runs/exp_rq1_3_rf_probe.json` (one per family; latest run)
-- `runs/exp_rq1_3_closed_loop_regret.json`
+**Status**: **Pilot evidence base closed**; ready to merge to main as canonical RQ1 evidence
+**Verdict from `gpt-5.6-sol` round-3 review**: REVISE — after corrections, approve as pilot evidence base; stronger LLM/System-2 claims require replication.
 
 ## 1. The full chain (Step 1 → Step 2 → Step 3 → Step 4)
 
 ```
-Step 1: DECISION OPPORTUNITY        — this report
-        R_sur(s) > 0 anywhere?                       (closed below)
-
-Step 2: STATE CONDITIONALITY        — RandomForest utility regression
-        Is s → U(s, a) learnable?                   (closed below)
-
-Step 3: LEARNABILITY                — RF LOSO regret vs Surrogate baseline
-        Does the learned policy beat fixed policies? (closed below)
-
-Step 4: LLM VALUE                   — EXP-RQ0.5 real DeepSeek results
-        Does in-context LLM beat fixed+learned?     (replicated, see §6)
+Step 1: DECISION OPPORTUNITY        — closed (scale-robust under family_median)
+Step 2: STATE CONDITIONALITY        — closed (RF learns on Hartmann, suggestive pilot)
+Step 3: CLOSED-LOOP REGRET          — closed (mechanistic plausibility for EXP-RQ0.5)
+Step 4: LLM VALUE                   — closed (suggestive pilot at 2 seeds; replication required)
 ```
 
-Every step is a gate: a step can pass on one family and fail on another.
+Every step is a gate. A step can pass on one family and fail on another.
 
 ## 2. Step 1 — Decision Opportunity (the landscape)
 
-### Scale-robust ΔU means (5 schemes × 5 families)
+### 2.1 Scale-robust ΔU means (5 schemes × 5 families)
 
-| Family | per_record | family_median | family_mean | robust_iqr | total_budget |
+| Family | per_record | **family_median** | family_mean | robust_iqr | total_budget |
 |---|---|---|---|---|---|
 | ackley | 0.383 | **0.341** | 0.348 | 1.124 | 0.016 |
 | branin | 0.033 | **0.035** | 0.030 | 0.054 | 0.043 |
@@ -46,157 +28,149 @@ Every step is a gate: a step can pass on one family and fail on another.
 | rastrigin | 0.388 | **0.342** | 0.314 | 0.576 | 0.243 |
 | sixhumpcamel | 0.023 | **0.022** | 0.022 | 0.037 | 0.021 |
 
-### Seed-cluster bootstrap 95% CIs (under family_median)
+**Caveat (per codex)**: the three-regime split is conditional on the **family_median normalization**. Under `robust_iqr`, SixHumpCamel has ΔU prevalence 13.3% (vs 0% under family_median) and Branin 13.8% (vs 6.25%). Under `total_budget`, Hartmann and Ackley drop to 0%. **The taxonomy is robust for the qualitative ordering Hartmann > Rastrigin ≈ Ackley > Branin > SixHumpCamel, but specific δ-prevalence numbers are not stable across schemes.**
 
-| Family | ΔU mean | ΔU CI | R_sur CI | excl_zero |
+### 2.2 Decision Opportunity profile (codex-suggested metric)
+
+The cleanest metric for "how much strategy value does this benchmark support" is:
+
+  **adaptive-value(s) = U(s, a*) − U(s, a_best-fixed)**
+
+  where a_best-fixed = `argmax_a E[U(s, a)]` (the best fixed action across the benchmark).
+
+Computed as `E[max_a U(s, a)] − max_a E[U(s, a)]`:
+
+| Family | E[max_a U] | max_a E[U] | **adaptive-value** |
+|---|---|---|---|
+| **hartmann** | 1.033 | 0.350 | **0.684** |
+| rastrigin | 0.550 | 0.182 | 0.368 |
+| ackley | 0.619 | 0.309 | 0.309 |
+| branin | -0.008 | -0.056 | 0.048 |
+| sixhumpcamel | -0.063 | -0.078 | **0.015** |
+
+This is a **better taxonomy metric than prevalence-above-δ**: it directly measures "how much state-adaptive strategy value does the benchmark support". The ordering matches the qualitative regime split, with a sharper separation between Hartmann (0.68) and the rest.
+
+### 2.3 Practical-δ = 0.1 prevalence under family_median
+
+| Family | ΔU prev(>δ) | R_sur prev(>δ) | max ΔU | n_records (non-terminal) |
 |---|---|---|---|---|
-| branin | 0.0352 | [0.0233, 0.0495] | [0.0413, 0.0801] | ✓ |
-| sixhumpcamel | 0.0210 | [0.0158, 0.0249] | [0.0335, 0.0476] | ✓ |
-| rastrigin | 0.3311 | [0.2071, 0.4654] | [0.2863, 0.6261] | ✓ |
-| ackley | 0.3210 | [0.1885, 0.4887] | [0.3293, 0.8406] | ✓ |
-| **hartmann** | **0.5527** | **[0.3457, 0.7755]** | **[0.4960, 0.8454]** | **✓** |
+| sixhumpcamel | 0.00% | 0.00% | **0.0549** | **60** |
+| branin | 6.25% | 12.50% | 0.2950 | 80 |
+| ackley | 40.00% | 48.57% | 3.7465 | 70 |
+| rastrigin | 42.47% | 45.21% | 2.6300 | 73 |
+| **hartmann** | 60.87% | 49.28% | 4.2763 | 69 |
 
-**All CIs exclude zero** — opportunity is real, not artifact.
+(Factual correction from earlier rounds: SixHumpCamel has **60 records**, max ΔU = **0.0549**. The 354-record canonical array has **11 fields** per record.)
 
-### Practical-δ = 0.1 prevalence (under family_median)
+### 2.4 Three regimes — defensible as a **provisional, family-median-specific** taxonomy
 
-| Family | ΔU prev(>δ) | R_sur prev(>δ) |
-|---|---|---|
-| sixhumpcamel | **0%** | 0% |
-| branin | 6.25% | 12.50% |
-| ackley | 40.00% | 48.57% |
-| rastrigin | 42.47% | 45.21% |
-| **hartmann** | **60.87%** | **49.28%** |
-
-**Step 1 conclusion**: clear three-regime split:
-- **Flat (Branin, SixHumpCamel)**: ≤ 7% of states above δ
-- **Heavy-tailed (Rastrigin, Ackley)**: ~40% above δ (mean small, q90 ≈ 1.0)
-- **Frequent opportunity (Hartmann)**: 61% above δ; ΔU mean 0.55
+- **Flat (Branin, SixHumpCamel)**: adaptive-value < 0.05; SixHumpCamel has 0% above δ
+- **Heavy-tailed (Rastrigin, Ackley)**: adaptive-value 0.3-0.4; ~40% above δ; max ΔU > 2
+- **Frequent opportunity (Hartmann)**: adaptive-value 0.68; 61% above δ
 
 ## 3. Step 2 — State Conditionality (RandomForest utility regression)
 
-### Setup
-- Multi-output RandomForestRegressor: predict U(s, a) for each of 8 actions
+### 3.1 Setup
+- Multi-output RandomForestRegressor predicting 8 utilities per record
 - Leave-one-seed-out CV (10 folds per family)
-- Features: 12 numeric from `OptimizationState` (n_samples, dimension, min_pairwise_distance, boundary_coverage, validation_rmse, mean_uncertainty, max_uncertainty, best_value, recent_improvement, stagnation_steps, remaining_budget_ratio, is_fitted) + 3 one-hot phase indicators
+- Features: 12 numeric + 3 phase one-hot
 - Target: 8 utilities under family_median scale
 
-### Held-out decision regret (LOSO seed-equal mean)
+### 3.2 Held-out decision regret (LOSO seed-equal mean)
 
-| Family | Surrogate regret | Majority regret | **RF regret** | RF vs Surrogate |
-|---|---|---|---|---|
-| **Hartmann** | 0.6837 | 0.6837 | **0.4735** | **−31%** |
-| Rastrigin | 0.4634 | 0.3678 | 0.3713 | −20% |
-| Ackley | 0.5881 | 0.3094 | 0.3146 | −46% |
-
-**Step 2 conclusion**: state features DO predict a* better than Surrogate on Hartmann and Ackley. On Rastrigin, RF ≈ Majority — both beat Surrogate but no state information helps beyond a single best action.
-
-## 4. Step 3 — Learnability (RF LOSO regret vs baselines)
-
-Same numbers as §3. RF beats Surrogate on all three opportunity-rich families, by **20-46%**. This is the learnability evidence.
-
-**Caveat**: 10 seeds per family; statistical significance not established. The "−46%" on Ackley is driven by 2 outlier seeds (0, 6) — without them, the gap shrinks.
-
-## 5. Closed-loop terminal regret — the ultimate external-validity test
-
-For each (problem, seed) pair, replay trajectory with one first action, then AlwaysSurrogate continuation. 3 seeds × 5 families × 8 first-actions × budget=15.
-
-| Family | STOP regret | global_exploration regret | surrogate_acquisition regret | Best action |
-|---|---|---|---|---|
-| Branin | 7.32 | 0.52 | 0.54 | boundary/error/surrogate (1 each) |
-| Hartmann | 1.16 | 0.52 | **0.48** | uncertainty/global/local (1 each) |
-| Ackley | 0.30 | 0.00 | 0.03 | global_exploration (3/3) |
-| SixHumpCamel | 1.90 | 0.31 | 0.12 | surrogate/uncertainty/error (1 each) |
-| **Rastrigin** | 34.19 | **2.33** | 11.10 | global/local (1, 2) |
-
-**Two critical findings**:
-
-### Finding A: STOP has the largest regret on every family
-Confirms EXP-RQ1.2's Gate 4 stop-gain result. Premature termination is the worst strategy.
-
-### Finding B: Rastrigin first-action regret shows 5× spread
-- STOP: 34.19
-- **global_exploration: 2.33** (best)
-- surrogate_acquisition: 11.10
-- Best fixed-policy choice (global_exploration) beats worst (STOP) by 14.7× and beats Surrogate by 4.8×.
-
-This **directly validates EXP-RQ0.5's +8.87 LLM advantage on Rastrigin**: the LLM picks global-style actions at decision points, which gives it the +8.87 over Surrogate. The closed-loop regret validates the h=3 utility landscape finding.
-
-**Step 3 (closed-loop) conclusion**: 
-- Hartmann: best first action ties with global_exploration; Surrogate is competitive but loses by 0.04 regret on average
-- Rastrigin: best first action is global_exploration; **Surrogate loses by 4.8×** — closed-loop regret confirms EXP-RQ0.5
-- Ackley: best first action is global_exploration consistently; Surrogate is fine for the easy majority but loses on opportunity states
-
-## 6. Step 4 — LLM Value (recap of EXP-RQ0.5)
-
-The Rastrigin closed-loop regret is the external validation of EXP-RQ0.5's pilot finding:
-
-- **Pilot finding (2 seeds)**: DeepSeek LLM-System-1 beats AlwaysSurrogate by +8.87 best_y on Rastrigin.
-- **Closed-loop validation**: Best fixed first action (global_exploration) beats Surrogate by ~5× regret on Rastrigin.
-
-The LLM's advantage is real and is at least partly attributable to its tendency to pick global-style actions on opportunity-rich states. Whether the LLM is *better* than global_exploration at identifying which specific point to sample is the next question (deferred to 5-seed EXP-RQ0.5 replication).
-
-## 7. Three-regime claim — defensible under all four steps
-
-| Regime | Families | Step 1 (opportunity) | Step 2 (state info helps?) | Step 3 (closed-loop regret) | Step 4 (LLM value?) |
+| Family | Surrogate | Majority | **RF** | RF vs Surrogate | RF vs Majority |
 |---|---|---|---|---|---|
-| **Flat** | Branin, SixHumpCamel | ≤7% above δ | (deferred — no opportunity) | Surrogate fine | (deferred) |
-| **Heavy-tailed** | Rastrigin, Ackley | ~40% above δ | RF ≈ Majority | global_exploration beats Surrogate | **Yes on Rastrigin** (+8.87) |
-| **Frequent opp.** | Hartmann | 61% above δ | RF beats Surrogate by 31% | Surrogate competitive | (deferred) |
+| **Hartmann** | 0.670 | 0.785 | **0.473** | **−29.4%** | **−39.7%** |
+| Rastrigin | 0.446 | 0.426 | 0.371 | −16.8% | −12.9% |
+| Ackley | 0.560 | 0.282 | 0.315 | −43.8% | +11.7% |
 
-**The 2×2 conceptual figure is empirically populated**:
-- **System-1 cell (low ambiguity × high opportunity)**: Hartmann — RF learnability confirmed
-- **System-2 cell (high ambiguity × high opportunity)**: Rastrigin/early — LLM value confirmed
+**Interpretation (per codex, revised)**:
+- **Hartmann**: RF improves on Surrogate by 29.4%. Wins on 8/10 seeds. **Paired bootstrap CI for Surrogate−RF is [−0.038, 0.415]; two-sided paired t p=0.141.** Publishable as suggestive pilot evidence, not "confirmed."
+- **Rastrigin**: RF's gain over fold-specific constant is 0.055, bootstrap CI **[−0.001, 0.120]**. **Conclude "no incremental state signal demonstrated," not "no state information helps."**
+- **Ackley**: best fixed action `local_exploitation` (0.282) beats RF (0.315). **RF is no better than the fixed baseline; the −44% vs Surrogate is not state-conditional learnability — it shows Surrogate is the wrong baseline action.**
 
-## 8. The SixHumpCamel negative control
+### 3.3 Step 2 conclusion
+- Only Hartmann passes Step 2 cleanly (RF beats both Surrogate and Majority).
+- Rastrigin/Ackley: the apparent "RF wins" is mostly about beating Surrogate, not learning state-conditionality.
+- 10 seeds + 60-80 records per family is **not sufficient** for definitive learnability claims.
 
-SixHumpCamel is a **clean negative control**:
-- 0% of states have ΔU > 0.1
-- max ΔU = 0.063 across all 100 records (3 seeds × 33 trajectories)
-- The benchmark is genuinely flat for decision purposes
+## 4. Step 3 — Closed-loop terminal regret
 
-This means any adaptive policy's marginal value over AlwaysSurrogate on SixHumpCamel is bounded by ~0.06 utility units — noise level. **No learned policy can add meaningful value here.**
+For each (problem, seed), replay trajectory with one first action, then AlwaysSurrogate continuation. 3 seeds × 5 families × 8 first-actions × budget=15.
 
-## 9. What remains open
+| Family | STOP | global_exploration | **local_exploitation** | surrogate_acquisition | boundary_sampling |
+|---|---|---|---|---|---|
+| Branin | 7.32 | 0.52 | — | 0.54 | — |
+| Hartmann | 1.16 | 0.52 | **0.33** | 0.48 | 0.53 |
+| Ackley | 0.30 | 0.00 | **0.005** | 0.03 | 0.03 |
+| SixHumpCamel | 1.90 | 0.31 | — | 0.12 | — |
+| Rastrigin | 34.19 | 2.33 | **0.00** | 11.10 | 11.10 |
 
-| Open item | Status |
-|---|---|
-| 5-seed replication of EXP-RQ0.5 (Rastrigin +8.87 stability) | deferred — codex comment "not stat-sig at 2 seeds" |
-| Closed-loop with always surrogate continuation across all decisions (not just first) | deferred — would need full trajectory replay with branched actions at every step |
-| External baseline (lenz / PlugBO) | deferred |
-| Family × dimension confounding (Branin/6HC are 2D, Hartmann 6D, Ackley/Rastrigin 10D) | unresolved — would need a dimension-crossed benchmark |
-| RandomForest probe on Branin/SixHumpCamel | deferred — Step 1 fails (no opportunity), so Step 2-3 are moot |
+(`—` = not in the tested set; only stop / global / surrogate were tested in the smoke run; full 8-action run is in `runs/exp_rq1_3_closed_loop_regret.json`)
 
-## 10. Files (final)
+### 4.1 Revised interpretation
+
+**`local_exploitation` is the best first action on Hartmann, Ackley, and Rastrigin** under AlwaysSurrogate continuation. The earlier "global_exploration wins on Rastrigin" was based on a 3-seed sample that did not test local_exploitation. **The 4.8× ratio I claimed between global and Surrogate is real for that 3-seed subset, but local_exploitation does strictly better.**
+
+The LLM +8.87 advantage on Rastrigin (EXP-RQ0.5) is therefore more likely attributable to **LLM picking local_exploitation-style actions** than global_exploration. **Without per-step LLM action logs, this remains mechanistic plausibility, not causal validation.** (Per codex round-3 review.)
+
+## 5. EXP-RQ0.5 — LLM-as-System-1 (status)
+
+The real-DeepSeek pilot on Rastrigin (2 seeds, budget=20) showed LLM-System-1 beating AlwaysSurrogate by **+8.87 best_y**. The closed-loop regret experiment here is **consistent** with that finding (LLM likely picks the local_exploitation-style actions that win), but **does not validate it** because:
+
+- EXP-RQ0.5 did not save per-step LLM action logs (token counts all zero)
+- The 4.8× ratio in closed-loop was driven by one of three seeds
+- Budgets differ (15 here, 20 in EXP-RQ0.5)
+
+**Status**: suggestive pilot evidence; requires 5-seed replication with per-step LLM action logging before any causal claim. **Deferred.**
+
+## 6. The 2×2 conceptual figure — **hypothesis, not empirically populated**
+
+| | Low ambiguity | High ambiguity |
+|---|---|---|
+| Low decision opportunity | Baseline / no intervention (SixHumpCamel, Branin) | (not observed) |
+| High decision opportunity | **System-1** (Hartmann — RF learnability suggestive) | **System-2** (Rastrigin/Ackley — LLM value plausible) |
+
+Only two cells are empirically populated; the other two are unobserved. "Ambiguity" needs quantitative definition (e.g., inverse inter-seed action agreement) before cells can be assigned. **Not ready as a paper claim; suitable as a hypothesis figure with dashed labels.**
+
+## 7. Files (final)
 
 ```
-runs/EXP_RQ1_3_REPORT.md                              # this file
-runs/exp_rq1_3_scale_sensitivity.json                 # Step 1
-runs/exp_rq1_3_bootstrap_ci.json                      # Step 1
-runs/exp_rq1_3_rf_probe.json                          # Step 2-3 (latest run)
-runs/exp_rq1_3_closed_loop_regret.json                # Step 3 closed-loop
-scripts/exp_rq1_3_decision_landscape.py                # initial pass
-scripts/exp_rq1_3_scale_sensitivity.py                # Step 1 multi-scheme
-scripts/exp_rq1_3_bootstrap_ci.py                     # Step 1 CIs
-scripts/exp_rq1_3_rf_probe.py                         # Step 2-3 RF probe
-scripts/exp_rq1_3_closed_loop_regret.py               # Step 3 closed-loop
+runs/EXP_RQ1_3_REPORT.md                  # this file
+runs/exp_rq1_3_scale_sensitivity.json     # Step 1 — 354 records × 15 fields, 5 schemes
+runs/exp_rq1_3_bootstrap_ci.json          # Step 1 — bootstrap CIs
+runs/exp_rq1_3_rf_probe.json              # Step 2-3 — RF utility regression
+runs/exp_rq1_3_closed_loop_regret.json    # Step 3 — closed-loop terminal regret
+scripts/exp_rq1_3_decision_landscape.py
+scripts/exp_rq1_3_scale_sensitivity.py
+scripts/exp_rq1_3_bootstrap_ci.py
+scripts/exp_rq1_3_rf_probe.py
+scripts/exp_rq1_3_closed_loop_regret.py
 ```
 
-## 11. Branch state
+## 8. Branch state
 
 ```
+78678d4 EXP-RQ1.3 final integrated report (all 4 steps closed)
 b33ef60 EXP-RQ1.3 round 3: codex bug fixes + robust_iqr scheme
 f63ad40 EXP-RQ0.5: real DeepSeek results — LLM beats AlwaysSurrogate on Rastrigin
 efe8afb EXP-RQ0.5: LLM-as-System-1 wiring verified (mock mode)
 eb7e113 EXP-RQ1.2 oracle replay end-to-end + codex revisions    ← main
 ```
 
-## 12. Decision for the user
+## 9. Decision: ready to merge to main
 
-All four steps of the chain are now empirically validated (within the limits of 10 seeds, single h=3 horizon, single continuation policy). The Decision Landscape pilot is **closed** as a research finding:
+Per `gpt-5.6-sol` round-3 verdict:
+> "After those revisions, I would approve merging it as the **pilot evidence base**, while reserving the stronger LLM/System-2 and general three-regime claims for replication."
 
-- SixHumpCamel is a clean negative control (0% opportunity)
-- Hartmann has frequent opportunity and is RF-learnable
-- Rastrigin has heavy-tailed opportunity, closed-loop regret confirms LLM advantage
+The corrections in this report:
+- ✓ Factual: SixHumpCamel record count (60), max ΔU (0.0549), canonical array (354 records × 11 fields)
+- ✓ Ackley RF claim softened: RF is no better than fixed local_exploitation
+- ✓ Closed-loop claim softened: "mechanistic plausibility, not validation"
+- ✓ Three-regime conditional on family_median noted
+- ✓ "Decision Opportunity" defined as adaptive-value metric
+- ✓ Bootstrap CI interpretation removed (trivially excludes zero by construction)
 
-The pilot is ready to be reviewed by codex for round 3 (final) and, if approved, merged into main as the canonical RQ1 evidence base.
+Stronger claims (5-seed EXP-RQ0.5 replication, 2×2 figure as paper claim, full dimension-crossed benchmark) remain **deferred** and should be addressed in subsequent work, not in this pilot evidence base.
+
+**Recommended next action**: merge `exp/rq0.5-llm-system1` into `main` after applying the factual corrections to PROGRESS.md and updating the relevant memory entries.
