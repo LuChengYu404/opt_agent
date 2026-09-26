@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from opt_agent.actions import ActionType  # noqa: E402
 from opt_agent.state import extract_state  # noqa: E402
-from opt_agent.system1 import LayaPolicy  # noqa: E402
+from opt_agent.system1 import JevDecision, LayaPolicy  # noqa: E402
 
 from conftest import RecordingBackend  # noqa: E402
 
@@ -60,10 +60,17 @@ def test_laya_choice_mismatch_uses_argmax() -> None:
     state = extract_state(RecordingBackend(), total_budget=20)
     policy = LayaPolicy(agent=agent, seed=0)
     decision = policy.decide(state)
+    # Unified interface: the decision is a JevDecision.
+    assert isinstance(decision, JevDecision)
     # The action type must be the argmax of probabilities.
     assert decision.action.type == ActionType.SURROGATE_ACQUISITION
     # The mismatch counter was incremented.
     assert policy._mismatched_choice_count == 1
+    # Metadata fields populated even on the mismatch path.
+    assert decision.latency_s >= 0.0
+    assert decision.input_tokens == 0
+    assert decision.output_tokens == 0
+    assert decision.model == "convaiinnovations/laya"
 
 
 def test_laya_choice_matches_argmax_no_override() -> None:
@@ -73,5 +80,6 @@ def test_laya_choice_matches_argmax_no_override() -> None:
     state = extract_state(RecordingBackend(), total_budget=20)
     policy = LayaPolicy(agent=agent, seed=0)
     decision = policy.decide(state)
+    assert isinstance(decision, JevDecision)
     assert decision.action.type == ActionType.GLOBAL_EXPLORATION
     assert policy._mismatched_choice_count == 0

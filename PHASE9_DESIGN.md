@@ -98,25 +98,45 @@ finding. References will be re-added with verified URLs in Phase 9.3.
 ### 2.1 System-1: LayaPolicy + DecisionLike
 
 ```python
-from opt_agent.system1.laya_policy import LayaPolicy, LayaDecision
-
-@dataclass(frozen=True)
-class LayaDecision:
-    action: OptimizationAction
-    probabilities: dict[str, float]
-    confidence: float
+from opt_agent.system1 import JevDecision, LayaPolicy
 
 class LayaPolicy:
-    def decide(self, state: OptimizationState) -> LayaDecision: ...
+    def __init__(
+        self, *, model_id="convaiinnovations/laya", subfolder=None, seed=0,
+        agent=None,
+        state_format: "structured" | "narrative" = "structured",
+        criteria_format: "legacy" | "executable" = "legacy",
+    ): ...
+    def decide(self, state: OptimizationState) -> JevDecision: ...
     def select_action(self, state, backend=None) -> OptimizationAction: ...
     def reset(self) -> None: ...
 ```
 
-`LayaPolicy.decide()` is the canonical System-1 contract. Its probability
-distribution is built from the shared candidate factory
-(`actions.candidate_actions_for_state`), so the action_id vocabulary is
-stable across LayaPolicy, the dataset generator (`full_candidates`), and
-any future System-1 implementation.
+`LayaPolicy.decide()` and `JevPolicy.decide()` both return a `JevDecision`
+after the 2026-09-26 interface unification; `LayaDecision` no longer exists.
+`JevDecision` carries:
+
+```python
+@dataclass(frozen=True)
+class JevDecision:
+    action: OptimizationAction
+    probabilities: dict[str, float]
+    confidence: float
+    latency_s: float           # local: time.monotonic around predict(); hosted: HTTP latency
+    input_tokens: int          # local: 0; hosted: API usage
+    output_tokens: int         # local: 0; hosted: API usage
+    model: str                 # local: model_id; hosted: API-reported model
+```
+
+`LayaPolicy`'s defaults — `state_format="structured"`,
+`criteria_format="legacy"` — preserve the prompt distribution that produced
+`runs/phase9_5_laya_zero_shot_5x5.json`. Flip the `criteria_format` default
+only after re-running that baseline.
+
+Both policies share `_DESCRIPTIONS`, `_state_payload`, `_state_narrative`,
+and `_executable_criterion` from `system1/_prompt.py` so the candidate
+vocabulary stays aligned. The action_id vocabulary is also anchored on the
+shared candidate factory (`actions.candidate_actions_for_state`).
 
 ### 2.2 Shared candidate factory
 
@@ -251,7 +271,9 @@ src/opt_agent/
 ├── loop/                           # Research core: DecisionLoop + base policies
 │   └── policies.py                 # RandomPolicy + RulePolicy (DecisionLoop is NOT modified)
 ├── system1/                        # Research core
-│   ├── laya_policy.py              # Production-ready LayaPolicy (decide / select_action / reset)
+│   ├── _prompt.py                  # Shared _DESCRIPTIONS / _state_payload / _state_narrative / _executable_criterion
+│   ├── laya_policy.py              # LayaPolicy.decide → JevDecision (state_format + criteria_format)
+│   ├── jev_policy.py               # JevPolicy.decide → JevDecision (hosted TypeSafe Choice API)
 │   └── hybrid_policy.py            # NEW — HybridPolicy + System1Decider + adapt_policy_as_system1
 ├── system2/                        # Research core: stub for Phase 11
 │   ├── base.py                     # NEW — System2Decision + System2Policy Protocol

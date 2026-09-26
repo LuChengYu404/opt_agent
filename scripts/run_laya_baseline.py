@@ -59,9 +59,19 @@ def main() -> int:
                 "best_value": step.next_state.optimization.best_value,
                 "confidence": policy.decisions[step.round].confidence,
                 "probabilities": policy.decisions[step.round].probabilities,
+                "latency_s": policy.decisions[step.round].latency_s,
+                "input_tokens": policy.decisions[step.round].input_tokens,
+                "output_tokens": policy.decisions[step.round].output_tokens,
+                "model": policy.decisions[step.round].model,
             }
             for step in trajectory.steps
         ],
+        "aggregates": {
+            "call_count": policy.call_count,
+            "total_input_tokens": policy.total_input_tokens,
+            "total_output_tokens": policy.total_output_tokens,
+            "total_latency_s": policy.total_latency_s,
+        },
     }
     print(json.dumps(report, indent=2, allow_nan=False))
     return 0
