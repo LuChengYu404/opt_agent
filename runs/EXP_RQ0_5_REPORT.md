@@ -127,28 +127,65 @@ Per-trajectory JSON now stores per-step records:
 
 This enables downstream analyses: cross-validate LLM's per-step choices against EXP-RQ1.3's h=3 utility landscape (does LLM pick high-U actions on the states it actually visits?), compute per-step decision regret.
 
-## 7. What this means for the Jev/LLM trade-off (n=10)
+## 7. RoutingAware Meta-Controller — empirical validation (n=10)
 
-| Operation | Result on Rastrigin | Result on Hartmann |
+Implemented a `RoutingAwareMetaController` (`scripts/exp_rq0_5_full.py`) that routes per-decision based on `state.sampling.dimension`:
+- If dimension >= 5 → delegate to LLMDeepSeek
+- If dimension < 5 → delegate to AlwaysSurrogatePolicy
+
+### Per-family results (n=10, budget=30)
+
+| Family | dim | RoutingAware | AlwaysSurrogate | LLMDeepSeek | Jev |
+|---|---|---|---|---|---|
+| Branin | 2 | **-0.43** | -0.43 | -2.67 | -0.44 |
+| SixHumpCamel | 2 | **0.89** | 0.89 | 0.85 | 0.89 |
+| Hartmann | 6 | 1.99 | **2.93** | 2.13 | 2.93 |
+| Ackley | 10 | **-19.41** | -20.18 | -19.96 | -20.18 |
+| Rastrigin | 10 | **-111.82** | -127.30 | **-111.11** | -127.30 |
+
+### Aggregate totals (sum across 5 families × mean best_y)
+
+| Policy | Total | vs RoutingAware |
 |---|---|---|
-| Use LLM | -111.11 best_y | 2.13 best_y |
-| Use Surrogate (= Jev) | -127.30 best_y | 2.93 best_y |
-| LLM advantage | +16.19 | -0.80 |
+| RulePolicy | -136.95 | RoutingAware +12.19 better |
+| AlwaysSurrogate | -144.09 | RoutingAware **+15.32** better |
+| LLMDeepSeek | -130.77 | RoutingAware **+2.00** better |
+| Jev | -144.09 | RoutingAware **+15.33** better |
+| **RoutingAware** | **-128.76** | (best) |
 
-**A meta-controller that picks between LLM and Surrogate based on the regime (e.g., `state.dimension` or `state.sampling.boundary_coverage`) could capture the best of both.** This is exactly what HybridPolicy implements; the empirical evidence here **directly justifies the routing decision**.
+### Per-family routing decisions (auditable from `routing_log`)
 
-Concretely: a simple rule "use LLM if dimension >= 5 else Surrogate" would give:
-- Branin (2D): Surrogate → -0.43 (better than LLM's -2.67)
-- SixHumpCamel (2D): Surrogate → 0.89
-- Ackley (10D): LLM → -19.96
-- Hartmann (6D): Surrogate → 2.93
-- Rastrigin (10D): LLM → -111.11
+- **Branin (2D)**: 100% routed to Surrogate → matches Surrogate's -0.43
+- **SixHumpCamel (2D)**: 100% routed to Surrogate → matches Surrogate's 0.89
+- **Hartmann (6D)**: 100% routed to LLM → loses -0.94 vs Surrogate (a routing mistake — Hartmann's frequent-opportunity profile makes Surrogate the better choice)
+- **Ackley (10D)**: 100% routed to LLM → beats Surrogate by +0.77
+- **Rastrigin (10D)**: 100% routed to LLM → nearly matches LLM (LLM beats Surrogate by +15.49)
 
-vs. running LLM everywhere: -111.11 + 2.13 + (-19.96) + (-2.67) + 0.85 = -130.76
-vs. running Surrogate everywhere: -127.30 + 2.93 + (-20.18) + (-0.43) + 0.89 = -144.09
-vs. **routing-aware**: -111.11 + 2.93 + (-19.96) + (-0.43) + 0.89 = **-127.68**
+### Per-family action distribution (RoutingAware)
 
-Routing-aware beats LLM-everywhere by 3.08 best_y and Surrogate-everywhere by 16.41 best_y across the 5 families (n=10 seeds).
+| Family | global | local | uncer | error | bound | surrogate | retrain | stop |
+|---|---|---|---|---|---|---|---|---|
+| Branin | 0% | 0% | 0% | 0% | 0% | **100%** | 0% | 0% |
+| SixHumpCamel | 0% | 0% | 0% | 0% | 0% | **100%** | 0% | 0% |
+| Hartmann | 70% | 29% | 0% | 0% | 0% | 1% | 0% | 0% |
+| Ackley | 62% | 32% | 0% | 0% | 0% | 6% | 0% | 0% |
+| Rastrigin | 69% | 30% | 0% | 0% | 0% | 1% | 0% | 0% |
+
+(Branin/6HC = Surrogate action distribution; Hartmann/Ackley/Rastrigin = LLM action distribution.)
+
+### Interpretation
+
+**The simple dimension-based routing rule is the strongest single deployment** of the four options tested. It captures:
+- +15.32 best_y over Surrogate-everywhere (Ackley +0.77 + Rastrigin +15.49)
+- +2.00 best_y over LLM-everywhere (Branin +2.24 + Hartmann +0.13 + 6HC +0.05; Rastrigin -0.71 since LLM is slightly better than the routing result)
+- +15.33 best_y over Jev-everywhere (since Jev ≡ Surrogate)
+
+**The routing rule is not optimal on Hartmann**: a Hartmann-aware router would route to Surrogate (since Surrogate wins by 0.94 there) and the total would improve by 0.94 to **-127.82 best_y**. This suggests **state-features beyond dimension** could improve the routing (e.g., boundary_coverage, surrogate_rmse, n_samples).
+
+### Reproducibility
+
+- `runs/exp_rq0_5_routing_10seed.json` — RoutingAware 10-seed results
+- `scripts/exp_rq0_5_full.py` — includes `RoutingAwareMetaController` class
 
 ## 8. Limitations
 

@@ -55,6 +55,8 @@ class RunResult:
     # action_id, params, n_new_samples, current_best, latency_s,
     # model (for LLM/Jev), is_fitted (for evaluating state features).
     steps: list[dict] = field(default_factory=list)
+    # RoutingAware controller: per-decision routing decision.
+    routing_log: list[dict] = field(default_factory=list)
 
 
 class AlwaysSurrogatePolicy:
@@ -74,6 +76,57 @@ class AlwaysSurrogatePolicy:
         else:
             self.last_action = next(iter(choices.values()))
         return self.last_action
+
+
+class RoutingAwareMetaController:
+    """Route between LLM and Surrogate based on problem dimension.
+
+    Hypothesis (EXP-RQ0.5 n=10 evidence):
+      - LLM wins on Rastrigin (10D) by +16.19 best_y (p=0.0001)
+      - Surrogate wins on Branin (2D), SixHumpCamel (2D), Hartmann (6D)
+      - LLM ≈ Surrogate on Ackley (10D, p=0.23)
+
+    Routing rule: if dimension >= threshold, use LLM; else use Surrogate.
+    """
+
+    def __init__(self, *, threshold: int = 5, seed: int = 0,
+                 llm: LLMSystem1Policy | None = None,
+                 surrogate: AlwaysSurrogatePolicy | None = None) -> None:
+        self.threshold = threshold
+        self.seed = seed
+        self.llm = llm or LLMSystem1Policy(mode="llm", seed=seed,
+                                           api_key=os.environ.get("DEEPSEEK_API_KEY"))
+        self.surrogate = surrogate or AlwaysSurrogatePolicy(seed=seed)
+        self.call_count = 0
+        self.llm_call_count = 0
+        self.surrogate_call_count = 0
+        self.routing_log: list[dict] = []
+        # Inherit fields for parity with LLM/Surrogate stats.
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.last_action: OptimizationAction | None = None
+
+    def select_action(self, state: OptimizationState, backend=None) -> OptimizationAction:
+        self.call_count += 1
+        dim = state.sampling.dimension
+        route = "llm" if dim >= self.threshold else "surrogate"
+        if route == "llm":
+            self.llm_call_count += 1
+            action = self.llm.select_action(state, backend)
+        else:
+            self.surrogate_call_count += 1
+            action = self.surrogate.select_action(state, backend)
+        self.total_input_tokens = self.llm.total_input_tokens
+        self.total_output_tokens = self.llm.total_output_tokens
+        self.routing_log.append({
+            "dim": dim,
+            "n_samples": int(state.sampling.n_samples),
+            "boundary_coverage": float(state.sampling.boundary_coverage),
+            "route": route,
+            "action_id": action.type.value,
+        })
+        self.last_action = action
+        return action
 
 
 def run_one(policy_factory, family: str, seed: int, budget: int,
@@ -101,6 +154,7 @@ def run_one(policy_factory, family: str, seed: int, budget: int,
         n_calls=getattr(policy, "call_count", 0),
         n_input_tokens=getattr(policy, "total_input_tokens", 0),
         n_output_tokens=getattr(policy, "total_output_tokens", 0),
+        routing_log=list(getattr(policy, "routing_log", [])),
     )
     # Per-step log (per codex round-4).
     history = backend.get_history()
@@ -143,8 +197,9 @@ def main() -> int:
     parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--budget", type=int, default=30)
     parser.add_argument("--policies", nargs="+",
-                        default=["RulePolicy", "AlwaysSurrogate", "LLMDeepSeek", "Jev"],
-                        help="Subset to run: RulePolicy / AlwaysSurrogate / LLMDeepSeek / Jev")
+                        default=["RulePolicy", "AlwaysSurrogate", "LLMDeepSeek",
+                                 "Jev", "RoutingAware"],
+                        help="Subset to run: RulePolicy / AlwaysSurrogate / LLMDeepSeek / Jev / RoutingAware")
     parser.add_argument("--output", type=Path,
                         default=ROOT / "runs" / "exp_rq0_5_full_results.json")
     args = parser.parse_args()
@@ -169,12 +224,17 @@ def main() -> int:
                                 api_key=os.environ.get("DEEPSEEK_API_KEY"))
     def make_jev(seed):
         return JevPolicy(seed=seed, api_key=os.environ.get("JEV_API"))
+    def make_routing(seed):
+        return RoutingAwareMetaController(threshold=5, seed=seed,
+                                          llm=make_llm(seed),
+                                          surrogate=make_surrogate(seed))
 
     factories = {
         "RulePolicy": make_rule,
         "AlwaysSurrogate": make_surrogate,
         "LLMDeepSeek": make_llm,
         "Jev": make_jev,
+        "RoutingAware": make_routing,
     }
     selected = {p: factories[p] for p in args.policies if p in factories}
 
@@ -248,6 +308,7 @@ def main() -> int:
              "n_input_tokens": r.n_input_tokens,
              "n_output_tokens": r.n_output_tokens,
              "action_counts": r.action_counts,
+             "routing_log": r.routing_log,
              "steps": r.steps}
             for r in results
         ],
