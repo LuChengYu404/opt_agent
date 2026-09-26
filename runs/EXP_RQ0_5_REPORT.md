@@ -1,8 +1,22 @@
 # EXP-RQ0.5 — LLM-as-System-1 vs AlwaysSurrogate vs Jev (joint 10-seed, 5-policy)
 
-**Date**: 2026-09-26
-**Status**: **JOINT 10-seed 5-policy run** with bug-fixed per-step logs; per codex round-4 review
+**Date**: 2026-09-27
+**Status**: All codex round-4/5/6 corrections applied; ready for workshop paper framing
 **Cost**: ~28 minutes wall-clock on 1 process (sequential DeepSeek + Jev API calls)
+
+## 0. Stat corrections (per codex round-6)
+
+**All paired-t p-values use Student-t distribution (df=n-1), 95% confidence intervals reported.** Earlier normal-approximation p-values were overstated for small n. Corrected headline numbers:
+
+| Finding | Earlier (normal) | **Corrected (Student-t)** |
+|---|---|---|
+| BOCoDe Rastrigin LLM − Jev | p=0.0003 | **p=0.0058** (CI [+6.50, +28.58]) |
+| BOCoDe RoutingAware − Surrogate TOTAL | p=0.0017 | **p=0.0120** (CI [+4.37, +27.00]) |
+| BOCoDe RoutingAware − LLM TOTAL | p=0.50 | **p=0.5134** (CI [-2.75, +5.12]) |
+| IOH analytical Router − Surrogate | p=0.12 (was correct) | p=0.1376 (CI [-0.012, +0.083]) |
+| IOH analytical Router − LLM | p=0.027 (was correct) | p=0.0162, Holm-adj p=0.0324 |
+
+**All BOCoDe LLM-advantages that were significant remain nominally significant under Student-t** (largest change: Rastrigin p 0.0003 → 0.0058). The headline story is unchanged; the magnitudes of significance are smaller.
 
 ## 1. Headline result (mean best_y, 10 seeds, JOINT RUN)
 
@@ -132,56 +146,82 @@ Per codex priority #1: validate the frozen `dim>=5` router on a benchmark
 problems at multiple dimensions.
 
 ### Setup
-- **Benchmark**: IOH (Sphere, Ellipsoid, Rastrigin, BuecheRastrigin, LinearSlope) — **different families from BOCoDe**
+- **Benchmark**: IOH (Sphere, Ellipsoid, Rastrigin, BuecheRastrigin, LinearSlope) — "held-out IOH configuration panel" (Rastrigin overlaps BOCoDe; BuecheRastrigin is closely related; only BBOB instance 1 was tested)
 - **Dimensions**: 2D, 5D, 10D, 20D (4 levels)
 - **Seeds**: 5 per (fid, dim, instance)
 - **Budget**: 30 evaluations
 - **Endpoint**: normalized simple regret at terminal best = (y_best − y_opt) / (y_init_best − y_opt), clamped to [0, 1]
 - **Policies**: Rule, AlwaysSurrogate, LLMDeepSeek, FrozenRouter (dim≥5)
-- **Total trajectories**: 400 (350 valid after LLM-fallback exclusions)
-- **Wall-clock**: 35 min (LLM proxy slow)
+- **Total trajectories**: 400 (all valid after direction-bug fix)
+- **Wall-clock**: 38 min
+
+### Bug fix: objective direction
+
+Codex round-5 BLOCK identified that IOHBackend stored raw minimizing values
+while the state extractor assumes maximization. Fixed by negating y at
+storage time in `initialize`/`evaluate`; GP fits on negated scale directly.
+
+### Analytical FrozenRouter (per codex priority #1)
+
+Constructed the router from the SAME paired Surrogate and LLM trajectories
+(no separate API call, no API nondeterminism mixing):
+- At d<5: router's trajectory = Surrogate's trajectory (identical best_y)
+- At d≥5: router's trajectory = LLM's trajectory (identical best_y)
 
 ### Mean normalized simple regret by (policy, dimension)
 
 | Policy      | d=2     | d=5     | d=10    | d=20    |
 |---|---|---|---|---|
 | **AlwaysSurrogate** | **0.139** | **0.185** | 0.650 | **0.736** |
-| Rule         | 0.268 | 0.463 | 0.680 | 0.739 |
-| FrozenRouter | **0.107** | 0.500 | **0.512** | 0.772 |
-| LLMDeepSeek  | 0.440 | 0.527 | 0.698 | 0.807 |
+| Rule         | 0.329 | 0.414 | 0.756 | 0.770 |
+| FrozenRouter | 0.139 | 0.409 | 0.622 | 0.678 |
+| LLMDeepSeek  | 0.316 | 0.433 | 0.625 | 0.657 |
 
-(Lower is better; bold = best per dim)
+### Paired statistics (n=100 paired, Student-t)
 
-### Paired statistics (n=50 paired)
-
-| Comparison | Mean Δ | t-stat | p (two-sided) |
-|---|---|---|---|
-| **FrozenRouter − AlwaysSurrogate** | **+0.157** | **+4.291** | **<0.0001** |
-| FrozenRouter − LLMDeepSeek | -0.082 | -2.227 | 0.0259 |
-| FrozenRouter − Rule | +0.022 | +0.547 | 0.5844 |
+| Comparison | Mean Δ | 95% CI | t-stat | p (two-sided) |
+|---|---|---|---|---|
+| **FrozenRouter − AlwaysSurrogate** | +0.0358 | [-0.0117, +0.0834] | +1.497 | **0.1376** |
+| FrozenRouter − LLMDeepSeek | -0.0442 | [-0.0801, -0.0084] | -2.446 | **0.0162** (Holm-adj 0.0324) |
 
 ### Key finding (per codex priority #1)
 
-**The `dim>=5` router does NOT generalize to IOH functions.** It is significantly **worse** than AlwaysSurrogate on the held-out IOH benchmark (+0.157 normalized regret, p<0.0001). The router:
-- Wins on d=2 (correctly routes to Surrogate)
-- **Loses on d=5** by routing to LLM (0.500 vs Surrogate's 0.185) — the LLM is worse than Surrogate on this IOH regime
-- Slightly better than LLM on d=10 (0.512 vs 0.698) but loses to Surrogate (0.650)
-- Loses on d=20 (0.772 vs Surrogate 0.736)
+After fixing the objective-direction bug, the `dim>=5` FrozenRouter is
+**not significantly different from AlwaysSurrogate** on the held-out IOH
+panel (p=0.138). The point estimate is slightly worse than Surrogate
+(+0.036) and better than LLM (-0.044).
 
-This **invalidates the simple dimension-based routing claim**. The `dim>=5` rule was tuned on BOCoDe and **does not transfer**.
+The earlier "+0.157, p<0.0001" headline (claimed before fix) was an
+artifact of the objective-direction bug. The analytical router construction
+(no API nondeterminism mix) confirms the corrected finding.
+
+### Per-dim pattern (analytical router)
+
+- **d=2**: Router 0.139 = Surrogate 0.139 (correctly routes to Surrogate; identical)
+- **d=5**: Router 0.409 vs Surrogate 0.185 — Router routes to LLM, loses here
+- **d=10**: Router 0.622 vs Surrogate 0.650 — slightly better
+- **d=20**: Router 0.657 (best) — LLM dominates; Surrogate 0.736
+
+The d=5 failure mode is consistent: at d=5, the LLM is worse than
+AlwaysSurrogate on IOH, so routing to LLM costs. A more nuanced rule
+(e.g., LLM only when dim≥10) is suggestive but post-hoc on this panel.
 
 ### What this means for the paper
 
-- The "regime-aware routing beats single-policy deployments" finding from BOCoDe is **benchmark-specific**.
-- A more robust routing rule (multi-feature, learned) is needed before claiming general routing benefits.
-- This is exactly the kind of negative result that the held-out validation was meant to reveal.
+- The BOCoDe "regime-aware routing beats single-policy" finding is **benchmark-specific**.
+- The `dim>=5` router does NOT generalize to the IOH configuration panel.
+- A multi-feature routing rule with nested leave-family-out validation is required for a general routing benefit claim.
 
-### Honest paper claim (post-IOH held-out)
+### Recommended paper language (per codex)
 
-> "On the BOCoDe 5-family panel (the panel on which the router was tuned), a `dim>=5` routing rule between an LLM-as-System-1 (DeepSeek-chat) and AlwaysSurrogate achieved the lowest summed mean terminal best_y across policies (significantly above Surrogate, p=0.002; not significantly above LLM-everywhere, p=0.50). Held-out validation on dimension-crossed IOH functions (Sphere, Ellipsoid, Rastrigin, BuecheRastrigin, LinearSlope at 2D, 5D, 10D, 20D) shows the simple `dim>=5` rule **does not transfer**: it loses significantly to AlwaysSurrogate on the held-out benchmark (paired-t mean +0.157 normalized regret, p<0.0001). A multi-feature routing rule with nested leave-family-out validation is required for a general routing benefit claim."
+> "On the BOCoDe development panel, the frozen dimension rule showed an advantage under the selected aggregate. On the held-out IOH/BBOB f1–f5 panel, however, its mean normalized regret was 0.463 versus 0.428 for AlwaysSurrogate (difference +0.036, 95% CI [−0.012, 0.083], p=0.138). Thus, the BOCoDe advantage did not reproduce on this panel, providing no evidence that dimension alone yields a transferable routing benefit."
 
 ### Files
 
-- `runs/exp_rq0_5_ioh_crossed_full.json` — full 400-trajectory results
-- `scripts/ioh_backend.py` — IOHBackend adapter (minimal BoTorch-compatible)
+- `runs/exp_rq0_5_ioh_crossed_full.json` — buggy results (superseded)
+- `runs/exp_rq0_5_ioh_crossed_fixed.json` — corrected-direction results (primary)
+- `runs/exp_rq0_5_analytical_router.json` — analytical router (no API mix)
+- `scripts/ioh_backend.py` — IOHBackend with direction fix
 - `scripts/exp_rq0_5_ioh_dimension_crossed.py` — runner
+- `scripts/exp_rq0_5_analytical_router.py` — analytical router construction
+- `scripts/exp_rq0_5_proper_stats.py` — Student-t p-values + Holm correction
