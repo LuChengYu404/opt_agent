@@ -1,7 +1,7 @@
 """Dataset analysis helpers (Phase 8 empirical validation).
 
 Per codex (gpt-5.6-sol) review 2025-09-23:
-  - `_validate_record` enforces the aligned-vocabulary invariant.
+  - `validate_record` enforces the aligned-vocabulary invariant.
   - Phase is defined by remaining_budget_ratio (>0.7 early, <0.3 late, 0 terminal).
   - Entropy is normalized to [0, 1] by log(len(valid)).
   - We do NOT yet assert "early = exploration-dominant" etc.; those are
@@ -19,16 +19,17 @@ from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
 
 
 def _phase(ratio: float) -> str:
-    if ratio == 0:
-        return "terminal"
-    if ratio > 0.7:
-        return "early"
-    if ratio < 0.3:
-        return "late"
-    return "mid"
+    """Classify a BO trajectory point by remaining-budget ratio. The
+    canonical version lives in ``dataset.validation.phase_of_ratio``;
+    this stub is a deferred-import indirection so ``dataset.analysis``
+    doesn't pull in the full validation module (which transitively
+    imports the rollout machinery) at import time.
+    """
+    from opt_agent.dataset.validation import phase_of_ratio
+    return phase_of_ratio(ratio)
 
 
-def _validate_record(record: DecisionRecord) -> None:
+def validate_record(record: DecisionRecord) -> None:
     """Enforce aligned vocabulary and probability invariants."""
     ids = [a["action_id"] for a in record.candidate_actions]
     if len(ids) != len(set(ids)):
@@ -80,7 +81,7 @@ def analyze_dataset(path: Path) -> DatasetStats:
     n_records = 0
 
     for record in iter_jsonl(path):
-        _validate_record(record)
+        validate_record(record)
         n_records += 1
         family = record.problem["family"]
         ratio = float(record.state["resource"]["remaining_budget_ratio"])

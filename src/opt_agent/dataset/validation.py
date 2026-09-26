@@ -58,9 +58,16 @@ EXPLORATION_ACTIONS: frozenset[str] = frozenset({
 EPS = 1e-12
 
 
-def phase_of(record: DecisionRecord) -> str:
-    """Same phase definition as analysis.py."""
-    ratio = float(record.state["resource"]["remaining_budget_ratio"])
+def phase_of_ratio(ratio: float) -> str:
+    """Classify a BO trajectory point by remaining-budget ratio.
+
+    Boundaries (single source of truth for both ``phase_of(record)`` and
+    the dataset analyzer):
+      - ratio == 0       → terminal
+      - ratio >  0.7     → early
+      - ratio <  0.3     → late
+      - else             → mid
+    """
     if ratio == 0:
         return "terminal"
     if ratio > 0.7:
@@ -68,6 +75,11 @@ def phase_of(record: DecisionRecord) -> str:
     if ratio < 0.3:
         return "late"
     return "mid"
+
+
+def phase_of(record: DecisionRecord) -> str:
+    """Classify a record's trajectory phase from its ``remaining_budget_ratio``."""
+    return phase_of_ratio(float(record.state["resource"]["remaining_budget_ratio"]))
 
 
 # ---------------------------------------------------------------------------
@@ -213,8 +225,9 @@ def oracle_test(
         return OptimizationAction(ActionType(spec["type"]), dict(spec["params"]))
 
     continuation_seed = derive_seed(int(record.metadata["run_seed"]), 1)
+    continuation_policy = RulePolicy(seed=continuation_seed)
     def choose_continuation(s, b):
-        return RulePolicy(seed=continuation_seed).select_action(s, b)
+        return continuation_policy.select_action(s, b)
 
     try:
         # Gold: gold top action, then RulePolicy continuation.

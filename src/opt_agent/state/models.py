@@ -18,7 +18,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
+
+
+def _finite(value: float) -> float | None:
+    """Coerce a float to JSON-safe form: NaN/Inf → None, finite → float.
+    Shared helper for any state serialization that needs to round-trip
+    through JSON (LLM prompts, dataset JSONL)."""
+    number = float(value)
+    return number if math.isfinite(number) else None
 
 
 @dataclass(frozen=True)
@@ -65,3 +73,38 @@ class OptimizationState:
     optimization: OptimizationProgress
     resource: ResourceState
     history: HistoryState
+
+    def to_payload(self) -> dict[str, Any]:
+        """Compact dict representation for LLM prompts.
+
+        NaN/Inf float values are coerced to None so the resulting dict is
+        JSON-safe. Used by ``system1._prompt._state_payload`` and any other
+        System-1 adapter that needs the same observable field set.
+        """
+        return {
+            "objective": "maximize",
+            "samples": self.sampling.n_samples,
+            "dimension": self.sampling.dimension,
+            "min_pairwise_distance": _finite(self.sampling.min_pairwise_distance),
+            "boundary_coverage": _finite(self.sampling.boundary_coverage),
+            "surrogate_current": self.surrogate.is_current,
+            "validation_rmse": _finite(self.surrogate.validation_rmse),
+            "mean_uncertainty": _finite(self.surrogate.mean_uncertainty),
+            "max_uncertainty": _finite(self.surrogate.max_uncertainty),
+            "best_value": _finite(self.optimization.best_value),
+            "recent_improvement": _finite(self.optimization.recent_improvement),
+            "stagnation_steps": self.optimization.stagnation_steps,
+            "remaining_budget": self.resource.remaining_budget,
+            "total_budget": self.resource.total_budget,
+            "last_action": self.history.last_action,
+        }
+
+    def to_narrative(self) -> str:
+        """Plain-English narrative of the same observable state for
+        narrative-format LLM prompts. The narrative text lives in
+        ``system1._prompt`` to keep all prompt-shape choices together;
+        this method is a thin wrapper so callers can request narrative
+        directly from the state.
+        """
+        from opt_agent.system1._prompt import _state_narrative
+        return _state_narrative(self)

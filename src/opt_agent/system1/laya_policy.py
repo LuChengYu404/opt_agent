@@ -37,16 +37,6 @@ class _LayaAgent(Protocol):
         ...
 
 
-def _candidate_actions(state: OptimizationState, seed: int) -> dict[str, OptimizationAction]:
-    """Build budget-valid candidates via the shared factory.
-
-    Per codex M1: a single factory owns candidate construction so the
-    action_id vocabulary stays aligned with ``full_candidates`` and any
-    other System-1 implementation.
-    """
-    return candidate_actions_for_state(state, seed=seed)
-
-
 class LayaPolicy:
     """Wrap Laya's typed ``choice`` prediction as a DecisionLoop policy.
 
@@ -115,7 +105,7 @@ class LayaPolicy:
         return self._agent
 
     def decide(self, state: OptimizationState) -> JevDecision:
-        choices = _candidate_actions(state, self.seed)
+        choices = candidate_actions_for_state(state, seed=self.seed)
         if state.resource.remaining_budget <= 0:
             decision = JevDecision(
                 choices["stop"], {"stop": 1.0}, 1.0,

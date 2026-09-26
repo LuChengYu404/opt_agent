@@ -115,9 +115,10 @@ def spec_from_metadata(meta: Mapping[str, Any] | None) -> ContinuationPolicySpec
 
 
 def _json_safe(value: Any) -> Any:
-    """Best-effort JSON-safe coercion for spec extras (numbers, bools, strings)."""
-    if isinstance(value, (str, int, bool)) or value is None:
-        return value
-    if isinstance(value, float):
-        return value
-    return str(value)
+    """Best-effort JSON-safe coercion. Delegates to
+    ``opt_agent.dataset.decision_record._json_safe`` (the comprehensive
+    version that walks dataclasses / enums / mappings); a deferred
+    import avoids a circular module dependency at import time.
+    """
+    from opt_agent.dataset.decision_record import _json_safe as _impl
+    return _impl(value)

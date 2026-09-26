@@ -29,12 +29,21 @@ from __future__ import annotations
 
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Mapping, Sequence
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+
+def _candidate_pool_from_factory() -> tuple[str, ...]:
+    """Derive the candidate-pool vocabulary from ``ALL_CANDIDATE_SPECS`` so
+    adding a new ``ActionType`` to the factory is automatically reflected
+    in the typed-decision model. Deferred import avoids a circular module
+    dependency at import time."""
+    from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
+    return tuple(spec[0] for spec in ALL_CANDIDATE_SPECS)
 
 
 @dataclass(frozen=True)
@@ -48,16 +57,7 @@ class TypedDecisionConfig:
     learning_rate: float = 1e-5
     batch_size: int = 16
     num_epochs: int = 5
-    candidate_pool: tuple[str, ...] = (
-        "global_exploration",
-        "local_exploitation",
-        "uncertainty_sampling",
-        "error_guided_sampling",
-        "boundary_sampling",
-        "surrogate_acquisition",
-        "retrain_surrogate",
-        "stop",
-    )
+    candidate_pool: tuple[str, ...] = field(default_factory=_candidate_pool_from_factory)
 
 
 class JevStyleSystem1(nn.Module):
@@ -179,10 +179,9 @@ class JevStyleSystem1(nn.Module):
 
 
 def state_to_text(state) -> str:
-    """Module-level helper: serialize a BO state to compact text.
-
-    Accepts either a Mapping (dict-like) or an `OptimizationState`
-    dataclass instance.
+    """Serialize a BO state to compact text. Accepts either an
+    ``OptimizationState`` dataclass or a Mapping (for training-time
+    records loaded from JSONL).
     """
     if hasattr(state, "resource"):  # OptimizationState dataclass
         return (
@@ -217,7 +216,6 @@ def gold_probs_to_target_tensor(
 ) -> torch.Tensor:
     """Reorder gold_probs to match the model's candidate ordering."""
     out = torch.zeros(len(candidates), dtype=torch.float32, device=device)
-    pool_idx = {c: i for i, c in enumerate(candidates)}
     for i, c in enumerate(candidates):
         out[i] = float(gold_probs.get(c, 0.0))
     s = out.sum().item()

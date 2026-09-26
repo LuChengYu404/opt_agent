@@ -9,6 +9,7 @@ max_uncertainty (populated only when backend.is_fitted; NaN otherwise).
 
 from __future__ import annotations
 
+import functools
 import math
 from typing import Optional
 
@@ -27,7 +28,17 @@ from opt_agent.state.models import (
 
 # Grid size for posterior uncertainty statistics.
 _UNCERTAINTY_GRID_SIZE = 64
-_BOUNDARY_TOL = 0.05  # fraction of range considered "near boundary"
+
+
+def _boundary_tol() -> float:
+    """Boundary coverage threshold as a fraction of the per-dimension
+    range. Deferred import keeps `state.extractor` from depending on
+    `actions.factory` at module load time. The single source of truth is
+    `actions.factory.BOUNDARY_TOL`; that constant also drives
+    BOUNDARY_SAMPLING's default `tol` so the coverage metric stays in
+    sync with the action's actual search margin."""
+    from opt_agent.actions.factory import BOUNDARY_TOL
+    return BOUNDARY_TOL
 
 
 def _min_pairwise_distance(X: torch.Tensor) -> float:
@@ -77,16 +88,23 @@ def _validation_rmse(backend: UnifiedBackend) -> float:
     return float(residuals.pow(2).mean().sqrt().item())
 
 
+@functools.lru_cache(maxsize=16)
+def _sobol_grid(d: int, size: int) -> torch.Tensor:
+    """A unit-cube Sobol grid is deterministic for fixed (d, size) and
+    is rebuilt on every ``extract_state`` call without this cache. The
+    grid is reused across all backends of a given dimension."""
+    return SobolEngine(dimension=d, scramble=True, seed=0).draw(size)
+
+
 def _uncertainty_stats(backend: UnifiedBackend) -> tuple[float, float]:
     """Compute mean and max posterior std on a Sobol grid."""
     bounds = backend.bounds
     if bounds is None:
         return float("nan"), float("nan")
     d = bounds.shape[1]
-    grid_unit = SobolEngine(dimension=d, scramble=True, seed=0).draw(
-        _UNCERTAINTY_GRID_SIZE
-    ).to(dtype=torch.double)
-    grid = bounds[0] + grid_unit * (bounds[1] - bounds[0])
+    grid = bounds[0] + _sobol_grid(d, _UNCERTAINTY_GRID_SIZE).to(
+        dtype=torch.double
+    ) * (bounds[1] - bounds[0])
     _, std = backend.predict(grid)
     return float(std.mean().item()), float(std.max().item())
 
@@ -148,7 +166,7 @@ def extract_state(
     bounds = backend.bounds
     if bounds is not None and bounds.shape[1] == dimension:
         min_pd = _min_pairwise_distance(history.X)
-        bcov = _boundary_coverage(history.X, bounds, tol=_BOUNDARY_TOL)
+        bcov = _boundary_coverage(history.X, bounds, tol=_boundary_tol())
     else:
         min_pd = float("inf")
         bcov = 0.0

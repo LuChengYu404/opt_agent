@@ -36,24 +36,11 @@ def _finite(value: float) -> float | None:
 
 
 def _state_payload(state: OptimizationState) -> dict[str, Any]:
-    """Keep the BO state compact enough for the policy's shared state/option context."""
-    return {
-        "objective": "maximize",
-        "samples": state.sampling.n_samples,
-        "dimension": state.sampling.dimension,
-        "min_pairwise_distance": _finite(state.sampling.min_pairwise_distance),
-        "boundary_coverage": _finite(state.sampling.boundary_coverage),
-        "surrogate_current": state.surrogate.is_current,
-        "validation_rmse": _finite(state.surrogate.validation_rmse),
-        "mean_uncertainty": _finite(state.surrogate.mean_uncertainty),
-        "max_uncertainty": _finite(state.surrogate.max_uncertainty),
-        "best_value": _finite(state.optimization.best_value),
-        "recent_improvement": _finite(state.optimization.recent_improvement),
-        "stagnation_steps": state.optimization.stagnation_steps,
-        "remaining_budget": state.resource.remaining_budget,
-        "total_budget": state.resource.total_budget,
-        "last_action": state.history.last_action,
-    }
+    """Compact dict serialization of an OptimizationState for LLM prompts.
+    Delegates to ``OptimizationState.to_payload`` so the field set lives
+    in one place. Kept as a thin wrapper for backwards compatibility with
+    any caller that already imports it from ``system1._prompt``."""
+    return state.to_payload()
 
 
 def _state_narrative(state: OptimizationState) -> str:

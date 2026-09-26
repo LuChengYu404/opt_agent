@@ -30,12 +30,20 @@ from opt_agent.state import OptimizationState
 #
 # `full_candidates()` reads this list unfiltered; the runtime factory
 # filters it by state.
+#
+# `BOUNDARY_TOL` is the default `tol` parameter for BOUNDARY_SAMPLING and
+# the metric threshold used by `state.extractor._boundary_coverage` to
+# decide whether a sampled point lies "near" a domain edge. Both must
+# reference the same constant so the coverage metric stays aligned with
+# the action's default search margin.
+BOUNDARY_TOL: float = 0.05
+
 ALL_CANDIDATE_SPECS: tuple[tuple[str, ActionType, dict], ...] = (
     ("global_exploration",  ActionType.GLOBAL_EXPLORATION,    {"n_samples": 2}),
     ("local_exploitation",  ActionType.LOCAL_EXPLOITATION,    {"step": 0.1}),
     ("uncertainty_sampling", ActionType.UNCERTAINTY_SAMPLING, {"n_samples": 1}),
     ("error_guided_sampling", ActionType.ERROR_GUIDED_SAMPLING, {"n_samples": 1}),
-    ("boundary_sampling",   ActionType.BOUNDARY_SAMPLING,     {"n_samples": 2, "tol": 0.05}),
+    ("boundary_sampling",   ActionType.BOUNDARY_SAMPLING,     {"n_samples": 2, "tol": BOUNDARY_TOL}),
     ("surrogate_acquisition", ActionType.SURROGATE_ACQUISITION, {}),
     ("retrain_surrogate",   ActionType.RETRAIN_SURROGATE,     {}),
     ("stop",                ActionType.STOP,                  {}),

@@ -47,6 +47,7 @@ from dataclasses import dataclass
 from typing import Mapping, Sequence
 
 from opt_agent.state.models import OptimizationState
+from opt_agent.system1._prompt import _finite
 
 
 _FEATURES: tuple[str, ...] = (
@@ -103,12 +104,6 @@ class StateOODDetector:
         self._stats: FeatureStats | None = None
 
     @staticmethod
-    def _finite(x: float) -> float | None:
-        if not math.isfinite(x):
-            return None
-        return float(x)
-
-    @staticmethod
     def features(state: OptimizationState) -> dict[str, float | None]:
         """Extract the OOD feature dict from a state.
 
@@ -130,17 +125,17 @@ class StateOODDetector:
         denom = max(abs(bv), 1.0)
         rel_improvement = ri / denom
         return {
-            "sample_fraction": StateOODDetector._finite(n_samples / n),
-            "stagnation_per_sample": StateOODDetector._finite(
+            "sample_fraction": _finite(n_samples / n),
+            "stagnation_per_sample": _finite(
                 stagnation / max(n_samples, 1)
             ),
-            "remaining_budget_ratio": StateOODDetector._finite(
+            "remaining_budget_ratio": _finite(
                 float(state.resource.remaining_budget_ratio)
             ),
-            "is_current": StateOODDetector._finite(
+            "is_current": _finite(
                 1.0 if state.surrogate.is_current else 0.0
             ),
-            "relative_improvement": StateOODDetector._finite(rel_improvement),
+            "relative_improvement": _finite(rel_improvement),
         }
 
     def fit(self, states: Sequence[OptimizationState]) -> FeatureStats:

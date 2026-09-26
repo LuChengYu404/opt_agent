@@ -1,6 +1,6 @@
 """Public re-exports for opt_agent.dataset."""
 
-from opt_agent.dataset.analysis import DatasetStats, _validate_record, analyze_dataset
+from opt_agent.dataset.analysis import DatasetStats, analyze_dataset, validate_record
 from opt_agent.dataset.decision_record import (
     DecisionRecord,
     iter_jsonl,
@@ -32,6 +32,7 @@ from opt_agent.dataset.validation import (
     oracle_test,
     oracle_test_from_record,
     phase_of,
+    phase_of_ratio,
 )
 
 __all__ = [
@@ -58,13 +59,9 @@ __all__ = [
     "oracle_test",
     "oracle_test_from_record",
     "phase_of",
+    "phase_of_ratio",
     "physical_state_hash",
     "split_records",
     "validate_record",
     "write_jsonl",
 ]
-
-
-# Re-export _validate_record under a public name for tests.
-validate_record = _validate_record
-del _validate_record
