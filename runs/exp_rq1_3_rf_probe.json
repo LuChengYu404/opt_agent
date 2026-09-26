@@ -1,0 +1,89 @@
+{
+  "dataset": "runs/phase8_6d_h3_10seed_5family.jsonl",
+  "family": "ackley",
+  "n_records": 70,
+  "n_seeds": 10,
+  "features": [
+    "samples",
+    "dimension",
+    "min_pairwise_distance",
+    "boundary_coverage",
+    "validation_rmse",
+    "mean_uncertainty",
+    "max_uncertainty",
+    "best_value",
+    "recent_improvement",
+    "stagnation_steps",
+    "remaining_budget_ratio",
+    "is_fitted",
+    "phase_early",
+    "phase_mid",
+    "phase_late"
+  ],
+  "rf_per_seed": [
+    {
+      "held_out_seed": 0,
+      "n_test": 8,
+      "mean_regret": 0.8899614771588577,
+      "median_regret": 0.008333333333333331
+    },
+    {
+      "held_out_seed": 1,
+      "n_test": 8,
+      "mean_regret": 0.4237771763140359,
+      "median_regret": 0.024999999999999994
+    },
+    {
+      "held_out_seed": 2,
+      "n_test": 7,
+      "mean_regret": 0.14566236346988465,
+      "median_regret": 0.016666666666666663
+    },
+    {
+      "held_out_seed": 3,
+      "n_test": 5,
+      "mean_regret": 0.06835591746331549,
+      "median_regret": 0.08333333333333333
+    },
+    {
+      "held_out_seed": 4,
+      "n_test": 10,
+      "mean_regret": 0.030213776532023458,
+      "median_regret": 0.016666666666666663
+    },
+    {
+      "held_out_seed": 5,
+      "n_test": 2,
+      "mean_regret": 0.016666666666666663,
+      "median_regret": 0.016666666666666663
+    },
+    {
+      "held_out_seed": 6,
+      "n_test": 8,
+      "mean_regret": 0.5508350311893832,
+      "median_regret": 0.6036207388793111
+    },
+    {
+      "held_out_seed": 7,
+      "n_test": 8,
+      "mean_regret": 0.24776731673473965,
+      "median_regret": 0.016666666666666666
+    },
+    {
+      "held_out_seed": 8,
+      "n_test": 7,
+      "mean_regret": 0.03869301353275236,
+      "median_regret": 0.0
+    },
+    {
+      "held_out_seed": 9,
+      "n_test": 7,
+      "mean_regret": 0.7337293904854593,
+      "median_regret": 0.3152299850093564
+    }
+  ],
+  "always_surrogate_mean_regret": 0.5881361274587522,
+  "majority_mean_regret": 0.30944864000202993,
+  "rf_seed_equal_mean": 0.3145662129547118,
+  "rf_seed_equal_median": 0.19671484010231216
+}
