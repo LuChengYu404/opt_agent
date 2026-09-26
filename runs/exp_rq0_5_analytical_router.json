@@ -1,0 +1,915 @@
+{
+  "config": {
+    "router_threshold": 5,
+    "construction": "deterministic; uses Surrogate at d<5, LLM at d>=5 from the same paired run"
+  },
+  "router": [
+    {
+      "fid": 1,
+      "dim": 2,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 79.51369805218799,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.007347031742307868
+    },
+    {
+      "fid": 1,
+      "dim": 2,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 79.49383144884786,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.002069227544786631
+    },
+    {
+      "fid": 1,
+      "dim": 2,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 79.48084068727537,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0001870064447498403
+    },
+    {
+      "fid": 1,
+      "dim": 2,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 79.48265810826489,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.00038557578588053055
+    },
+    {
+      "fid": 1,
+      "dim": 2,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 79.48060041763061,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.00012994604290759803
+    },
+    {
+      "fid": 1,
+      "dim": 5,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 90.64361904623952,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3387358842818006
+    },
+    {
+      "fid": 1,
+      "dim": 5,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 92.2717244964968,
+      "source_policy": "LLM",
+      "normalized_regret": 0.4378477838399111
+    },
+    {
+      "fid": 1,
+      "dim": 5,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 80.38333120805751,
+      "source_policy": "LLM",
+      "normalized_regret": 0.0448157623810212
+    },
+    {
+      "fid": 1,
+      "dim": 5,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 82.6092836239722,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5253737568587429
+    },
+    {
+      "fid": 1,
+      "dim": 5,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 90.64361904623952,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8599632467650562
+    },
+    {
+      "fid": 1,
+      "dim": 10,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 95.69951955493656,
+      "source_policy": "LLM",
+      "normalized_regret": 0.25435042570140487
+    },
+    {
+      "fid": 1,
+      "dim": 10,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 137.92160203068138,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8683954413977816
+    },
+    {
+      "fid": 1,
+      "dim": 10,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 95.69442642561141,
+      "source_policy": "LLM",
+      "normalized_regret": 0.2344355111488187
+    },
+    {
+      "fid": 1,
+      "dim": 10,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 111.35257083772369,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7617587023555565
+    },
+    {
+      "fid": 1,
+      "dim": 10,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 99.71855106181968,
+      "source_policy": "LLM",
+      "normalized_regret": 0.34071534216761823
+    },
+    {
+      "fid": 1,
+      "dim": 20,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 202.4408583183826,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7240362397832197
+    },
+    {
+      "fid": 1,
+      "dim": 20,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 196.30174908923277,
+      "source_policy": "LLM",
+      "normalized_regret": 0.6473939583004447
+    },
+    {
+      "fid": 1,
+      "dim": 20,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 233.54306747334607,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7472330294843923
+    },
+    {
+      "fid": 1,
+      "dim": 20,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 224.56730249063588,
+      "source_policy": "LLM",
+      "normalized_regret": 0.648365909162405
+    },
+    {
+      "fid": 1,
+      "dim": 20,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 192.3038862922607,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8963418021110822
+    },
+    {
+      "fid": 2,
+      "dim": 2,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 106.97760704114569,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0014570875148997985
+    },
+    {
+      "fid": 2,
+      "dim": 2,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -193.54978715519513,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.00010873055998575
+    },
+    {
+      "fid": 2,
+      "dim": 2,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 38.40269617774857,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.023686230971656275
+    },
+    {
+      "fid": 2,
+      "dim": 2,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -185.73895310477113,
+      "source_policy": "Surrogate",
+      "normalized_regret": 9.405848386574813e-05
+    },
+    {
+      "fid": 2,
+      "dim": 2,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -208.14781314657108,
+      "source_policy": "Surrogate",
+      "normalized_regret": 3.964067254001993e-06
+    },
+    {
+      "fid": 2,
+      "dim": 5,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 29357.828212826567,
+      "source_policy": "LLM",
+      "normalized_regret": 1.0
+    },
+    {
+      "fid": 2,
+      "dim": 5,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 66848.57061946885,
+      "source_policy": "LLM",
+      "normalized_regret": 0.0319979875766042
+    },
+    {
+      "fid": 2,
+      "dim": 5,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 66848.57061946885,
+      "source_policy": "LLM",
+      "normalized_regret": 0.05566190064460728
+    },
+    {
+      "fid": 2,
+      "dim": 5,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 66848.57061946885,
+      "source_policy": "LLM",
+      "normalized_regret": 0.019401002694992828
+    },
+    {
+      "fid": 2,
+      "dim": 5,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 70201.14040227182,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3501689986620333
+    },
+    {
+      "fid": 2,
+      "dim": 10,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 1129732.5285498204,
+      "source_policy": "LLM",
+      "normalized_regret": 0.2231173486091895
+    },
+    {
+      "fid": 2,
+      "dim": 10,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 646920.7207836503,
+      "source_policy": "LLM",
+      "normalized_regret": 0.217335233032644
+    },
+    {
+      "fid": 2,
+      "dim": 10,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 1129732.5285498204,
+      "source_policy": "LLM",
+      "normalized_regret": 0.28140006423860053
+    },
+    {
+      "fid": 2,
+      "dim": 10,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 1030003.7710532608,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3250173163065513
+    },
+    {
+      "fid": 2,
+      "dim": 10,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 936873.9506167951,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5523949432351586
+    },
+    {
+      "fid": 2,
+      "dim": 20,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 3820920.1911660726,
+      "source_policy": "LLM",
+      "normalized_regret": 0.45800026233350954
+    },
+    {
+      "fid": 2,
+      "dim": 20,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 1505909.0535489134,
+      "source_policy": "LLM",
+      "normalized_regret": 0.08651601715716582
+    },
+    {
+      "fid": 2,
+      "dim": 20,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 3381278.573503047,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5939422762477539
+    },
+    {
+      "fid": 2,
+      "dim": 20,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 3479348.9453734863,
+      "source_policy": "LLM",
+      "normalized_regret": 0.4335387854096849
+    },
+    {
+      "fid": 2,
+      "dim": 20,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 3381278.573503047,
+      "source_policy": "LLM",
+      "normalized_regret": 0.39561869683053213
+    },
+    {
+      "fid": 3,
+      "dim": 2,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -445.2100641877812,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.41601855336611054
+    },
+    {
+      "fid": 3,
+      "dim": 2,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -445.81704104121917,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.2366416828307176
+    },
+    {
+      "fid": 3,
+      "dim": 2,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -452.79556354516285,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.3550397974968238
+    },
+    {
+      "fid": 3,
+      "dim": 2,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -454.6323268884044,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.1911799476101035
+    },
+    {
+      "fid": 3,
+      "dim": 2,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -451.32798230077316,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.3732648246151322
+    },
+    {
+      "fid": 3,
+      "dim": 5,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -410.146893898675,
+      "source_policy": "LLM",
+      "normalized_regret": 0.6341582144422491
+    },
+    {
+      "fid": 3,
+      "dim": 5,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -367.02764569130136,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3952289822882379
+    },
+    {
+      "fid": 3,
+      "dim": 5,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -367.02764569130136,
+      "source_policy": "LLM",
+      "normalized_regret": 0.4223613649053786
+    },
+    {
+      "fid": 3,
+      "dim": 5,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -367.02764569130136,
+      "source_policy": "LLM",
+      "normalized_regret": 0.4927033033979763
+    },
+    {
+      "fid": 3,
+      "dim": 5,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -378.9635926943737,
+      "source_policy": "LLM",
+      "normalized_regret": 0.27023559256010315
+    },
+    {
+      "fid": 3,
+      "dim": 10,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -232.34913512329354,
+      "source_policy": "LLM",
+      "normalized_regret": 0.54588454805418
+    },
+    {
+      "fid": 3,
+      "dim": 10,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -226.02470642571245,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7683179317879909
+    },
+    {
+      "fid": 3,
+      "dim": 10,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -261.3472949154184,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5712013941738008
+    },
+    {
+      "fid": 3,
+      "dim": 10,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -220.78082636388837,
+      "source_policy": "LLM",
+      "normalized_regret": 1.0
+    },
+    {
+      "fid": 3,
+      "dim": 10,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -216.82106118361247,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8239433428980163
+    },
+    {
+      "fid": 3,
+      "dim": 20,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 297.08550578331545,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8061298951642205
+    },
+    {
+      "fid": 3,
+      "dim": 20,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 178.75796140022243,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3673747551620125
+    },
+    {
+      "fid": 3,
+      "dim": 20,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 567.7895680614877,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7260503129728021
+    },
+    {
+      "fid": 3,
+      "dim": 20,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 528.7759690794894,
+      "source_policy": "LLM",
+      "normalized_regret": 0.9776434966904062
+    },
+    {
+      "fid": 3,
+      "dim": 20,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 281.0603830832476,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7219128261135819
+    },
+    {
+      "fid": 4,
+      "dim": 2,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -456.3385410671366,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.09797491971408001
+    },
+    {
+      "fid": 4,
+      "dim": 2,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -453.75462224982425,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.10756574802630553
+    },
+    {
+      "fid": 4,
+      "dim": 2,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -453.52144681330077,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.4696933586765681
+    },
+    {
+      "fid": 4,
+      "dim": 2,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -453.06028728758236,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.6378838771246227
+    },
+    {
+      "fid": 4,
+      "dim": 2,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -442.0034069107217,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.5484563455551267
+    },
+    {
+      "fid": 4,
+      "dim": 5,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -307.63219319468453,
+      "source_policy": "LLM",
+      "normalized_regret": 1.0
+    },
+    {
+      "fid": 4,
+      "dim": 5,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -354.8367729194278,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3843911146476875
+    },
+    {
+      "fid": 4,
+      "dim": 5,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -348.0736738634396,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5680901095205715
+    },
+    {
+      "fid": 4,
+      "dim": 5,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -354.8367729194278,
+      "source_policy": "LLM",
+      "normalized_regret": 0.3000819649617816
+    },
+    {
+      "fid": 4,
+      "dim": 5,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -348.0736738634396,
+      "source_policy": "LLM",
+      "normalized_regret": 0.35257367202265966
+    },
+    {
+      "fid": 4,
+      "dim": 10,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -197.17460896815652,
+      "source_policy": "LLM",
+      "normalized_regret": 0.43793865954246075
+    },
+    {
+      "fid": 4,
+      "dim": 10,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -15.398759697552066,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8349165847942235
+    },
+    {
+      "fid": 4,
+      "dim": 10,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -197.17460896815652,
+      "source_policy": "LLM",
+      "normalized_regret": 0.6150036016604072
+    },
+    {
+      "fid": 4,
+      "dim": 10,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 23.5940598870273,
+      "source_policy": "LLM",
+      "normalized_regret": 1.0
+    },
+    {
+      "fid": 4,
+      "dim": 10,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -203.81914703213022,
+      "source_policy": "LLM",
+      "normalized_regret": 0.4984516809608908
+    },
+    {
+      "fid": 4,
+      "dim": 20,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 434.55301851655685,
+      "source_policy": "LLM",
+      "normalized_regret": 0.5127986719984039
+    },
+    {
+      "fid": 4,
+      "dim": 20,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 676.8818831983187,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7839558634407746
+    },
+    {
+      "fid": 4,
+      "dim": 20,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 619.2439260434007,
+      "source_policy": "LLM",
+      "normalized_regret": 0.586507919314425
+    },
+    {
+      "fid": 4,
+      "dim": 20,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 522.7521442026818,
+      "source_policy": "LLM",
+      "normalized_regret": 0.24021058916630145
+    },
+    {
+      "fid": 4,
+      "dim": 20,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 153.1317508244377,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8233309270626021
+    },
+    {
+      "fid": 5,
+      "dim": 2,
+      "instance": 1,
+      "seed": 0,
+      "best_y": -9.21,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0
+    },
+    {
+      "fid": 5,
+      "dim": 2,
+      "instance": 1,
+      "seed": 1,
+      "best_y": -9.21,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0
+    },
+    {
+      "fid": 5,
+      "dim": 2,
+      "instance": 1,
+      "seed": 2,
+      "best_y": -9.21,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0
+    },
+    {
+      "fid": 5,
+      "dim": 2,
+      "instance": 1,
+      "seed": 3,
+      "best_y": -9.21,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0
+    },
+    {
+      "fid": 5,
+      "dim": 2,
+      "instance": 1,
+      "seed": 4,
+      "best_y": -9.21,
+      "source_policy": "Surrogate",
+      "normalized_regret": 0.0
+    },
+    {
+      "fid": 5,
+      "dim": 5,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 2.049290487431076,
+      "source_policy": "LLM",
+      "normalized_regret": 0.41063000577136227
+    },
+    {
+      "fid": 5,
+      "dim": 5,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 32.63076593079609,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7394626703089607
+    },
+    {
+      "fid": 5,
+      "dim": 5,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 2.049290487431076,
+      "source_policy": "LLM",
+      "normalized_regret": 0.20567069371843846
+    },
+    {
+      "fid": 5,
+      "dim": 5,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 27.075233511090147,
+      "source_policy": "LLM",
+      "normalized_regret": 0.6923437479768672
+    },
+    {
+      "fid": 5,
+      "dim": 5,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 4.153886259408555,
+      "source_policy": "LLM",
+      "normalized_regret": 0.29900009057799726
+    },
+    {
+      "fid": 5,
+      "dim": 10,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 106.77513481012127,
+      "source_policy": "LLM",
+      "normalized_regret": 0.9740565755507994
+    },
+    {
+      "fid": 5,
+      "dim": 10,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 121.74867827262031,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8276880781843424
+    },
+    {
+      "fid": 5,
+      "dim": 10,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 98.80480105793791,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7988525650626548
+    },
+    {
+      "fid": 5,
+      "dim": 10,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 130.23996585238876,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8582332727088512
+    },
+    {
+      "fid": 5,
+      "dim": 10,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 111.04686232387854,
+      "source_policy": "LLM",
+      "normalized_regret": 1.0
+    },
+    {
+      "fid": 5,
+      "dim": 20,
+      "instance": 1,
+      "seed": 0,
+      "best_y": 264.54624617219423,
+      "source_policy": "LLM",
+      "normalized_regret": 0.98894531238556
+    },
+    {
+      "fid": 5,
+      "dim": 20,
+      "instance": 1,
+      "seed": 1,
+      "best_y": 229.76646605343203,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7206211090773781
+    },
+    {
+      "fid": 5,
+      "dim": 20,
+      "instance": 1,
+      "seed": 2,
+      "best_y": 265.46526821237995,
+      "source_policy": "LLM",
+      "normalized_regret": 0.7761427600922128
+    },
+    {
+      "fid": 5,
+      "dim": 20,
+      "instance": 1,
+      "seed": 3,
+      "best_y": 246.0249396539147,
+      "source_policy": "LLM",
+      "normalized_regret": 0.8295651694339842
+    },
+    {
+      "fid": 5,
+      "dim": 20,
+      "instance": 1,
+      "seed": 4,
+      "best_y": 235.18911253251494,
+      "source_policy": "LLM",
+      "normalized_regret": 0.9424042858219848
+    }
+  ],
+  "summary": {
+    "Surrogate mean": 0.4276393413516878,
+    "LLM mean": 0.5077233454507143,
+    "Router mean": 0.463480751992677,
+    "Router \u2212 Surrogate mean": 0.035841410640989266,
+    "Router \u2212 LLM mean": -0.04424259345803725
+  }
+}
