@@ -122,7 +122,7 @@ class LLMSystem1Policy:
         start = time.monotonic()
         try:
             if self.mode == "llm":
-                raw = self._call_real_llm(state_arg, question)
+                raw = self._call_real_llm(state_arg, question, candidates=choices)
             else:
                 # Mock: HeuristicLLMClient uses the candidate list + state
                 # to produce a response dict (no LLM).
@@ -160,14 +160,36 @@ class LLMSystem1Policy:
     ) -> OptimizationAction:
         return self.decide(state).action
 
-    def _call_real_llm(self, state_arg: Any, question: Mapping[str, Any]) -> dict:
-        """POST to OpenAI-compatible chat completions API."""
+    def _call_real_llm(
+        self,
+        state_arg: Any,
+        question: Mapping[str, Any],
+        *,
+        candidates: Mapping[str, OptimizationAction] | None = None,
+    ) -> dict:
+        """POST to OpenAI-compatible chat completions API.
+
+        If `candidates` is provided, instruct the LLM to pick from those
+        action_ids. The response parser needs the candidate set to build
+        a full probability vector matching `validate_choice_response`'s
+        expectation (one prob per candidate action).
+        """
         import httpx
 
-        # Flatten state + question into a single user message (same shape
-        # JevPolicy's payload uses).
+        cand_hint = ""
+        if candidates is not None:
+            cand_hint = (
+                " Choose exactly one action_id from: "
+                + ", ".join(candidates.keys())
+                + ". Respond with JSON only: "
+                + '{"action_id": "<one of those>", "rationale": "<short>"}'
+            )
+        system_msg = (
+            "You are an expert Bayesian-Optimization decision policy."
+            + cand_hint
+        )
         messages = [
-            {"role": "system", "content": "You are an expert BO decision policy."},
+            {"role": "system", "content": system_msg},
             {"role": "user", "content": f"State:\n{state_arg}\n\nQuestion:\n{question}"},
         ]
         body = {
@@ -181,31 +203,60 @@ class LLMSystem1Policy:
             r = client.post(f"{self.base_url}/chat/completions",
                             json=body, headers=headers)
         r.raise_for_status()
-        return self._parse_openai_response(r.json())
+        return self._parse_openai_response(r.json(), candidates)
 
     @staticmethod
-    def _parse_openai_response(body: dict) -> dict:
+    def _parse_openai_response(
+        body: dict,
+        candidates: Mapping[str, OptimizationAction] | None = None,
+    ) -> dict:
         """Map OpenAI chat completion response → Jev-style answer dict.
 
-        OpenAI returns {choices: [{message: {content: "..."}}], usage: {...}}.
-        We ask the LLM to respond in JSON: {"action_id": "...", "rationale": "..."}.
+        Output schema (must satisfy `validate_choice_response`):
+            {
+              "answers": {
+                "next_action": {
+                  "type": "choice",
+                  "choice": <action_id>,
+                  "probabilities": {<action_id>: <prob>, ...}  # keys == candidate set
+                }
+              },
+              "model": ...,
+              "usage": {...},
+            }
+        If the LLM only emits action_id (no probabilities), we synthesize a
+        full probability vector (1.0 on selected, 0.0 on others, renormalized).
         """
         import json
+        import re
         content = body["choices"][0]["message"]["content"].strip()
-        # Strip code-fence markers if present.
         if content.startswith("```"):
             content = content.strip("`").split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        action_id = None
         try:
             parsed = json.loads(content)
+            action_id = parsed.get("action_id")
         except json.JSONDecodeError:
-            # Fall back to extracting an action_id: line.
-            import re
             m = re.search(r"action_id\s*[:=]\s*([a-z_]+)", content)
-            parsed = {"action_id": m.group(1) if m else "stop"}
-        action_id = parsed.get("action_id", "stop")
+            if m:
+                action_id = m.group(1)
+        if not action_id:
+            action_id = "stop"
+        # Build probabilities: 1.0 on selected, 0.0 elsewhere, normalize.
+        if candidates is not None:
+            probs = {k: (1.0 if k == action_id else 0.0) for k in candidates}
+        else:
+            probs = {action_id: 1.0}
+        s = sum(probs.values()) or 1.0
+        probs = {k: v / s for k, v in probs.items()}
         return {
-            "answers": {"next_action": {"type": "choice", "choice": action_id}},
-            "probabilities": {"next_action": {action_id: 1.0}},
+            "answers": {
+                "next_action": {
+                    "type": "choice",
+                    "choice": action_id,
+                    "probabilities": probs,
+                }
+            },
             "model": body.get("model", "unknown"),
             "usage": body.get("usage", {}),
         }

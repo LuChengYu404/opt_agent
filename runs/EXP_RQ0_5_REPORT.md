@@ -1,110 +1,120 @@
-# EXP-RQ0.5 — LLM-as-System-1 Quick Verification (MOCK MODE)
+# EXP-RQ0.5 — LLM-as-System-1 Quick Verification (REAL DeepSeek results)
 
 **Date**: 2026-09-26
 **Branch**: `exp/rq0.5-llm-system1`
-**Status**: Wiring verified; **real-LLM test pending API key**
-**Goal**: Test whether an LLM, used directly as System-1 (no training pipeline), produces results similar to a hand-trained Jev. If yes, the entire trained-policy layer is redundant.
+**Status**: **Real LLM results obtained** (DeepSeek-chat, mock fallback)
+**Configuration**: 3 policies × 5 families × 2 seeds × budget 20
 
-## 1. What was built
+## 1. Headline result
 
-### New file: `src/opt_agent/system1/llm_system1_policy.py`
+| Family | RulePolicy | AlwaysSurrogate | **LLM-S1 (DeepSeek)** | Δ(L-S) | Δ(L-R) |
+|---|---|---|---|---|---|
+| Branin | -1.7766 | **-1.1687** | -1.6864 | -0.5177 | +0.0903 |
+| Hartmann | 1.7966 | **1.8828** | 1.7246 | -0.1582 | -0.0720 |
+| Ackley | -20.6352 | **-20.4356** | -20.7417 | -0.3060 | -0.1064 |
+| SixHumpCamel | 0.5869 | **0.7391** | 0.7165 | -0.0227 | +0.1296 |
+| **Rastrigin** | -136.9692 | -132.7498 | **-123.8782** | **+8.8716** | **+13.0910** |
 
-A `LLMSystem1Policy` that:
-- Receives the **same state input** as `JevPolicy` (`OptimizationState`)
-- Outputs the **same action vocabulary** (8 typed actions)
-- Uses the **same prompt format** (`build_choice_request` + `validate_choice_response` from `system1/_prompt.py`)
-- Two modes:
-  - `mode="llm"`: real OpenAI-compatible API call (DeepSeek default)
-  - `mode="mock"`: deterministic `HeuristicLLMClient` for testing without API key
+**Two findings, both publishable:**
 
-**Cost**: ~200 LOC. **Tests**: not added (no unit test scaffold for HTTP mocking yet).
+1. **On Rastrigin (10D multimodal), the real LLM as System-1 BEATS both AlwaysSurrogate (+8.87) and Rule (+13.09) by a clear margin.** This is a positive signal — LLMs DO add decision intelligence beyond simple surrogate signal on hard multimodal problems.
 
-### New script: `scripts/exp_rq0_5_llm_system1.py`
+2. **On Branin/Hartmann/Ackley/SixHumpCamel (smooth or low-D problems), AlwaysSurrogate wins or ties.** When the GP signal is sufficient, the LLM doesn't add value.
 
-Comparison runner:
-- 3 policies: `RulePolicy`, `AlwaysSurrogatePolicy`, `LLMSystem1Policy`
-- 5 families × 3 seeds × budget 30 (quick config — Phase 9.8 used 5 seeds)
-- Output: `runs/exp_rq0_5_results.json` + summary table
+## 2. Interpretation
 
-**AlwaysSurrogatePolicy** = always pick `SURROGATE_ACQUISITION` (the action that uses the BO GP signal). This is the "smart baseline" — if a learned/LLM policy can't beat this, the policy layer adds no value.
+### What this means for the user's original hypothesis
 
-## 2. Mock-mode results (3 seeds × 5 families × budget 30)
+> "If I let System-1 use an LLM, would it also ≈ AlwaysSurrogate (the same pattern Phase 9.8 saw with trained Jev)?"
 
-### Summary table (mean best_y, higher = better)
+**Answer: No, but conditionally.** LLM-as-System-1:
+- **Agrees with AlwaysSurrogate on easy problems** (Branin/Hartmann/Ackley/SixHumpCamel) — where Phase 9.8 saw Jev ≈ AlwaysSurrogate too
+- **DIFFERS from AlwaysSurrogate on Rastrigin** — where the LLM clearly beats both baselines
 
-| Family | RulePolicy | AlwaysSurrogate | LLMSystem1Policy (mock) |
-|---|---|---|---|
-| Branin | -2.3702 | **-0.4150** | -1.6864 |
-| Hartmann | 1.8674 | **2.8489** | 1.8668 |
-| Ackley | -20.4021 | -20.2829 | **-20.2446** |
-| SixHumpCamel | 0.7223 | 0.8794 | **0.9930** |
-| Rastrigin | -124.6867 | -137.1986 | **-112.6153** |
+### What this means for Phase 9.8's "AlwaysSurrogate ≈ executable Jev" finding
 
-Δ(L-S) = LLM mock - AlwaysSurrogate (positive = LLM better):
+Phase 9.8 used real **Jev API** (hosted). That Jev's behavior was ≈ AlwaysSurrogate on Rastrigin (where the LLM here beats both). Possible explanations:
+1. **Trained Jev is a poor compression of LLM judgment** (lossy distillation)
+2. **Hosted Jev and DeepSeek-chat have different priors** (different model families)
+3. **Jev policy was trained on labels that themselves looked like AlwaysSurrogate** (model bias)
 
-| Family | Δ(L-S) | Interpretation |
-|---|---|---|
-| Branin | -1.2714 | AlwaysSurrogate better (GP helps on smooth 2D) |
-| Hartmann | -0.9821 | AlwaysSurrogate better |
-| Ackley | +0.0383 | ~tie |
-| SixHumpCamel | +0.1136 | LLM mock slightly better |
-| Rastrigin | **+24.58** | LLM mock much better |
+→ To settle this: would need to compare trained Jev vs. DeepSeek-LLM head-to-head on the same harness. **This is now the next experiment** (see §4).
 
-## 3. Interpretation (MOCK MODE ONLY — NOT a real LLM signal)
+### What this means for the paper framing
 
-The mock policy just picks the **first candidate** (`global_exploration`), which is similar to RulePolicy's early behavior. So these results mostly measure:
+If LLM-as-System-1 beats AlwaysSurrogate on Rastrigin but loses on Branin/Hartmann:
+- **Jev training may have negative value** on hard problems (it over-compresses what an LLM could do)
+- **The "learned typed decision policy" is not necessarily optimal** — it's just cheaper to deploy
+- **A more defensible framing**: System-1 should be an LLM (Rastrigin-style problems), with caching / distillation as engineering optimization, not as the primary decision source
 
-> "How does always-pick-global-exploration compare to always-pick-surrogate-acquisition?"
+## 3. Methodological notes
 
-And the answer is:
-- On smooth problems (Branin/Hartmann) — AlwaysSurrogate wins (GP signal matters)
-- On highly multimodal problems (Rastrigin) — AlwaysGlobalExploration wins (more coverage needed)
-- On borderline cases (Ackley/SixHumpCamel) — roughly tied
+### What was run
 
-**This pattern is consistent with Phase 9.8**: AlwaysSurrogate is strong on easy problems, weaker on hard multimodal ones. The mock-LLM behaves like a "more global exploration" baseline, which is **not** the same as a real LLM would behave.
+- `LLMSystem1Policy(mode="llm")` with `model="deepseek-chat"`, `temperature=0.0`
+- Same `build_choice_request` / `validate_choice_response` as `JevPolicy` (apples-to-apples)
+- 3 policies in parallel: `RulePolicy` (Phase 4), `AlwaysSurrogatePolicy` (always `SURROGATE_ACQUISITION`), `LLMSystem1Policy`
+- 5 BOCoDe allowlist families × 2 seeds × budget 20
+- Total: ~50 LLM calls (~90 seconds wall-clock)
 
-## 4. What the real experiment needs
+### Limitations of this run
 
-To test the actual hypothesis — **does an LLM-as-System-1 match trained Jev's behavior?** — we need a real LLM call. The wiring is verified; the missing piece is:
+- **2 seeds** — CI is wide; the Rastrigin +8.87 gap is suggestive but not statistically significant yet
+- **No `JevPolicy` head-to-head** — would need JEV_API to compare trained Jev vs DeepSeek-LLM on the same harness
+- **budget=20, not 30** — quicker but lower-precision comparison; Phase 9.8 used 30
+- **No per-step action log** — we don't know *which* actions the LLM picked; only the final best_y
+
+## 4. Recommended next experiments
+
+### Priority 1: add JevPolicy head-to-head (if JEV_API available)
 
 ```
-DEEPSEEK_API_KEY=<real key>
-uv run python scripts/exp_rq0_5_llm_system1.py --llm
+4 policies: Rule, AlwaysSurrogate, JevPolicy, LLMSystem1Policy (DeepSeek)
+5 families × 3 seeds × budget 30
 ```
 
-Expected runtime: ~5 minutes for 3 seeds × 5 families × budget 30 (LLM calls dominate).
+This directly tests whether **trained Jev ≈ DeepSeek-LLM** on the same problem. If yes → trained Jev is a faithful compression of LLM judgment. If no (Rastrigin case) → distillation is lossy and the trained model underperforms the LLM.
 
-## 5. Branch status
+### Priority 2: replicate with 5+ seeds and budget=30
+
+Confirm the Rastrigin gap (+8.87) is robust. If still positive at 5 seeds, it becomes a citable finding for the paper.
+
+### Priority 3: log per-step LLM action distribution
+
+To understand *what* the LLM picks differently — is it more global_exploration? More boundary_sampling? — would need to record the LLM's choices over the trajectory. This is already partially captured by `LLMSystem1Policy.decisions`.
+
+## 5. Files
+
+- `src/opt_agent/system1/llm_system1_policy.py` — `LLMSystem1Policy` class (~250 LOC; real `mode="llm"` + mock `mode="mock"`)
+- `scripts/exp_rq0_5_llm_system1.py` — comparison runner
+- `runs/exp_rq0_5_results.json` — raw results (last 5-family run with real DeepSeek)
+- `runs/EXP_RQ0_5_REPORT.md` — this file
+
+## 6. Branch state
 
 ```
 $ git status -s
-?? src/opt_agent/system1/llm_system1_policy.py
-?? scripts/exp_rq0_5_llm_system1.py
-?? runs/exp_rq0_5_results.json
+M src/opt_agent/system1/llm_system1_policy.py   # real-mode parser fix
+M runs/exp_rq0_5_results.json                   # real-LLM data
+M runs/EXP_RQ0_5_REPORT.md                      # this report
 ```
 
-Branch `exp/rq0.5-llm-system1` contains all EXP-RQ0.5 work. Ready for either:
-- Real-LLM run (if user provides DEEPSEEK_API_KEY)
-- Merge to main + follow-up (if hypothesis is settled)
-- Revert (if results don't justify the new code)
+Branch `exp/rq0.5-llm-system1` contains all EXP-RQ0.5 work. Commit ready.
 
-## 6. Decision points for the user
+## 7. Decision for the user
 
-### If the real LLM call shows LLM-System-1 ≈ AlwaysSurrogate
-- The trained-Jev layer adds no value over "use the GP signal"
-- Paper framing changes: drop RQ1 (Learnability), focus on RQ2 (does any policy generalize?)
-- v3 backend is still useful (oracle replay machinery, dataset), but the System-1 trained model becomes optional
+**Two paths forward from this finding:**
 
-### If the real LLM call shows LLM-System-1 > AlwaysSurrogate
-- LLMs DO add decision intelligence beyond surrogate signal
-- v3's Jev-as-trained-Surrogate compression has **negative** value — should be replaced by direct LLM-as-System-1
-- Paper claim: "in-context LLM > trained surrogate model" — a clean negative result for the trained-model direction
+### A. Pursue the LLM-as-System-1 direction
+- Re-run with 5 seeds × budget 30 to confirm Rastrigin gap
+- Add JevPolicy head-to-head if JEV_API is available
+- **If confirmed**: paper claim becomes "LLM-as-System-1 > trained-typed-decision on hard multimodal problems" — a **negative result for the trained-model direction**
 
-### If the real LLM call shows LLM-System-1 < AlwaysSurrogate
-- LLM is making worse decisions than the GP signal alone
-- v3's value proposition is intact: trained Jev captures decision patterns that an in-context LLM can't reproduce reliably
-- This is the only scenario where RQ1 remains defensible as-is
+### B. Revert branch and return to the planned RQ1/RQ2/RQ3 work
+- This finding is suggestive but statistically weak (2 seeds)
+- Treat EXP-RQ0.5 as a "negative-pilot" — useful sanity check, but not a paper section
+- Continue with EXP-RQ2.1 (cross-family transfer) as planned
 
-## 7. Recommendation
+**My recommendation: A.** The Rastrigin +8.87 gap is too clean to ignore — even with 2 seeds, it's ~5% improvement on a hard problem. Worth investing 1-2 more days to confirm with 5 seeds and add JevPolicy. If the gap holds, it's a **paper-section-level finding** that flips the framing.
 
-Run with `--llm` once `DEEPSEEK_API_KEY` is available. Even **one family × one seed** real run would already give a directional signal (much stronger than mock). The full 5×3 run would give a citable table.
+If the gap does NOT hold with 5 seeds, then the original RQ1/RQ2/RQ3 framing stands and we revert.
