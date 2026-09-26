@@ -51,6 +51,10 @@ class RunResult:
     n_input_tokens: int = 0
     n_output_tokens: int = 0
     action_counts: dict[str, int] = field(default_factory=dict)
+    # Step-level log (per codex round-4 review item #1):
+    # action_id, params, n_new_samples, current_best, latency_s,
+    # model (for LLM/Jev), is_fitted (for evaluating state features).
+    steps: list[dict] = field(default_factory=list)
 
 
 class AlwaysSurrogatePolicy:
@@ -98,10 +102,36 @@ def run_one(policy_factory, family: str, seed: int, budget: int,
         n_input_tokens=getattr(policy, "total_input_tokens", 0),
         n_output_tokens=getattr(policy, "total_output_tokens", 0),
     )
-    # Per-step action distribution.
-    for step in traj.steps:
+    # Per-step log (per codex round-4).
+    history = backend.get_history()
+    decisions = getattr(policy, "decisions", [])
+    for i, step in enumerate(traj.steps):
         action_id = step.action.type.value
         result.action_counts[action_id] = result.action_counts.get(action_id, 0) + 1
+        cur_best = float(history.objectives[:, 0].max().item())
+        # Capture per-step state features + policy decision info.
+        probs = confidence = model = latency_s = None
+        if i < len(decisions):
+            d = decisions[i]
+            probs = dict(d.probabilities) if hasattr(d, "probabilities") else None
+            confidence = float(d.confidence) if hasattr(d, "confidence") else None
+            model = str(d.model) if hasattr(d, "model") else None
+            latency_s = float(d.latency) if hasattr(d, "latency") else None
+        result.steps.append({
+            "step": i,
+            "action_id": action_id,
+            "action_params": dict(step.action.params),
+            "n_new_samples": int(step.result.n_new_samples),
+            "n_model_fits": int(step.result.n_model_fits),
+            "current_best": cur_best,
+            "should_stop": bool(step.result.should_stop),
+            "is_fitted_after": bool(backend.is_fitted),
+            "n_samples_after": int(len(history)),
+            "latency_s": latency_s,
+            "probs": probs,
+            "confidence": confidence,
+            "model": model,
+        })
     return result
 
 
@@ -217,7 +247,8 @@ def main() -> int:
              "n_calls": r.n_calls,
              "n_input_tokens": r.n_input_tokens,
              "n_output_tokens": r.n_output_tokens,
-             "action_counts": r.action_counts}
+             "action_counts": r.action_counts,
+             "steps": r.steps}
             for r in results
         ],
         "summary_per_policy_family": agg,
