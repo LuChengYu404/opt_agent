@@ -1,0 +1,541 @@
+{
+  "config": {
+    "families": [
+      "Branin",
+      "Hartmann",
+      "Ackley",
+      "SixHumpCamel",
+      "Rastrigin"
+    ],
+    "seeds": 3,
+    "budget": 30,
+    "llm_mode": "mock",
+    "api_key_present": false
+  },
+  "raw": {
+    "RulePolicy": [
+      {
+        "family": "Branin",
+        "seed": 0,
+        "best_y": -1.6863752547656183,
+        "n_steps": 13,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 1,
+        "best_y": -1.8668825826466389,
+        "n_steps": 15,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 2,
+        "best_y": -3.5572618887069245,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 0,
+        "best_y": 1.868532050067167,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 1,
+        "best_y": 1.866811279435455,
+        "n_steps": 13,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 2,
+        "best_y": 1.866811279435455,
+        "n_steps": 13,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 0,
+        "best_y": -20.528795152511606,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 1,
+        "best_y": -20.338747080921394,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 2,
+        "best_y": -20.338747080921394,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 0,
+        "best_y": 0.9930007891141641,
+        "n_steps": 13,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 1,
+        "best_y": 0.18080497371649973,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 2,
+        "best_y": 0.9930007891141641,
+        "n_steps": 16,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 0,
+        "best_y": -128.93291342134216,
+        "n_steps": 14,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 1,
+        "best_y": -126.40001595930676,
+        "n_steps": 17,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 2,
+        "best_y": -118.72730654357555,
+        "n_steps": 17,
+        "termination_reason": "stop",
+        "n_policy_calls": 0,
+        "n_llm_tokens": 0
+      }
+    ],
+    "AlwaysSurrogate": [
+      {
+        "family": "Branin",
+        "seed": 0,
+        "best_y": -0.4004572651117222,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 25,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 1,
+        "best_y": -0.3982964992428908,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 50,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 2,
+        "best_y": -0.4462091855585548,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 75,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 0,
+        "best_y": 2.59219563232677,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 100,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 1,
+        "best_y": 2.7285245109273113,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 125,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 2,
+        "best_y": 3.2259831432106596,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 150,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 0,
+        "best_y": -20.50180819994382,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 175,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 1,
+        "best_y": -20.34250244625584,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 200,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 2,
+        "best_y": -20.004437300386364,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 225,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 0,
+        "best_y": 1.0217754620333457,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 250,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 1,
+        "best_y": 0.5902793123472625,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 275,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 2,
+        "best_y": 1.0261253734524656,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 300,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 0,
+        "best_y": -128.93291342134216,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 325,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 1,
+        "best_y": -136.5667394183376,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 350,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 2,
+        "best_y": -146.09613207471907,
+        "n_steps": 25,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 375,
+        "n_llm_tokens": 0
+      }
+    ],
+    "LLMSystem1Policy": [
+      {
+        "family": "Branin",
+        "seed": 0,
+        "best_y": -1.6863752547656183,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 13,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 1,
+        "best_y": -1.6863752547656183,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 26,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Branin",
+        "seed": 2,
+        "best_y": -1.6863752547656183,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 39,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 0,
+        "best_y": 1.866811279435455,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 52,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 1,
+        "best_y": 1.866811279435455,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 65,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Hartmann",
+        "seed": 2,
+        "best_y": 1.866811279435455,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 78,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 0,
+        "best_y": -20.244609518703506,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 91,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 1,
+        "best_y": -20.244609518703506,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 104,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Ackley",
+        "seed": 2,
+        "best_y": -20.244609518703506,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 117,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 0,
+        "best_y": 0.9930007891141641,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 130,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 1,
+        "best_y": 0.9930007891141641,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 143,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "SixHumpCamel",
+        "seed": 2,
+        "best_y": 0.9930007891141641,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 156,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 0,
+        "best_y": -112.61527649235586,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 169,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 1,
+        "best_y": -112.61527649235586,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 182,
+        "n_llm_tokens": 0
+      },
+      {
+        "family": "Rastrigin",
+        "seed": 2,
+        "best_y": -112.61527649235586,
+        "n_steps": 13,
+        "termination_reason": "budget_exhausted",
+        "n_policy_calls": 195,
+        "n_llm_tokens": 0
+      }
+    ]
+  },
+  "summary": {
+    "RulePolicy": {
+      "Branin": {
+        "n_seeds": 3,
+        "mean_best_y": -2.3701732420397272,
+        "median_best_y": -1.8668825826466389,
+        "min_best_y": -3.5572618887069245,
+        "max_best_y": -1.6863752547656183
+      },
+      "Hartmann": {
+        "n_seeds": 3,
+        "mean_best_y": 1.8673848696460258,
+        "median_best_y": 1.866811279435455,
+        "min_best_y": 1.866811279435455,
+        "max_best_y": 1.868532050067167
+      },
+      "Ackley": {
+        "n_seeds": 3,
+        "mean_best_y": -20.402096438118132,
+        "median_best_y": -20.338747080921394,
+        "min_best_y": -20.528795152511606,
+        "max_best_y": -20.338747080921394
+      },
+      "SixHumpCamel": {
+        "n_seeds": 3,
+        "mean_best_y": 0.722268850648276,
+        "median_best_y": 0.9930007891141641,
+        "min_best_y": 0.18080497371649973,
+        "max_best_y": 0.9930007891141641
+      },
+      "Rastrigin": {
+        "n_seeds": 3,
+        "mean_best_y": -124.68674530807482,
+        "median_best_y": -126.40001595930676,
+        "min_best_y": -128.93291342134216,
+        "max_best_y": -118.72730654357555
+      }
+    },
+    "AlwaysSurrogate": {
+      "Branin": {
+        "n_seeds": 3,
+        "mean_best_y": -0.4149876499710559,
+        "median_best_y": -0.4004572651117222,
+        "min_best_y": -0.4462091855585548,
+        "max_best_y": -0.3982964992428908
+      },
+      "Hartmann": {
+        "n_seeds": 3,
+        "mean_best_y": 2.8489010954882468,
+        "median_best_y": 2.7285245109273113,
+        "min_best_y": 2.59219563232677,
+        "max_best_y": 3.2259831432106596
+      },
+      "Ackley": {
+        "n_seeds": 3,
+        "mean_best_y": -20.28291598219534,
+        "median_best_y": -20.34250244625584,
+        "min_best_y": -20.50180819994382,
+        "max_best_y": -20.004437300386364
+      },
+      "SixHumpCamel": {
+        "n_seeds": 3,
+        "mean_best_y": 0.8793933826110246,
+        "median_best_y": 1.0217754620333457,
+        "min_best_y": 0.5902793123472625,
+        "max_best_y": 1.0261253734524656
+      },
+      "Rastrigin": {
+        "n_seeds": 3,
+        "mean_best_y": -137.19859497146626,
+        "median_best_y": -136.5667394183376,
+        "min_best_y": -146.09613207471907,
+        "max_best_y": -128.93291342134216
+      }
+    },
+    "LLMSystem1Policy": {
+      "Branin": {
+        "n_seeds": 3,
+        "mean_best_y": -1.6863752547656183,
+        "median_best_y": -1.6863752547656183,
+        "min_best_y": -1.6863752547656183,
+        "max_best_y": -1.6863752547656183
+      },
+      "Hartmann": {
+        "n_seeds": 3,
+        "mean_best_y": 1.8668112794354552,
+        "median_best_y": 1.866811279435455,
+        "min_best_y": 1.866811279435455,
+        "max_best_y": 1.866811279435455
+      },
+      "Ackley": {
+        "n_seeds": 3,
+        "mean_best_y": -20.244609518703506,
+        "median_best_y": -20.244609518703506,
+        "min_best_y": -20.244609518703506,
+        "max_best_y": -20.244609518703506
+      },
+      "SixHumpCamel": {
+        "n_seeds": 3,
+        "mean_best_y": 0.9930007891141641,
+        "median_best_y": 0.9930007891141641,
+        "min_best_y": 0.9930007891141641,
+        "max_best_y": 0.9930007891141641
+      },
+      "Rastrigin": {
+        "n_seeds": 3,
+        "mean_best_y": -112.61527649235586,
+        "median_best_y": -112.61527649235586,
+        "min_best_y": -112.61527649235586,
+        "max_best_y": -112.61527649235586
+      }
+    }
+  }
+}
