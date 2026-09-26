@@ -17,6 +17,11 @@ from opt_agent.system1.typed_decision import (  # noqa: E402
     gold_probs_to_target_tensor,
     state_to_text,
 )
+from opt_agent.system1.typed_decision_policy import TypedDecisionPolicy  # noqa: E402
+from opt_agent.state import (  # noqa: E402
+    HistoryState, OptimizationProgress, OptimizationState, ResourceState,
+    SamplingState, SurrogateState,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -159,3 +164,27 @@ def test_jev_style_is_eval_mode_by_default_after_init() -> None:
     # No .eval() called — decide_distribution must still work.
     probs, _ = model.decide_distribution(state, ["stop", "global_exploration"])
     assert pytest.approx(sum(probs.values()), abs=1e-5) == 1.0
+
+
+def test_trained_policy_uses_valid_parameterized_candidate() -> None:
+    class FakeModel:
+        def decide_distribution(self, _state, candidates):
+            assert "retrain_surrogate" not in candidates
+            return ({c: (1.0 if c == "boundary_sampling" else 0.0)
+                     for c in candidates}, 1.0)
+
+    policy = object.__new__(TypedDecisionPolicy)
+    policy.model = FakeModel()
+    policy.seed = 17
+    state = OptimizationState(
+        sampling=SamplingState(5, 2, 0.1, 0.2),
+        surrogate=SurrogateState(True, 0.1, 0.2, 0.3),
+        optimization=OptimizationProgress(1.0, 1.0, 0.0, 0),
+        resource=ResourceState(9, 10, 1, 0.1),
+        history=HistoryState(None),
+    )
+    decision = policy.decide(state)
+    assert decision.action.type.value == "boundary_sampling"
+    assert decision.action.params["n_samples"] == 1
+    assert decision.action.params["seed"] == 22
+    assert "retrain_surrogate" not in decision.probabilities

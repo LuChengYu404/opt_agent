@@ -22,7 +22,8 @@ from typing import Mapping, Sequence
 
 import torch
 
-from opt_agent.actions import ActionType, OptimizationAction
+from opt_agent.actions import OptimizationAction
+from opt_agent.actions.factory import candidate_actions_for_state
 from opt_agent.state import OptimizationState
 from opt_agent.system1.typed_decision import (
     JevStyleSystem1,
@@ -56,11 +57,13 @@ class TypedDecisionPolicy:
         model: JevStyleSystem1,
         config: TypedDecisionConfig,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
+        seed: int = 0,
     ) -> None:
         self.model = model.to(device)
         self.model.eval()
         self.config = config
         self.device = device
+        self.seed = seed
 
     @classmethod
     def from_checkpoint(
@@ -68,6 +71,7 @@ class TypedDecisionPolicy:
         path: str | Path,
         *,
         device: str | None = None,
+        seed: int = 0,
     ) -> "TypedDecisionPolicy":
         path = Path(path)
         ckpt = torch.load(path, map_location="cpu", weights_only=False)
@@ -76,21 +80,20 @@ class TypedDecisionPolicy:
         model.load_state_dict(ckpt["model_state_dict"])
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        return cls(model, config, device=device)
+        return cls(model, config, device=device, seed=seed)
 
     def _candidate_pool(self, state: OptimizationState) -> list[str]:
-        """Return the candidate action ids the state permits, in the
-        order used at training time (the factory's full vocabulary)."""
-        from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
-        return [c[0] for c in ALL_CANDIDATE_SPECS]
+        """Return only actions that can execute in the current state."""
+        return list(candidate_actions_for_state(state, seed=self.seed))
 
     def decide(self, state: OptimizationState) -> TypedDecisionOutput:
-        candidates = self._candidate_pool(state)
+        available = candidate_actions_for_state(state, seed=self.seed)
+        candidates = list(available)
         probs, confidence = self.model.decide_distribution(state, candidates)
-        # Argmax → chosen action. OptimizationAction requires an
-        # ActionType enum (not a raw string).
+        # Reuse the factory action so required parameters and budget caps
+        # survive the argmax decision.
         chosen_id = max(probs, key=probs.get)
-        action = OptimizationAction(ActionType(chosen_id))
+        action = available[chosen_id]
         return TypedDecisionOutput(
             action=action, probabilities=probs, confidence=confidence,
         )

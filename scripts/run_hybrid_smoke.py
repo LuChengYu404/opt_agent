@@ -225,6 +225,7 @@ def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
     """
     if system1_kind == "typed-decision":
         s1 = _get_typed_decision_policy(system1_checkpoint)
+        s1.seed = seed
     else:
         agent = (laya_agent if laya_agent is not None
                  else _FakeLayaSurrogateAcquisition())
