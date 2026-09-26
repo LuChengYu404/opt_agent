@@ -730,3 +730,108 @@ remains unverified. A valid performance test must first make the router use
 the trained System-1 on a measurable fraction of decisions, then compare
 paired outcomes on held-out seeds. The earlier raw report is retained for
 audit and must not be cited as a learned-model improvement.
+
+## EXP-RQ1.2: counterfactual oracle replay (2026-09-26)
+
+The `oracle_test_from_record` pipeline (`scripts/validate_phase8_6b.py`)
+runs end-to-end on the Phase 8.6B JSONL datasets. The earlier "bash
+classifier blocked" note was a tooling artifact — the code was never
+actually invoked before this run.
+
+Two versions were produced (treated as configuration sensitivity, **not**
+independent replications; see methodology caveat below):
+
+| Version | Dataset | Records | Families | Horizon |
+| --- | --- | --- | --- | --- |
+| 3-family | `phase8_6b_{h1,h3,hfull}_10seed.jsonl` | 226 each | Branin/Hartmann/Ackley | 3 |
+| 5-family canonical | `phase8_6d_h3_10seed_5family.jsonl` | 354 | + SixHumpCamel/Rastrigin | 3 |
+
+Naming correction: the original 5-family file was named `…hfull…` but
+generated with `horizon=3`, not `horizon=30`. Renamed to `…h3…` to match
+the actual configuration. True hfull (horizon=30) is **not in scope**
+for RQ1; cost ≈ 90 minutes.
+
+### Headline result (5-family canonical)
+
+| Gate | Result |
+| --- | --- |
+| 2: stability (top_action_share ≥ 0.6) | FAIL (**5/15** buckets pass) |
+| 3: aggregate_mass | **PASS** (mean = 1.124; seed-clustered 95% CI = [0.695, 1.722], n_seeds=50) |
+| 4a: stop-gain CI lo > 0 | **PASS 5/5** |
+| 4b: uniform-gain CI lo > 0 | PASS 3/5 (hartmann, rastrigin, sixhumpcamel) |
+| 4c: behavior-gain CI lo > 0 | PASS 1/5 (rastrigin only) |
+
+### Per-family Gate 4 (5-family canonical)
+
+| Family | behavior CI lo | uniform CI lo | **stop CI lo** |
+| --- | --- | --- | --- |
+| ackley (10D noisy) | -0.498 | -0.855 | +1.084 |
+| branin (2D smooth) | -0.011 | -0.004 | +0.093 |
+| hartmann (6D) | -0.093 | +0.203 | +1.493 |
+| rastrigin (10D multimodal) | +0.032 | +0.136 | +0.840 |
+| sixhumpcamel (2D) | -0.004 | +0.008 | +0.044 |
+
+Bold cells have CI lower bound > 0 (statistically detectable positive
+mean normalized terminal gain).
+
+### Three findings (per `gpt-5.6-sol` review 2026-09-26, exploratory)
+
+> **C1.** Oracle-labeled first actions produced positive mean normalized
+> terminal gain over STOP on the five evaluated BOCoDe families. CI
+> lower bound > 0 on 5/5. **Not** "universal" — only across the
+> evaluated families; no claim about problems generally.
+
+> **C2.** Per-family gain estimates and interval conclusions varied
+> across the five families. Rastrigin was the only family with CI
+> lower bound > 0 against all three baselines (STOP, uniform, behavior).
+> Hartmann passed STOP and uniform. Branin, SixHumpCamel, and Ackley
+> passed STOP only. **Not** a "dimension-dependent" claim — that would
+> require a crossed design (same problem at multiple dimensions),
+> which the current allowlist does not support.
+
+> **C3.** Oracle-label argmax actions were heterogeneous across seeds
+> within coarse (problem, phase) strata. Early-phase top-label shares
+> ranged 0.20 (rastrigin/early) to 0.70 (hartmann/early). **Not** a
+> "policy multimodality" claim — could reflect different states across
+> seeds. Causal interpretation deferred.
+
+### Branin: detectable disadvantage (corrected framing)
+
+> On Branin, the oracle-labeled first action had a statistically
+> detectable but **small in magnitude on the normalized-gain scale**
+> disadvantage relative to behavior: mean gain −0.00494, bootstrap 95%
+> CI [−0.01065, −0.00035]. The CI excludes zero, so the effect is
+> detectable. Practical importance is unclear; a smallest-meaningful-δ
+> test would require pre-specifying δ. **Not** "no measurable difference."
+
+### Caveats
+
+- All three findings are **exploratory**; per-family intervals are
+  **unadjusted** for multiple comparisons.
+- 3-family and 5-family used different generator configurations and
+  are **not** independent replications; treat as configuration
+  sensitivity, not as horizon-only sensitivity (other generator
+  parameters may have differed).
+- For fewer than 5 seed clusters, Gate 3's point-estimate fallback is
+  a smoke-test result, not an inferential pass.
+
+### Code revisions applied (post-`gpt-5.6-sol` review)
+
+- `validation.py`: `MassGateResult.seed_clustered_ci95` field added;
+  `aggregate_mass()` now bootstraps over per-seed adjusted_lift when
+  n_seeds ≥ 5 and uses CI lower bound > 0 as gate criterion.
+- `validate_phase8_6b.py`: report includes `gate3.seed_clustered_ci95`.
+- Tests: 16/16 Gate tests pass; full suite 364/364.
+
+### Open follow-ups
+
+1. **Replication** (codex priority): expand to 20+ seeds; report
+   seeds 10–29 as confirmatory (separate from seeds 0–9 exploratory).
+2. Gate 2 threshold sensitivity + within-state rollout diagnostics
+   (strengthens C3).
+3. EXP-RQ2.1 (cross-family transfer; 5-fold leave-one-family-out).
+4. EXP-RQ3.0 (Level 3 LLM baseline).
+5. Commit the 5-family generator driver (current state: `/tmp/gen_5family.py`).
+
+Full report: `runs/EXP_RQ1_2_REPORT.md`. Per-dataset JSON in
+`runs/exp_rq1_2_{h1,h3,hfull,h3_5family}_report.json`.

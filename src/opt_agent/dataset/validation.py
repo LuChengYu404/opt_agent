@@ -93,6 +93,9 @@ class MassGateResult:
     raw_mean: float
     adjusted_lift_mean: float
     pass_: bool
+    seed_clustered_ci95: tuple[float, float] | None = (
+        None  # bootstrap 95% CI over per-seed adjusted_lift; None if < 5 seeds
+    )
 
 
 def _lift(probs: dict[str, float]) -> tuple[float, float]:
@@ -140,13 +143,43 @@ def aggregate_mass(records: list[DecisionRecord]) -> MassGateResult:
                               pass_=False)
     raw_mean = statistics.fmean(r["raw"] for r in seed_rows)
     adj_mean = statistics.fmean(r["adjusted_lift"] for r in seed_rows)
-    # Smoke gate: per-seed mean adjusted lift must be > 0 in early phase.
-    # (Strict CI-based check would be added when we have ≥ 10 seeds.)
-    pass_ = adj_mean > 0.0
+
+    # Seed-clustered bootstrap CI (per codex review 2026-09-26): when ≥ 5
+    # seeds are available, gate criterion is the CI lower bound > 0 instead
+    # of the point estimate. Fewer seeds fall back to point estimate (kept
+    # for backward compat with single-seed smoke tests).
+    seed_clustered_ci95: tuple[float, float] | None = None
+    n_seeds = len(seed_rows)
+    if n_seeds >= 5:
+        seed_lifts = [r["adjusted_lift"] for r in seed_rows]
+        seed_clustered_ci95 = _bootstrap_ci_mean(seed_lifts, repetitions=2000, seed=0)
+        pass_ = seed_clustered_ci95[0] > 0.0
+    else:
+        pass_ = adj_mean > 0.0
+
     return MassGateResult(
         seed_rows=seed_rows, raw_mean=raw_mean,
-        adjusted_lift_mean=adj_mean, pass_=pass_,
+        adjusted_lift_mean=adj_mean, seed_clustered_ci95=seed_clustered_ci95,
+        pass_=pass_,
     )
+
+
+def _bootstrap_ci_mean(
+    values: list[float], *, repetitions: int = 2000, seed: int = 0,
+) -> tuple[float, float]:
+    """Bootstrap 95% CI for the mean of `values`. Pure-Python; no scipy."""
+    import random
+    if not values:
+        return (0.0, 0.0)
+    rng = random.Random(seed)
+    n = len(values)
+    means = sorted(
+        statistics.fmean(values[rng.randrange(n)] for _ in range(n))
+        for _ in range(repetitions)
+    )
+    lo = means[int(0.025 * repetitions)]
+    hi = means[int(0.975 * repetitions)]
+    return (lo, hi)
 
 
 # ---------------------------------------------------------------------------

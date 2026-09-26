@@ -110,6 +110,10 @@ def main() -> int:
         "gate3": {
             "pass": gate3.pass_,
             "adjusted_lift_mean": gate3.adjusted_lift_mean,
+            "seed_clustered_ci95": (
+                list(gate3.seed_clustered_ci95)
+                if gate3.seed_clustered_ci95 is not None else None
+            ),
             "seed_rows": gate3.seed_rows,
         },
         "gate4": {
