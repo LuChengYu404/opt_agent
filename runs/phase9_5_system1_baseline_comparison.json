@@ -1,0 +1,454 @@
+{
+  "global_equivalence": [
+    {
+      "problem": "Branin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 20
+    },
+    {
+      "problem": "Branin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 21
+    },
+    {
+      "problem": "Branin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 22
+    },
+    {
+      "problem": "Branin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 23
+    },
+    {
+      "problem": "Branin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 24
+    },
+    {
+      "problem": "Ackley",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 20
+    },
+    {
+      "problem": "Ackley",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 21
+    },
+    {
+      "problem": "Ackley",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 22
+    },
+    {
+      "problem": "Ackley",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 23
+    },
+    {
+      "problem": "Ackley",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 24
+    },
+    {
+      "problem": "Hartmann",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 20
+    },
+    {
+      "problem": "Hartmann",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 21
+    },
+    {
+      "problem": "Hartmann",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 22
+    },
+    {
+      "problem": "Hartmann",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 23
+    },
+    {
+      "problem": "Hartmann",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 24
+    },
+    {
+      "problem": "SixHumpCamel",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 20
+    },
+    {
+      "problem": "SixHumpCamel",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 21
+    },
+    {
+      "problem": "SixHumpCamel",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 22
+    },
+    {
+      "problem": "SixHumpCamel",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 23
+    },
+    {
+      "problem": "SixHumpCamel",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 24
+    },
+    {
+      "problem": "Rastrigin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 20
+    },
+    {
+      "problem": "Rastrigin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 21
+    },
+    {
+      "problem": "Rastrigin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 22
+    },
+    {
+      "problem": "Rastrigin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 23
+    },
+    {
+      "problem": "Rastrigin",
+      "same_actions": true,
+      "same_terminal": true,
+      "seed": 24
+    }
+  ],
+  "sources": [
+    "runs/phase9_5_jev_zero_shot_5x5_threads1.json",
+    "runs/phase9_5_laya_zero_shot_5x5.json",
+    "runs/phase9_5_trained_system1_5x5.json"
+  ],
+  "summary": {
+    "Ackley": {
+      "jev": {
+        "bootstrap95_paired_gain": [
+          -0.028369798194758288,
+          0.16545471544027635
+        ],
+        "losses": 1,
+        "mean_paired_gain_vs_rule": 0.04569497241517269,
+        "mean_terminal_best": -19.969927082649583,
+        "ties": 3,
+        "wins": 1
+      },
+      "laya": {
+        "bootstrap95_paired_gain": [
+          -0.2752324380438395,
+          1.088231969084579
+        ],
+        "losses": 3,
+        "mean_paired_gain_vs_rule": 0.40649976552036976,
+        "mean_terminal_best": -19.609122289544388,
+        "ties": 0,
+        "wins": 2
+      },
+      "no_fit_rollout": {
+        "bootstrap95_paired_gain": [
+          -0.2752324380438395,
+          1.088231969084579
+        ],
+        "losses": 3,
+        "mean_paired_gain_vs_rule": 0.40649976552036976,
+        "mean_terminal_best": -19.609122289544388,
+        "ties": 0,
+        "wins": 2
+      },
+      "rule_full_budget": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": -20.015622055064757,
+        "ties": 5,
+        "wins": 0
+      },
+      "rule_imitation": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": -20.015622055064757,
+        "ties": 5,
+        "wins": 0
+      }
+    },
+    "Branin": {
+      "jev": {
+        "bootstrap95_paired_gain": [
+          -1.6503728487918334,
+          -0.7663406169646872
+        ],
+        "losses": 5,
+        "mean_paired_gain_vs_rule": -1.2083567328782603,
+        "mean_terminal_best": -1.6525419654756763,
+        "ties": 0,
+        "wins": 0
+      },
+      "laya": {
+        "bootstrap95_paired_gain": [
+          -14.523949087731921,
+          -4.594371528322599
+        ],
+        "losses": 5,
+        "mean_paired_gain_vs_rule": -8.838769091615116,
+        "mean_terminal_best": -9.282954324212534,
+        "ties": 0,
+        "wins": 0
+      },
+      "no_fit_rollout": {
+        "bootstrap95_paired_gain": [
+          -14.523949087731921,
+          -4.594371528322599
+        ],
+        "losses": 5,
+        "mean_paired_gain_vs_rule": -8.838769091615116,
+        "mean_terminal_best": -9.282954324212534,
+        "ties": 0,
+        "wins": 0
+      },
+      "rule_full_budget": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": -0.44418523259741605,
+        "ties": 5,
+        "wins": 0
+      },
+      "rule_imitation": {
+        "bootstrap95_paired_gain": [
+          -0.5872152998239819,
+          0.0
+        ],
+        "losses": 1,
+        "mean_paired_gain_vs_rule": -0.19573843327466064,
+        "mean_terminal_best": -0.6399236658720767,
+        "ties": 4,
+        "wins": 0
+      }
+    },
+    "Hartmann": {
+      "jev": {
+        "bootstrap95_paired_gain": [
+          -1.0890377140374616,
+          -0.027470342471328024
+        ],
+        "losses": 3,
+        "mean_paired_gain_vs_rule": -0.5582540282543949,
+        "mean_terminal_best": 1.607814623597422,
+        "ties": 1,
+        "wins": 1
+      },
+      "laya": {
+        "bootstrap95_paired_gain": [
+          -1.6804535421251896,
+          -0.5148291196643229
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -1.1841067777856193,
+        "mean_terminal_best": 0.9819618740661976,
+        "ties": 0,
+        "wins": 1
+      },
+      "no_fit_rollout": {
+        "bootstrap95_paired_gain": [
+          -1.6804535421251896,
+          -0.5148291196643229
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -1.1841067777856193,
+        "mean_terminal_best": 0.9819618740661976,
+        "ties": 0,
+        "wins": 1
+      },
+      "rule_full_budget": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": 2.166068651851817,
+        "ties": 5,
+        "wins": 0
+      },
+      "rule_imitation": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": 2.166068651851817,
+        "ties": 5,
+        "wins": 0
+      }
+    },
+    "Rastrigin": {
+      "jev": {
+        "bootstrap95_paired_gain": [
+          -18.32918289361283,
+          0.0
+        ],
+        "losses": 1,
+        "mean_paired_gain_vs_rule": -6.109727631204277,
+        "mean_terminal_best": -117.1514321064964,
+        "ties": 4,
+        "wins": 0
+      },
+      "laya": {
+        "bootstrap95_paired_gain": [
+          -43.12750607938454,
+          1.473286168361642
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -18.953741901369607,
+        "mean_terminal_best": -129.99544637666173,
+        "ties": 0,
+        "wins": 1
+      },
+      "no_fit_rollout": {
+        "bootstrap95_paired_gain": [
+          -39.83203542218116,
+          2.9159675230098343
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -14.670577458026585,
+        "mean_terminal_best": -125.71228193331869,
+        "ties": 0,
+        "wins": 1
+      },
+      "rule_full_budget": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": -111.04170447529211,
+        "ties": 5,
+        "wins": 0
+      },
+      "rule_imitation": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": -111.04170447529211,
+        "ties": 5,
+        "wins": 0
+      }
+    },
+    "SixHumpCamel": {
+      "jev": {
+        "bootstrap95_paired_gain": [
+          -0.6700232409646693,
+          0.35351864735265454
+        ],
+        "losses": 3,
+        "mean_paired_gain_vs_rule": -0.20490180228191351,
+        "mean_terminal_best": 0.1467125340996069,
+        "ties": 1,
+        "wins": 1
+      },
+      "laya": {
+        "bootstrap95_paired_gain": [
+          -2.7801095098952584,
+          -0.500806155767216
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -1.43601348603934,
+        "mean_terminal_best": -1.0843991496578198,
+        "ties": 1,
+        "wins": 0
+      },
+      "no_fit_rollout": {
+        "bootstrap95_paired_gain": [
+          -2.7801095098952584,
+          -0.500806155767216
+        ],
+        "losses": 4,
+        "mean_paired_gain_vs_rule": -1.43601348603934,
+        "mean_terminal_best": -1.0843991496578198,
+        "ties": 1,
+        "wins": 0
+      },
+      "rule_full_budget": {
+        "bootstrap95_paired_gain": [
+          0.0,
+          0.0
+        ],
+        "losses": 0,
+        "mean_paired_gain_vs_rule": 0.0,
+        "mean_terminal_best": 0.3516143363815204,
+        "ties": 5,
+        "wins": 0
+      },
+      "rule_imitation": {
+        "bootstrap95_paired_gain": [
+          -0.5232267444891694,
+          0.0
+        ],
+        "losses": 2,
+        "mean_paired_gain_vs_rule": -0.24771194947884556,
+        "mean_terminal_best": 0.10390238690267486,
+        "ties": 3,
+        "wins": 0
+      }
+    },
+    "overall": {
+      "jev_calls": 325,
+      "jev_global_equivalent_pairs": 25,
+      "jev_input_tokens": 219301,
+      "jev_mean_api_latency_s": 0.3213324110711423,
+      "laya_error_guided_count": 600,
+      "laya_uncertainty_count": 25
+    }
+  }
+}

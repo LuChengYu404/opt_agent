@@ -1,0 +1,3423 @@
+{
+  "metadata": {
+    "dataset": "runs/phase8_6b_h3_10seed.jsonl",
+    "n_records_total": 226,
+    "n_records_sampled": 5,
+    "sample_seed": 0,
+    "utility_variants": [
+      "original",
+      "no_stop_pen",
+      "delta_best"
+    ],
+    "horizon_levels": [
+      "1",
+      "3",
+      "5",
+      "10",
+      "full"
+    ],
+    "continuation_policy": "rule",
+    "oracle_replicates": 3,
+    "oracle_max_actions": 50
+  },
+  "per_record_config": [
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "original_h1",
+      "utility_variant": "original",
+      "horizon": 1,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12582539022526273,
+        "local_exploitation": 0.13009025610983777,
+        "uncertainty_sampling": 0.1279400533043687,
+        "error_guided_sampling": 0.1279400533043687,
+        "boundary_sampling": 0.12582539022526273,
+        "surrogate_acquisition": 0.1279400533043687,
+        "retrain_surrogate": 0.132276595934053,
+        "stop": 0.10216220759247764
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "original_h3",
+      "utility_variant": "original",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12401826079166173,
+        "local_exploitation": 0.12822187381895114,
+        "uncertainty_sampling": 0.12610255265645587,
+        "error_guided_sampling": 0.12610255265645587,
+        "boundary_sampling": 0.12401826079166173,
+        "surrogate_acquisition": 0.12610255265645587,
+        "retrain_surrogate": 0.1303768129930979,
+        "stop": 0.11505713363525993
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "original_h5",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "local_exploitation",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12407737843252872,
+        "local_exploitation": 0.12828299525896597,
+        "uncertainty_sampling": 0.12616266384792693,
+        "error_guided_sampling": 0.12616266384792693,
+        "boundary_sampling": 0.12407737843252872,
+        "surrogate_acquisition": 0.12616266384792693,
+        "retrain_surrogate": 0.12202655975341403,
+        "stop": 0.12304769657878172
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "original_h10",
+      "utility_variant": "original",
+      "horizon": 10,
+      "new_top_action": "local_exploitation",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12407737843252872,
+        "local_exploitation": 0.12828299525896597,
+        "uncertainty_sampling": 0.12616266384792693,
+        "error_guided_sampling": 0.12616266384792693,
+        "boundary_sampling": 0.12407737843252872,
+        "surrogate_acquisition": 0.12616266384792693,
+        "retrain_surrogate": 0.12202655975341403,
+        "stop": 0.12304769657878172
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "original_hfull",
+      "utility_variant": "original",
+      "horizon": 11,
+      "new_top_action": "local_exploitation",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12407737843252872,
+        "local_exploitation": 0.12828299525896597,
+        "uncertainty_sampling": 0.12616266384792693,
+        "error_guided_sampling": 0.12616266384792693,
+        "boundary_sampling": 0.12407737843252872,
+        "surrogate_acquisition": 0.12616266384792693,
+        "retrain_surrogate": 0.12202655975341403,
+        "stop": 0.12304769657878172
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "no_stop_pen_h1",
+      "utility_variant": "no_stop_pen",
+      "horizon": 1,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12188397067356142,
+        "local_exploitation": 0.12601524169502692,
+        "uncertainty_sampling": 0.12393239295349064,
+        "error_guided_sampling": 0.12393239295349064,
+        "boundary_sampling": 0.12188397067356142,
+        "surrogate_acquisition": 0.12393239295349064,
+        "retrain_surrogate": 0.12813309548065807,
+        "stop": 0.13028654261672035
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "no_stop_pen_h3",
+      "utility_variant": "no_stop_pen",
+      "horizon": 3,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11966033753801232,
+        "local_exploitation": 0.12371623826193585,
+        "uncertainty_sampling": 0.12167138870480768,
+        "error_guided_sampling": 0.12167138870480768,
+        "boundary_sampling": 0.11966033753801232,
+        "surrogate_acquisition": 0.12167138870480768,
+        "retrain_surrogate": 0.12579545423631133,
+        "stop": 0.14615346631130516
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "no_stop_pen_h5",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11942593295574656,
+        "local_exploitation": 0.12347388850974608,
+        "uncertainty_sampling": 0.12143304464168829,
+        "error_guided_sampling": 0.12143304464168829,
+        "boundary_sampling": 0.11942593295574656,
+        "surrogate_acquisition": 0.12143304464168829,
+        "retrain_surrogate": 0.11745199590799109,
+        "stop": 0.15592311574570492
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "no_stop_pen_h10",
+      "utility_variant": "no_stop_pen",
+      "horizon": 10,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11942593295574656,
+        "local_exploitation": 0.12347388850974608,
+        "uncertainty_sampling": 0.12143304464168829,
+        "error_guided_sampling": 0.12143304464168829,
+        "boundary_sampling": 0.11942593295574656,
+        "surrogate_acquisition": 0.12143304464168829,
+        "retrain_surrogate": 0.11745199590799109,
+        "stop": 0.15592311574570492
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "no_stop_pen_hfull",
+      "utility_variant": "no_stop_pen",
+      "horizon": 11,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11942593295574656,
+        "local_exploitation": 0.12347388850974608,
+        "uncertainty_sampling": 0.12143304464168829,
+        "error_guided_sampling": 0.12143304464168829,
+        "boundary_sampling": 0.11942593295574656,
+        "surrogate_acquisition": 0.12143304464168829,
+        "retrain_surrogate": 0.11745199590799109,
+        "stop": 0.15592311574570492
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "delta_best_h1",
+      "utility_variant": "delta_best",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "delta_best_h3",
+      "utility_variant": "delta_best",
+      "horizon": 3,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "delta_best_h5",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "delta_best_h10",
+      "utility_variant": "delta_best",
+      "horizon": 10,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "ackley:9:0:12",
+      "problem": "ackley",
+      "phase": "mid",
+      "config": "delta_best_hfull",
+      "utility_variant": "delta_best",
+      "horizon": 11,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "new_top_terminal": {
+          "gold": -19.668531215207402,
+          "stop": -19.668531215207402,
+          "uniform": -19.668531215207402,
+          "behavior": -19.668531215207402
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "original_h1",
+      "utility_variant": "original",
+      "horizon": 1,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12377891097196153,
+        "local_exploitation": 0.12797441120994274,
+        "uncertainty_sampling": 0.1258591802446079,
+        "error_guided_sampling": 0.1258591802446079,
+        "boundary_sampling": 0.12377891097196153,
+        "surrogate_acquisition": 0.1258591802446079,
+        "retrain_surrogate": 0.13012519144572426,
+        "stop": 0.11676503466658626
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "original_h3",
+      "utility_variant": "original",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12123550440421439,
+        "local_exploitation": 0.12534479558787068,
+        "uncertainty_sampling": 0.12327302834577664,
+        "error_guided_sampling": 0.12327302834577664,
+        "boundary_sampling": 0.12123550440421439,
+        "surrogate_acquisition": 0.12327302834577664,
+        "retrain_surrogate": 0.14799936147858125,
+        "stop": 0.11436574908778933
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "original_h5",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12123550440421439,
+        "local_exploitation": 0.12534479558787068,
+        "uncertainty_sampling": 0.12327302834577664,
+        "error_guided_sampling": 0.12327302834577664,
+        "boundary_sampling": 0.12123550440421439,
+        "surrogate_acquisition": 0.12327302834577664,
+        "retrain_surrogate": 0.14799936147858125,
+        "stop": 0.11436574908778933
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "original_h10",
+      "utility_variant": "original",
+      "horizon": 10,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12123550440421439,
+        "local_exploitation": 0.12534479558787068,
+        "uncertainty_sampling": 0.12327302834577664,
+        "error_guided_sampling": 0.12327302834577664,
+        "boundary_sampling": 0.12123550440421439,
+        "surrogate_acquisition": 0.12327302834577664,
+        "retrain_surrogate": 0.14799936147858125,
+        "stop": 0.11436574908778933
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "original_hfull",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12123550440421439,
+        "local_exploitation": 0.12534479558787068,
+        "uncertainty_sampling": 0.12327302834577664,
+        "error_guided_sampling": 0.12327302834577664,
+        "boundary_sampling": 0.12123550440421439,
+        "surrogate_acquisition": 0.12327302834577664,
+        "retrain_surrogate": 0.14799936147858125,
+        "stop": 0.11436574908778933
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "no_stop_pen_h1",
+      "utility_variant": "no_stop_pen",
+      "horizon": 1,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12188397067356142,
+        "local_exploitation": 0.12601524169502692,
+        "uncertainty_sampling": 0.12393239295349064,
+        "error_guided_sampling": 0.12393239295349064,
+        "boundary_sampling": 0.12188397067356142,
+        "surrogate_acquisition": 0.12393239295349064,
+        "retrain_surrogate": 0.12813309548065807,
+        "stop": 0.13028654261672035
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 1.7246157970650198,
+          "stop": 1.7246157970650198,
+          "uniform": 1.7246157970650196,
+          "behavior": 1.7246157970650196
+        },
+        "new_top_terminal": {
+          "gold": 1.7246157970650198,
+          "stop": 1.7246157970650198,
+          "uniform": 1.7246157970650196,
+          "behavior": 1.7246157970650196
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 3.3751173695102215e-16,
+          "behavior": 3.3751173695102215e-16
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 3.3751173695102215e-16,
+          "behavior": 3.3751173695102215e-16
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "no_stop_pen_h3",
+      "utility_variant": "no_stop_pen",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.1194170663882561,
+        "local_exploitation": 0.12346472140894406,
+        "uncertainty_sampling": 0.12142402905973519,
+        "error_guided_sampling": 0.12142402905973519,
+        "boundary_sampling": 0.1194170663882561,
+        "surrogate_acquisition": 0.12142402905973519,
+        "retrain_surrogate": 0.14577948647931618,
+        "stop": 0.12764957215602202
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "no_stop_pen_h5",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.1194170663882561,
+        "local_exploitation": 0.12346472140894406,
+        "uncertainty_sampling": 0.12142402905973519,
+        "error_guided_sampling": 0.12142402905973519,
+        "boundary_sampling": 0.1194170663882561,
+        "surrogate_acquisition": 0.12142402905973519,
+        "retrain_surrogate": 0.14577948647931618,
+        "stop": 0.12764957215602202
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "no_stop_pen_h10",
+      "utility_variant": "no_stop_pen",
+      "horizon": 10,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.1194170663882561,
+        "local_exploitation": 0.12346472140894406,
+        "uncertainty_sampling": 0.12142402905973519,
+        "error_guided_sampling": 0.12142402905973519,
+        "boundary_sampling": 0.1194170663882561,
+        "surrogate_acquisition": 0.12142402905973519,
+        "retrain_surrogate": 0.14577948647931618,
+        "stop": 0.12764957215602202
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "no_stop_pen_hfull",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.1194170663882561,
+        "local_exploitation": 0.12346472140894406,
+        "uncertainty_sampling": 0.12142402905973519,
+        "error_guided_sampling": 0.12142402905973519,
+        "boundary_sampling": 0.1194170663882561,
+        "surrogate_acquisition": 0.12142402905973519,
+        "retrain_surrogate": 0.14577948647931618,
+        "stop": 0.12764957215602202
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "delta_best_h1",
+      "utility_variant": "delta_best",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 1.7246157970650198,
+          "stop": 1.7246157970650198,
+          "uniform": 1.7246157970650196,
+          "behavior": 1.7246157970650196
+        },
+        "new_top_terminal": {
+          "gold": 1.7246157970650198,
+          "stop": 1.7246157970650198,
+          "uniform": 1.7246157970650196,
+          "behavior": 1.7246157970650196
+        },
+        "original_top_gains": {
+          "stop": 0.0,
+          "uniform": 3.3751173695102215e-16,
+          "behavior": 3.3751173695102215e-16
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": 3.3751173695102215e-16,
+          "behavior": 3.3751173695102215e-16
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "delta_best_h3",
+      "utility_variant": "delta_best",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12134043737280549,
+        "local_exploitation": 0.12134043737280549,
+        "uncertainty_sampling": 0.12134043737280549,
+        "error_guided_sampling": 0.12134043737280549,
+        "boundary_sampling": 0.12134043737280549,
+        "surrogate_acquisition": 0.12134043737280549,
+        "retrain_surrogate": 0.15061693839036158,
+        "stop": 0.12134043737280549
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "delta_best_h5",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12134043737280549,
+        "local_exploitation": 0.12134043737280549,
+        "uncertainty_sampling": 0.12134043737280549,
+        "error_guided_sampling": 0.12134043737280549,
+        "boundary_sampling": 0.12134043737280549,
+        "surrogate_acquisition": 0.12134043737280549,
+        "retrain_surrogate": 0.15061693839036158,
+        "stop": 0.12134043737280549
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "delta_best_h10",
+      "utility_variant": "delta_best",
+      "horizon": 10,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12134043737280549,
+        "local_exploitation": 0.12134043737280549,
+        "uncertainty_sampling": 0.12134043737280549,
+        "error_guided_sampling": 0.12134043737280549,
+        "boundary_sampling": 0.12134043737280549,
+        "surrogate_acquisition": 0.12134043737280549,
+        "retrain_surrogate": 0.15061693839036158,
+        "stop": 0.12134043737280549
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:5:0:10",
+      "problem": "hartmann",
+      "phase": "late",
+      "config": "delta_best_hfull",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12134043737280549,
+        "local_exploitation": 0.12134043737280549,
+        "uncertainty_sampling": 0.12134043737280549,
+        "error_guided_sampling": 0.12134043737280549,
+        "boundary_sampling": 0.12134043737280549,
+        "surrogate_acquisition": 0.12134043737280549,
+        "retrain_surrogate": 0.15061693839036158,
+        "stop": 0.12134043737280549
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "original_h1",
+      "utility_variant": "original",
+      "horizon": 1,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.1273541978802617,
+        "local_exploitation": 0.13167088287384335,
+        "uncertainty_sampling": 0.12949455460591464,
+        "error_guided_sampling": 0.12949455460591464,
+        "boundary_sampling": 0.1273541978802617,
+        "surrogate_acquisition": 0.12949455460591464,
+        "retrain_surrogate": 0.13388378723367184,
+        "stop": 0.0912532703142176
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "original_h3",
+      "utility_variant": "original",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12381051971196604,
+        "local_exploitation": 0.13015842080048387,
+        "uncertainty_sampling": 0.12800709133177773,
+        "error_guided_sampling": 0.12800709133177773,
+        "boundary_sampling": 0.12381051971196604,
+        "surrogate_acquisition": 0.12800709133177773,
+        "retrain_surrogate": 0.13683178573749658,
+        "stop": 0.10136748004275428
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "original_h5",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.12204596379353067,
+        "local_exploitation": 0.1283033941654935,
+        "uncertainty_sampling": 0.12618272559018595,
+        "error_guided_sampling": 0.12618272559018595,
+        "boundary_sampling": 0.12204596379353067,
+        "surrogate_acquisition": 0.12618272559018595,
+        "retrain_surrogate": 0.13488164985312354,
+        "stop": 0.11417485162376384
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "original_h10",
+      "utility_variant": "original",
+      "horizon": 10,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12735064041711608,
+        "local_exploitation": 0.1252457194761352,
+        "uncertainty_sampling": 0.12317558981812915,
+        "error_guided_sampling": 0.12317558981812915,
+        "boundary_sampling": 0.12735064041711608,
+        "surrogate_acquisition": 0.12317558981812915,
+        "retrain_surrogate": 0.12317558981812915,
+        "stop": 0.12735064041711608
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "original_hfull",
+      "utility_variant": "original",
+      "horizon": 16,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12735064041711608,
+        "local_exploitation": 0.1252457194761352,
+        "uncertainty_sampling": 0.12317558981812915,
+        "error_guided_sampling": 0.12317558981812915,
+        "boundary_sampling": 0.12735064041711608,
+        "surrogate_acquisition": 0.12317558981812915,
+        "retrain_surrogate": 0.12317558981812915,
+        "stop": 0.12735064041711608
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "no_stop_pen_h1",
+      "utility_variant": "no_stop_pen",
+      "horizon": 1,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.12188397067356142,
+        "local_exploitation": 0.12601524169502692,
+        "uncertainty_sampling": 0.12393239295349064,
+        "error_guided_sampling": 0.12393239295349064,
+        "boundary_sampling": 0.12188397067356142,
+        "surrogate_acquisition": 0.12393239295349064,
+        "retrain_surrogate": 0.12813309548065807,
+        "stop": 0.13028654261672035
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.876822501315651,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": -0.006909586877734954,
+          "behavior": -0.006909586877734954
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "no_stop_pen_h3",
+      "utility_variant": "no_stop_pen",
+      "horizon": 3,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11793106300181706,
+        "local_exploitation": 0.12397751789871019,
+        "uncertainty_sampling": 0.12192834976904011,
+        "error_guided_sampling": 0.12192834976904011,
+        "boundary_sampling": 0.11793106300181706,
+        "surrogate_acquisition": 0.12192834976904011,
+        "retrain_surrogate": 0.1303339811673552,
+        "stop": 0.14404132562318012
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.876822501315651,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": -0.006909586877734954,
+          "behavior": -0.006909586877734954
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "no_stop_pen_h5",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11555697599112816,
+        "local_exploitation": 0.12148170884409118,
+        "uncertainty_sampling": 0.11947379280963281,
+        "error_guided_sampling": 0.11947379280963281,
+        "boundary_sampling": 0.11555697599112816,
+        "surrogate_acquisition": 0.11947379280963281,
+        "retrain_surrogate": 0.12771020924616067,
+        "stop": 0.1612727514985934
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.876822501315651,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": -0.006909586877734954,
+          "behavior": -0.006909586877734954
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "no_stop_pen_h10",
+      "utility_variant": "no_stop_pen",
+      "horizon": 10,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11984429033950202,
+        "local_exploitation": 0.11786343845241007,
+        "uncertainty_sampling": 0.11591532716720647,
+        "error_guided_sampling": 0.11591532716720647,
+        "boundary_sampling": 0.11984429033950202,
+        "surrogate_acquisition": 0.11591532716720647,
+        "retrain_surrogate": 0.11591532716720647,
+        "stop": 0.1787866721997602
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.876822501315651,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": -0.006909586877734954,
+          "behavior": -0.006909586877734954
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "no_stop_pen_hfull",
+      "utility_variant": "no_stop_pen",
+      "horizon": 16,
+      "new_top_action": "stop",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.11984429033950202,
+        "local_exploitation": 0.11786343845241007,
+        "uncertainty_sampling": 0.11591532716720647,
+        "error_guided_sampling": 0.11591532716720647,
+        "boundary_sampling": 0.11984429033950202,
+        "surrogate_acquisition": 0.11591532716720647,
+        "retrain_surrogate": 0.11591532716720647,
+        "stop": 0.1787866721997602
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.876822501315651,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.0,
+          "uniform": -0.006909586877734954,
+          "behavior": -0.006909586877734954
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "delta_best_h1",
+      "utility_variant": "delta_best",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "delta_best_h3",
+      "utility_variant": "delta_best",
+      "horizon": 3,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "delta_best_h5",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "delta_best_h10",
+      "utility_variant": "delta_best",
+      "horizon": 10,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "branin:4:0:8",
+      "problem": "branin",
+      "phase": "mid",
+      "config": "delta_best_hfull",
+      "utility_variant": "delta_best",
+      "horizon": 16,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.125,
+        "local_exploitation": 0.125,
+        "uncertainty_sampling": 0.125,
+        "error_guided_sampling": 0.125,
+        "boundary_sampling": 0.125,
+        "surrogate_acquisition": 0.125,
+        "retrain_surrogate": 0.125,
+        "stop": 0.125
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "new_top_terminal": {
+          "gold": -0.7605277821599259,
+          "stop": -0.876822501315651,
+          "uniform": -0.7605277821599259,
+          "behavior": -0.7605277821599259
+        },
+        "original_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        },
+        "new_top_gains": {
+          "stop": 0.006909586877734954,
+          "uniform": 0.0,
+          "behavior": 0.0
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "original_h1",
+      "utility_variant": "original",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.9923663145325332,
+        "local_exploitation": 0.0009525066509101179,
+        "uncertainty_sampling": 0.000736769206599466,
+        "error_guided_sampling": 0.0008586580273569817,
+        "boundary_sampling": 0.0031726566737698757,
+        "surrogate_acquisition": 0.000736769206599466,
+        "retrain_surrogate": 0.0007617420824904607,
+        "stop": 0.0004145836197405572
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 1.6810977274809724,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 7.222239562816816,
+          "uniform": 3.5056960922609135,
+          "behavior": 0.61160809299662
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "original_h3",
+      "utility_variant": "original",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.40095983993340156,
+        "local_exploitation": 0.0003848547745842503,
+        "uncertainty_sampling": 0.02999140054826128,
+        "error_guided_sampling": 0.000738574737130747,
+        "boundary_sampling": 0.001281893483736044,
+        "surrogate_acquisition": 0.02999140054826128,
+        "retrain_surrogate": 0.5364669086822551,
+        "stop": 0.00018512729236953753
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "original_h5",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.38643808193630486,
+        "local_exploitation": 0.0003771500435005543,
+        "uncertainty_sampling": 0.029884931980475385,
+        "error_guided_sampling": 0.000735952819079984,
+        "boundary_sampling": 0.0017924474831810902,
+        "surrogate_acquisition": 0.05484063784904653,
+        "retrain_surrogate": 0.5257269269029884,
+        "stop": 0.00020387098542313682
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "original_h10",
+      "utility_variant": "original",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.013327545339601845,
+        "local_exploitation": 0.00018620252282526917,
+        "uncertainty_sampling": 0.001030676852408019,
+        "error_guided_sampling": 0.9532440064392044,
+        "boundary_sampling": 0.012114930963798053,
+        "surrogate_acquisition": 0.0019554613250652893,
+        "retrain_surrogate": 0.01813136381238949,
+        "stop": 9.812744707741595e-06
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "original_hfull",
+      "utility_variant": "original",
+      "horizon": 25,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.047892700193438886,
+        "local_exploitation": 0.045556945642790114,
+        "uncertainty_sampling": 0.0012326167857848013,
+        "error_guided_sampling": 0.8445420807386326,
+        "boundary_sampling": 0.011473373184442035,
+        "surrogate_acquisition": 0.0021877707954626137,
+        "retrain_surrogate": 0.047101103486684205,
+        "stop": 1.34091727649134e-05
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "no_stop_pen_h1",
+      "utility_variant": "no_stop_pen",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.9920092303425314,
+        "local_exploitation": 0.0009521639094638086,
+        "uncertainty_sampling": 0.00073650409417928,
+        "error_guided_sampling": 0.0008583490555572569,
+        "boundary_sampling": 0.003171515053461008,
+        "surrogate_acquisition": 0.00073650409417928,
+        "retrain_surrogate": 0.0007614679840546987,
+        "stop": 0.0007742654665732819
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 1.6810977274809724,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 7.222239562816816,
+          "uniform": 3.5056960922609135,
+          "behavior": 0.61160809299662
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "no_stop_pen_h3",
+      "utility_variant": "no_stop_pen",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.400895401600825,
+        "local_exploitation": 0.00038479292449980674,
+        "uncertainty_sampling": 0.02998658062454202,
+        "error_guided_sampling": 0.0007384560406434585,
+        "boundary_sampling": 0.0012816874703890553,
+        "surrogate_acquisition": 0.02998658062454202,
+        "retrain_surrogate": 0.5363806929827384,
+        "stop": 0.0003458077318201535
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "no_stop_pen_h5",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.3863696905759697,
+        "local_exploitation": 0.000377083295926412,
+        "uncertainty_sampling": 0.02987964298012266,
+        "error_guided_sampling": 0.0007358225710097443,
+        "boundary_sampling": 0.0017921302579193101,
+        "surrogate_acquisition": 0.05483093221702044,
+        "retrain_surrogate": 0.5256338843655772,
+        "stop": 0.0003808137364544858
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "no_stop_pen_h10",
+      "utility_variant": "no_stop_pen",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.013327431791536597,
+        "local_exploitation": 0.00018620093641639402,
+        "uncertainty_sampling": 0.0010306680712439335,
+        "error_guided_sampling": 0.9532358849877381,
+        "boundary_sampling": 0.01211482774696881,
+        "surrogate_acquisition": 0.0019554446649193685,
+        "retrain_surrogate": 0.018131209336735593,
+        "stop": 1.8332464441230256e-05
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "no_stop_pen_hfull",
+      "utility_variant": "no_stop_pen",
+      "horizon": 25,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.04789214261108203,
+        "local_exploitation": 0.04555641525404569,
+        "uncertainty_sampling": 0.0012326024352601966,
+        "error_guided_sampling": 0.8445322483056744,
+        "boundary_sampling": 0.011473239607708307,
+        "surrogate_acquisition": 0.0021877453247250806,
+        "retrain_surrogate": 0.047100555120353084,
+        "stop": 2.505134115132127e-05
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "delta_best_h1",
+      "utility_variant": "delta_best",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.9921648231559773,
+        "local_exploitation": 0.0009210927107067546,
+        "uncertainty_sampling": 0.0007244443607268629,
+        "error_guided_sampling": 0.0008442941970697566,
+        "boundary_sampling": 0.0031720124933385416,
+        "surrogate_acquisition": 0.0007244443607268629,
+        "retrain_surrogate": 0.0007244443607268629,
+        "stop": 0.0007244443607268629
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 1.6810977274809724,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 7.222239562816816,
+          "uniform": 3.5056960922609135,
+          "behavior": 0.61160809299662
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "delta_best_h3",
+      "utility_variant": "delta_best",
+      "horizon": 3,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.4076852487396352,
+        "local_exploitation": 0.00037848137941664715,
+        "uncertainty_sampling": 0.031006954370660908,
+        "error_guided_sampling": 0.0007385507252382249,
+        "boundary_sampling": 0.0013033950329326015,
+        "surrogate_acquisition": 0.031006954370660908,
+        "retrain_surrogate": 0.5275827377451314,
+        "stop": 0.0002976776363240668
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "delta_best_h5",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "retrain_surrogate",
+      "original_top_action": "retrain_surrogate",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.39719211919614716,
+        "local_exploitation": 0.0003687399081313977,
+        "uncertainty_sampling": 0.03020888774949612,
+        "error_guided_sampling": 0.0007195416773064686,
+        "boundary_sampling": 0.0017819300943221167,
+        "surrogate_acquisition": 0.05543511606367263,
+        "retrain_surrogate": 0.514003649394051,
+        "stop": 0.0002900159168730827
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "delta_best_h10",
+      "utility_variant": "delta_best",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.015167965808609062,
+        "local_exploitation": 0.00019497167665460068,
+        "uncertainty_sampling": 0.0011536164852107443,
+        "error_guided_sampling": 0.9494570525170951,
+        "boundary_sampling": 0.012269600619460736,
+        "surrogate_acquisition": 0.002116955257701945,
+        "retrain_surrogate": 0.019628762512428195,
+        "stop": 1.1075122839763524e-05
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:6:0:0",
+      "problem": "hartmann",
+      "phase": "early",
+      "config": "delta_best_hfull",
+      "utility_variant": "delta_best",
+      "horizon": 25,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "retrain_surrogate",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.041367825631021614,
+        "local_exploitation": 0.041367825631021614,
+        "uncertainty_sampling": 0.001047088059649349,
+        "error_guided_sampling": 0.8617813247171999,
+        "boundary_sampling": 0.011136588693040931,
+        "surrogate_acquisition": 0.0019214692244508614,
+        "retrain_surrogate": 0.041367825631021614,
+        "stop": 1.0052412594076004e-05
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.0771551762454035,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "new_top_terminal": {
+          "gold": 2.3793685755405574,
+          "stop": 0.4619922257634659,
+          "uniform": 1.0893403707424525,
+          "behavior": 1.5778590042868712
+        },
+        "original_top_gains": {
+          "stop": 9.568567892551146,
+          "uniform": 5.852024421995242,
+          "behavior": 2.957936422730949
+        },
+        "new_top_gains": {
+          "stop": 11.358944169032412,
+          "uniform": 7.642400698476509,
+          "behavior": 4.7483126992122155
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "original_h1",
+      "utility_variant": "original",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9999999604180032,
+        "local_exploitation": 6.8767947457239205e-09,
+        "uncertainty_sampling": 5.5581495327873224e-09,
+        "error_guided_sampling": 6.919547890336765e-09,
+        "boundary_sampling": 5.466281401568297e-09,
+        "surrogate_acquisition": 5.5581495327873224e-09,
+        "retrain_surrogate": 5.7465436421265775e-09,
+        "stop": 3.456530136038476e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "original_h3",
+      "utility_variant": "original",
+      "horizon": 3,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9999994706715272,
+        "local_exploitation": 3.3551058995575956e-07,
+        "uncertainty_sampling": 1.0288107677557649e-08,
+        "error_guided_sampling": 8.690673646154843e-08,
+        "boundary_sampling": 5.3759290841547286e-09,
+        "surrogate_acquisition": 8.158393569160955e-08,
+        "retrain_surrogate": 5.8431190915067184e-09,
+        "stop": 3.820054712942467e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "original_h5",
+      "utility_variant": "original",
+      "horizon": 5,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9747780473671975,
+        "local_exploitation": 3.325450165262363e-07,
+        "uncertainty_sampling": 1.0197171237153023e-08,
+        "error_guided_sampling": 0.004147204003181532,
+        "boundary_sampling": 5.1537252205221734e-09,
+        "surrogate_acquisition": 0.0210251409769021,
+        "retrain_surrogate": 4.9255572308961203e-05,
+        "stop": 4.184496824615154e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "original_h10",
+      "utility_variant": "original",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.0014735960517442584,
+        "local_exploitation": 5.111653353730287e-10,
+        "uncertainty_sampling": 1.5415315634789107e-11,
+        "error_guided_sampling": 0.7727877923117877,
+        "boundary_sampling": 8.328119234053808e-12,
+        "surrogate_acquisition": 0.11004816062174463,
+        "retrain_surrogate": 0.11569045047098636,
+        "stop": 8.828375139692532e-12
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "original_hfull",
+      "utility_variant": "original",
+      "horizon": 21,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.0019480799667887451,
+        "local_exploitation": 1.330268801059351e-05,
+        "uncertainty_sampling": 1.906460392637251e-11,
+        "error_guided_sampling": 0.7824862632521536,
+        "boundary_sampling": 1.1009694428594932e-11,
+        "surrogate_acquisition": 0.10777617702565091,
+        "retrain_surrogate": 0.10777617702565091,
+        "stop": 1.1671027978511155e-11
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "no_stop_pen_h1",
+      "utility_variant": "no_stop_pen",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9999999580314114,
+        "local_exploitation": 6.8767947293118175e-09,
+        "uncertainty_sampling": 5.558149519522288e-09,
+        "error_guided_sampling": 6.919547873822628e-09,
+        "boundary_sampling": 5.466281388522514e-09,
+        "surrogate_acquisition": 5.558149519522288e-09,
+        "retrain_surrogate": 5.746543628411923e-09,
+        "stop": 5.84312193921007e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "no_stop_pen_h3",
+      "utility_variant": "no_stop_pen",
+      "horizon": 3,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.999999468033938,
+        "local_exploitation": 3.3551058907082004e-07,
+        "uncertainty_sampling": 1.0288107650421834e-08,
+        "error_guided_sampling": 8.690673623232405e-08,
+        "boundary_sampling": 5.375929069975229e-09,
+        "surrogate_acquisition": 8.158393547642453e-08,
+        "retrain_surrogate": 5.843119076094963e-09,
+        "stop": 6.457645273753209e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "no_stop_pen_h5",
+      "utility_variant": "no_stop_pen",
+      "horizon": 5,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9747780445508464,
+        "local_exploitation": 3.3254501556543956e-07,
+        "uncertainty_sampling": 1.019717120769112e-08,
+        "error_guided_sampling": 0.004147203991199335,
+        "boundary_sampling": 5.153725205631912e-09,
+        "surrogate_acquisition": 0.021025140916155777,
+        "retrain_surrogate": 4.9255572166650866e-05,
+        "stop": 7.073719662747333e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "no_stop_pen_h10",
+      "utility_variant": "no_stop_pen",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.0014735960517352758,
+        "local_exploitation": 5.111653353699128e-10,
+        "uncertainty_sampling": 1.541531563469514e-11,
+        "error_guided_sampling": 0.7727877923070771,
+        "boundary_sampling": 8.328119234003043e-12,
+        "surrogate_acquisition": 0.11004816062107381,
+        "retrain_surrogate": 0.11569045047028115,
+        "stop": 1.4924004871612247e-11
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "no_stop_pen_hfull",
+      "utility_variant": "no_stop_pen",
+      "horizon": 21,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.0019480799667730467,
+        "local_exploitation": 1.3302688010486311e-05,
+        "uncertainty_sampling": 1.906460392621888e-11,
+        "error_guided_sampling": 0.7824862632458481,
+        "boundary_sampling": 1.1009694428506212e-11,
+        "surrogate_acquisition": 0.10777617702478241,
+        "retrain_surrogate": 0.10777617702478241,
+        "stop": 1.9729392515795108e-11
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "delta_best_h1",
+      "utility_variant": "delta_best",
+      "horizon": 1,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9999999592120689,
+        "local_exploitation": 6.651346589753139e-09,
+        "uncertainty_sampling": 5.46628139497632e-09,
+        "error_guided_sampling": 6.805177815291212e-09,
+        "boundary_sampling": 5.46628139497632e-09,
+        "surrogate_acquisition": 5.46628139497632e-09,
+        "retrain_surrogate": 5.46628139497632e-09,
+        "stop": 5.46628139497632e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "delta_best_h3",
+      "utility_variant": "delta_best",
+      "horizon": 3,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9999994832660865,
+        "local_exploitation": 3.2451124857450535e-07,
+        "uncertainty_sampling": 1.0118060342153552e-08,
+        "error_guided_sampling": 8.547029553119225e-08,
+        "boundary_sampling": 5.466278793321546e-09,
+        "surrogate_acquisition": 8.023547285364734e-08,
+        "retrain_surrogate": 5.466278793321546e-09,
+        "stop": 5.466278793321546e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "delta_best_h5",
+      "utility_variant": "delta_best",
+      "horizon": 5,
+      "new_top_action": "global_exploration",
+      "original_top_action": "global_exploration",
+      "changed": false,
+      "new_probs": {
+        "global_exploration": 0.9755870052052449,
+        "local_exploitation": 3.165891207445518e-07,
+        "uncertainty_sampling": 9.871053288395536e-09,
+        "error_guided_sampling": 0.004014571370940475,
+        "boundary_sampling": 5.332833313249334e-09,
+        "surrogate_acquisition": 0.020352731375429266,
+        "retrain_surrogate": 4.535492254483341e-05,
+        "stop": 5.332833313249334e-09
+      },
+      "oracle": null
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "delta_best_h10",
+      "utility_variant": "delta_best",
+      "horizon": 10,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.001665036880769424,
+        "local_exploitation": 5.4032347630455e-10,
+        "uncertainty_sampling": 1.684695233692777e-11,
+        "error_guided_sampling": 0.7770303312935288,
+        "boundary_sampling": 9.101560494533128e-12,
+        "surrogate_acquisition": 0.11065231562516412,
+        "retrain_surrogate": 0.11065231562516412,
+        "stop": 9.101560494533128e-12
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    },
+    {
+      "record_id": "hartmann:3:0:4",
+      "problem": "hartmann",
+      "phase": "mid",
+      "config": "delta_best_hfull",
+      "utility_variant": "delta_best",
+      "horizon": 21,
+      "new_top_action": "error_guided_sampling",
+      "original_top_action": "global_exploration",
+      "changed": true,
+      "new_probs": {
+        "global_exploration": 0.0016650166455126365,
+        "local_exploitation": 1.215357849950104e-05,
+        "uncertainty_sampling": 1.684674759527276e-11,
+        "error_guided_sampling": 0.7770208880142436,
+        "boundary_sampling": 9.101449882920917e-12,
+        "surrogate_acquisition": 0.11065097086334733,
+        "retrain_surrogate": 0.11065097086334733,
+        "stop": 9.101449882920917e-12
+      },
+      "oracle": {
+        "original_top_terminal": {
+          "gold": 2.3040124221974145,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "new_top_terminal": {
+          "gold": 2.850129402428454,
+          "stop": 0.6134306191722354,
+          "uniform": 1.9520532257478471,
+          "behavior": 2.2489879264097747
+        },
+        "original_top_gains": {
+          "stop": 19.024667229008745,
+          "uniform": 3.9607113827088845,
+          "behavior": 0.6192085588113061
+        },
+        "new_top_gains": {
+          "stop": 25.170299341228947,
+          "uniform": 10.106343494929089,
+          "behavior": 6.764840671031511
+        }
+      }
+    }
+  ],
+  "summary": {
+    "per_config": {
+      "original_h1": {
+        "config": "original_h1",
+        "n_records": 5,
+        "n_changed": 1,
+        "top1_agreement_with_original": 0.8,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "hartmann:6:0:0"
+        ],
+        "n_oracle_evaluated": 1,
+        "n_oracle_pass_gold_vs_stop": 1,
+        "mean_gain_new_vs_stop": 7.222239562816816,
+        "mean_gain_new_vs_behavior": 0.61160809299662,
+        "mean_gain_original_vs_stop": 9.568567892551146
+      },
+      "original_h3": {
+        "config": "original_h3",
+        "n_records": 5,
+        "n_changed": 0,
+        "top1_agreement_with_original": 1.0,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [],
+        "n_oracle_evaluated": 0,
+        "n_oracle_pass_gold_vs_stop": 0,
+        "mean_gain_new_vs_stop": 0.0,
+        "mean_gain_new_vs_behavior": 0.0,
+        "mean_gain_original_vs_stop": 0.0
+      },
+      "original_h5": {
+        "config": "original_h5",
+        "n_records": 5,
+        "n_changed": 1,
+        "top1_agreement_with_original": 0.8,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12"
+        ],
+        "n_oracle_evaluated": 1,
+        "n_oracle_pass_gold_vs_stop": 0,
+        "mean_gain_new_vs_stop": 0.0,
+        "mean_gain_new_vs_behavior": 0.0,
+        "mean_gain_original_vs_stop": 0.0
+      },
+      "original_h10": {
+        "config": "original_h10",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 3,
+        "mean_gain_new_vs_stop": 9.134038274284773,
+        "mean_gain_new_vs_behavior": 2.8782883425609316,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      },
+      "original_hfull": {
+        "config": "original_hfull",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 3,
+        "mean_gain_new_vs_stop": 9.134038274284773,
+        "mean_gain_new_vs_behavior": 2.8782883425609316,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      },
+      "no_stop_pen_h1": {
+        "config": "no_stop_pen_h1",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "hartmann:5:0:10",
+          "branin:4:0:8",
+          "hartmann:6:0:0"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 1,
+        "mean_gain_new_vs_stop": 1.805559890704204,
+        "mean_gain_new_vs_behavior": 0.15117462652972136,
+        "mean_gain_original_vs_stop": 2.39386936985722
+      },
+      "no_stop_pen_h3": {
+        "config": "no_stop_pen_h3",
+        "n_records": 5,
+        "n_changed": 2,
+        "top1_agreement_with_original": 0.6,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8"
+        ],
+        "n_oracle_evaluated": 2,
+        "n_oracle_pass_gold_vs_stop": 0,
+        "mean_gain_new_vs_stop": 0.0,
+        "mean_gain_new_vs_behavior": -0.003454793438867477,
+        "mean_gain_original_vs_stop": 0.003454793438867477
+      },
+      "no_stop_pen_h5": {
+        "config": "no_stop_pen_h5",
+        "n_records": 5,
+        "n_changed": 2,
+        "top1_agreement_with_original": 0.6,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8"
+        ],
+        "n_oracle_evaluated": 2,
+        "n_oracle_pass_gold_vs_stop": 0,
+        "mean_gain_new_vs_stop": 0.0,
+        "mean_gain_new_vs_behavior": -0.003454793438867477,
+        "mean_gain_original_vs_stop": 0.003454793438867477
+      },
+      "no_stop_pen_h10": {
+        "config": "no_stop_pen_h10",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 2,
+        "mean_gain_new_vs_stop": 9.13231087756534,
+        "mean_gain_new_vs_behavior": 2.876560945841498,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      },
+      "no_stop_pen_hfull": {
+        "config": "no_stop_pen_hfull",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 2,
+        "mean_gain_new_vs_stop": 9.13231087756534,
+        "mean_gain_new_vs_behavior": 2.876560945841498,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      },
+      "delta_best_h1": {
+        "config": "delta_best_h1",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "hartmann:5:0:10",
+          "branin:4:0:8",
+          "hartmann:6:0:0"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 2,
+        "mean_gain_new_vs_stop": 1.8072872874236379,
+        "mean_gain_new_vs_behavior": 0.15290202324915508,
+        "mean_gain_original_vs_stop": 2.39386936985722
+      },
+      "delta_best_h3": {
+        "config": "delta_best_h3",
+        "n_records": 5,
+        "n_changed": 2,
+        "top1_agreement_with_original": 0.6,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8"
+        ],
+        "n_oracle_evaluated": 2,
+        "n_oracle_pass_gold_vs_stop": 1,
+        "mean_gain_new_vs_stop": 0.003454793438867477,
+        "mean_gain_new_vs_behavior": 0.0,
+        "mean_gain_original_vs_stop": 0.003454793438867477
+      },
+      "delta_best_h5": {
+        "config": "delta_best_h5",
+        "n_records": 5,
+        "n_changed": 2,
+        "top1_agreement_with_original": 0.6,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8"
+        ],
+        "n_oracle_evaluated": 2,
+        "n_oracle_pass_gold_vs_stop": 1,
+        "mean_gain_new_vs_stop": 0.003454793438867477,
+        "mean_gain_new_vs_behavior": 0.0,
+        "mean_gain_original_vs_stop": 0.003454793438867477
+      },
+      "delta_best_h10": {
+        "config": "delta_best_h10",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 3,
+        "mean_gain_new_vs_stop": 9.134038274284773,
+        "mean_gain_new_vs_behavior": 2.8782883425609316,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      },
+      "delta_best_hfull": {
+        "config": "delta_best_hfull",
+        "n_records": 5,
+        "n_changed": 4,
+        "top1_agreement_with_original": 0.2,
+        "mean_kl_vs_original": 0.0,
+        "changed_records": [
+          "ackley:9:0:12",
+          "branin:4:0:8",
+          "hartmann:6:0:0",
+          "hartmann:3:0:4"
+        ],
+        "n_oracle_evaluated": 4,
+        "n_oracle_pass_gold_vs_stop": 3,
+        "mean_gain_new_vs_stop": 9.134038274284773,
+        "mean_gain_new_vs_behavior": 2.8782883425609316,
+        "mean_gain_original_vs_stop": 7.150036177109406
+      }
+    },
+    "per_problem_phase_config": [
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "delta_best_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "delta_best_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "delta_best_h3",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "delta_best_h5",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "delta_best_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "no_stop_pen_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "no_stop_pen_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "no_stop_pen_h3",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "no_stop_pen_h5",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "no_stop_pen_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "original_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "original_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "original_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "original_h5",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "ackley",
+        "phase": "mid",
+        "config": "original_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "delta_best_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "delta_best_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "delta_best_h3",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "delta_best_h5",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "delta_best_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "no_stop_pen_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "no_stop_pen_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "no_stop_pen_h3",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "no_stop_pen_h5",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "no_stop_pen_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "original_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "original_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "original_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "original_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "branin",
+        "phase": "mid",
+        "config": "original_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "delta_best_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "delta_best_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "delta_best_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "delta_best_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "delta_best_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "no_stop_pen_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "no_stop_pen_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "no_stop_pen_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "no_stop_pen_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "no_stop_pen_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "original_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "original_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "original_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "original_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "early",
+        "config": "original_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "delta_best_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "delta_best_h10",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "delta_best_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "delta_best_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "delta_best_hfull",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "no_stop_pen_h1",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "no_stop_pen_h10",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "no_stop_pen_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "no_stop_pen_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "no_stop_pen_hfull",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "original_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "original_h10",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "original_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "original_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "late",
+        "config": "original_hfull",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "delta_best_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "delta_best_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "delta_best_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "delta_best_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "delta_best_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "no_stop_pen_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "no_stop_pen_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "no_stop_pen_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "no_stop_pen_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "no_stop_pen_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "original_h1",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "original_h10",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "original_h3",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "original_h5",
+        "n_records": 1,
+        "top1_agreement": 1.0
+      },
+      {
+        "problem": "hartmann",
+        "phase": "mid",
+        "config": "original_hfull",
+        "n_records": 1,
+        "top1_agreement": 0.0
+      }
+    ]
+  }
+}

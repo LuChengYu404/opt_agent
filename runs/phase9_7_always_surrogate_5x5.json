@@ -1,0 +1,4080 @@
+{
+  "description": "Constant surrogate_acquisition policy, five problems, seeds 20-24, budget30, torch threads1. Local baseline for phase9.7 Jev policy.",
+  "rows": [
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.469376534010225,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.386765874573923,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.0210825750233052,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.0210825750233052,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.0210825750233052,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.9528835563544611,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.9528835563544611,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.46979380706876483,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.46979380706876483,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40194634074106617,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -6.54437192689212,
+      "new_evaluations": 25,
+      "objective_scale": 41.55111947213898,
+      "policy": "always_surrogate",
+      "problem": "Branin",
+      "seed": 20,
+      "terminal_best": -0.40194634074106617,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -10.502727589778974,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -10.502727589778974,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -10.502727589778974,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -10.502727589778974,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.664350774197617,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.291397637768119,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.291397637768119,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.291397637768119,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.291397637768119,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4344921102886108,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40252947708633613,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40252947708633613,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40252947708633613,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40252947708633613,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.40252947708633613,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -10.502727589778974,
+      "new_evaluations": 25,
+      "objective_scale": 50.96787375735682,
+      "policy": "always_surrogate",
+      "problem": "Branin",
+      "seed": 21,
+      "terminal_best": -0.40252947708633613,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -11.024559698240084,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.513314073943522,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -4.3515515963357725,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -4.3515515963357725,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.3704601731523836,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.9582531483936716,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.9582531483936716,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4515127975257869,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4515127975257869,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4515127975257869,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4515127975257869,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4515127975257869,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4349391257524857,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.39795019585341684,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -11.024559698240084,
+      "new_evaluations": 25,
+      "objective_scale": 47.15436693300647,
+      "policy": "always_surrogate",
+      "problem": "Branin",
+      "seed": 22,
+      "terminal_best": -0.39795019585341684,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.363757965554736,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.363757965554736,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -5.363757965554736,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.7575425661656237,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.5510856435093014,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.5510856435093014,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.5510856435093014,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.5510856435093014,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4271369549327595,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.41628663333828086,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -5.363757965554736,
+      "new_evaluations": 25,
+      "objective_scale": 54.77186462055425,
+      "policy": "always_surrogate",
+      "problem": "Branin",
+      "seed": 23,
+      "terminal_best": -0.41628663333828086,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -11.751069625671938,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -11.751069625671938,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -11.751069625671938,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -11.751069625671938,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.2055311482386966,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.2055311482386966,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.2055311482386966,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.2055311482386966,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.592857097384762,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.592857097384762,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.592857097384762,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4662641210636487,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4004482497997657,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.3988461264030825,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -20.093806148044823,
+      "new_evaluations": 25,
+      "objective_scale": 46.11446458317257,
+      "policy": "always_surrogate",
+      "problem": "Branin",
+      "seed": 24,
+      "terminal_best": -0.3988461264030825,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.874102735501772,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.712292915653038,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.682647373208095,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.682647373208095,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.35323571623447,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.35323571623447,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.321353679954722,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -20.874102735501772,
+      "new_evaluations": 25,
+      "objective_scale": 0.2212260896764642,
+      "policy": "always_surrogate",
+      "problem": "Ackley",
+      "seed": 20,
+      "terminal_best": -20.321353679954722,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.146689018524096,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -19.19397201551536,
+      "new_evaluations": 25,
+      "objective_scale": 0.8019156516947485,
+      "policy": "always_surrogate",
+      "problem": "Ackley",
+      "seed": 21,
+      "terminal_best": -19.146689018524096,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.765060702386776,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.98190119499537,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.98190119499537,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.98190119499537,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.98190119499537,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -19.7488022602287,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -20.765060702386776,
+      "new_evaluations": 25,
+      "objective_scale": 0.24357626385972503,
+      "policy": "always_surrogate",
+      "problem": "Ackley",
+      "seed": 22,
+      "terminal_best": -19.7488022602287,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.83462934311706,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.627256670541332,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.627256670541332,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.627256670541332,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.627256670541332,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.378823270741783,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -20.83462934311706,
+      "new_evaluations": 25,
+      "objective_scale": 0.18257403475215872,
+      "policy": "always_surrogate",
+      "problem": "Ackley",
+      "seed": 23,
+      "terminal_best": -20.378823270741783,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.602779415144152,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -20.55259897239229,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -20.602779415144152,
+      "new_evaluations": 25,
+      "objective_scale": 0.3709112074900294,
+      "policy": "always_surrogate",
+      "problem": "Ackley",
+      "seed": 24,
+      "terminal_best": -20.55259897239229,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3078994589338422,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3078994589338422,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.31718066889148067,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.4021556754347922,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.4021556754347922,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.7732642865899971,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9459919350481707,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0444288828056636,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0444288828056636,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0444288828056636,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0444288828056636,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.5520241517353661,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8036158863490341,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8036158863490341,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8036158863490341,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.969225219997121,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.969225219997121,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.969225219997121,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.969225219997121,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0145853681816166,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.3078994589338422,
+      "new_evaluations": 25,
+      "objective_scale": 0.11508045971713937,
+      "policy": "always_surrogate",
+      "problem": "Hartmann",
+      "seed": 20,
+      "terminal_best": 3.0145853681816166,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.063928620466251,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.063928620466251,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.6751703529024928,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.6751703529024928,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.6751703529024928,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.338897062768226,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.338897062768226,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.338897062768226,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.338897062768226,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.338897062768226,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.605687895932762,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.605687895932762,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.605687895932762,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.976259769700402,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.976259769700402,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.0431720002451708,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.183346227579014,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.241517686855744,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.241517686855744,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.241517686855744,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": 1.063928620466251,
+      "new_evaluations": 25,
+      "objective_scale": 0.3927466122325559,
+      "policy": "always_surrogate",
+      "problem": "Hartmann",
+      "seed": 21,
+      "terminal_best": 3.241517686855744,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.21609662877596741,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.27616078725009574,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.27616078725009574,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3515165389468635,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3760950047117435,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.6650668685253562,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9142654636479884,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.382341361319049,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.6069645625359066,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.6069645625359066,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.9634328807058756,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.9900203015726523,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.283627832076032,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.21609662877596741,
+      "new_evaluations": 25,
+      "objective_scale": 0.0753211048880679,
+      "policy": "always_surrogate",
+      "problem": "Hartmann",
+      "seed": 22,
+      "terminal_best": 2.283627832076032,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.5368225624877153,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8210302632135735,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8210302632135735,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8210302632135735,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8210302632135735,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8210302632135735,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.090543511168523,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.090543511168523,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.090543511168523,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.090543511168523,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.5647689409457475,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.7698928395183295,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.7698928395183295,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.7698928395183295,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.7698928395183295,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.7698928395183295,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.0601683181013053,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.0601683181013053,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.101569507626796,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.101569507626796,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.388700693981849,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.388700693981849,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.388700693981849,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.388700693981849,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.452667960841589,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.5368225624877153,
+      "new_evaluations": 25,
+      "objective_scale": 0.19165215933636542,
+      "policy": "always_surrogate",
+      "problem": "Hartmann",
+      "seed": 23,
+      "terminal_best": 2.452667960841589,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.5038678674366065,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.5038678674366065,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.5038678674366065,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.5038678674366065,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.7877533439012062,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.7877533439012062,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.7877533439012062,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.4868581087328532,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.4868581087328532,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.4868581087328532,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.730089912808078,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.783142890528085,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.534836182841213,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.534836182841213,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.534836182841213,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.534836182841213,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.534836182841213,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 3.1057588041198256,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.5038678674366065,
+      "new_evaluations": 25,
+      "objective_scale": 0.21922913958403834,
+      "policy": "always_surrogate",
+      "problem": "Hartmann",
+      "seed": 24,
+      "terminal_best": 3.1057588041198256,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.377074722331212,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9804465570737756,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0292745310130613,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -0.4495865840001968,
+      "new_evaluations": 25,
+      "objective_scale": 18.134706553074643,
+      "policy": "always_surrogate",
+      "problem": "SixHumpCamel",
+      "seed": 20,
+      "terminal_best": 1.0292745310130613,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4021454933986871,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4021454933986871,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4021454933986871,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4021454933986871,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2959628693660614,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2959628693660614,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2959628693660614,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.2689767671311777,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0301313433813644,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0301313433813644,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -0.4021454933986871,
+      "new_evaluations": 25,
+      "objective_scale": 32.60940636261046,
+      "policy": "always_surrogate",
+      "problem": "SixHumpCamel",
+      "seed": 21,
+      "terminal_best": 1.0301313433813644,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.6167544520021285,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.19014844089582017,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.19014844089582017,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.19014844089582017,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.17016466404594754,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.6837707311608484,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.6837707311608484,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.6837707311608484,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.6837707311608484,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9770183652846433,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9985549438802831,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9985549438802831,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9985549438802831,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9985549438802831,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -0.6167544520021285,
+      "new_evaluations": 25,
+      "objective_scale": 15.294637241763173,
+      "policy": "always_surrogate",
+      "problem": "SixHumpCamel",
+      "seed": 22,
+      "terminal_best": 0.9985549438802831,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.235832383727821,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -3.235832383727821,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.20081953137547992,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.24718353217698397,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0182747377424874,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0182747377424874,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.0280676864501221,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -3.235832383727821,
+      "new_evaluations": 25,
+      "objective_scale": 8.08059558470997,
+      "policy": "always_surrogate",
+      "problem": "SixHumpCamel",
+      "seed": 23,
+      "terminal_best": 1.0280676864501221,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.30669819192689673,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.30669819192689673,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.30669819192689673,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.30669819192689673,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.30669819192689673,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.8470034431603616,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -0.7176768351602656,
+      "new_evaluations": 25,
+      "objective_scale": 15.465579291891267,
+      "policy": "always_surrogate",
+      "problem": "SixHumpCamel",
+      "seed": 24,
+      "terminal_best": 0.8470034431603616,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -176.99542536488298,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -176.99542536488298,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -123.18178310274149,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -176.99542536488298,
+      "new_evaluations": 25,
+      "objective_scale": 35.34506285776357,
+      "policy": "always_surrogate",
+      "problem": "Rastrigin",
+      "seed": 20,
+      "terminal_best": -123.18178310274149,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -82.55271677983933,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -113.10135493586071,
+      "new_evaluations": 25,
+      "objective_scale": 39.23777488955387,
+      "policy": "always_surrogate",
+      "problem": "Rastrigin",
+      "seed": 21,
+      "terminal_best": -82.55271677983933,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -151.31749106890214,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -141.96716406255396,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -136.28578504793853,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -151.31749106890214,
+      "new_evaluations": 25,
+      "objective_scale": 15.116923834343925,
+      "policy": "always_surrogate",
+      "problem": "Rastrigin",
+      "seed": 22,
+      "terminal_best": -136.28578504793853,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -135.91114370302836,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -126.9244378384545,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -89.5766662270598,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -135.91114370302836,
+      "new_evaluations": 25,
+      "objective_scale": 39.7651307678484,
+      "policy": "always_surrogate",
+      "problem": "Rastrigin",
+      "seed": 23,
+      "terminal_best": -89.5766662270598,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 20
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 21
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 22
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 23
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -131.51224856620328,
+          "n_new_samples": 1,
+          "round": 24
+        }
+      ],
+      "budget": 30,
+      "initial_best": -131.51224856620328,
+      "new_evaluations": 25,
+      "objective_scale": 45.46057706954614,
+      "policy": "always_surrogate",
+      "problem": "Rastrigin",
+      "seed": 24,
+      "terminal_best": -131.51224856620328,
+      "termination": "budget_exhausted"
+    }
+  ]
+}

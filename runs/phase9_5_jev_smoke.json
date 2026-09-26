@@ -1,0 +1,213 @@
+{
+  "model_requested": "jev-latest",
+  "rows": [
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 2,
+          "round": 3
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -2.4717055201640106,
+          "n_new_samples": 2,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 7
+        }
+      ],
+      "budget": 15,
+      "initial_best": -6.54437192689212,
+      "new_evaluations": 10,
+      "objective_scale": 41.55111947213898,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "seed": 20,
+      "terminal_best": -2.464419382004717,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.58,
+          "input_tokens": 666,
+          "latency_s": 0.7354720920557156,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.11,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.64,
+            "local_exploitation": 0.02,
+            "retrain_surrogate": 0.1,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.08,
+            "uncertainty_sampling": 0.05
+          },
+          "round": 0
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.64,
+          "input_tokens": 674,
+          "latency_s": 0.2919875290244818,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.1,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.68,
+            "local_exploitation": 0.02,
+            "retrain_surrogate": 0.04,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.09,
+            "uncertainty_sampling": 0.07
+          },
+          "round": 1
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.58,
+          "input_tokens": 673,
+          "latency_s": 0.3011775290360674,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.12,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.65,
+            "local_exploitation": 0.02,
+            "retrain_surrogate": 0.06,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.07,
+            "uncertainty_sampling": 0.07
+          },
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.61,
+          "input_tokens": 675,
+          "latency_s": 0.27992971800267696,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.11,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.66,
+            "local_exploitation": 0.02,
+            "retrain_surrogate": 0.06,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.07,
+            "uncertainty_sampling": 0.06
+          },
+          "round": 3
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.48,
+          "input_tokens": 675,
+          "latency_s": 0.29909671598579735,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.14,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.55,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.03,
+            "stop": 0.06,
+            "surrogate_acquisition": 0.08,
+            "uncertainty_sampling": 0.08
+          },
+          "round": 4
+        }
+      ],
+      "budget": 15,
+      "initial_best": -6.54437192689212,
+      "new_evaluations": 10,
+      "objective_scale": 41.55111947213898,
+      "policy": "jev",
+      "problem": "Branin",
+      "seed": 20,
+      "terminal_best": -6.54437192689212,
+      "termination": "budget_exhausted"
+    }
+  ],
+  "summary": {
+    "Branin/budget15/jev": {
+      "action_counts": {
+        "global_exploration": 5
+      },
+      "api_calls": 5,
+      "first_stop": 0,
+      "input_tokens": 3363,
+      "mean_latency_s": 0.3815327168209478,
+      "mean_new_evaluations": 10.0,
+      "mean_normalized_gain_vs_rule_full": -0.09819115818583683,
+      "mean_terminal_best": -6.54437192689212,
+      "n": 1
+    },
+    "Branin/budget15/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 2,
+        "surrogate_acquisition": 6
+      },
+      "api_calls": 0,
+      "first_stop": 0,
+      "input_tokens": 0,
+      "mean_latency_s": null,
+      "mean_new_evaluations": 10.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "mean_terminal_best": -2.464419382004717,
+      "n": 1
+    }
+  }
+}

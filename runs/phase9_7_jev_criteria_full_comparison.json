@@ -1,0 +1,836 @@
+{
+  "description": "Paired Jev Choice criteria experiment. Old and new share model jev-1.13.0, narrative state, action factory, problem seeds, budget30, max_rounds40, and torch thread1; only criteria wording/instruction differs. Constant baseline always selects surrogate_acquisition. Higher terminal_best is better. Five-seed exact bootstrap intervals are exploratory.",
+  "sets": {
+    "development": {
+      "cost": {
+        "new": {
+          "action_counts": {
+            "global_exploration": 55,
+            "surrogate_acquisition": 513,
+            "uncertainty_sampling": 2
+          },
+          "api_calls": 570,
+          "input_tokens": 560048,
+          "mean_new_evaluations": 25.0
+        },
+        "old": {
+          "action_counts": {
+            "global_exploration": 187,
+            "local_exploitation": 1,
+            "retrain_surrogate": 52,
+            "stop": 1,
+            "surrogate_acquisition": 248,
+            "uncertainty_sampling": 3
+          },
+          "api_calls": 492,
+          "input_tokens": 341334,
+          "mean_new_evaluations": 24.96
+        }
+      },
+      "results": [
+        {
+          "mean_always_surrogate": -0.4035117546844365,
+          "mean_executable": -0.4010827696998181,
+          "mean_legacy": -0.441291151160787,
+          "mean_new_minus_constant": 0.0024289849846184097,
+          "mean_new_minus_legacy": 0.040208381460968924,
+          "mean_rule_full_budget": -0.44418523259741605,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.020866969864319886,
+            0.07362493090291303
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            2,
+            3,
+            0
+          ],
+          "new_vs_old_wins_ties_losses": [
+            5,
+            0,
+            0
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -0.40194634074106617,
+              "executable": -0.39896896802848403,
+              "legacy": -0.42605870389518863,
+              "new_minus_constant": 0.002977372712582138,
+              "new_minus_legacy": 0.0270897358667046,
+              "new_minus_rule": 0.07148866387217545,
+              "rule_full_budget": -0.4704576319006595,
+              "seed": 20
+            },
+            {
+              "always_surrogate": -0.40252947708633613,
+              "executable": -0.40252947708633613,
+              "legacy": -0.41924793628239954,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.016718459196063407,
+              "new_minus_rule": 0.022389213088571225,
+              "rule_full_budget": -0.42491869017490735,
+              "seed": 21
+            },
+            {
+              "always_surrogate": -0.39795019585341684,
+              "executable": -0.39795019585341684,
+              "legacy": -0.5033956669896611,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.10544547113624425,
+              "new_minus_rule": 0.043087876650860224,
+              "rule_full_budget": -0.44103807250427707,
+              "seed": 22
+            },
+            {
+              "always_surrogate": -0.41628663333828086,
+              "executable": -0.40711908112777095,
+              "legacy": -0.43605670767716376,
+              "new_minus_constant": 0.00916755221050991,
+              "new_minus_legacy": 0.028937626549392803,
+              "new_minus_rule": 0.07454207949057867,
+              "rule_full_budget": -0.4816611606183496,
+              "seed": 23
+            },
+            {
+              "always_surrogate": -0.3988461264030825,
+              "executable": -0.3988461264030825,
+              "legacy": -0.42169674095952203,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.022850614556439552,
+              "new_minus_rule": 0.004004481385804226,
+              "rule_full_budget": -0.4028506077888867,
+              "seed": 24
+            }
+          ],
+          "problem": "Branin"
+        },
+        {
+          "mean_always_surrogate": -20.029653440368318,
+          "mean_executable": -19.764782059479302,
+          "mean_legacy": -19.752778765570017,
+          "mean_new_minus_constant": 0.2648713808890172,
+          "mean_new_minus_legacy": -0.01200329390928374,
+          "mean_rule_full_budget": -20.015622055064757,
+          "new_minus_legacy_bootstrap_95pct": [
+            -0.15979149142650256,
+            0.11245516167110381
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            3,
+            1,
+            1
+          ],
+          "new_vs_old_wins_ties_losses": [
+            2,
+            2,
+            1
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -20.321353679954722,
+              "executable": -20.057184249251666,
+              "legacy": -20.244609518703506,
+              "new_minus_constant": 0.2641694307030562,
+              "new_minus_legacy": 0.18742526945183968,
+              "new_minus_rule": 0.18742526945183968,
+              "rule_full_budget": -20.244609518703506,
+              "seed": 20
+            },
+            {
+              "always_surrogate": -19.146689018524096,
+              "executable": -19.146689018524096,
+              "legacy": -19.175005138592965,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.028316120068868855,
+              "new_minus_rule": 0.0,
+              "rule_full_budget": -19.146689018524096,
+              "seed": 21
+            },
+            {
+              "always_surrogate": -19.7488022602287,
+              "executable": -20.057184249251666,
+              "legacy": -19.78142639018454,
+              "new_minus_constant": -0.30838198902296554,
+              "new_minus_legacy": -0.27575785906712724,
+              "new_minus_rule": 0.18742526945183968,
+              "rule_full_budget": -20.244609518703506,
+              "seed": 22
+            },
+            {
+              "always_surrogate": -20.378823270741783,
+              "executable": -19.78142639018454,
+              "legacy": -19.78142639018454,
+              "new_minus_constant": 0.5973968805572447,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.27575785906712724,
+              "rule_full_budget": -20.057184249251666,
+              "seed": 23
+            },
+            {
+              "always_surrogate": -20.55259897239229,
+              "executable": -19.78142639018454,
+              "legacy": -19.78142639018454,
+              "new_minus_constant": 0.7711725822077504,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.6035915799564684,
+              "rule_full_budget": -20.385017970141007,
+              "seed": 24
+            }
+          ],
+          "problem": "Ackley"
+        },
+        {
+          "mean_always_surrogate": 2.8196315304149615,
+          "mean_executable": 2.8196315304149615,
+          "mean_legacy": 2.3884807155827965,
+          "mean_new_minus_constant": 0.0,
+          "mean_new_minus_legacy": 0.4311508148321649,
+          "mean_rule_full_budget": 2.166068651851817,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.28497234549141737,
+            0.6462817270406174
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            0,
+            5,
+            0
+          ],
+          "new_vs_old_wins_ties_losses": [
+            5,
+            0,
+            0
+          ],
+          "pairs": [
+            {
+              "always_surrogate": 3.0145853681816166,
+              "executable": 3.0145853681816166,
+              "legacy": 2.67876472611019,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.3358206420714267,
+              "new_minus_rule": 1.1671286022972263,
+              "rule_full_budget": 1.8474567658843903,
+              "seed": 20
+            },
+            {
+              "always_surrogate": 3.241517686855744,
+              "executable": 3.241517686855744,
+              "legacy": 2.950550200348694,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.29096748650704995,
+              "new_minus_rule": 0.9026206240875179,
+              "rule_full_budget": 2.338897062768226,
+              "seed": 21
+            },
+            {
+              "always_surrogate": 2.283627832076032,
+              "executable": 2.283627832076032,
+              "legacy": 1.4324064872656628,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.8512213448103694,
+              "new_minus_rule": 0.33054017875404273,
+              "rule_full_budget": 1.9530876533219894,
+              "seed": 22
+            },
+            {
+              "always_surrogate": 2.452667960841589,
+              "executable": 2.452667960841589,
+              "legacy": 2.1991149046558087,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.25355305618578017,
+              "new_minus_rule": 0.06346732411093825,
+              "rule_full_budget": 2.3892006367306506,
+              "seed": 23
+            },
+            {
+              "always_surrogate": 3.1057588041198256,
+              "executable": 3.1057588041198256,
+              "legacy": 2.6815672595336273,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.42419154458619834,
+              "new_minus_rule": 0.804057663565998,
+              "rule_full_budget": 2.3017011405538277,
+              "seed": 24
+            }
+          ],
+          "problem": "Hartmann"
+        },
+        {
+          "mean_always_surrogate": 0.9866063895770385,
+          "mean_executable": 0.9768407947891813,
+          "mean_legacy": 0.22732182527141562,
+          "mean_new_minus_constant": -0.009765594787857147,
+          "mean_new_minus_legacy": 0.7495189695177658,
+          "mean_rule_full_budget": 0.3516143363815204,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.5800609957116984,
+            0.9189769433238331
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            0,
+            4,
+            1
+          ],
+          "new_vs_old_wins_ties_losses": [
+            5,
+            0,
+            0
+          ],
+          "pairs": [
+            {
+              "always_surrogate": 1.0292745310130613,
+              "executable": 0.9804465570737756,
+              "legacy": 0.20064261075257617,
+              "new_minus_constant": -0.04882797393928573,
+              "new_minus_legacy": 0.7798039463211994,
+              "new_minus_rule": 0.7798039463211994,
+              "rule_full_budget": 0.20064261075257617,
+              "seed": 20
+            },
+            {
+              "always_surrogate": 1.0301313433813644,
+              "executable": 1.0301313433813644,
+              "legacy": 0.06581741912015304,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.9643139242612113,
+              "new_minus_rule": 0.14070174510297861,
+              "rule_full_budget": 0.8894295982783857,
+              "seed": 21
+            },
+            {
+              "always_surrogate": 0.9985549438802831,
+              "executable": 0.9985549438802831,
+              "legacy": 0.48244175924047783,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.5161131846398053,
+              "new_minus_rule": 1.6153093958824116,
+              "rule_full_budget": -0.6167544520021285,
+              "seed": 22
+            },
+            {
+              "always_surrogate": 1.0280676864501221,
+              "executable": 1.0280676864501221,
+              "legacy": 0.08484122556235041,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.9432264608877717,
+              "new_minus_rule": 0.27765231582912775,
+              "rule_full_budget": 0.7504153706209944,
+              "seed": 23
+            },
+            {
+              "always_surrogate": 0.8470034431603616,
+              "executable": 0.8470034431603616,
+              "legacy": 0.30286611168152056,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.544137331478841,
+              "new_minus_rule": 0.31266488890258726,
+              "rule_full_budget": 0.5343385542577743,
+              "seed": 24
+            }
+          ],
+          "problem": "SixHumpCamel"
+        },
+        {
+          "mean_always_surrogate": -112.62183994475649,
+          "mean_executable": -114.58139206427529,
+          "mean_legacy": -113.41340060064583,
+          "mean_new_minus_constant": -1.9595521195188013,
+          "mean_new_minus_legacy": -1.1679914636294626,
+          "mean_rule_full_budget": -111.04170447529211,
+          "new_minus_legacy_bootstrap_95pct": [
+            -2.814368213433977,
+            0.5050828095705782
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            2,
+            2,
+            1
+          ],
+          "new_vs_old_wins_ties_losses": [
+            1,
+            1,
+            3
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -123.18178310274149,
+              "executable": -123.18178310274149,
+              "legacy": -122.065914155277,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": -1.1158689474644916,
+              "new_minus_rule": -8.18216570228779,
+              "rule_full_budget": -114.9996174004537,
+              "seed": 20
+            },
+            {
+              "always_surrogate": -82.55271677983933,
+              "executable": -82.55271677983933,
+              "legacy": -82.55271677983933,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.0,
+              "rule_full_budget": -82.55271677983933,
+              "seed": 21
+            },
+            {
+              "always_surrogate": -136.28578504793853,
+              "executable": -117.44959288825846,
+              "legacy": -114.9996174004537,
+              "new_minus_constant": 18.836192159680067,
+              "new_minus_legacy": -2.449975487804764,
+              "new_minus_rule": -2.449975487804764,
+              "rule_full_budget": -114.9996174004537,
+              "seed": 22
+            },
+            {
+              "always_surrogate": -89.5766662270598,
+              "executable": -122.065914155277,
+              "legacy": -123.72437733382955,
+              "new_minus_constant": -32.489247928217196,
+              "new_minus_legacy": 1.6584631785525517,
+              "new_minus_rule": 5.591039239983161,
+              "rule_full_budget": -127.65695339526016,
+              "seed": 23
+            },
+            {
+              "always_surrogate": -131.51224856620328,
+              "executable": -127.65695339526016,
+              "legacy": -123.72437733382955,
+              "new_minus_constant": 3.8552951709431227,
+              "new_minus_legacy": -3.932576061430609,
+              "new_minus_rule": -12.65733599480646,
+              "rule_full_budget": -114.9996174004537,
+              "seed": 24
+            }
+          ],
+          "problem": "Rastrigin"
+        }
+      ],
+      "seeds": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "sources": {
+        "constant": "phase9_7_always_surrogate_5x5.json",
+        "new": "phase9_7_jev_executable_5x5.json",
+        "old": "phase9_6_jev_narrative_5x5.json"
+      }
+    },
+    "fresh": {
+      "cost": {
+        "new": {
+          "action_counts": {
+            "global_exploration": 75,
+            "surrogate_acquisition": 477
+          },
+          "api_calls": 552,
+          "input_tokens": 542259,
+          "mean_new_evaluations": 25.0
+        },
+        "old": {
+          "action_counts": {
+            "global_exploration": 184,
+            "local_exploitation": 1,
+            "retrain_surrogate": 57,
+            "stop": 1,
+            "surrogate_acquisition": 254,
+            "uncertainty_sampling": 4
+          },
+          "api_calls": 501,
+          "input_tokens": 347836,
+          "mean_new_evaluations": 24.96
+        }
+      },
+      "results": [
+        {
+          "mean_always_surrogate": -0.40327969198557734,
+          "mean_executable": -0.40327969198557734,
+          "mean_legacy": -0.42489631221102686,
+          "mean_new_minus_constant": 0.0,
+          "mean_new_minus_legacy": 0.021616620225449523,
+          "mean_rule_full_budget": -0.6846935749665282,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.005496033024987667,
+            0.03448010337870784
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            0,
+            5,
+            0
+          ],
+          "new_vs_old_wins_ties_losses": [
+            4,
+            0,
+            1
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -0.4081359000738036,
+              "executable": -0.4081359000738036,
+              "legacy": -0.39876234694961,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": -0.009373553124193634,
+              "new_minus_rule": 0.3154624403714976,
+              "rule_full_budget": -0.7235983404453012,
+              "seed": 30
+            },
+            {
+              "always_surrogate": -0.3980528330355071,
+              "executable": -0.3980528330355071,
+              "legacy": -0.43731578556805495,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.03926295253254786,
+              "new_minus_rule": 0.4851744645545306,
+              "rule_full_budget": -0.8832272975900377,
+              "seed": 31
+            },
+            {
+              "always_surrogate": -0.4030777811241766,
+              "executable": -0.4030777811241766,
+              "legacy": -0.41941565308914797,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.016337871964971384,
+              "new_minus_rule": 0.12767759838236437,
+              "rule_full_budget": -0.530755379506541,
+              "seed": 32
+            },
+            {
+              "always_surrogate": -0.40094294720964285,
+              "executable": -0.40094294720964285,
+              "legacy": -0.4307799948890434,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.02983704767940054,
+              "new_minus_rule": 0.004530560937539008,
+              "rule_full_budget": -0.40547350814718186,
+              "seed": 33
+            },
+            {
+              "always_surrogate": -0.4061889984847564,
+              "executable": -0.4061889984847564,
+              "legacy": -0.4382077805592779,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.03201878207452147,
+              "new_minus_rule": 0.4742243506588224,
+              "rule_full_budget": -0.8804133491435788,
+              "seed": 34
+            }
+          ],
+          "problem": "Branin"
+        },
+        {
+          "mean_always_surrogate": -20.16756269849308,
+          "mean_executable": -20.231784477296856,
+          "mean_legacy": -20.148001642008587,
+          "mean_new_minus_constant": -0.0642217788037776,
+          "mean_new_minus_legacy": -0.08378283528826955,
+          "mean_rule_full_budget": -20.417700688914714,
+          "new_minus_legacy_bootstrap_95pct": [
+            -0.32048455344035104,
+            0.0691360475755424
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            3,
+            0,
+            2
+          ],
+          "new_vs_old_wins_ties_losses": [
+            1,
+            3,
+            1
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -20.51286326523909,
+              "executable": -20.43079405854436,
+              "legacy": -20.43079405854436,
+              "new_minus_constant": 0.0820692066947295,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.08544367221671578,
+              "rule_full_budget": -20.516237730761077,
+              "seed": 30
+            },
+            {
+              "always_surrogate": -19.551387497141334,
+              "executable": -20.315567312585124,
+              "legacy": -19.78142639018454,
+              "new_minus_constant": -0.7641798154437893,
+              "new_minus_legacy": -0.5341409224005851,
+              "new_minus_rule": 0.11522674595923732,
+              "rule_full_budget": -20.43079405854436,
+              "seed": 31
+            },
+            {
+              "always_surrogate": -20.278568862723308,
+              "executable": -20.315567312585124,
+              "legacy": -20.43079405854436,
+              "new_minus_constant": -0.036998449861815885,
+              "new_minus_legacy": 0.11522674595923732,
+              "new_minus_rule": 0.2893017461806302,
+              "rule_full_budget": -20.604869058765754,
+              "seed": 32
+            },
+            {
+              "always_surrogate": -20.105808537958016,
+              "executable": -19.78142639018454,
+              "legacy": -19.78142639018454,
+              "new_minus_constant": 0.32438214777347696,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.32438214777347696,
+              "rule_full_budget": -20.105808537958016,
+              "seed": 33
+            },
+            {
+              "always_surrogate": -20.389185329403634,
+              "executable": -20.315567312585124,
+              "legacy": -20.315567312585124,
+              "new_minus_constant": 0.07361801681851077,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.11522674595923732,
+              "rule_full_budget": -20.43079405854436,
+              "seed": 34
+            }
+          ],
+          "problem": "Ackley"
+        },
+        {
+          "mean_always_surrogate": 2.9291949316900667,
+          "mean_executable": 2.9081470348294642,
+          "mean_legacy": 2.5000106367168837,
+          "mean_new_minus_constant": -0.02104789686060231,
+          "mean_new_minus_legacy": 0.4081363981125808,
+          "mean_rule_full_budget": 1.65248015621661,
+          "new_minus_legacy_bootstrap_95pct": [
+            -0.2475197428824501,
+            1.3226477105263004
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            1,
+            3,
+            1
+          ],
+          "new_vs_old_wins_ties_losses": [
+            3,
+            1,
+            1
+          ],
+          "pairs": [
+            {
+              "always_surrogate": 2.2044094189499694,
+              "executable": 2.2044094189499694,
+              "legacy": 2.76102723191705,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": -0.5566178129670805,
+              "new_minus_rule": 0.25132176562798003,
+              "rule_full_budget": 1.9530876533219894,
+              "seed": 30
+            },
+            {
+              "always_surrogate": 3.110767897488716,
+              "executable": 3.110767897488716,
+              "legacy": 2.737564830753986,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.3732030667347299,
+              "new_minus_rule": 2.307386590866823,
+              "rule_full_budget": 0.8033813066218929,
+              "seed": 31
+            },
+            {
+              "always_surrogate": 3.058750479669001,
+              "executable": 3.1677487005368428,
+              "legacy": 1.0027036214958496,
+              "new_minus_constant": 0.10899822086784194,
+              "new_minus_legacy": 2.1650450790409934,
+              "new_minus_rule": 1.2146610472148534,
+              "rule_full_budget": 1.9530876533219894,
+              "seed": 32
+            },
+            {
+              "always_surrogate": 3.0416479390742603,
+              "executable": 2.827410233903407,
+              "legacy": 2.768358576149146,
+              "new_minus_constant": -0.2142377051708535,
+              "new_minus_legacy": 0.05905165775426102,
+              "new_minus_rule": 0.5978382554086683,
+              "rule_full_budget": 2.2295719784947385,
+              "seed": 33
+            },
+            {
+              "always_surrogate": 3.2303989232683863,
+              "executable": 3.2303989232683863,
+              "legacy": 3.2303989232683863,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 1.9071267339459468,
+              "rule_full_budget": 1.3232721893224395,
+              "seed": 34
+            }
+          ],
+          "problem": "Hartmann"
+        },
+        {
+          "mean_always_surrogate": 0.9519726971221273,
+          "mean_executable": 0.9317752819757436,
+          "mean_legacy": 0.6407780512886164,
+          "mean_new_minus_constant": -0.02019741514638369,
+          "mean_new_minus_legacy": 0.29099723068712713,
+          "mean_rule_full_budget": 0.42793697962832,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.017281552238798414,
+            0.6400627976609214
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            0,
+            4,
+            1
+          ],
+          "new_vs_old_wins_ties_losses": [
+            3,
+            0,
+            2
+          ],
+          "pairs": [
+            {
+              "always_surrogate": 1.0181932795149395,
+              "executable": 1.0181932795149395,
+              "legacy": 1.021635168460122,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": -0.003441888945182381,
+              "new_minus_rule": 0.6424925112518904,
+              "rule_full_budget": 0.37570076826304916,
+              "seed": 30
+            },
+            {
+              "always_surrogate": 0.9472314251837534,
+              "executable": 0.9472314251837534,
+              "legacy": 0.6435288966201913,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.30370252856356206,
+              "new_minus_rule": 0.5016654983716338,
+              "rule_full_budget": 0.4455659268121196,
+              "seed": 31
+            },
+            {
+              "always_surrogate": 0.9199010623835261,
+              "executable": 0.9199010623835261,
+              "legacy": 0.9911853551916553,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": -0.0712842928081292,
+              "new_minus_rule": 0.408617007824046,
+              "rule_full_budget": 0.5112840545594801,
+              "seed": 32
+            },
+            {
+              "always_surrogate": 1.0095710790448098,
+              "executable": 0.9085840033128914,
+              "legacy": -0.058100446249184534,
+              "new_minus_constant": -0.10098707573191845,
+              "new_minus_legacy": 0.9666844495620759,
+              "new_minus_rule": 0.30209246555851643,
+              "rule_full_budget": 0.6064915377543749,
+              "seed": 33
+            },
+            {
+              "always_surrogate": 0.8649666394836075,
+              "executable": 0.8649666394836075,
+              "legacy": 0.6056412824202981,
+              "new_minus_constant": 0.0,
+              "new_minus_legacy": 0.2593253570633094,
+              "new_minus_rule": 0.6643240287310314,
+              "rule_full_budget": 0.20064261075257617,
+              "seed": 34
+            }
+          ],
+          "problem": "SixHumpCamel"
+        },
+        {
+          "mean_always_surrogate": -123.11022217650626,
+          "mean_executable": -114.92556616115323,
+          "mean_legacy": -117.5032596500605,
+          "mean_new_minus_constant": 8.184656015353024,
+          "mean_new_minus_legacy": 2.5776934889072747,
+          "mean_rule_full_budget": -117.45708244251429,
+          "new_minus_legacy_bootstrap_95pct": [
+            0.0,
+            7.22839443544702
+          ],
+          "new_vs_constant_wins_ties_losses": [
+            3,
+            0,
+            2
+          ],
+          "new_vs_old_wins_ties_losses": [
+            2,
+            3,
+            0
+          ],
+          "pairs": [
+            {
+              "always_surrogate": -113.73814773426554,
+              "executable": -113.73790232226669,
+              "legacy": -114.9996174004537,
+              "new_minus_constant": 0.0002454119988470893,
+              "new_minus_legacy": 1.2617150781870095,
+              "new_minus_rule": 0.0002454119988470893,
+              "rule_full_budget": -113.73814773426554,
+              "seed": 30
+            },
+            {
+              "always_surrogate": -110.57417289658284,
+              "executable": -114.9996174004537,
+              "legacy": -126.62636976680307,
+              "new_minus_constant": -4.425444503870864,
+              "new_minus_legacy": 11.626752366349365,
+              "new_minus_rule": 12.65733599480646,
+              "rule_full_budget": -127.65695339526016,
+              "seed": 31
+            },
+            {
+              "always_surrogate": -137.13137181118202,
+              "executable": -114.9996174004537,
+              "legacy": -114.9996174004537,
+              "new_minus_constant": 22.13175441072832,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.0,
+              "rule_full_budget": -114.9996174004537,
+              "seed": 32
+            },
+            {
+              "always_surrogate": -115.64063795460255,
+              "executable": -115.89107628213834,
+              "legacy": -115.89107628213834,
+              "new_minus_constant": -0.25043832753578954,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.0,
+              "rule_full_budget": -115.89107628213834,
+              "seed": 33
+            },
+            {
+              "always_surrogate": -138.4667804858983,
+              "executable": -114.9996174004537,
+              "legacy": -114.9996174004537,
+              "new_minus_constant": 23.46716308544461,
+              "new_minus_legacy": 0.0,
+              "new_minus_rule": 0.0,
+              "rule_full_budget": -114.9996174004537,
+              "seed": 34
+            }
+          ],
+          "problem": "Rastrigin"
+        }
+      ],
+      "seeds": [
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "sources": {
+        "constant": "phase9_7_always_surrogate_fresh_5x5.json",
+        "new": "phase9_7_jev_executable_fresh_5x5.json",
+        "old": "phase9_7_jev_legacy_fresh_5x5.json"
+      }
+    }
+  }
+}

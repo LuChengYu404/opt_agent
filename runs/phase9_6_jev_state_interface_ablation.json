@@ -1,0 +1,302 @@
+{
+  "description": "Development-set paired ablation of Jev state interface on five problems, seeds 20-24, budget 30. Higher terminal_best is better. Narrative adds semantic explanation and last_value; it is not a format-only ablation.",
+  "model_resolved": "jev-1.13.0",
+  "narrative_api_calls": 492,
+  "narrative_input_tokens": 341334,
+  "narrative_source": "runs/phase9_6_jev_narrative_5x5.json",
+  "results": [
+    {
+      "losses": 0,
+      "mean_narrative_terminal_best": -19.752778765570017,
+      "mean_normalized_gain": 0.7105133553584466,
+      "mean_raw_gain": 0.21714831707956606,
+      "mean_structured_terminal_best": -19.969927082649583,
+      "n": 5,
+      "paired": [
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -20.244609518703506,
+          "normalized_gain": 0.0,
+          "raw_gain": 0.0,
+          "seed": 20,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -20.244609518703506
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -19.175005138592965,
+          "normalized_gain": 0.023651960006405705,
+          "raw_gain": 0.01896687692239496,
+          "seed": 21,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -19.19397201551536
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -19.78142639018454,
+          "normalized_gain": 1.9015938629624147,
+          "raw_gain": 0.4631831285189669,
+          "seed": 22,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -20.244609518703506
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -19.78142639018454,
+          "normalized_gain": 0.0,
+          "raw_gain": 0.0,
+          "seed": 23,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -19.78142639018454
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -19.78142639018454,
+          "normalized_gain": 1.6273209538234126,
+          "raw_gain": 0.6035915799564684,
+          "seed": 24,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -20.385017970141007
+        }
+      ],
+      "problem": "Ackley",
+      "ties": 2,
+      "wins": 3
+    },
+    {
+      "losses": 0,
+      "mean_narrative_terminal_best": -0.441291151160787,
+      "mean_normalized_gain": 0.025887987073591506,
+      "mean_raw_gain": 1.2112508143148895,
+      "mean_structured_terminal_best": -1.6525419654756763,
+      "n": 5,
+      "paired": [
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -0.42605870389518863,
+          "normalized_gain": 0.04437792159505636,
+          "raw_gain": 1.8439523221214031,
+          "seed": 20,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -2.2700110260165918
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -0.41924793628239954,
+          "normalized_gain": 0.019629665293831665,
+          "raw_gain": 1.0004823025951808,
+          "seed": 21,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -1.4197302388775803
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -0.5033956669896611,
+          "normalized_gain": 0.037464512280205364,
+          "raw_gain": 1.7666153590269307,
+          "seed": 22,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -2.2700110260165918
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -0.43605670767716376,
+          "normalized_gain": 0.017959467657620572,
+          "raw_gain": 0.9836735312004166,
+          "seed": 23,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -1.4197302388775803
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -0.42169674095952203,
+          "normalized_gain": 0.010008368541243581,
+          "raw_gain": 0.4615305566305157,
+          "seed": 24,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -0.8832272975900377
+        }
+      ],
+      "problem": "Branin",
+      "ties": 0,
+      "wins": 5
+    },
+    {
+      "losses": 1,
+      "mean_narrative_terminal_best": 2.3884807155827965,
+      "mean_normalized_gain": 2.6482117837462678,
+      "mean_raw_gain": 0.7806660919853745,
+      "mean_structured_terminal_best": 1.607814623597422,
+      "n": 5,
+      "paired": [
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 2.67876472611019,
+          "normalized_gain": 6.305823547906132,
+          "raw_gain": 0.7256770727882005,
+          "seed": 20,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 1.9530876533219894
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 2.950550200348694,
+          "normalized_gain": 4.7375204862018885,
+          "raw_gain": 1.860645121338123,
+          "seed": 21,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 1.0899050790105709
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 1.4324064872656628,
+          "normalized_gain": -6.912819014406295,
+          "raw_gain": -0.5206811660563266,
+          "seed": 22,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 1.9530876533219894
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 2.1991149046558087,
+          "normalized_gain": 5.787619766383548,
+          "raw_gain": 1.1092098256452378,
+          "seed": 23,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 1.0899050790105709
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 2.6815672595336273,
+          "normalized_gain": 3.322914132646065,
+          "raw_gain": 0.7284796062116379,
+          "seed": 24,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 1.9530876533219894
+        }
+      ],
+      "problem": "Hartmann",
+      "ties": 0,
+      "wins": 4
+    },
+    {
+      "losses": 2,
+      "mean_narrative_terminal_best": -113.41340060064583,
+      "mean_normalized_gain": 0.09712088371093303,
+      "mean_raw_gain": 3.738031505850569,
+      "mean_structured_terminal_best": -117.1514321064964,
+      "n": 5,
+      "paired": [
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -122.065914155277,
+          "normalized_gain": -0.19992316276985148,
+          "raw_gain": -7.066296754823298,
+          "seed": 20,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -114.9996174004537
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -82.55271677983933,
+          "normalized_gain": 0.7785517461683139,
+          "raw_gain": 30.548638156021383,
+          "seed": 21,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -113.10135493586071
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -114.9996174004537,
+          "normalized_gain": 0.0,
+          "raw_gain": 0.0,
+          "seed": 22,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -114.9996174004537
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": -123.72437733382955,
+          "normalized_gain": 0.098895086863646,
+          "raw_gain": 3.932576061430609,
+          "seed": 23,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -127.65695339526016
+        },
+        {
+          "narrative_new_evaluations": 24,
+          "narrative_terminal_best": -123.72437733382955,
+          "normalized_gain": -0.19191925170744328,
+          "raw_gain": -8.72475993337585,
+          "seed": 24,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": -114.9996174004537
+        }
+      ],
+      "problem": "Rastrigin",
+      "ties": 1,
+      "wins": 2
+    },
+    {
+      "losses": 0,
+      "mean_narrative_terminal_best": 0.22732182527141562,
+      "mean_normalized_gain": 0.005477740742997318,
+      "mean_raw_gain": 0.08060929117180868,
+      "mean_structured_terminal_best": 0.1467125340996069,
+      "n": 5,
+      "paired": [
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 0.20064261075257617,
+          "normalized_gain": 0.0,
+          "raw_gain": 0.0,
+          "seed": 20,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 0.20064261075257617
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 0.06581741912015304,
+          "normalized_gain": 0.0,
+          "raw_gain": 0.0,
+          "seed": 21,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 0.06581741912015304
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 0.48244175924047783,
+          "normalized_gain": 0.018424702987948457,
+          "raw_gain": 0.28179914848790166,
+          "seed": 22,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 0.20064261075257617
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 0.08484122556235041,
+          "normalized_gain": 0.002354257955712329,
+          "raw_gain": 0.019023806442197366,
+          "seed": 23,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 0.06581741912015304
+        },
+        {
+          "narrative_new_evaluations": 25,
+          "narrative_terminal_best": 0.30286611168152056,
+          "normalized_gain": 0.006609742771325807,
+          "raw_gain": 0.10222350092894439,
+          "seed": 24,
+          "structured_new_evaluations": 25,
+          "structured_terminal_best": 0.20064261075257617
+        }
+      ],
+      "problem": "SixHumpCamel",
+      "ties": 2,
+      "wins": 3
+    }
+  ],
+  "structured_api_calls": 325,
+  "structured_input_tokens": 219301,
+  "structured_source": "runs/phase9_5_jev_zero_shot_5x5_threads1.json"
+}

@@ -1,0 +1,3045 @@
+{
+  "checkpoints": [
+    "rule_imitation=runs/typed_decision_rule_full_v2.pt",
+    "no_fit_rollout=runs/typed_decision_no_fit_v2.pt"
+  ],
+  "rows": [
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -5.604306589256247,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "routes": null,
+      "scale": 82.79420345894916,
+      "seed": 10,
+      "terminal_best": -3.5572618887069245,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 4
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -5.604306589256247,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Branin",
+      "routes": {
+        "system1": 15
+      },
+      "scale": 82.79420345894916,
+      "seed": 10,
+      "terminal_best": -3.5572618887069245,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -5.604306589256247,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Branin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 82.79420345894916,
+      "seed": 10,
+      "terminal_best": -5.604306589256247,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -5.101854251220087,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "routes": null,
+      "scale": 20.70183227122269,
+      "seed": 11,
+      "terminal_best": -3.5572618887069245,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -5.101854251220087,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Branin",
+      "routes": {
+        "system1": 14
+      },
+      "scale": 20.70183227122269,
+      "seed": 11,
+      "terminal_best": -3.5572618887069245,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -5.101854251220087,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Branin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 20.70183227122269,
+      "seed": 11,
+      "terminal_best": -1.6529167317449645,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -21.22958854898816,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "routes": null,
+      "scale": 20.438664657874348,
+      "seed": 12,
+      "terminal_best": -0.5608144363243408,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 6
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -21.22958854898816,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Branin",
+      "routes": {
+        "system1": 16
+      },
+      "scale": 20.438664657874348,
+      "seed": 12,
+      "terminal_best": -3.7782251424455326,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -21.22958854898816,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Branin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 20.438664657874348,
+      "seed": 12,
+      "terminal_best": -21.22958854898816,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -9.078124730032364,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "routes": null,
+      "scale": 56.09034215309245,
+      "seed": 13,
+      "terminal_best": -2.756462233978783,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -9.078124730032364,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Branin",
+      "routes": {
+        "system1": 16
+      },
+      "scale": 56.09034215309245,
+      "seed": 13,
+      "terminal_best": -2.756462233978783,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -9.078124730032364,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Branin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 56.09034215309245,
+      "seed": 13,
+      "terminal_best": -1.395013318742798,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -16.75027074812528,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "routes": null,
+      "scale": 57.06105154918264,
+      "seed": 14,
+      "terminal_best": -1.4197302388775803,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -16.75027074812528,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Branin",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 57.06105154918264,
+      "seed": 14,
+      "terminal_best": -1.4197302388775803,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -16.75027074812528,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Branin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 57.06105154918264,
+      "seed": 14,
+      "terminal_best": -16.75027074812528,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -20.95974743133289,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Ackley",
+      "routes": null,
+      "scale": 0.27714313001356294,
+      "seed": 10,
+      "terminal_best": -20.373681912598467,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 8
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.95974743133289,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 0.27714313001356294,
+      "seed": 10,
+      "terminal_best": -20.373681912598467,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -20.95974743133289,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.27714313001356294,
+      "seed": 10,
+      "terminal_best": -20.824356202303857,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -20.530139140346073,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Ackley",
+      "routes": null,
+      "scale": 0.32946248272898665,
+      "seed": 11,
+      "terminal_best": -20.057184249251666,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 4
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.530139140346073,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 15
+      },
+      "scale": 0.32946248272898665,
+      "seed": 11,
+      "terminal_best": -20.057184249251666,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -20.530139140346073,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.32946248272898665,
+      "seed": 11,
+      "terminal_best": -19.92638707760741,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -21.14517520368061,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Ackley",
+      "routes": null,
+      "scale": 0.1730303883456071,
+      "seed": 12,
+      "terminal_best": -20.244609518703506,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 8
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -21.14517520368061,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 0.1730303883456071,
+      "seed": 12,
+      "terminal_best": -20.244609518703506,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -21.14517520368061,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.1730303883456071,
+      "seed": 12,
+      "terminal_best": -21.081195390445075,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.839331029676902,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Ackley",
+      "routes": null,
+      "scale": 0.18476466288618995,
+      "seed": 13,
+      "terminal_best": -20.385017970141007,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.839331029676902,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 16
+      },
+      "scale": 0.18476466288618995,
+      "seed": 13,
+      "terminal_best": -20.385017970141007,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -20.839331029676902,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.18476466288618995,
+      "seed": 13,
+      "terminal_best": -20.342323706808575,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.48084130371166,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Ackley",
+      "routes": null,
+      "scale": 0.4630111000817348,
+      "seed": 14,
+      "terminal_best": -20.057184249251666,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -20.48084130371166,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 14
+      },
+      "scale": 0.4630111000817348,
+      "seed": 14,
+      "terminal_best": -20.057184249251666,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -20.48084130371166,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Ackley",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.4630111000817348,
+      "seed": 14,
+      "terminal_best": -19.99114049182732,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": 0.5367606064669946,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "routes": null,
+      "scale": 0.18879380005695479,
+      "seed": 10,
+      "terminal_best": 1.1498992489147126,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 8
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.5367606064669946,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 0.18879380005695479,
+      "seed": 10,
+      "terminal_best": 1.1498992489147126,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 0.5367606064669946,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.18879380005695479,
+      "seed": 10,
+      "terminal_best": 0.6805321491793535,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 2,
+        "surrogate_acquisition": 21
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": 0.11484056205213593,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "routes": null,
+      "scale": 0.03535914394676934,
+      "seed": 11,
+      "terminal_best": 2.852333920067464,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 20
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.11484056205213593,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 23
+      },
+      "scale": 0.03535914394676934,
+      "seed": 11,
+      "terminal_best": 2.852333920067464,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 0.11484056205213593,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.03535914394676934,
+      "seed": 11,
+      "terminal_best": 0.313753247831492,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 1.9771271369154644,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "routes": null,
+      "scale": 0.825975397230911,
+      "seed": 12,
+      "terminal_best": 1.9771271369154644,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 1.9771271369154644,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 14
+      },
+      "scale": 0.825975397230911,
+      "seed": 12,
+      "terminal_best": 1.9771271369154644,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 1.9771271369154644,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.825975397230911,
+      "seed": 12,
+      "terminal_best": 2.5216158942261493,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 1.5238983272321114,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "routes": null,
+      "scale": 0.5702224640027622,
+      "seed": 13,
+      "terminal_best": 2.217654162651109,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 1.5238983272321114,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 15
+      },
+      "scale": 0.5702224640027622,
+      "seed": 13,
+      "terminal_best": 2.217654162651109,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 1.5238983272321114,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.5702224640027622,
+      "seed": 13,
+      "terminal_best": 2.575258320693573,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": 0.9122000237778204,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "routes": null,
+      "scale": 0.33147986375610217,
+      "seed": 14,
+      "terminal_best": 1.7290749751509717,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 8
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.9122000237778204,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 0.33147986375610217,
+      "seed": 14,
+      "terminal_best": 1.7290749751509717,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 0.9122000237778204,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Hartmann",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 0.33147986375610217,
+      "seed": 14,
+      "terminal_best": 1.649429782422472,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -2.0676166976372694,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "SixHumpCamel",
+      "routes": null,
+      "scale": 34.35227198550233,
+      "seed": 10,
+      "terminal_best": 0.7329948654151907,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -2.0676166976372694,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 15
+      },
+      "scale": 34.35227198550233,
+      "seed": 10,
+      "terminal_best": 0.7329948654151907,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -2.0676166976372694,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 34.35227198550233,
+      "seed": 10,
+      "terminal_best": -2.0676166976372694,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 19
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -1.9606808662914788,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "SixHumpCamel",
+      "routes": null,
+      "scale": 17.516616498439404,
+      "seed": 11,
+      "terminal_best": 0.9740538324948933,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 19
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -1.9606808662914788,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 22
+      },
+      "scale": 17.516616498439404,
+      "seed": 11,
+      "terminal_best": 0.9740538324948933,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -1.9606808662914788,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 17.516616498439404,
+      "seed": 11,
+      "terminal_best": -1.9606808662914788,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -1.1517364264028265,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "SixHumpCamel",
+      "routes": null,
+      "scale": 38.63554978454174,
+      "seed": 12,
+      "terminal_best": -0.03103343679819548,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 8
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -1.1517364264028265,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 38.63554978454174,
+      "seed": 12,
+      "terminal_best": -0.03103343679819548,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -1.1517364264028265,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 38.63554978454174,
+      "seed": 12,
+      "terminal_best": -1.1517364264028265,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 12,
+        "surrogate_acquisition": 1
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.030623665797252758,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "SixHumpCamel",
+      "routes": null,
+      "scale": 17.108419389121106,
+      "seed": 13,
+      "terminal_best": 0.030623665797252758,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 12,
+        "surrogate_acquisition": 1
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.030623665797252758,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 13
+      },
+      "scale": 17.108419389121106,
+      "seed": 13,
+      "terminal_best": 0.030623665797252758,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 0.030623665797252758,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 17.108419389121106,
+      "seed": 13,
+      "terminal_best": 0.030623665797252758,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": 0.09874324713562133,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "SixHumpCamel",
+      "routes": null,
+      "scale": 9.845117899364901,
+      "seed": 14,
+      "terminal_best": 0.09874324713562133,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 12,
+        "surrogate_acquisition": 2
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": 0.09874324713562133,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 14
+      },
+      "scale": 9.845117899364901,
+      "seed": 14,
+      "terminal_best": 0.09874324713562133,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": 0.09874324713562133,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "SixHumpCamel",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 9.845117899364901,
+      "seed": 14,
+      "terminal_best": 0.09874324713562133,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -145.86294067245802,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "routes": null,
+      "scale": 24.68909373102355,
+      "seed": 10,
+      "terminal_best": -112.61527649235586,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 3
+      },
+      "actions": [
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -145.86294067245802,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 14
+      },
+      "scale": 24.68909373102355,
+      "seed": 10,
+      "terminal_best": -112.61527649235586,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -145.86294067245802,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 24.68909373102355,
+      "seed": 10,
+      "terminal_best": -145.86294067245802,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -171.39506153250642,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "routes": null,
+      "scale": 15.318745067988793,
+      "seed": 11,
+      "terminal_best": -114.9996174004537,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 9
+      },
+      "actions": [
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -171.39506153250642,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 17
+      },
+      "scale": 15.318745067988793,
+      "seed": 11,
+      "terminal_best": -114.9996174004537,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -171.39506153250642,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 15.318745067988793,
+      "seed": 11,
+      "terminal_best": -152.43622351305387,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 10,
+        "surrogate_acquisition": 5
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -166.30657854921787,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "routes": null,
+      "scale": 20.041598988229186,
+      "seed": 12,
+      "terminal_best": -103.28227490914479,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 11,
+        "surrogate_acquisition": 4
+      },
+      "actions": [
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -166.30657854921787,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 15
+      },
+      "scale": 20.041598988229186,
+      "seed": 12,
+      "terminal_best": -103.28227490914479,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -166.30657854921787,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 20.041598988229186,
+      "seed": 12,
+      "terminal_best": -166.30657854921787,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -124.48105461562861,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "routes": null,
+      "scale": 24.526998999848452,
+      "seed": 13,
+      "terminal_best": -114.9996174004537,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition"
+      ],
+      "budget": 30,
+      "initial_best": -124.48105461562861,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 16
+      },
+      "scale": 24.526998999848452,
+      "seed": 13,
+      "terminal_best": -114.9996174004537,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -124.48105461562861,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 24.526998999848452,
+      "seed": 13,
+      "terminal_best": -124.48105461562861,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 13
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -149.34788630193987,
+      "new_evaluations": 25,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "routes": null,
+      "scale": 26.897509863885976,
+      "seed": 14,
+      "terminal_best": -118.13630532709446,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 13
+      },
+      "actions": [
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration",
+        "global_exploration",
+        "global_exploration",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "surrogate_acquisition",
+        "global_exploration"
+      ],
+      "budget": 30,
+      "initial_best": -149.34788630193987,
+      "new_evaluations": 25,
+      "policy": "rule_imitation",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 19
+      },
+      "scale": 26.897509863885976,
+      "seed": 14,
+      "terminal_best": -118.13630532709446,
+      "termination": "budget_exhausted"
+    },
+    {
+      "action_counts": {
+        "error_guided_sampling": 25
+      },
+      "actions": [
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling",
+        "error_guided_sampling"
+      ],
+      "budget": 30,
+      "initial_best": -149.34788630193987,
+      "new_evaluations": 25,
+      "policy": "no_fit_rollout",
+      "problem": "Rastrigin",
+      "routes": {
+        "system1": 25
+      },
+      "scale": 26.897509863885976,
+      "seed": 14,
+      "terminal_best": -120.3369413590748,
+      "termination": "budget_exhausted"
+    }
+  ],
+  "summary": {
+    "Ackley/no_fit_rollout": {
+      "action_counts": {
+        "error_guided_sampling": 125
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -20.433080573798446,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -1.1380669597909814,
+      "n": 5
+    },
+    "Ackley/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 46,
+        "surrogate_acquisition": 33
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -20.223535579989264,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Ackley/rule_imitation": {
+      "action_counts": {
+        "global_exploration": 49,
+        "surrogate_acquisition": 30
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -20.223535579989264,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Branin/no_fit_rollout": {
+      "action_counts": {
+        "error_guided_sampling": 125
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -9.32641918737149,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -0.23767809525742983,
+      "n": 5
+    },
+    "Branin/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 47,
+        "surrogate_acquisition": 31
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -2.3703061373189107,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Branin/rule_imitation": {
+      "action_counts": {
+        "global_exploration": 49,
+        "surrogate_acquisition": 29
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -3.013788278543149,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -0.031483570575454686,
+      "n": 5
+    },
+    "Hartmann/no_fit_rollout": {
+      "action_counts": {
+        "error_guided_sampling": 125
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": 1.548117878870608,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -14.646849554500895,
+      "n": 5
+    },
+    "Hartmann/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 39,
+        "surrogate_acquisition": 47
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": 1.9852178887399443,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Hartmann/rule_imitation": {
+      "action_counts": {
+        "global_exploration": 42,
+        "surrogate_acquisition": 44
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": 1.9852178887399443,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Rastrigin/no_fit_rollout": {
+      "action_counts": {
+        "error_guided_sampling": 125
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -141.88474774188666,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -1.4807116468703463,
+      "n": 5
+    },
+    "Rastrigin/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 44,
+        "surrogate_acquisition": 37
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -112.8066183059005,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "Rastrigin/rule_imitation": {
+      "action_counts": {
+        "global_exploration": 45,
+        "surrogate_acquisition": 36
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -112.8066183059005,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "SixHumpCamel/no_fit_rollout": {
+      "action_counts": {
+        "error_guided_sampling": 125
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": -1.0101334154797401,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -0.05561466502297206,
+      "n": 5
+    },
+    "SixHumpCamel/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 44,
+        "surrogate_acquisition": 37
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": 0.3610764348089525,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    },
+    "SixHumpCamel/rule_imitation": {
+      "action_counts": {
+        "global_exploration": 46,
+        "surrogate_acquisition": 35
+      },
+      "first_stop": 0,
+      "max_rounds": 0,
+      "mean_best": 0.3610764348089525,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "n": 5
+    }
+  }
+}

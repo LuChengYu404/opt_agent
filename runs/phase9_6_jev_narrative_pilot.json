@@ -1,0 +1,1783 @@
+{
+  "direct": true,
+  "model_requested": "jev-1.13.0",
+  "rows": [
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "n_new_samples": 2,
+          "round": 3
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -2.4717055201640106,
+          "n_new_samples": 2,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.464419382004717,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.186179865519682,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -2.186179865519682,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.8259070698340967,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -1.8259070698340967,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 1,
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 1,
+          "round": 15
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 2,
+          "round": 16
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 2,
+          "round": 17
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 2,
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.4704576319006595,
+          "n_new_samples": 1,
+          "round": 19
+        }
+      ],
+      "budget": 30,
+      "initial_best": -6.54437192689212,
+      "new_evaluations": 25,
+      "objective_scale": 41.55111947213898,
+      "policy": "rule_full_budget",
+      "problem": "Branin",
+      "seed": 20,
+      "terminal_best": -0.4704576319006595,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.35,
+          "input_tokens": 696,
+          "latency_s": 0.4342764680041,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.0,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.44,
+            "local_exploitation": 0.05,
+            "retrain_surrogate": 0.26,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.18,
+            "uncertainty_sampling": 0.07
+          },
+          "round": 0
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.3,
+          "input_tokens": 690,
+          "latency_s": 0.29856482590548694,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.39,
+            "local_exploitation": 0.05,
+            "retrain_surrogate": 0.25,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.2,
+            "uncertainty_sampling": 0.1
+          },
+          "round": 1
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.28,
+          "input_tokens": 689,
+          "latency_s": 0.39431686606258154,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.37,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.26,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.16,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.25,
+          "input_tokens": 689,
+          "latency_s": 0.2757208829279989,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.33999999999999997,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.24,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.19,
+            "uncertainty_sampling": 0.12
+          },
+          "round": 3
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.3,
+          "input_tokens": 689,
+          "latency_s": 0.28424454503692687,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.38,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.22,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.14,
+            "uncertainty_sampling": 0.16
+          },
+          "round": 4
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.21,
+          "input_tokens": 690,
+          "latency_s": 0.27841475897002965,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.32,
+            "local_exploitation": 0.08,
+            "retrain_surrogate": 0.21,
+            "stop": 0.05,
+            "surrogate_acquisition": 0.17,
+            "uncertainty_sampling": 0.15
+          },
+          "round": 5
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.2,
+          "input_tokens": 693,
+          "latency_s": 0.29219331697095186,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.29,
+            "local_exploitation": 0.1,
+            "retrain_surrogate": 0.22,
+            "stop": 0.04,
+            "surrogate_acquisition": 0.2,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 6
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -6.54437192689212,
+          "confidence": 0.18,
+          "input_tokens": 693,
+          "latency_s": 0.31252677203156054,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.27,
+            "local_exploitation": 0.1,
+            "retrain_surrogate": 0.25,
+            "stop": 0.07,
+            "surrogate_acquisition": 0.16,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 7
+        },
+        {
+          "action": "retrain_surrogate",
+          "best_value": -6.54437192689212,
+          "confidence": 0.2,
+          "input_tokens": 690,
+          "latency_s": 0.2807530739810318,
+          "model": "jev-1.13.0",
+          "n_new_samples": 0,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.08,
+            "retrain_surrogate": 0.29,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.16,
+            "uncertainty_sampling": 0.15
+          },
+          "round": 8
+        },
+        {
+          "action": "uncertainty_sampling",
+          "best_value": -6.54437192689212,
+          "confidence": 0.34,
+          "input_tokens": 697,
+          "latency_s": 0.2795901959761977,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 91,
+          "probabilities": {
+            "boundary_sampling": 0.0,
+            "error_guided_sampling": 0.1,
+            "global_exploration": 0.08,
+            "local_exploitation": 0.01,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.35,
+            "uncertainty_sampling": 0.44
+          },
+          "round": 9
+        },
+        {
+          "action": "retrain_surrogate",
+          "best_value": -6.54437192689212,
+          "confidence": 0.16,
+          "input_tokens": 688,
+          "latency_s": 0.27699170901905745,
+          "model": "jev-1.13.0",
+          "n_new_samples": 0,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.21,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.27,
+            "stop": 0.08,
+            "surrogate_acquisition": 0.12,
+            "uncertainty_sampling": 0.24
+          },
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.35,
+          "input_tokens": 700,
+          "latency_s": 0.3274278660537675,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 94,
+          "probabilities": {
+            "boundary_sampling": 0.0,
+            "error_guided_sampling": 0.07,
+            "global_exploration": 0.06,
+            "local_exploitation": 0.01,
+            "stop": 0.06,
+            "surrogate_acquisition": 0.44,
+            "uncertainty_sampling": 0.36
+          },
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.38,
+          "input_tokens": 699,
+          "latency_s": 0.28195279999636114,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.13,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.11,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.46,
+            "uncertainty_sampling": 0.16
+          },
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.29,
+          "input_tokens": 691,
+          "latency_s": 0.3120060700457543,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.16,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.2,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.39,
+            "uncertainty_sampling": 0.16
+          },
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.31,
+          "input_tokens": 691,
+          "latency_s": 0.29237413592636585,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.18,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.12,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.39,
+            "uncertainty_sampling": 0.21
+          },
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.29,
+          "input_tokens": 692,
+          "latency_s": 0.2847561480011791,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.21,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.11,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.37,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.29,
+          "input_tokens": 690,
+          "latency_s": 0.27873070002533495,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.17,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.12,
+            "stop": 0.04,
+            "surrogate_acquisition": 0.39,
+            "uncertainty_sampling": 0.19
+          },
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.29,
+          "input_tokens": 691,
+          "latency_s": 0.322306614019908,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.15,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.1,
+            "stop": 0.05,
+            "surrogate_acquisition": 0.37,
+            "uncertainty_sampling": 0.22
+          },
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -0.42605870389518863,
+          "confidence": 0.37,
+          "input_tokens": 691,
+          "latency_s": 0.2817301800241694,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.1,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.08,
+            "stop": 0.15,
+            "surrogate_acquisition": 0.45,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 18
+        }
+      ],
+      "budget": 30,
+      "initial_best": -6.54437192689212,
+      "new_evaluations": 25,
+      "objective_scale": 41.55111947213898,
+      "policy": "jev",
+      "problem": "Branin",
+      "seed": 20,
+      "terminal_best": -0.42605870389518863,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3078994589338422,
+          "n_new_samples": 1,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.3078994589338422,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 0.575449933109318,
+          "n_new_samples": 2,
+          "round": 2
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.575449933109318,
+          "n_new_samples": 1,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9160755631211198,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9160755631211198,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 0.9160755631211198,
+          "n_new_samples": 1,
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.212045059428172,
+          "n_new_samples": 1,
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.212045059428172,
+          "n_new_samples": 1,
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.611844078255509,
+          "n_new_samples": 1,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 1,
+          "round": 13
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 2,
+          "round": 14
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 2,
+          "round": 15
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 2,
+          "round": 16
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 2,
+          "round": 17
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.8474567658843903,
+          "n_new_samples": 2,
+          "round": 18
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.3078994589338422,
+      "new_evaluations": 25,
+      "objective_scale": 0.11508045971713937,
+      "policy": "rule_full_budget",
+      "problem": "Hartmann",
+      "seed": 20,
+      "terminal_best": 1.8474567658843903,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "global_exploration",
+          "best_value": 1.866811279435455,
+          "confidence": 0.26,
+          "input_tokens": 693,
+          "latency_s": 0.4806809430010617,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.0,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.36,
+            "local_exploitation": 0.01,
+            "retrain_surrogate": 0.32,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.25,
+            "uncertainty_sampling": 0.06
+          },
+          "round": 0
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.866811279435455,
+          "confidence": 0.22,
+          "input_tokens": 694,
+          "latency_s": 0.29345869401004165,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.32,
+            "local_exploitation": 0.08,
+            "retrain_surrogate": 0.28,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.21,
+            "uncertainty_sampling": 0.1
+          },
+          "round": 1
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.866811279435455,
+          "confidence": 0.26,
+          "input_tokens": 692,
+          "latency_s": 0.29239889699965715,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.36,
+            "local_exploitation": 0.08,
+            "retrain_surrogate": 0.22,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.21,
+            "uncertainty_sampling": 0.12
+          },
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.866811279435455,
+          "confidence": 0.17,
+          "input_tokens": 693,
+          "latency_s": 0.26683616696391255,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.26,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.24,
+            "uncertainty_sampling": 0.12
+          },
+          "round": 3
+        },
+        {
+          "action": "global_exploration",
+          "best_value": 1.866811279435455,
+          "confidence": 0.26,
+          "input_tokens": 693,
+          "latency_s": 0.28057231300044805,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.35,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.27,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.16,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 4
+        },
+        {
+          "action": "retrain_surrogate",
+          "best_value": 1.866811279435455,
+          "confidence": 0.18,
+          "input_tokens": 694,
+          "latency_s": 0.28263923700433224,
+          "model": "jev-1.13.0",
+          "n_new_samples": 0,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.28,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.17,
+            "uncertainty_sampling": 0.15
+          },
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.866811279435455,
+          "confidence": 0.68,
+          "input_tokens": 707,
+          "latency_s": 0.26329936494585127,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 94,
+          "probabilities": {
+            "boundary_sampling": 0.0,
+            "error_guided_sampling": 0.02,
+            "global_exploration": 0.04,
+            "local_exploitation": 0.01,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.72,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.866811279435455,
+          "confidence": 0.21,
+          "input_tokens": 693,
+          "latency_s": 0.3644927409477532,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.3,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.1,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.32,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 1.866811279435455,
+          "confidence": 0.28,
+          "input_tokens": 694,
+          "latency_s": 0.26499074697494507,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.26,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.12,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.38,
+            "uncertainty_sampling": 0.17
+          },
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.3354904644897565,
+          "confidence": 0.25,
+          "input_tokens": 695,
+          "latency_s": 0.2591353489551693,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.26,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.14,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.33999999999999997,
+            "uncertainty_sampling": 0.17
+          },
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.3354904644897565,
+          "confidence": 0.39,
+          "input_tokens": 700,
+          "latency_s": 0.2753041289979592,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.02,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.14,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.09,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.46,
+            "uncertainty_sampling": 0.18
+          },
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.3354904644897565,
+          "confidence": 0.33,
+          "input_tokens": 692,
+          "latency_s": 0.259875804069452,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.17,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.1,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.41,
+            "uncertainty_sampling": 0.22
+          },
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.28,
+          "input_tokens": 692,
+          "latency_s": 0.2579614509595558,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.18,
+            "local_exploitation": 0.05,
+            "retrain_surrogate": 0.18,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.36,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.32,
+          "input_tokens": 699,
+          "latency_s": 0.2696671049343422,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.15,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.14,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.42,
+            "uncertainty_sampling": 0.18
+          },
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.34,
+          "input_tokens": 691,
+          "latency_s": 0.2665173859568313,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.15,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.1,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.43,
+            "uncertainty_sampling": 0.22
+          },
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.27,
+          "input_tokens": 691,
+          "latency_s": 0.2955141890561208,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.19,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.15,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.36,
+            "uncertainty_sampling": 0.22
+          },
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.23,
+          "input_tokens": 693,
+          "latency_s": 0.2817715819692239,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.02,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.2,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.14,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.33,
+            "uncertainty_sampling": 0.21
+          },
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.21,
+          "input_tokens": 694,
+          "latency_s": 0.3076758940005675,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.18,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.15,
+            "stop": 0.07,
+            "surrogate_acquisition": 0.32,
+            "uncertainty_sampling": 0.19
+          },
+          "round": 17
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.22,
+          "input_tokens": 695,
+          "latency_s": 0.2909608189947903,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.17,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.15,
+            "stop": 0.08,
+            "surrogate_acquisition": 0.32,
+            "uncertainty_sampling": 0.19
+          },
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.26,
+          "input_tokens": 693,
+          "latency_s": 0.26617203396745026,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.16,
+            "local_exploitation": 0.1,
+            "retrain_surrogate": 0.1,
+            "stop": 0.1,
+            "surrogate_acquisition": 0.33999999999999997,
+            "uncertainty_sampling": 0.18
+          },
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": 2.67876472611019,
+          "confidence": 0.17,
+          "input_tokens": 694,
+          "latency_s": 0.29649499407969415,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.17,
+            "local_exploitation": 0.17,
+            "retrain_surrogate": 0.04,
+            "stop": 0.16,
+            "surrogate_acquisition": 0.28,
+            "uncertainty_sampling": 0.16
+          },
+          "round": 20
+        }
+      ],
+      "budget": 30,
+      "initial_best": 0.3078994589338422,
+      "new_evaluations": 25,
+      "objective_scale": 0.11508045971713937,
+      "policy": "jev",
+      "problem": "Hartmann",
+      "seed": 20,
+      "terminal_best": 2.67876472611019,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "global_exploration",
+          "best_value": -150.6746193146139,
+          "n_new_samples": 2,
+          "round": 0
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -150.6746193146139,
+          "n_new_samples": 1,
+          "round": 1
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -150.6746193146139,
+          "n_new_samples": 1,
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "n_new_samples": 2,
+          "round": 3
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "n_new_samples": 1,
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "n_new_samples": 1,
+          "round": 5
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "n_new_samples": 2,
+          "round": 6
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "n_new_samples": 2,
+          "round": 7
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "n_new_samples": 2,
+          "round": 8
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 2,
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 1,
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 1,
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 1,
+          "round": 12
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 2,
+          "round": 13
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 2,
+          "round": 14
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -114.9996174004537,
+          "n_new_samples": 2,
+          "round": 15
+        }
+      ],
+      "budget": 30,
+      "initial_best": -176.99542536488298,
+      "new_evaluations": 25,
+      "objective_scale": 35.34506285776357,
+      "policy": "rule_full_budget",
+      "problem": "Rastrigin",
+      "seed": 20,
+      "terminal_best": -114.9996174004537,
+      "termination": "budget_exhausted"
+    },
+    {
+      "actions": [
+        {
+          "action": "global_exploration",
+          "best_value": -150.6746193146139,
+          "confidence": 0.25,
+          "input_tokens": 689,
+          "latency_s": 0.4340932300547138,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.34,
+            "local_exploitation": 0.01,
+            "retrain_surrogate": 0.33,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.23,
+            "uncertainty_sampling": 0.08
+          },
+          "round": 0
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -127.0537847915,
+          "confidence": 0.27,
+          "input_tokens": 689,
+          "latency_s": 0.31395894393790513,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.36,
+            "local_exploitation": 0.05,
+            "retrain_surrogate": 0.31,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.17,
+            "uncertainty_sampling": 0.09
+          },
+          "round": 1
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "confidence": 0.32,
+          "input_tokens": 689,
+          "latency_s": 0.31140610901638865,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.4,
+            "local_exploitation": 0.05,
+            "retrain_surrogate": 0.29,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.14,
+            "uncertainty_sampling": 0.11
+          },
+          "round": 2
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "confidence": 0.24,
+          "input_tokens": 692,
+          "latency_s": 0.27483965805731714,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.34,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.26,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.22,
+            "uncertainty_sampling": 0.11
+          },
+          "round": 3
+        },
+        {
+          "action": "retrain_surrogate",
+          "best_value": -122.065914155277,
+          "confidence": 0.25,
+          "input_tokens": 692,
+          "latency_s": 0.29888598003890365,
+          "model": "jev-1.13.0",
+          "n_new_samples": 0,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.0,
+            "global_exploration": 0.3,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.35000000000000003,
+            "stop": 0.0,
+            "surrogate_acquisition": 0.19,
+            "uncertainty_sampling": 0.12
+          },
+          "round": 4
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.4,
+          "input_tokens": 702,
+          "latency_s": 0.32017831306438893,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 94,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.04,
+            "global_exploration": 0.09,
+            "local_exploitation": 0.0,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.48,
+            "uncertainty_sampling": 0.37
+          },
+          "round": 5
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.19,
+          "input_tokens": 692,
+          "latency_s": 0.28735423798207194,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.16,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.27999999999999997,
+            "uncertainty_sampling": 0.21
+          },
+          "round": 6
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.23,
+          "input_tokens": 692,
+          "latency_s": 0.29593984002713114,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.29,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.12,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.33,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 7
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.22,
+          "input_tokens": 692,
+          "latency_s": 0.29626355203799903,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.14,
+            "stop": 0.01,
+            "surrogate_acquisition": 0.31,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 8
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.24,
+          "input_tokens": 692,
+          "latency_s": 0.27809769997838885,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.26,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.18,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.33,
+            "uncertainty_sampling": 0.15
+          },
+          "round": 9
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.29,
+          "input_tokens": 691,
+          "latency_s": 0.28376713395118713,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.26,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.16,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.37,
+            "uncertainty_sampling": 0.14
+          },
+          "round": 10
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.25,
+          "input_tokens": 692,
+          "latency_s": 0.2769448719918728,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.23,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.15,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.35,
+            "uncertainty_sampling": 0.19
+          },
+          "round": 11
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.2,
+          "input_tokens": 693,
+          "latency_s": 0.316969703999348,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.27,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.15,
+            "stop": 0.07,
+            "surrogate_acquisition": 0.3,
+            "uncertainty_sampling": 0.16
+          },
+          "round": 12
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.17,
+          "input_tokens": 692,
+          "latency_s": 0.2815180899342522,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.15,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.27,
+            "uncertainty_sampling": 0.22
+          },
+          "round": 13
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.27,
+          "input_tokens": 692,
+          "latency_s": 0.30466468702070415,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.23,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.14,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.36,
+            "uncertainty_sampling": 0.19
+          },
+          "round": 14
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.27,
+          "input_tokens": 692,
+          "latency_s": 0.27794779802206904,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.24,
+            "local_exploitation": 0.03,
+            "retrain_surrogate": 0.17,
+            "stop": 0.02,
+            "surrogate_acquisition": 0.37,
+            "uncertainty_sampling": 0.15
+          },
+          "round": 15
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.2,
+          "input_tokens": 692,
+          "latency_s": 0.2794529100647196,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.28,
+            "local_exploitation": 0.04,
+            "retrain_surrogate": 0.16,
+            "stop": 0.03,
+            "surrogate_acquisition": 0.29,
+            "uncertainty_sampling": 0.18
+          },
+          "round": 16
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.2,
+          "input_tokens": 692,
+          "latency_s": 0.29680426605045795,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.24,
+            "local_exploitation": 0.06,
+            "retrain_surrogate": 0.12,
+            "stop": 0.06,
+            "surrogate_acquisition": 0.3,
+            "uncertainty_sampling": 0.2
+          },
+          "round": 17
+        },
+        {
+          "action": "global_exploration",
+          "best_value": -122.065914155277,
+          "confidence": 0.19,
+          "input_tokens": 692,
+          "latency_s": 0.32078488904517144,
+          "model": "jev-1.13.0",
+          "n_new_samples": 2,
+          "output_tokens": 103,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.29,
+            "local_exploitation": 0.07,
+            "retrain_surrogate": 0.13,
+            "stop": 0.06,
+            "surrogate_acquisition": 0.25,
+            "uncertainty_sampling": 0.18
+          },
+          "round": 18
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.12,
+          "input_tokens": 691,
+          "latency_s": 0.3197469119913876,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.21,
+            "local_exploitation": 0.17,
+            "retrain_surrogate": 0.15,
+            "stop": 0.13,
+            "surrogate_acquisition": 0.22,
+            "uncertainty_sampling": 0.1
+          },
+          "round": 19
+        },
+        {
+          "action": "surrogate_acquisition",
+          "best_value": -122.065914155277,
+          "confidence": 0.26,
+          "input_tokens": 692,
+          "latency_s": 0.28272051899693906,
+          "model": "jev-1.13.0",
+          "n_new_samples": 1,
+          "output_tokens": 105,
+          "probabilities": {
+            "boundary_sampling": 0.01,
+            "error_guided_sampling": 0.01,
+            "global_exploration": 0.15,
+            "local_exploitation": 0.09,
+            "retrain_surrogate": 0.08,
+            "stop": 0.19,
+            "surrogate_acquisition": 0.33999999999999997,
+            "uncertainty_sampling": 0.13
+          },
+          "round": 20
+        }
+      ],
+      "budget": 30,
+      "initial_best": -176.99542536488298,
+      "new_evaluations": 25,
+      "objective_scale": 35.34506285776357,
+      "policy": "jev",
+      "problem": "Rastrigin",
+      "seed": 20,
+      "terminal_best": -122.065914155277,
+      "termination": "budget_exhausted"
+    }
+  ],
+  "state_format": "narrative",
+  "summary": {
+    "Branin/budget30/jev": {
+      "action_counts": {
+        "global_exploration": 8,
+        "retrain_surrogate": 2,
+        "surrogate_acquisition": 8,
+        "uncertainty_sampling": 1
+      },
+      "api_calls": 19,
+      "first_stop": 0,
+      "input_tokens": 13149,
+      "mean_latency_s": 0.3046777857357244,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0010685374682923138,
+      "mean_terminal_best": -0.42605870389518863,
+      "n": 1
+    },
+    "Branin/budget30/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 15
+      },
+      "api_calls": 0,
+      "first_stop": 0,
+      "input_tokens": 0,
+      "mean_latency_s": null,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "mean_terminal_best": -0.4704576319006595,
+      "n": 1
+    },
+    "Hartmann/budget30/jev": {
+      "action_counts": {
+        "global_exploration": 5,
+        "retrain_surrogate": 1,
+        "surrogate_acquisition": 15
+      },
+      "api_calls": 21,
+      "first_stop": 0,
+      "input_tokens": 14582,
+      "mean_latency_s": 0.2912580876090076,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 7.223710804328579,
+      "mean_terminal_best": 2.67876472611019,
+      "n": 1
+    },
+    "Hartmann/budget30/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 13
+      },
+      "api_calls": 0,
+      "first_stop": 0,
+      "input_tokens": 0,
+      "mean_latency_s": null,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "mean_terminal_best": 1.8474567658843903,
+      "n": 1
+    },
+    "Rastrigin/budget30/jev": {
+      "action_counts": {
+        "global_exploration": 5,
+        "retrain_surrogate": 1,
+        "surrogate_acquisition": 15
+      },
+      "api_calls": 21,
+      "first_stop": 0,
+      "input_tokens": 14532,
+      "mean_latency_s": 0.30249234977444367,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": -0.19992316276985148,
+      "mean_terminal_best": -122.065914155277,
+      "n": 1
+    },
+    "Rastrigin/budget30/rule_full_budget": {
+      "action_counts": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 7
+      },
+      "api_calls": 0,
+      "first_stop": 0,
+      "input_tokens": 0,
+      "mean_latency_s": null,
+      "mean_new_evaluations": 25.0,
+      "mean_normalized_gain_vs_rule_full": 0.0,
+      "mean_terminal_best": -114.9996174004537,
+      "n": 1
+    }
+  },
+  "torch_num_threads": 1
+}
