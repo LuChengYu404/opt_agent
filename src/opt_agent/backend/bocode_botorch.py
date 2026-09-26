@@ -9,7 +9,7 @@ Correction history (2025-09-23, per codex gpt-5.6-sol review):
   - UnifiedBackend uses abc.ABC + @abstractmethod.
   - get_history() returns cloned tensors so callers cannot mutate internal state.
   - propose(n != 1) raises (LogExpectedImprovement analytic only supports q=1).
-  - Gating uses allowlist (Branin/Hartmann/Ackley) + structural assertions.
+  - Gating uses an audited synthetic-problem allowlist + structural assertions.
 
 Design follows:
   - MASTER_PLAN.md §6 (Unified Backend)
@@ -136,7 +136,7 @@ class BocodeBotorchBackend(UnifiedBackend):
       - Single-objective only (n_obj == 1).
       - Unconstrained only (n_constr == 0).
       - Continuous box-bounded only.
-      - Problems limited to allowlist {Branin, Hartmann, Ackley}. Other problems
+      - Problems limited to the audited synthetic allowlist. Other problems
         are rejected to avoid admitting categorical/integer/noisy BOCoDe
         problems that the SingleTaskGP + optimize_acqf stack cannot handle.
 
@@ -149,7 +149,9 @@ class BocodeBotorchBackend(UnifiedBackend):
       - Batch proposals (propose(n=1) only).
     """
 
-    _ALLOWED_PROBLEMS = ("Branin", "Hartmann", "Ackley")
+    _ALLOWED_PROBLEMS = (
+        "Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin"
+    )
 
     def __init__(self) -> None:
         self.config: Optional[BackendConfig] = None

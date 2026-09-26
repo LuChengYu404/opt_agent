@@ -183,6 +183,23 @@ def test_problem_outside_allowlist_is_rejected() -> None:
         be.initialize(BackendConfig(problem_id="BikeBench64", seed=0, n_init=5))
 
 
+@pytest.mark.parametrize("problem_id,dimension", [
+    ("SixHumpCamel", 2),
+    ("Rastrigin", 10),
+])
+def test_new_synthetic_problem_runs_one_bo_step(problem_id: str, dimension: int) -> None:
+    be = BocodeBotorchBackend()
+    initial = be.initialize(BackendConfig(problem_id=problem_id, seed=0, n_init=5))
+    assert initial.X.shape == (5, dimension)
+    assert initial.objectives.shape == (5, 1)
+    assert initial.constraints.shape == (5, 0)
+    be.fit()
+    candidate = be.propose()
+    assert candidate.shape == (1, dimension)
+    be.evaluate(candidate)
+    assert len(be.get_history()) == 6
+
+
 # ---------------------------------------------------------------------------
 # Lifecycle errors
 # ---------------------------------------------------------------------------
