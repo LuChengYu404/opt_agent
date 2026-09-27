@@ -171,18 +171,26 @@ def build_choice_request(
 
     ``state_arg`` is the state payload passed as the predict call's
     ``state`` slot. ``inner_question`` is the dict that carries the
-    choice primitive (top-level ``"next_action"``); callers wrap it
+    choice primitive (top-level ``next_action``); callers wrap it
     with their own envelope (e.g. Jev nests under ``"questions"``).
 
     Centralising this here means a tweak to either prompt shape applies
     to both policies and there is no second copy of the instruction
     suffix or criteria block to drift out of sync.
+
+    ``state`` may also be a plain payload Mapping (e.g. a DecisionRecord's
+    serialized ``state`` block): it is passed through unchanged in
+    ``structured`` mode so offline trainers build the exact deployment
+    prompt from records. Narrative mode still requires the dataclass.
     """
-    state_arg = (
-        _state_payload(state)
-        if state_format == "structured"
-        else _state_narrative(state)
-    )
+    if isinstance(state, Mapping) and state_format == "structured":
+        state_arg = dict(state)
+    else:
+        state_arg = (
+            _state_payload(state)
+            if state_format == "structured"
+            else _state_narrative(state)
+        )
     criteria = {
         name: (
             _executable_criterion(action, state)

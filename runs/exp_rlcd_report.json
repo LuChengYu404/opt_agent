@@ -1,0 +1,80 @@
+{
+  "dataset": "runs/phase8_6d_h3_20seed_5family.jsonl",
+  "method": "RLCD CD stage (Yang et al., ICLR 2024, arXiv:2307.12950) adapted: pairs from counterfactual rollout utilities; Bradley-Terry loss on Laya per-option scorer logits",
+  "rf_baseline": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.816545517480097,
+    "top1_agreement": 0.4,
+    "train_records_used": 548,
+    "val_records": 115,
+    "wall_clock_s": 1.7
+  },
+  "rlcd_finetuned": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.8788508134302527,
+    "records": 115,
+    "top1_agreement": 0.3826086956521739
+  },
+  "rlcd_train": {
+    "best_val_pairwise_accuracy": 0.8788508134302527,
+    "config": {
+      "batch_size": 8,
+      "beta": 1.0,
+      "learning_rate": 1e-05,
+      "margin": 0.0,
+      "max_pairs_per_record": null,
+      "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
+      "num_epochs": 3,
+      "output_dir": "runs/rlcd_laya_v1"
+    },
+    "final_val": {
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8788508134302527,
+      "records": 115,
+      "top1_agreement": 0.3826086956521739
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": 0.39844323932260706,
+        "train_pair_acc": 0.8460104168506396,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.8598130841121495,
+        "val_top1_agreement": 0.24347826086956523
+      },
+      {
+        "epoch": 1,
+        "train_loss": 0.349525682952093,
+        "train_pair_acc": 0.8621562193447212,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.8688127379716165,
+        "val_top1_agreement": 0.391304347826087
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3284065397321314,
+        "train_pair_acc": 0.8720695617240776,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.8788508134302527,
+        "val_top1_agreement": 0.3826086956521739
+      }
+    ],
+    "train_items": 548,
+    "train_pairs": 13618,
+    "train_records": 548,
+    "val_records": 115
+  },
+  "split": {
+    "train_records": 548,
+    "train_seed_range": "[0, 16)",
+    "val_records": 115,
+    "val_seed_range": "[16, \u221e)"
+  },
+  "train_wall_clock_s": 56.1,
+  "zero_shot_laya": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.3956386292834891,
+    "records": 115,
+    "top1_agreement": 0.034782608695652174
+  }
+}
