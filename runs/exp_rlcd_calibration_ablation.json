@@ -1,0 +1,56 @@
+{
+  "arms": {
+    "bt": {
+      "fitted_temperature_on_calib": 16.49229907983848,
+      "raw": {
+        "argmax_accuracy": 0.4,
+        "aurc": 0.5570144090634077,
+        "conf_gap": 0.012937280716318056,
+        "conf_when_correct": 0.4127263982187618,
+        "conf_when_incorrect": 0.3997891175024437,
+        "ece15_argmax": 0.02086799144744876,
+        "mean_log_score": -3.067899151281877,
+        "mean_max_prob": 0.40496402978897095,
+        "mean_nll_argmax": 1.5236654671755705
+      },
+      "tempered": {
+        "argmax_accuracy": 0.4,
+        "aurc": 0.5526632141986806,
+        "conf_gap": 0.00044664717984924107,
+        "conf_when_correct": 0.14375873790545898,
+        "conf_when_incorrect": 0.14331209072560974,
+        "ece15_argmax": 0.2565092504024506,
+        "mean_log_score": -2.0725445812398737,
+        "mean_max_prob": 0.14349074959754943,
+        "mean_nll_argmax": 1.9789109403436833
+      }
+    },
+    "proper": {
+      "fitted_temperature_on_calib": 1.556875884360819,
+      "raw": {
+        "argmax_accuracy": 0.2727272727272727,
+        "aurc": 0.6568322540951129,
+        "conf_gap": 0.004494233553608257,
+        "conf_when_correct": 0.16156410177548727,
+        "conf_when_incorrect": 0.15706986822187902,
+        "ece15_argmax": 0.11443170444531872,
+        "mean_log_score": -2.070340691913258,
+        "mean_max_prob": 0.15829556828195399,
+        "mean_nll_argmax": 1.940264023434032
+      },
+      "tempered": {
+        "argmax_accuracy": 0.2727272727272727,
+        "aurc": 0.6603941892359956,
+        "conf_gap": 0.002771385386586195,
+        "conf_when_correct": 0.14822929501533508,
+        "conf_when_incorrect": 0.14545790962874888,
+        "ece15_argmax": 0.12651353072036395,
+        "mean_log_score": -2.0681848612698643,
+        "mean_max_prob": 0.14621374200690876,
+        "mean_nll_argmax": 1.984635056148876
+      }
+    }
+  },
+  "n_calib": 60,
+  "n_held": 55
+}

@@ -577,11 +577,18 @@ def gate2_stability(records: list[DecisionRecord]) -> Gate2Result:
         top_counts: dict[str, int] = defaultdict(int)
         seed_lifts: list[float] = []
         for seed, recs in seed_groups:
-            action_ids = recs[0].gold_probs.keys()
-            mean_probs = {
-                action: statistics.fmean(r.gold_probs[action] for r in recs)
-                for action in action_ids
+            # Partial-rollout records (long-horizon quota datasets) cover a
+            # k-of-8 subset per record. Per-action means are taken only over
+            # records where the action was actually rolled out; the seed's
+            # top action is the argmax over actions covered by its records.
+            covered = {
+                a for r in recs for a in r.gold_probs
             }
+            mean_probs = {}
+            for action in sorted(covered):
+                vals = [r.gold_probs[action] for r in recs if action in r.gold_probs]
+                if vals:
+                    mean_probs[action] = statistics.fmean(vals)
             top_counts[max(mean_probs, key=mean_probs.get)] += 1
             lift = statistics.fmean(_lift(r.gold_probs)[1] for r in recs)
             per_seed_lift[(problem, phase, seed)] = lift

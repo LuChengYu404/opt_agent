@@ -81,12 +81,19 @@ Frequent-opportunity。在上述所有近邻工作中都没有对应物——这
 
 ### P1 — 缺一个"赢"的 regime
 
-- 全阴性对 workshop 够、对期刊需至少一个正向结果。最有希望的路径：
-  **把 LLM 的全局→局部调度蒸馏成可学习策略**——机制检查里确定性
-  global-then-local 基线已在 dev seeds 上赢过 LLM（见
-  EXP_FINAL_GOAL_CLOSED_LOOP_REPORT 机制检查段）；下一步在多峰问题族上展示
-  learned schedule > 固定规则，即"从 LLM 轨迹蒸馏调度先验"的完整故事
-  （这也是 Sara/lenz future work 未做的）。
+- 全阴性对 workshop 够、对期刊需至少一个正向结果。（2026-09-27 更新：
+  **部分达成，走的是"蒸馏泛化"而非"调度蒸馏"路径**——EXP-RLCD-JOURNAL
+  轮的 E5 显示：反事实蒸馏的 Laya typed-decision 模型在 leave-one-family-
+  out 下保持 ~99% 族内排序精度（0.866 vs 0.873），对 RF 基线的优势在家族
+  偏移下从 +0.056 翻倍到 +0.146，5/5 折全胜（符号检验 p=0.031）。这是
+  RQ2 式的"跨问题泛化"阳性。机制边界的诚实刻画同时到手：置信度无判别力
+  （AURC≈1−acc，E1）→ 量化路由退化为家族级整体切换（E4，预申明标准未过）
+  → RQ3 前沿保持退化的原因比"RF 平"更深：现有监督不提供判别性不确定性。
+  详见 `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`。原"调度蒸馏"路径仍是
+  备选：机制检查里确定性 global-then-local 基线已在 dev seeds 上赢过 LLM；
+  在多峰问题族上展示 learned schedule > 固定规则仍是可选的第二个"赢"。）
+- 确认性补强（E5 后续）：per-record 日志 + record-clustered CI；每折
+  2 个训练种子。
 
 ### P1 — 统计完整化
 

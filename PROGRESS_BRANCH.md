@@ -167,3 +167,31 @@ runs/EXP_RLCD_CLOSED_LOOP_REPORT.md     # Track D (collapse finding + interpreta
 runs/exp_rlcd_report.json, exp_rlcd_ci.json, exp_rlcd_sweep.json,
 runs/exp_rlcd_longhorizon.json, runs/exp_rlcd_closed_loop.json
 ```
+
+## 8. Journal round E1–E5 (2026-09-27 evening; parallel CPU+GPU)
+
+Five experiments against the journal gaps (`docs/ref_papers/journal_positioning.md`).
+Consolidated report: `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`.
+
+- **E1 calibration ablation**: proper-score is the only jointly calibrated
+  arm (log −2.07 + ECE 0.11); BT+temperature recovers log but breaks ECE
+  (0.02→0.26); **confidence discrimination ≈ 0 in every arm** (conf_gap
+  ≤ 0.013, AURC ≈ 1−acc).
+- **E2 long-horizon gates**: Gate 3 lift 12.9 (10× the h3 teacher's 1.29);
+  Gate 2/4 still FAIL. Partial-record Gate 2 machinery fixed
+  (`validation.gate2_stability` now averages per-action mass over records
+  that rolled the action out).
+- **E3**: long-horizon fine-tunes still collapse to constants — different
+  modes per objective (bt_lh→local, proper_lh→error_guided).
+- **E4 router panel (predeclared)**: FAIL — quantile routing degenerates to
+  family-level all-or-nothing switching (Hartmann +5.87*** vs pure but
+  trajectories ≡ surrogate). Consistent with E1's null discrimination;
+  sharpens RQ3: the missing ingredient is discriminative uncertainty.
+- **E5 LOO transfer (the positive)**: bt retains 0.866/0.873 of in-family
+  ranking on unseen families; RF drops to 0.720; bt > rf on 5/5 folds
+  (sign p=0.031); the gap doubles under shift (+0.056 → +0.146).
+  Exploratory (per-fold aggregates); confirmatory per-record rerun queued.
+
+New scripts: `exp_rlcd_calibration_ablation.py`, `exp_rlcd_router_panel.py`,
+`exp_rlcd_loo_transfer.py`. Gate-2 partial-record fix in
+`src/opt_agent/dataset/validation.py`.

@@ -1,0 +1,6 @@
+calib=60 held=55
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[bt] T*=16.492 log_score -3.0679 -> -2.0725 | ECE 0.0209 -> 0.2565
+[proper] T*=1.557 log_score -2.0703 -> -2.0682 | ECE 0.1144 -> 0.1265
+wrote runs/exp_rlcd_calibration_ablation.json

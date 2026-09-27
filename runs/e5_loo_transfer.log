@@ -1,0 +1,75 @@
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[rlcd:proper_score] epoch 0: loss=1.9528 val_pair_acc=0.773 val_top1=0.242 val_logscore=-2.0695
+[rlcd:proper_score] epoch 0: loss=1.9620 val_pair_acc=0.698 val_top1=0.125 val_logscore=-2.0715
+[rlcd:proper_score] epoch 1: loss=1.8884 val_pair_acc=0.733 val_top1=0.242 val_logscore=-2.0655
+[rlcd:proper_score] epoch 1: loss=1.8922 val_pair_acc=0.755 val_top1=0.261 val_logscore=-2.0690
+[rlcd:proper_score] epoch 2: loss=1.8819 val_pair_acc=0.752 val_top1=0.264 val_logscore=-2.0646
+[rlcd:proper_score] epoch 2: loss=1.8910 val_pair_acc=0.721 val_top1=0.170 val_logscore=-2.0684
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[rlcd:bt_pairs] epoch 0: loss=0.4171 val_pair_acc=0.870 val_top1=0.396 val_logscore=-3.0303
+[rlcd:bt_pairs] epoch 0: loss=0.4120 val_pair_acc=0.858 val_top1=0.261 val_logscore=-2.8222
+[rlcd:bt_pairs] epoch 1: loss=0.3577 val_pair_acc=0.873 val_top1=0.385 val_logscore=-2.8413
+[rlcd:bt_pairs] epoch 1: loss=0.3619 val_pair_acc=0.868 val_top1=0.420 val_logscore=-2.9899
+[rlcd:bt_pairs] epoch 2: loss=0.3344 val_pair_acc=0.860 val_top1=0.242 val_logscore=-2.9103
+[rlcd:bt_pairs] epoch 2: loss=0.3434 val_pair_acc=0.871 val_top1=0.443 val_logscore=-3.0490
+[loo:branin] proper_score  pair_acc=0.750 top1=0.219 log_score=-2.088
+[loo:branin] bt_pairs      pair_acc=0.871 top1=0.521 log_score=-2.981
+[loo:branin] rf            pair_acc=0.817 top1=0.212
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[loo:ackley] proper_score  pair_acc=0.758 top1=0.300 log_score=-2.061
+[loo:ackley] bt_pairs      pair_acc=0.869 top1=0.315 log_score=-2.890
+[loo:ackley] rf            pair_acc=0.666 top1=0.162
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[rlcd:proper_score] epoch 0: loss=1.9673 val_pair_acc=0.780 val_top1=0.232 val_logscore=-2.0724
+[rlcd:proper_score] epoch 0: loss=1.9511 val_pair_acc=0.718 val_top1=0.239 val_logscore=-2.0698
+[rlcd:proper_score] epoch 1: loss=1.8935 val_pair_acc=0.720 val_top1=0.232 val_logscore=-2.0718
+[rlcd:proper_score] epoch 1: loss=1.8897 val_pair_acc=0.743 val_top1=0.239 val_logscore=-2.0677
+[rlcd:proper_score] epoch 2: loss=1.8934 val_pair_acc=0.759 val_top1=0.232 val_logscore=-2.0711
+[rlcd:proper_score] epoch 2: loss=1.8869 val_pair_acc=0.740 val_top1=0.239 val_logscore=-2.0662
+[rlcd:bt_pairs] epoch 0: loss=0.3983 val_pair_acc=0.889 val_top1=0.463 val_logscore=-3.4121
+[rlcd:bt_pairs] epoch 0: loss=0.3957 val_pair_acc=0.871 val_top1=0.304 val_logscore=-2.8819
+[rlcd:bt_pairs] epoch 1: loss=0.3476 val_pair_acc=0.892 val_top1=0.495 val_logscore=-3.0421
+[rlcd:bt_pairs] epoch 1: loss=0.3500 val_pair_acc=0.875 val_top1=0.380 val_logscore=-2.8985
+[rlcd:bt_pairs] epoch 2: loss=0.3258 val_pair_acc=0.893 val_top1=0.474 val_logscore=-3.3603
+[rlcd:bt_pairs] epoch 2: loss=0.3295 val_pair_acc=0.865 val_top1=0.228 val_logscore=-3.0014
+[loo:rastrigin] proper_score  pair_acc=0.734 top1=0.240 log_score=-2.071
+[loo:rastrigin] bt_pairs      pair_acc=0.844 top1=0.248 log_score=-2.890
+[loo:rastrigin] rf            pair_acc=0.697 top1=0.225
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[loo:hartmann] proper_score  pair_acc=0.757 top1=0.252 log_score=-2.057
+[loo:hartmann] bt_pairs      pair_acc=0.829 top1=0.319 log_score=-3.141
+[loo:hartmann] rf            pair_acc=0.812 top1=0.267
+[rlcd:proper_score] epoch 0: loss=1.9482 val_pair_acc=0.683 val_top1=0.245 val_logscore=-2.0679
+[rlcd:proper_score] epoch 1: loss=1.8866 val_pair_acc=0.716 val_top1=0.245 val_logscore=-2.0652
+[rlcd:proper_score] epoch 2: loss=1.8819 val_pair_acc=0.731 val_top1=0.245 val_logscore=-2.0649
+[rlcd:bt_pairs] epoch 0: loss=0.4183 val_pair_acc=0.850 val_top1=0.245 val_logscore=-2.6261
+[rlcd:bt_pairs] epoch 1: loss=0.3715 val_pair_acc=0.850 val_top1=0.245 val_logscore=-2.8531
+[rlcd:bt_pairs] epoch 2: loss=0.3546 val_pair_acc=0.855 val_top1=0.245 val_logscore=-2.7604
+[loo:sixhumpcamel] proper_score  pair_acc=0.732 top1=0.268 log_score=-2.089
+[loo:sixhumpcamel] bt_pairs      pair_acc=0.915 top1=0.301 log_score=-2.881
+[loo:sixhumpcamel] rf            pair_acc=0.608 top1=0.081
+{
+  "bt_pairs": {
+    "mean_log_score": -2.9566050870861185,
+    "mean_pairwise_accuracy": 0.8657267121965049,
+    "mean_top1_agreement": 0.3406652205485141
+  },
+  "proper_score": {
+    "mean_log_score": -2.0731278712973564,
+    "mean_pairwise_accuracy": 0.7462565386512103,
+    "mean_top1_agreement": 0.25592653889796835
+  },
+  "rf": {
+    "mean_pairwise_accuracy": 0.7199983673042958,
+    "mean_top1_agreement": 0.1893281819773867
+  }
+}

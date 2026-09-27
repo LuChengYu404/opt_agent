@@ -1,0 +1,145 @@
+{
+  "aggregate": {
+    "bt_pairs": {
+      "mean_log_score": -2.9566050870861185,
+      "mean_pairwise_accuracy": 0.8657267121965049,
+      "mean_top1_agreement": 0.3406652205485141
+    },
+    "proper_score": {
+      "mean_log_score": -2.0731278712973564,
+      "mean_pairwise_accuracy": 0.7462565386512103,
+      "mean_top1_agreement": 0.25592653889796835
+    },
+    "rf": {
+      "mean_pairwise_accuracy": 0.7199983673042958,
+      "mean_top1_agreement": 0.1893281819773867
+    }
+  },
+  "folds": [
+    {
+      "bt_pairs": {
+        "mean_log_score": -2.8904162067633408,
+        "pairs": 3229,
+        "pairwise_accuracy": 0.869309383710127,
+        "records": 130,
+        "top1_agreement": 0.3153846153846154
+      },
+      "family": "ackley",
+      "proper_score": {
+        "mean_log_score": -2.061214283796457,
+        "pairs": 3229,
+        "pairwise_accuracy": 0.7575100650356147,
+        "records": 130,
+        "top1_agreement": 0.3
+      },
+      "rf": {
+        "pairwise_accuracy": 0.6658408175905853,
+        "records": 130,
+        "top1_agreement": 0.16153846153846155,
+        "train_records_full_width": 530,
+        "train_records_skipped_partial": 3
+      },
+      "test_records": 130
+    },
+    {
+      "bt_pairs": {
+        "mean_log_score": -2.981137556572483,
+        "pairs": 3612,
+        "pairwise_accuracy": 0.8707087486157253,
+        "records": 146,
+        "top1_agreement": 0.5205479452054794
+      },
+      "family": "branin",
+      "proper_score": {
+        "mean_log_score": -2.0880048781225127,
+        "pairs": 3612,
+        "pairwise_accuracy": 0.7502768549280178,
+        "records": 146,
+        "top1_agreement": 0.2191780821917808
+      },
+      "rf": {
+        "pairwise_accuracy": 0.8167220376522702,
+        "records": 146,
+        "top1_agreement": 0.21232876712328766,
+        "train_records_full_width": 516,
+        "train_records_skipped_partial": 1
+      },
+      "test_records": 146
+    },
+    {
+      "bt_pairs": {
+        "mean_log_score": -3.1411385907067193,
+        "pairs": 3459,
+        "pairwise_accuracy": 0.8291413703382481,
+        "records": 135,
+        "top1_agreement": 0.31851851851851853
+      },
+      "family": "hartmann",
+      "proper_score": {
+        "mean_log_score": -2.056770917221352,
+        "pairs": 3459,
+        "pairwise_accuracy": 0.7574443480774791,
+        "records": 135,
+        "top1_agreement": 0.2518518518518518
+      },
+      "rf": {
+        "pairwise_accuracy": 0.8120844174616941,
+        "records": 135,
+        "top1_agreement": 0.26666666666666666,
+        "train_records_full_width": 525,
+        "train_records_skipped_partial": 3
+      },
+      "test_records": 135
+    },
+    {
+      "bt_pairs": {
+        "mean_log_score": -2.889542805132016,
+        "pairs": 3181,
+        "pairwise_accuracy": 0.8440741905061302,
+        "records": 129,
+        "top1_agreement": 0.24806201550387597
+      },
+      "family": "rastrigin",
+      "proper_score": {
+        "mean_log_score": -2.070973431417184,
+        "pairs": 3181,
+        "pairwise_accuracy": 0.7337315309651053,
+        "records": 129,
+        "top1_agreement": 0.24031007751937986
+      },
+      "rf": {
+        "pairwise_accuracy": 0.6969506444514304,
+        "records": 129,
+        "top1_agreement": 0.2248062015503876,
+        "train_records_full_width": 532,
+        "train_records_skipped_partial": 2
+      },
+      "test_records": 129
+    },
+    {
+      "bt_pairs": {
+        "mean_log_score": -2.8807902762560342,
+        "pairs": 3026,
+        "pairwise_accuracy": 0.9153998678122934,
+        "records": 123,
+        "top1_agreement": 0.3008130081300813
+      },
+      "family": "sixhumpcamel",
+      "proper_score": {
+        "mean_log_score": -2.0886758459292776,
+        "pairs": 3026,
+        "pairwise_accuracy": 0.7323198942498348,
+        "records": 123,
+        "top1_agreement": 0.2682926829268293
+      },
+      "rf": {
+        "pairwise_accuracy": 0.608393919365499,
+        "records": 123,
+        "top1_agreement": 0.08130081300813008,
+        "train_records_full_width": 537,
+        "train_records_skipped_partial": 3
+      },
+      "test_records": 123
+    }
+  ]
+}

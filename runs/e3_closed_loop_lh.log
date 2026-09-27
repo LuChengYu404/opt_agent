@@ -1,0 +1,478 @@
+200 trajectories over 4 workers (5 problems × 10 seeds × 4 arms)
+[10/200] Branin seed=201 proper_lh: best=-3.8487 eval=25
+[20/200] Branin seed=204 surrogate: best=-0.4483 eval=25
+[30/200] Branin seed=208 rule_full_budget: best=-1.6399 eval=25
+[40/200] Branin seed=209 surrogate: best=-0.4105 eval=25
+[50/200] Ackley seed=203 rule_full_budget: best=-19.9520 eval=25
+[60/200] Ackley seed=204 proper_lh: best=-19.4189 eval=25
+[70/200] Ackley seed=208 rule_full_budget: best=-19.9850 eval=25
+[80/200] Hartmann seed=200 rule_full_budget: best=0.7714 eval=25
+[90/200] Hartmann seed=203 rule_full_budget: best=1.6315 eval=25
+[100/200] Hartmann seed=205 rule_full_budget: best=2.6078 eval=25
+[110/200] Hartmann seed=207 bt_lh: best=1.2122 eval=25
+[120/200] SixHumpCamel seed=200 surrogate: best=0.6759 eval=25
+[130/200] SixHumpCamel seed=202 surrogate: best=0.9892 eval=25
+[140/200] SixHumpCamel seed=204 proper_lh: best=-3.0367 eval=25
+[150/200] SixHumpCamel seed=208 rule_full_budget: best=0.8730 eval=25
+[160/200] Rastrigin seed=200 surrogate: best=-114.1169 eval=25
+[170/200] Rastrigin seed=203 rule_full_budget: best=-139.1133 eval=25
+[180/200] Rastrigin seed=203 proper_lh: best=-120.9885 eval=25
+[190/200] Rastrigin seed=208 rule_full_budget: best=-123.6516 eval=25
+[200/200] Rastrigin seed=208 proper_lh: best=-149.0912 eval=25
+{
+  "Ackley/bt_lh": {
+    "action_counts": {
+      "local_exploitation": 250
+    },
+    "first_stop": 0,
+    "mean_best": -19.144280346938235,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Ackley/bt_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.24964459406767583,
+      4.777636522285667
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 2.3393659235208704,
+    "n_seeds": 10
+  },
+  "Ackley/bt_lh/vs_surrogate": {
+    "ci95": [
+      -0.53437681712031,
+      4.704858300189339
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 2.171284918550229,
+    "n_seeds": 10
+  },
+  "Ackley/proper_lh": {
+    "action_counts": {
+      "error_guided_sampling": 250
+    },
+    "first_stop": 0,
+    "mean_best": -19.795907380828105,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Ackley/proper_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.9729591856541674,
+      2.0120311973667846
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.4707403727180023,
+    "n_seeds": 10
+  },
+  "Ackley/proper_lh/vs_surrogate": {
+    "ci95": [
+      -1.3485892814165887,
+      2.004943132442702
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.3026593677473609,
+    "n_seeds": 10
+  },
+  "Ackley/rule_full_budget": {
+    "action_counts": {
+      "global_exploration": 104,
+      "surrogate_acquisition": 42
+    },
+    "first_stop": 0,
+    "mean_best": -20.061233033980937,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Ackley/rule_full_budget/vs_surrogate": {
+    "ci95": [
+      -0.48811254044831226,
+      0.11056841219298766
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": -0.16808100497064132,
+    "n_seeds": 10
+  },
+  "Ackley/surrogate": {
+    "action_counts": {
+      "surrogate_acquisition": 250
+    },
+    "first_stop": 0,
+    "mean_best": -20.03022534863022,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Ackley/surrogate/vs_rule_full_budget": {
+    "ci95": [
+      -0.10972533159958853,
+      0.48895562104171136
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.16808100497064132,
+    "n_seeds": 10
+  },
+  "Branin/bt_lh": {
+    "action_counts": {
+      "local_exploitation": 250
+    },
+    "first_stop": 0,
+    "mean_best": -1.0147573903346907,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Branin/bt_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.014780873517987042,
+      0.014483215348503903
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.00015566493034044614,
+    "n_seeds": 10
+  },
+  "Branin/bt_lh/vs_surrogate": {
+    "ci95": [
+      -0.025986724491090213,
+      -0.007126135947205221
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.01571778779771516,
+    "n_seeds": 10
+  },
+  "Branin/proper_lh": {
+    "action_counts": {
+      "error_guided_sampling": 250
+    },
+    "first_stop": 0,
+    "mean_best": -12.652179791962558,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Branin/proper_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.5530583564133332,
+      -0.1447753933079364
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.333774400228198,
+    "n_seeds": 10
+  },
+  "Branin/proper_lh/vs_surrogate": {
+    "ci95": [
+      -0.5791311080728931,
+      -0.15201757993678483
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.3496478529562536,
+    "n_seeds": 10
+  },
+  "Branin/rule_full_budget": {
+    "action_counts": {
+      "global_exploration": 95,
+      "surrogate_acquisition": 60
+    },
+    "first_stop": 0,
+    "mean_best": -1.096671353029474,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Branin/rule_full_budget/vs_surrogate": {
+    "ci95": [
+      -0.02884450381779751,
+      -0.006383064152625069
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.01587345272805561,
+    "n_seeds": 10
+  },
+  "Branin/surrogate": {
+    "action_counts": {
+      "surrogate_acquisition": 250
+    },
+    "first_stop": 0,
+    "mean_best": -0.4183970185016069,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Branin/surrogate/vs_rule_full_budget": {
+    "ci95": [
+      0.006418003165498081,
+      0.028858145632019182
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": 0.01587345272805561,
+    "n_seeds": 10
+  },
+  "Hartmann/bt_lh": {
+    "action_counts": {
+      "local_exploitation": 250
+    },
+    "first_stop": 0,
+    "mean_best": 2.1084137465960726,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Hartmann/bt_lh/vs_rule_full_budget": {
+    "ci95": [
+      -7.532788156013628,
+      6.155720664138608
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": -0.8194588951127482,
+    "n_seeds": 10
+  },
+  "Hartmann/bt_lh/vs_surrogate": {
+    "ci95": [
+      -17.88764127554271,
+      -1.9094672545650688
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -9.04097814364986,
+    "n_seeds": 10
+  },
+  "Hartmann/proper_lh": {
+    "action_counts": {
+      "error_guided_sampling": 250
+    },
+    "first_stop": 0,
+    "mean_best": 1.060464388195794,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Hartmann/proper_lh/vs_rule_full_budget": {
+    "ci95": [
+      -21.56594790232298,
+      -3.4020367504537474
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -12.105931892008687,
+    "n_seeds": 10
+  },
+  "Hartmann/proper_lh/vs_surrogate": {
+    "ci95": [
+      -32.97814302842696,
+      -9.002196389341325
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -20.3274511405458,
+    "n_seeds": 10
+  },
+  "Hartmann/rule_full_budget": {
+    "action_counts": {
+      "global_exploration": 73,
+      "surrogate_acquisition": 104
+    },
+    "first_stop": 0,
+    "mean_best": 2.026415694040655,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Hartmann/rule_full_budget/vs_surrogate": {
+    "ci95": [
+      -15.096707138084984,
+      -2.12523186819001
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -8.221519248537113,
+    "n_seeds": 10
+  },
+  "Hartmann/surrogate": {
+    "action_counts": {
+      "surrogate_acquisition": 250
+    },
+    "first_stop": 0,
+    "mean_best": 2.852562882832693,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Hartmann/surrogate/vs_rule_full_budget": {
+    "ci95": [
+      2.261800159524621,
+      15.144520421044088
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": 8.221519248537113,
+    "n_seeds": 10
+  },
+  "Rastrigin/bt_lh": {
+    "action_counts": {
+      "local_exploitation": 250
+    },
+    "first_stop": 0,
+    "mean_best": -104.9462639841679,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Rastrigin/bt_lh/vs_rule_full_budget": {
+    "ci95": [
+      0.288263095765109,
+      0.9360663846236017
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": 0.623832849118265,
+    "n_seeds": 10
+  },
+  "Rastrigin/bt_lh/vs_surrogate": {
+    "ci95": [
+      -0.06553031623544169,
+      0.608470809276561
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.259058418384233,
+    "n_seeds": 10
+  },
+  "Rastrigin/proper_lh": {
+    "action_counts": {
+      "error_guided_sampling": 250
+    },
+    "first_stop": 0,
+    "mean_best": -125.92797823869269,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Rastrigin/proper_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.32156047562417267,
+      0.5146532967015156
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.06293445879357676,
+    "n_seeds": 10
+  },
+  "Rastrigin/proper_lh/vs_surrogate": {
+    "ci95": [
+      -0.7221441339837387,
+      0.11918079507168669
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": -0.30183997194045525,
+    "n_seeds": 10
+  },
+  "Rastrigin/rule_full_budget": {
+    "action_counts": {
+      "global_exploration": 102,
+      "surrogate_acquisition": 46
+    },
+    "first_stop": 0,
+    "mean_best": -124.79600911475896,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Rastrigin/rule_full_budget/vs_surrogate": {
+    "ci95": [
+      -0.656902950198836,
+      -0.10386040063752018
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.36477443073403204,
+    "n_seeds": 10
+  },
+  "Rastrigin/surrogate": {
+    "action_counts": {
+      "surrogate_acquisition": 250
+    },
+    "first_stop": 0,
+    "mean_best": -113.955507900281,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "Rastrigin/surrogate/vs_rule_full_budget": {
+    "ci95": [
+      0.10939043306968481,
+      0.6570789280626556
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": 0.36477443073403204,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/bt_lh": {
+    "action_counts": {
+      "local_exploitation": 250
+    },
+    "first_stop": 0,
+    "mean_best": 0.7888710783926185,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "SixHumpCamel/bt_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.005703021841391834,
+      0.012021879300177063
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": 0.005205459731125349,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/bt_lh/vs_surrogate": {
+    "ci95": [
+      -0.02398535082446705,
+      0.0001748415143831068
+    ],
+    "ci_excludes_zero": false,
+    "mean_normalized_gain": -0.011131211342811833,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/proper_lh": {
+    "action_counts": {
+      "error_guided_sampling": 250
+    },
+    "first_stop": 0,
+    "mean_best": -0.4644635307168925,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "SixHumpCamel/proper_lh/vs_rule_full_budget": {
+    "ci95": [
+      -0.10597177475606394,
+      -0.02232503012846813
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.058631054471973885,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/proper_lh/vs_surrogate": {
+    "ci95": [
+      -0.13358726088628434,
+      -0.031075611457690965
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.07496772554591107,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/rule_full_budget": {
+    "action_counts": {
+      "global_exploration": 102,
+      "surrogate_acquisition": 46
+    },
+    "first_stop": 0,
+    "mean_best": 0.5901328684772179,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "SixHumpCamel/rule_full_budget/vs_surrogate": {
+    "ci95": [
+      -0.02912320152993833,
+      -0.005588554725117039
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": -0.01633667107393718,
+    "n_seeds": 10
+  },
+  "SixHumpCamel/surrogate": {
+    "action_counts": {
+      "surrogate_acquisition": 250
+    },
+    "first_stop": 0,
+    "mean_best": 0.9586122338473636,
+    "mean_new_evaluations": 25.0,
+    "n": 10
+  },
+  "SixHumpCamel/surrogate/vs_rule_full_budget": {
+    "ci95": [
+      0.005674481907786292,
+      0.029745202132686176
+    ],
+    "ci_excludes_zero": true,
+    "mean_normalized_gain": 0.01633667107393718,
+    "n_seeds": 10
+  }
+}
