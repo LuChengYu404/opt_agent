@@ -87,7 +87,9 @@ def _reroll_record(task: dict) -> dict | None:
             if "seed" in spec["params"]:
                 merged["seed"] = derive_seed(
                     run_seed, rep, 987654321,
-                    abs(hash(spec["action_id"])) & 0xFFFF,
+                    int.from_bytes(
+                        spec["action_id"].encode("utf-8")[:4], "little"
+                    ),
                 )
             cands.append(Candidate(
                 action_id=spec["action_id"],
@@ -117,7 +119,7 @@ def _reroll_record(task: dict) -> dict | None:
         for a, cell in rec.rollout_results.items()
         if cell.get("status") == "valid"
     }
-    flips, gaps, spread = [], [], []
+    flips, flips_any, gaps, spread = [], [], [], []
     actions = sorted(stored)
     for i, a in enumerate(actions):
         for b in actions[i + 1:]:
@@ -125,8 +127,10 @@ def _reroll_record(task: dict) -> dict | None:
             if abs(g) <= 1e-12:
                 continue
             per_roll = [r[a] - r[b] for r in rerun if a in r and b in r]
-            agree = all(d * g > 0 for d in per_roll)
-            flips.append(0 if agree else 1)
+            # Per-re-roll flip indicators (each re-roll counted separately).
+            flips.extend(0 if d * g > 0 else 1 for d in per_roll)
+            # Conservative union: flipped if ANY re-roll disagrees.
+            flips_any.append(0 if all(d * g > 0 for d in per_roll) else 1)
             gaps.append(abs(g))
             if len(per_roll) >= 2:
                 spread.append(statistics.pstdev(per_roll))
@@ -139,11 +143,13 @@ def _reroll_record(task: dict) -> dict | None:
         "horizon": horizon,
         "n_actions": len(stored),
         "n_pairs": len(flips),
-        "flip_rate": (sum(flips) / len(flips)) if flips else None,
+        "flip_rate": (sum(flips_any) / len(flips_any)) if flips_any else None,
+        "per_reroll_flip_rate": (sum(flips) / len(flips)) if flips else None,
         "median_gap": statistics.median(gaps) if gaps else None,
         "median_gap_spread": statistics.median(spread) if spread else None,
         "argmax_stable_across_rerolls": argmax_stable,
-        "flips": flips,
+        "flips_any": flips_any,
+        "flips_per_roll": flips,
         "gaps": gaps,
     }
 
@@ -187,7 +193,8 @@ def main() -> int:
                 print(f"[{i}/{len(tasks)}] flip_rate={r['flip_rate']}",
                       flush=True)
 
-    all_flips = [f for r in results for f in r["flips"]]
+    all_flips = [f for r in results for f in r["flips_any"]]
+    all_rolls = [f for r in results for f in r["flips_per_roll"]]
     all_gaps = [g for r in results for g in r["gaps"]]
     order = sorted(range(len(all_gaps)), key=lambda i: all_gaps[i])
     half = len(order) // 2
@@ -205,8 +212,10 @@ def main() -> int:
     summary = {
         "n_records": len(results),
         "repeats": args.repeats,
-        "mean_flip_rate": (statistics.fmean(all_flips)
-                           if all_flips else None),
+        "mean_flip_rate_any_of_R": (statistics.fmean(all_flips)
+                                    if all_flips else None),
+        "mean_per_reroll_flip_rate": (statistics.fmean(all_rolls)
+                                      if all_rolls else None),
         "flip_rate_below_median_gap": (statistics.fmean(below)
                                        if below else None),
         "flip_rate_above_median_gap": above_rate,
@@ -222,8 +231,12 @@ def main() -> int:
                               for r in results]) if results else None
         ),
         "verdict": verdict,
-        "verdict_rule": ("flip rate on pairs above the median stored gap: "
-                         ">=0.25 NOISE; <=0.10 MISSPEC; else MIXED"),
+        "verdict_rule": ("ANY-of-R flip rate on pairs above the median "
+                         "stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED"),
+        "note": ("flips_any is a conservative union over re-rolls; "
+                 "per_reroll_flip_rate is the per-re-roll probability; "
+                 "split-half reliability is computed separately from stored "
+                 "utility_replicas (2v2 independent-half agreement)."),
     }
     args.json_out.write_text(
         json.dumps({"summary": summary, "records": results}, indent=2,

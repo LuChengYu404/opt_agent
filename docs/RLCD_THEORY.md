@@ -116,14 +116,17 @@ Rollout utilities are noisy (GP refit nondeterminism Q-T8, continuation
 coupling Q-T2), so the teacher distribution
 `t̃ = softmax((U + ε)/T)` is a noisy instance of a clean `t*`.
 
-**Proposition R2.** For the log-score component, the population optimum
-over the simplex satisfies
-`q*(a|s) = E_t̃[ t̃(a|s) ]` for every `a`: maximizing
-`E[ Σ_a t̃_a log q_a ]` over `q` yields the **mean of the noisy targets**,
-because the objective is linear in `t̃`. The spherical component's optimum
-is a monotone function of the same mean near interior points; the composite
-therefore anchors `q*` to the noise-averaged teacher — a T-tempered,
-noise-smoothed version of `softmax(U*/T)`.
+**Proposition R2.** Both components are LINEAR in the target for fixed
+`q`: the log-score objective `E[Σ_a t̃_a log q_a]` is maximized at
+`q*(a|s) = E_t̃[t̃(a|s)]`, and the spherical objective
+`E[(Σ_a t̃_a q_a)/‖q‖₂]` is likewise linear in `t̃` for fixed `q`, so its
+population optimum also tracks `E[t̃]` (its first-order condition is
+solved by the mean direction; interior uniqueness follows from strict
+properness R1). The composite therefore anchors `q*` to the
+noise-averaged teacher `E[softmax((U*+ε)/T)]` — a T-tempered,
+noise-smoothed version of `softmax(U*/T)`. (Corrected 2026-09-28 per
+codex review: the spherical statement is exact-linear, not "monotone
+near interior points".)
 
 **Contrast (deliberate).** BT under the same noise recovers only the
 ranking of `U*` (T2) and is *sign-stable*; proper-score training tracks
@@ -158,11 +161,14 @@ actions because absent actions receive no logit in that forward pass.
 (ii) The composite full-vocabulary distribution the model would report if
 offered all of `A` is *not* constrained to equal `softmax(U/T)` by
 subset-only training: cross-subset consistency
-(`t^R = softmax(U/T)|_R / Z_R` for all `R`) is implied only if the model
-represents a single underlying utility score per (s, a). Laya does — one
-scalar `z_θ(a|s)` per option — so subset training is consistent with a
-shared-score representation; models with subset-specific heads would not
-have this guarantee.
+(`t^R = softmax(U/T)|_R / Z_R` for all `R`) holds only if each option's
+score is (approximately) INDEPENDENT of which other options are offered.
+Laya emits one scalar `z_θ(a|s)` per option, which is consistent with a
+shared-score representation, but the score is computed from a prompt
+containing ALL offered options — so set-independence is an ARCHITECTURAL
+HYPOTHESIS, not a guarantee; subset-perturbation tests of `z_θ` under
+changed option sets are the required check (deferred; flagged per codex
+review 2026-09-28).
 
 (iii) The pairwise objective remains the weakest-assumption estimator: it
 uses only co-observed ordering and requires no renormalization or
@@ -194,10 +200,12 @@ arXiv:2609.28940 quotes Brier explicitly).
   outcome) is a proper-score reward available at *every* decision, unlike
   sparse terminal-Δbest REINFORCE. Combined with the SDK's TD(λ)
   bootstrap (`td_lambda_targets`) over decision-loop trajectories, this
-  is the faithful Laya-lineage recipe for the closed-loop stage T5
-  designs — and it optimizes the *reported distribution*, so calibration
-  pressure persists during RL (RLHF's overconfidence failure mode is
-  structurally absent, per the Table II contrast in 2609.28940).
+  is a PROPOSED design (unrun; marked per codex review 2026-09-28) for
+  the closed-loop stage T5 sketches. That it optimizes the *reported
+  distribution* is a property of the objective, but empirical
+  calibration-under-RL and the absence of overconfidence are claims to
+  be TESTED, not consequences (the Table II contrast in 2609.28940 is
+  the lineage's own framing, not our result).
 - **Escalation economics.** `act_costs`/`cost_wrong_act` in the shipped
   config make the reward cost-aware — the same term structure as our
   utility's evaluation/fit costs (`w_eval`, `w_fit`), so the teacher `U`
@@ -224,7 +232,11 @@ errors and per-state opportunity costs are invisible to it;
 action-dependent perturbations `h(a)` are not. ∎ (differences cancel
 `g(s)`; P1 term-by-term.)
 
-**T2 (noise consistency).** With symmetric zero-mean utility noise, the
+**T2 (noise consistency).** ASSUMPTIONS (strengthened per codex review
+2026-09-28): (a) symmetric zero-mean utility noise; (b) the pair
+preference probabilities are jointly representable by a single per-state
+score vector (BT transitivity) — noise that is correlated across pairs
+within a state can violate this. Under these, the
 flip rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
 through `η(0) = 1/2`; the noisy-BT population optimum satisfies
 `βΔf* = log((1−η(g))/η(g))` — a strictly increasing reparametrization of

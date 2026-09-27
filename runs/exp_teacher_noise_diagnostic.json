@@ -1,14 +1,120 @@
 {
   "records": [
     {
+      "argmax_stable_across_rerolls": false,
+      "family": "ackley",
+      "flip_rate": 0.4,
+      "flips_any": [
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.016666666666666663,
+        0.05000000000000002,
+        0.016666666666666663,
+        0.05000000000000002,
+        0.033333333333333354
+      ],
+      "horizon": 8,
+      "id": "ackley:7:0:10",
+      "median_gap": 0.033333333333333354,
+      "median_gap_spread": 0.4635248461110711,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.13333333333333333
+    },
+    {
+      "argmax_stable_across_rerolls": true,
+      "family": "ackley",
+      "flip_rate": 0.6,
+      "flips_any": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "gaps": [
+        0.016666666666666677,
+        0.016666666666666663,
+        0.016666666666666677,
+        0.016666666666666663,
+        0.03333333333333334
+      ],
+      "horizon": 4,
+      "id": "ackley:19:0:14",
+      "median_gap": 0.016666666666666677,
+      "median_gap_spread": 0.023570226039551584,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.2
+    },
+    {
       "argmax_stable_across_rerolls": true,
       "family": "ackley",
       "flip_rate": 0.3333333333333333,
-      "flips": [
+      "flips_any": [
         0,
         1,
         0,
         1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0
       ],
@@ -25,41 +131,34 @@
       "median_gap": 0.016666666666666663,
       "median_gap_spread": 0.9516238213250925,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
-      "flip_rate": 0.4,
-      "flips": [
+      "flip_rate": 0.6,
+      "flips_any": [
         1,
-        0,
+        1,
         1,
         0,
         0
       ],
-      "gaps": [
-        0.016666666666666663,
-        0.05000000000000002,
-        0.016666666666666663,
-        0.05000000000000002,
-        0.033333333333333354
-      ],
-      "horizon": 8,
-      "id": "ackley:7:0:10",
-      "median_gap": 0.033333333333333354,
-      "median_gap_spread": 0.4635248461110711,
-      "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": true,
-      "family": "ackley",
-      "flip_rate": 0.2,
-      "flips": [
+      "flips_per_roll": [
+        0,
+        1,
         0,
         0,
         1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
         0,
         0
       ],
@@ -73,19 +172,37 @@
       "horizon": 12,
       "id": "ackley:17:0:6",
       "median_gap": 0.21611369615037446,
-      "median_gap_spread": 0.2960478481967125,
+      "median_gap_spread": 0.028327886186626575,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
-      "flip_rate": 1.0,
-      "flips": [
+      "flip_rate": 0.6,
+      "flips_any": [
         1,
         1,
+        0,
+        0,
+        1
+      ],
+      "flips_per_roll": [
         1,
+        0,
+        0,
+        0,
         1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
         1
       ],
       "gaps": [
@@ -98,42 +215,29 @@
       "horizon": 10,
       "id": "ackley:15:0:10",
       "median_gap": 1.1623111247187634,
-      "median_gap_spread": 0.09451606569450971,
+      "median_gap_spread": 1.978529831201846,
       "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": true,
-      "family": "ackley",
-      "flip_rate": 0.6,
-      "flips": [
-        1,
-        0,
-        1,
-        0,
-        1
-      ],
-      "gaps": [
-        0.016666666666666677,
-        0.016666666666666663,
-        0.016666666666666677,
-        0.016666666666666663,
-        0.03333333333333334
-      ],
-      "horizon": 4,
-      "id": "ackley:19:0:14",
-      "median_gap": 0.016666666666666677,
-      "median_gap_spread": 0.023570226039551584,
-      "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.26666666666666666
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "ackley",
       "flip_rate": 0.3333333333333333,
-      "flips": [
+      "flips_any": [
         0,
         0,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
         1
       ],
       "gaps": [
@@ -146,18 +250,36 @@
       "median_gap": 0.016666666666666663,
       "median_gap_spread": 0.0,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
         1,
         1,
         1,
         1,
         1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.5142555003714439,
@@ -171,17 +293,35 @@
       "median_gap": 0.49758883370477724,
       "median_gap_spread": 0.23443701397328956,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.6
     },
     {
-      "argmax_stable_across_rerolls": false,
+      "argmax_stable_across_rerolls": true,
       "family": "ackley",
       "flip_rate": 0.4,
-      "flips": [
+      "flips_any": [
         0,
         1,
         0,
         1,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
         0
       ],
       "gaps": [
@@ -194,15 +334,78 @@
       "horizon": 25,
       "id": "ackley:6:0:0",
       "median_gap": 1.5241205071711326,
-      "median_gap_spread": 1.1578744696955066,
+      "median_gap_spread": 1.1838907061922375,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.4
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "gaps": [
+        2.1493471111305915,
+        0.8849612216404751,
+        3.7659530303589404,
+        1.2643858894901165,
+        1.6166059192283486,
+        2.8809918087184654
+      ],
+      "horizon": 22,
+      "id": "ackley:13:0:2",
+      "median_gap": 1.88297651517947,
+      "median_gap_spread": 3.0598046935755354,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3888888888888889
+    },
+    {
+      "argmax_stable_across_rerolls": true,
+      "family": "ackley",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1,
         1,
         1,
@@ -217,19 +420,40 @@
       "horizon": 21,
       "id": "ackley:5:0:2",
       "median_gap": 1.0552939041459328,
-      "median_gap_spread": 3.758689663345905,
+      "median_gap_spread": 3.408465277008596,
       "n_actions": 4,
-      "n_pairs": 4
+      "n_pairs": 12,
+      "per_reroll_flip_rate": 1.0
     },
     {
-      "argmax_stable_across_rerolls": true,
+      "argmax_stable_across_rerolls": false,
       "family": "ackley",
       "flip_rate": 0.5,
-      "flips": [
+      "flips_any": [
         1,
         0,
         1,
         1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0
       ],
@@ -244,45 +468,38 @@
       "horizon": 23,
       "id": "ackley:14:0:2",
       "median_gap": 0.33858163947776265,
-      "median_gap_spread": 0.020745160807554418,
+      "median_gap_spread": 0.06097335395584315,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "ackley",
-      "flip_rate": 0.8,
-      "flips": [
-        1,
-        1,
-        1,
-        0,
-        1
-      ],
-      "gaps": [
-        0.6188470425979149,
-        0.6355137092645817,
-        0.6188470425979149,
-        0.01666666666666672,
-        0.6355137092645817
-      ],
-      "horizon": 18,
-      "id": "ackley:0:0:4",
-      "median_gap": 0.6188470425979149,
-      "median_gap_spread": 0.3819938348442877,
-      "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2777777777777778
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
       "flip_rate": 0.6,
-      "flips": [
+      "flips_any": [
         1,
         0,
         0,
         1,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.008333333333333318,
@@ -296,17 +513,35 @@
       "median_gap": 0.008333333333333345,
       "median_gap_spread": 0.01360827634879543,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.2
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
       "flip_rate": 0.8,
-      "flips": [
+      "flips_any": [
         0,
         1,
         1,
         1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
         1
       ],
       "gaps": [
@@ -321,72 +556,39 @@
       "median_gap": 0.041666666666666685,
       "median_gap_spread": 0.03142696805273544,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.26666666666666666
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
-      "flip_rate": 0.16666666666666666,
-      "flips": [
-        0,
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      "gaps": [
-        0.01666666666666667,
-        0.03333333333333334,
-        0.01444922711380707,
-        0.016666666666666666,
-        0.0022174395528596,
-        0.018884106219526266
-      ],
-      "horizon": 1,
-      "id": "branin:0:0:12",
-      "median_gap": 0.01666666666666667,
-      "median_gap_spread": 0.004472796011776479,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "ackley",
-      "flip_rate": 0.5,
-      "flips": [
+      "flip_rate": 0.6666666666666666,
+      "flips_any": [
         1,
         0,
         1,
-        0,
+        1,
         1,
         0
       ],
-      "gaps": [
-        0.06672305502933147,
-        0.7676525141050907,
-        0.08338972169599813,
-        0.7009294590757593,
-        0.016666666666666663,
-        0.6842627924090926
-      ],
-      "horizon": 25,
-      "id": "ackley:19:0:0",
-      "median_gap": 0.38382625705254536,
-      "median_gap_spread": 0.4221581152706012,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 0.5,
-      "flips": [
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         1,
         0,
         0,
         1,
         1,
+        1,
+        0,
+        0,
+        0,
         0
       ],
       "gaps": [
@@ -402,40 +604,309 @@
       "median_gap": 0.02083333333333333,
       "median_gap_spread": 0.03928371006591931,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3333333333333333
+    },
+    {
+      "argmax_stable_across_rerolls": true,
+      "family": "ackley",
+      "flip_rate": 0.8,
+      "flips_any": [
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "gaps": [
+        0.6188470425979149,
+        0.6355137092645817,
+        0.6188470425979149,
+        0.01666666666666672,
+        0.6355137092645817
+      ],
+      "horizon": 18,
+      "id": "ackley:0:0:4",
+      "median_gap": 0.6188470425979149,
+      "median_gap_spread": 0.3070994976158187,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.6666666666666666
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "branin",
+      "flip_rate": 0.16666666666666666,
+      "flips_any": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.01666666666666667,
+        0.03333333333333334,
+        0.01444922711380707,
+        0.016666666666666666,
+        0.0022174395528596,
+        0.018884106219526266
+      ],
+      "horizon": 1,
+      "id": "branin:0:0:12",
+      "median_gap": 0.01666666666666667,
+      "median_gap_spread": 0.005633049246173485,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.05555555555555555
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
+      "flip_rate": 0.5,
+      "flips_any": [
+        1,
         0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.22601318818754074,
+        0.7153136628651959,
+        0.07733885123989476,
+        0.48930047467765525,
+        0.3033520394274355,
+        0.7926525141050907
+      ],
+      "horizon": 20,
+      "id": "ackley:19:0:4",
+      "median_gap": 0.39632625705254537,
+      "median_gap_spread": 0.31298495544504007,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2777777777777778
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "ackley",
+      "flip_rate": 0.5,
+      "flips_any": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.06672305502933147,
+        0.7676525141050907,
+        0.08338972169599813,
+        0.7009294590757593,
+        0.016666666666666663,
+        0.6842627924090926
+      ],
+      "horizon": 25,
+      "id": "ackley:19:0:0",
+      "median_gap": 0.38382625705254536,
+      "median_gap_spread": 0.6472920541765177,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2777777777777778
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "ackley",
+      "flip_rate": 0.4,
+      "flips_any": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        1.6944158354446603,
+        0.0945944594150766,
+        0.0945944594150766,
+        1.5998213760295839,
+        1.5998213760295839
+      ],
+      "horizon": 25,
+      "id": "ackley:15:0:0",
+      "median_gap": 1.5998213760295839,
+      "median_gap_spread": 0.5807422041099738,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.13333333333333333
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "branin",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
         1,
         1,
         1,
         1,
         1
       ],
-      "gaps": [
-        2.1493471111305915,
-        0.8849612216404751,
-        3.7659530303589404,
-        1.2643858894901165,
-        1.6166059192283486,
-        2.8809918087184654
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0
       ],
-      "horizon": 22,
-      "id": "ackley:13:0:2",
-      "median_gap": 1.88297651517947,
-      "median_gap_spread": 3.0598046935755354,
+      "gaps": [
+        0.032604252820897406,
+        0.016666666666666663,
+        0.00833333333333336,
+        0.015937586154230743,
+        0.040937586154230765,
+        0.025000000000000022
+      ],
+      "horizon": 11,
+      "id": "branin:3:0:10",
+      "median_gap": 0.020833333333333343,
+      "median_gap_spread": 0.06337708549063766,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.7222222222222222
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "branin",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1,
         1,
         1,
@@ -452,71 +923,37 @@
       "horizon": 16,
       "id": "branin:7:0:10",
       "median_gap": 0.033333333333333326,
-      "median_gap_spread": 0.015713484026367717,
+      "median_gap_spread": 0.002918993854221366,
       "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "ackley",
-      "flip_rate": 0.4,
-      "flips": [
-        0,
-        1,
-        1,
-        0,
-        0
-      ],
-      "gaps": [
-        1.6944158354446603,
-        0.0945944594150766,
-        0.0945944594150766,
-        1.5998213760295839,
-        1.5998213760295839
-      ],
-      "horizon": 25,
-      "id": "ackley:15:0:0",
-      "median_gap": 1.5998213760295839,
-      "median_gap_spread": 0.5807422041099738,
-      "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "ackley",
-      "flip_rate": 0.5,
-      "flips": [
-        1,
-        0,
-        1,
-        0,
-        1,
-        0
-      ],
-      "gaps": [
-        0.22601318818754074,
-        0.7153136628651959,
-        0.07733885123989476,
-        0.48930047467765525,
-        0.3033520394274355,
-        0.7926525141050907
-      ],
-      "horizon": 20,
-      "id": "ackley:19:0:4",
-      "median_gap": 0.39632625705254537,
-      "median_gap_spread": 0.46861075288971243,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 1.0
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "ackley",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
         1,
         1,
         1,
         1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
         1
       ],
       "gaps": [
@@ -529,19 +966,83 @@
       "horizon": 25,
       "id": "ackley:9:0:0",
       "median_gap": 0.11352930125649707,
-      "median_gap_spread": 1.3429180227129314,
+      "median_gap_spread": 1.247705801532707,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.4666666666666667
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "branin",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "gaps": [
+        0.08673971335899888,
+        0.03236947020083314,
+        0.03236947020083314,
+        0.11910918355983202,
+        0.11910918355983202
+      ],
+      "horizon": 25,
+      "id": "branin:2:0:0",
+      "median_gap": 0.08673971335899888,
+      "median_gap_spread": 0.24895416961659916,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "branin",
-      "flip_rate": 0.3333333333333333,
-      "flips": [
+      "flip_rate": 0.5,
+      "flips_any": [
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
         0,
         1,
         0,
         1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
         0,
         0
       ],
@@ -556,47 +1057,38 @@
       "horizon": 15,
       "id": "branin:8:0:8",
       "median_gap": 0.03749999999999998,
-      "median_gap_spread": 0.04189740545958471,
+      "median_gap_spread": 0.04253472656871031,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
       "flip_rate": 1.0,
-      "flips": [
-        1,
+      "flips_any": [
         1,
         1,
         1,
         1,
         1
       ],
-      "gaps": [
-        0.032604252820897406,
-        0.016666666666666663,
-        0.00833333333333336,
-        0.015937586154230743,
-        0.040937586154230765,
-        0.025000000000000022
-      ],
-      "horizon": 11,
-      "id": "branin:3:0:10",
-      "median_gap": 0.020833333333333343,
-      "median_gap_spread": 0.0818400554093323,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 1.0,
-      "flips": [
+      "flips_per_roll": [
+        1,
+        0,
+        0,
         1,
         1,
         1,
         1,
-        1
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.09166666666666679,
@@ -610,38 +1102,31 @@
       "median_gap": 0.09166666666666679,
       "median_gap_spread": 0.15852626488868757,
       "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 0.8,
-      "flips": [
-        1,
-        0,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.08673971335899888,
-        0.03236947020083314,
-        0.03236947020083314,
-        0.11910918355983202,
-        0.11910918355983202
-      ],
-      "horizon": 25,
-      "id": "branin:2:0:0",
-      "median_gap": 0.08673971335899888,
-      "median_gap_spread": 0.24895416961659916,
-      "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.6
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "hartmann",
       "flip_rate": 0.0,
-      "flips": [
+      "flips_any": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -660,19 +1145,136 @@
       "median_gap": 0.016666666666666677,
       "median_gap_spread": 0.0,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.0
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "branin",
+      "flip_rate": 0.5,
+      "flips_any": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.018446999823121923,
+        0.03191632159289093,
+        0.006134279281117538,
+        0.013469321769769005,
+        0.024581279104239462,
+        0.03805060087400847
+      ],
+      "horizon": 23,
+      "id": "branin:6:0:2",
+      "median_gap": 0.021514139463680693,
+      "median_gap_spread": 0.018048901975273778,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
       "flip_rate": 0.8333333333333334,
-      "flips": [
+      "flips_any": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "gaps": [
+        0.12527130291962474,
+        0.10860463625295802,
+        0.016666666666666607,
+        0.01666666666666672,
+        0.10860463625295813,
+        0.09193796958629141
+      ],
+      "horizon": 20,
+      "id": "branin:6:0:6",
+      "median_gap": 0.10027130291962472,
+      "median_gap_spread": 0.04021829963438116,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.5
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "branin",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
         1,
         1,
         1,
         0,
         1,
         1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.07991954976888427,
@@ -685,44 +1287,38 @@
       "horizon": 11,
       "id": "branin:1:0:8",
       "median_gap": 0.039959774884442134,
-      "median_gap_spread": 0.05834067562919296,
+      "median_gap_spread": 0.041491984819441836,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
-        0,
-        1,
-        1,
-        1,
-        0,
-        1
-      ],
-      "gaps": [
-        0.02628855977542599,
-        0.02960965389564152,
-        0.13340999113924623,
-        0.0033210941202155286,
-        0.15969855091467222,
-        0.16301964503488775
-      ],
-      "horizon": 25,
-      "id": "branin:8:0:0",
-      "median_gap": 0.08150982251744388,
-      "median_gap_spread": 0.06701502849348319,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "hartmann",
       "flip_rate": 0.16666666666666666,
-      "flips": [
+      "flips_any": [
         0,
         1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -741,44 +1337,38 @@
       "median_gap": 0.18754963588975507,
       "median_gap_spread": 0.0,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 0.3333333333333333,
-      "flips": [
-        1,
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "gaps": [
-        0.018446999823121923,
-        0.03191632159289093,
-        0.006134279281117538,
-        0.013469321769769005,
-        0.024581279104239462,
-        0.03805060087400847
-      ],
-      "horizon": 23,
-      "id": "branin:6:0:2",
-      "median_gap": 0.021514139463680693,
-      "median_gap_spread": 0.01734372782269186,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
         1,
         1,
         1,
         1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
         1,
         1
       ],
@@ -793,93 +1383,89 @@
       "horizon": 19,
       "id": "branin:2:0:4",
       "median_gap": 0.102725232250165,
-      "median_gap_spread": 0.1081786440707127,
+      "median_gap_spread": 0.09993397998774975,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.7777777777777778
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "branin",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
         1,
         1,
         0,
         1,
+        0,
+        0,
         1,
-        1
+        0
       ],
       "gaps": [
-        0.12527130291962474,
-        0.10860463625295802,
-        0.016666666666666607,
-        0.01666666666666672,
-        0.10860463625295813,
-        0.09193796958629141
+        0.02628855977542599,
+        0.02960965389564152,
+        0.13340999113924623,
+        0.0033210941202155286,
+        0.15969855091467222,
+        0.16301964503488775
       ],
-      "horizon": 20,
-      "id": "branin:6:0:6",
-      "median_gap": 0.10027130291962472,
-      "median_gap_spread": 0.04021829963438116,
+      "horizon": 25,
+      "id": "branin:8:0:0",
+      "median_gap": 0.08150982251744388,
+      "median_gap_spread": 0.09657499554709771,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.05,
-        0.46646535625815677,
-        0.05,
-        0.4164653562581568,
-        0.46646535625815677
-      ],
-      "horizon": 15,
-      "id": "hartmann:2:0:6",
-      "median_gap": 0.4164653562581568,
-      "median_gap_spread": 0.07061799940985722,
-      "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.4877314664256325,
-        0.4877314664256325,
-        0.4877314664256325
-      ],
-      "horizon": 18,
-      "id": "hartmann:9:0:4",
-      "median_gap": 0.4877314664256325,
-      "median_gap_spread": 0.01571348402636772,
-      "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3888888888888889
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "hartmann",
       "flip_rate": 0.3333333333333333,
-      "flips": [
+      "flips_any": [
         0,
         0,
         1,
         0,
         1,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
         0
       ],
       "gaps": [
@@ -895,70 +1481,39 @@
       "median_gap": 1.685378980531529,
       "median_gap_spread": 0.3265581113180539,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2222222222222222
     },
     {
       "argmax_stable_across_rerolls": true,
-      "family": "hartmann",
-      "flip_rate": 0.3333333333333333,
-      "flips": [
-        0,
-        0,
-        1,
-        0,
-        0,
-        1
-      ],
-      "gaps": [
-        11.780254155689525,
-        0.033333333333333326,
-        5.36264822553629,
-        11.813587489022858,
-        6.417605930153234,
-        5.395981558869623
-      ],
-      "horizon": 10,
-      "id": "hartmann:4:0:12",
-      "median_gap": 5.906793744511429,
-      "median_gap_spread": 1.53022450819181,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        1.7010572930209347,
-        1.7177239596876013,
-        0.016666666666666663,
-        1.7010572930209347,
-        1.7177239596876013
-      ],
-      "horizon": 10,
-      "id": "hartmann:6:0:8",
-      "median_gap": 1.7010572930209347,
-      "median_gap_spread": 0.03142696805273544,
-      "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
       "family": "branin",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flip_rate": 0.5,
+      "flips_any": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         1,
         0,
+        0,
         1,
-        1,
+        0,
+        0,
+        0,
         1
       ],
       "gaps": [
@@ -972,19 +1527,110 @@
       "horizon": 25,
       "id": "branin:14:0:0",
       "median_gap": 0.06438955783833294,
-      "median_gap_spread": 0.0397210724542634,
+      "median_gap_spread": 0.028378321779420318,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
+    },
+    {
+      "argmax_stable_across_rerolls": true,
+      "family": "hartmann",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "gaps": [
+        0.4877314664256325,
+        0.4877314664256325,
+        0.4877314664256325
+      ],
+      "horizon": 18,
+      "id": "hartmann:9:0:4",
+      "median_gap": 0.4877314664256325,
+      "median_gap_spread": 0.01571348402636772,
+      "n_actions": 4,
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 1.0
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "hartmann",
+      "flip_rate": 0.8,
+      "flips_any": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "gaps": [
+        1.7010572930209347,
+        1.7177239596876013,
+        0.016666666666666663,
+        1.7010572930209347,
+        1.7177239596876013
+      ],
+      "horizon": 10,
+      "id": "hartmann:6:0:8",
+      "median_gap": 1.7010572930209347,
+      "median_gap_spread": 0.03142696805273544,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "hartmann",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
         1,
         1,
         1,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
       ],
       "gaps": [
         0.4664653562581569,
@@ -995,20 +1641,38 @@
       "horizon": 25,
       "id": "hartmann:2:0:0",
       "median_gap": 0.4664653562581569,
-      "median_gap_spread": 0.47459460190022756,
+      "median_gap_spread": 0.5220124833364087,
       "n_actions": 4,
-      "n_pairs": 4
+      "n_pairs": 12,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "hartmann",
-      "flip_rate": 0.6,
-      "flips": [
+      "flip_rate": 0.4,
+      "flips_any": [
         0,
         1,
         0,
         1,
-        1
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
       ],
       "gaps": [
         0.07577111223887503,
@@ -1020,19 +1684,37 @@
       "horizon": 10,
       "id": "hartmann:18:0:8",
       "median_gap": 3.9640383648458677,
-      "median_gap_spread": 3.143127918948452,
+      "median_gap_spread": 3.074360976587025,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.13333333333333333
     },
     {
-      "argmax_stable_across_rerolls": false,
+      "argmax_stable_across_rerolls": true,
       "family": "rastrigin",
-      "flip_rate": 0.6,
-      "flips": [
-        1,
+      "flip_rate": 0.0,
+      "flips_any": [
         0,
-        1,
-        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "gaps": [
@@ -1045,72 +1727,87 @@
       "horizon": 11,
       "id": "rastrigin:5:0:10",
       "median_gap": 0.3351465981794013,
-      "median_gap_spread": 0.6320962210549821,
+      "median_gap_spread": 0.40492779447366467,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.0
     },
     {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
+      "argmax_stable_across_rerolls": true,
+      "family": "hartmann",
+      "flip_rate": 0.3333333333333333,
+      "flips_any": [
+        0,
+        0,
         1,
+        0,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         1,
         1,
         1,
         0,
-        1
-      ],
-      "gaps": [
-        0.033333333333333326,
-        0.00833333333333336,
-        0.016666666666666663,
-        0.024999999999999967,
-        0.016666666666666663,
-        0.008333333333333304
-      ],
-      "horizon": 11,
-      "id": "rastrigin:15:0:10",
-      "median_gap": 0.016666666666666663,
-      "median_gap_spread": 0.09840798456502985,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         1,
         1
       ],
       "gaps": [
-        0.050000000000000044,
-        0.10833333333333328,
+        11.780254155689525,
         0.033333333333333326,
-        0.15833333333333333,
-        0.01666666666666672,
-        0.1416666666666666
+        5.36264822553629,
+        11.813587489022858,
+        6.417605930153234,
+        5.395981558869623
       ],
-      "horizon": 25,
-      "id": "rastrigin:13:0:0",
-      "median_gap": 0.07916666666666666,
-      "median_gap_spread": 0.19875530733129695,
+      "horizon": 10,
+      "id": "hartmann:4:0:12",
+      "median_gap": 5.906793744511429,
+      "median_gap_spread": 2.4833671174215044,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2777777777777778
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
       "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flips_any": [
         1,
         1,
         1,
+        0,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         1
@@ -1126,18 +1823,265 @@
       "horizon": 15,
       "id": "rastrigin:6:0:8",
       "median_gap": 0.4144183641446951,
-      "median_gap_spread": 0.337801478172469,
+      "median_gap_spread": 0.1738384298863517,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "hartmann",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
+        1,
+        1,
         1,
         1,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "gaps": [
+        0.05,
+        0.46646535625815677,
+        0.05,
+        0.4164653562581568,
+        0.46646535625815677
+      ],
+      "horizon": 15,
+      "id": "hartmann:2:0:6",
+      "median_gap": 0.4164653562581568,
+      "median_gap_spread": 0.4937670969982765,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.6
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "rastrigin",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "gaps": [
+        0.033333333333333326,
+        0.00833333333333336,
+        0.016666666666666663,
+        0.024999999999999967,
+        0.016666666666666663,
+        0.008333333333333304
+      ],
+      "horizon": 11,
+      "id": "rastrigin:15:0:10",
+      "median_gap": 0.016666666666666663,
+      "median_gap_spread": 0.09840798456502985,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.6111111111111112
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "hartmann",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "gaps": [
+        2.210745652065491,
+        0.01666666666666683,
+        0.5377160276862543,
+        2.227412318732158,
+        1.6730296243792369,
+        0.5543826943529211
+      ],
+      "horizon": 10,
+      "id": "hartmann:17:0:8",
+      "median_gap": 1.113706159366079,
+      "median_gap_spread": 1.6696009059020214,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "rastrigin",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "gaps": [
+        0.050000000000000044,
+        0.10833333333333328,
+        0.033333333333333326,
+        0.15833333333333333,
+        0.01666666666666672,
+        0.1416666666666666
+      ],
+      "horizon": 25,
+      "id": "rastrigin:13:0:0",
+      "median_gap": 0.07916666666666666,
+      "median_gap_spread": 0.19875530733129695,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "hartmann",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "gaps": [
+        3.787339925866619,
+        0.016666666666666663,
+        0.03333333333333338,
+        3.8040065925332858,
+        3.754006592533286,
+        0.050000000000000044
+      ],
+      "horizon": 18,
+      "id": "hartmann:17:0:4",
+      "median_gap": 1.9020032962666429,
+      "median_gap_spread": 1.0404798706577987,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3888888888888889
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "hartmann",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.04999999999999999,
@@ -1147,17 +2091,75 @@
       "horizon": 14,
       "id": "hartmann:8:0:6",
       "median_gap": 0.04999999999999999,
-      "median_gap_spread": 0.2993688249605636,
+      "median_gap_spread": 0.36710520998620294,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.4444444444444444
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "rastrigin",
+      "flip_rate": 0.2,
+      "flips_any": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.4043147902249167,
+        0.016666666666666663,
+        0.016666666666666663,
+        0.38764812355824996,
+        0.38764812355824996
+      ],
+      "horizon": 21,
+      "id": "rastrigin:2:0:2",
+      "median_gap": 0.38764812355824996,
+      "median_gap_spread": 0.4461870655884537,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.06666666666666667
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
         1,
         1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
         1,
         1
       ],
@@ -1170,65 +2172,33 @@
       "horizon": 18,
       "id": "rastrigin:14:0:6",
       "median_gap": 0.6358880370763553,
-      "median_gap_spread": 0.05558635253254171,
+      "median_gap_spread": 0.043865029040475734,
       "n_actions": 4,
-      "n_pairs": 4
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        1.5798847584256113,
-        1.5798847584256113,
-        1.5798847584256113,
-        1.5798847584256113
-      ],
-      "horizon": 23,
-      "id": "rastrigin:5:0:2",
-      "median_gap": 1.5798847584256113,
-      "median_gap_spread": 0.5154430825879096,
-      "n_actions": 4,
-      "n_pairs": 4
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.4737656887458255,
-        0.557099022079159,
-        0.4904323554124921,
-        0.08333333333333348,
-        0.016666666666666607,
-        0.06666666666666687
-      ],
-      "horizon": 23,
-      "id": "rastrigin:6:0:2",
-      "median_gap": 0.2785495110395795,
-      "median_gap_spread": 0.5757977130543039,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 12,
+      "per_reroll_flip_rate": 0.8333333333333334
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "rastrigin",
       "flip_rate": 0.0,
-      "flips": [
+      "flips_any": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -1247,16 +2217,34 @@
       "median_gap": 0.016666666666666663,
       "median_gap_spread": 0.0,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
       "flip_rate": 0.6,
-      "flips": [
+      "flips_any": [
         1,
         0,
         1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
         0,
         1
       ],
@@ -1272,63 +2260,96 @@
       "median_gap": 0.04166666666666667,
       "median_gap_spread": 0.054997194092287024,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.2
     },
     {
-      "argmax_stable_across_rerolls": true,
+      "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
-      "flip_rate": 0.0,
-      "flips": [
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
         0,
         0,
+        1,
         0,
+        0,
+        1,
+        0,
+        0,
+        1,
         0,
         0
       ],
       "gaps": [
-        0.016666666666666607,
-        0.033333333333333326,
-        0.016666666666666607,
-        0.01666666666666672,
-        0.01666666666666672
+        1.5798847584256113,
+        1.5798847584256113,
+        1.5798847584256113,
+        1.5798847584256113
       ],
       "horizon": 23,
-      "id": "rastrigin:18:0:2",
-      "median_gap": 0.01666666666666672,
-      "median_gap_spread": 0.1490849648822578,
+      "id": "rastrigin:5:0:2",
+      "median_gap": 1.5798847584256113,
+      "median_gap_spread": 0.6430952596733601,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 12,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
-      "argmax_stable_across_rerolls": true,
+      "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
-      "flip_rate": 0.0,
-      "flips": [
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
         0,
         0,
+        1,
         0,
+        0,
+        1,
         0,
         0
       ],
       "gaps": [
-        0.4043147902249167,
-        0.016666666666666663,
-        0.016666666666666663,
-        0.38764812355824996,
-        0.38764812355824996
+        0.7405310366163942,
+        0.7405310366163942,
+        0.7405310366163942
       ],
-      "horizon": 21,
-      "id": "rastrigin:2:0:2",
-      "median_gap": 0.38764812355824996,
-      "median_gap_spread": 0.3684612581390875,
+      "horizon": 25,
+      "id": "rastrigin:7:0:0",
+      "median_gap": 0.7405310366163942,
+      "median_gap_spread": 0.1650750669531823,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "rastrigin",
       "flip_rate": 0.0,
-      "flips": [
+      "flips_any": [
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0
@@ -1341,42 +2362,33 @@
       "horizon": 10,
       "id": "rastrigin:8:0:8",
       "median_gap": 0.016666666666666663,
-      "median_gap_spread": 0.036829035801722164,
+      "median_gap_spread": 0.1974920572273413,
       "n_actions": 4,
-      "n_pairs": 3
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "branin",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.10436373791362547,
-        0.1546955292281454,
-        0.0876970712469588,
-        0.050331791314519925,
-        0.016666666666666663,
-        0.06699845798118659
-      ],
-      "horizon": 25,
-      "id": "branin:17:0:0",
-      "median_gap": 0.0773477646140727,
-      "median_gap_spread": 0.11248219643870895,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "sixhumpcamel",
       "flip_rate": 0.0,
-      "flips": [
+      "flips_any": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -1395,39 +2407,36 @@
       "median_gap": 0.016666666666666677,
       "median_gap_spread": 0.0,
       "n_actions": 4,
-      "n_pairs": 5
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 1.0,
-      "flips": [
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        0.7405310366163942,
-        0.7405310366163942,
-        0.7405310366163942
-      ],
-      "horizon": 25,
-      "id": "rastrigin:7:0:0",
-      "median_gap": 0.7405310366163942,
-      "median_gap_spread": 0.0726504309474408,
-      "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "hartmann",
-      "flip_rate": 1.0,
-      "flips": [
+      "flip_rate": 0.8,
+      "flips_any": [
         1,
-        1,
+        0,
         1,
         1,
         1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
       ],
       "gaps": [
         0.04999999999999999,
@@ -1439,16 +2448,119 @@
       "horizon": 20,
       "id": "hartmann:14:0:6",
       "median_gap": 0.2821860370554138,
-      "median_gap_spread": 0.836913102135206,
+      "median_gap_spread": 0.48748265979175776,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.4666666666666667
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "rastrigin",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "gaps": [
+        0.4737656887458255,
+        0.557099022079159,
+        0.4904323554124921,
+        0.08333333333333348,
+        0.016666666666666607,
+        0.06666666666666687
+      ],
+      "horizon": 23,
+      "id": "rastrigin:6:0:2",
+      "median_gap": 0.2785495110395795,
+      "median_gap_spread": 0.5966558013532928,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.5555555555555556
+    },
+    {
+      "argmax_stable_across_rerolls": true,
+      "family": "rastrigin",
+      "flip_rate": 0.0,
+      "flips_any": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gaps": [
+        0.016666666666666607,
+        0.033333333333333326,
+        0.016666666666666607,
+        0.01666666666666672,
+        0.01666666666666672
+      ],
+      "horizon": 23,
+      "id": "rastrigin:18:0:2",
+      "median_gap": 0.01666666666666672,
+      "median_gap_spread": 0.10202754048043951,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flip_rate": 1.0,
+      "flips_any": [
         1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
         1,
         0
       ],
@@ -1462,43 +2574,28 @@
       "median_gap": 0.033333333333333354,
       "median_gap_spread": 0.08202679477907444,
       "n_actions": 4,
-      "n_pairs": 3
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "rastrigin",
-      "flip_rate": 0.5,
-      "flips": [
-        0,
-        0,
-        1,
-        0,
-        1,
-        1
-      ],
-      "gaps": [
-        0.01666666666666672,
-        0.06666666666666665,
-        0.7787311553075695,
-        0.04999999999999993,
-        0.7620644886409028,
-        0.7120644886409029
-      ],
-      "horizon": 17,
-      "id": "rastrigin:4:0:4",
-      "median_gap": 0.38936557765378477,
-      "median_gap_spread": 0.3336133334511742,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
       "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flips_any": [
         1,
         0,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
       ],
       "gaps": [
         0.033333333333333326,
@@ -1510,42 +2607,71 @@
       "median_gap": 0.033333333333333326,
       "median_gap_spread": 0.031426968052735454,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.2222222222222222
     },
     {
       "argmax_stable_across_rerolls": true,
-      "family": "rastrigin",
-      "flip_rate": 0.4,
-      "flips": [
+      "family": "sixhumpcamel",
+      "flip_rate": 0.0,
+      "flips_any": [
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
         0,
         0,
         0,
-        1,
-        1
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "gaps": [
         0.016666666666666663,
-        0.033333333333333354,
         0.016666666666666663,
-        0.01666666666666669,
-        0.01666666666666669
+        0.016666666666666663
       ],
-      "horizon": 8,
-      "id": "rastrigin:8:0:10",
-      "median_gap": 0.01666666666666669,
-      "median_gap_spread": 0.06285393610547091,
+      "horizon": 2,
+      "id": "sixhumpcamel:14:0:14",
+      "median_gap": 0.016666666666666663,
+      "median_gap_spread": 0.01775464336544914,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
       "flip_rate": 0.8333333333333334,
-      "flips": [
+      "flips_any": [
         0,
         1,
         1,
         1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
         1,
         1
       ],
@@ -1562,37 +2688,80 @@
       "median_gap": 0.04583333333333334,
       "median_gap_spread": 0.08644142352585303,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.5555555555555556
     },
     {
       "argmax_stable_across_rerolls": true,
-      "family": "sixhumpcamel",
-      "flip_rate": 0.0,
-      "flips": [
+      "family": "rastrigin",
+      "flip_rate": 0.4,
+      "flips_any": [
         0,
         0,
+        0,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
         0
       ],
       "gaps": [
         0.016666666666666663,
+        0.033333333333333354,
         0.016666666666666663,
-        0.016666666666666663
+        0.01666666666666669,
+        0.01666666666666669
       ],
-      "horizon": 2,
-      "id": "sixhumpcamel:14:0:14",
-      "median_gap": 0.016666666666666663,
-      "median_gap_spread": 0.005588397365727322,
+      "horizon": 8,
+      "id": "rastrigin:8:0:10",
+      "median_gap": 0.01666666666666669,
+      "median_gap_spread": 0.06285393610547091,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.26666666666666666
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "rastrigin",
-      "flip_rate": 1.0,
-      "flips": [
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
         1,
         1,
         1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
         1,
         1,
         1
@@ -1608,75 +2777,90 @@
       "horizon": 25,
       "id": "rastrigin:6:0:0",
       "median_gap": 0.8348064140570997,
-      "median_gap_spread": 0.7335565145541099,
+      "median_gap_spread": 0.3476221412255085,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.5555555555555556
     },
     {
       "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
-        0,
+      "family": "branin",
+      "flip_rate": 1.0,
+      "flips_any": [
         1,
-        0,
+        1,
+        1,
         1,
         1,
         1
       ],
-      "gaps": [
-        2.210745652065491,
-        0.01666666666666683,
-        0.5377160276862543,
-        2.227412318732158,
-        1.6730296243792369,
-        0.5543826943529211
-      ],
-      "horizon": 10,
-      "id": "hartmann:17:0:8",
-      "median_gap": 1.113706159366079,
-      "median_gap_spread": 1.1980279458118293,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 0.5,
-      "flips": [
+      "flips_per_roll": [
         1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
         0,
         1,
         0,
         1,
-        0
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1
       ],
       "gaps": [
-        5.102575706311056,
-        5.128346818549931,
-        3.2290775651327,
-        0.025771112238875016,
-        8.331653271443756,
-        8.35742438368263
+        0.10436373791362547,
+        0.1546955292281454,
+        0.0876970712469588,
+        0.050331791314519925,
+        0.016666666666666663,
+        0.06699845798118659
       ],
-      "horizon": 14,
-      "id": "hartmann:18:0:6",
-      "median_gap": 5.115461262430493,
-      "median_gap_spread": 2.60785638462354,
+      "horizon": 25,
+      "id": "branin:17:0:0",
+      "median_gap": 0.0773477646140727,
+      "median_gap_spread": 0.05900167380520485,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
       "flip_rate": 0.5,
-      "flips": [
+      "flips_any": [
         0,
         1,
         0,
         1,
         0,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
       ],
       "gaps": [
         0.033333333333333326,
@@ -1689,15 +2873,123 @@
       "horizon": 5,
       "id": "sixhumpcamel:8:0:12",
       "median_gap": 0.025,
-      "median_gap_spread": 0.01964185503295965,
+      "median_gap_spread": 0.023600971585652393,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "sixhumpcamel",
+      "flip_rate": 0.6666666666666666,
+      "flips_any": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "gaps": [
+        0.033333333333333326,
+        0.016666666666666663,
+        0.016666666666666663,
+        0.04999999999999999,
+        0.016666666666666663,
+        0.033333333333333326
+      ],
+      "horizon": 13,
+      "id": "sixhumpcamel:5:0:8",
+      "median_gap": 0.024999999999999994,
+      "median_gap_spread": 0.028441602776696308,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3888888888888889
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "sixhumpcamel",
+      "flip_rate": 0.6666666666666666,
+      "flips_any": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "gaps": [
+        0.033333333333333326,
+        0.016666666666666663,
+        0.04999999999999999,
+        0.016666666666666663,
+        0.016666666666666663,
+        0.033333333333333326
+      ],
+      "horizon": 14,
+      "id": "sixhumpcamel:8:0:6",
+      "median_gap": 0.024999999999999994,
+      "median_gap_spread": 0.03540018893032211,
+      "n_actions": 4,
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2222222222222222
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "sixhumpcamel",
       "flip_rate": 0.0,
-      "flips": [
+      "flips_any": [
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0
@@ -1712,13 +3004,68 @@
       "median_gap": 0.04999999999999999,
       "median_gap_spread": 0.04714045207910317,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.0
     },
     {
       "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
+      "family": "sixhumpcamel",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "gaps": [
+        0.04999999999999999,
+        0.04999999999999999,
+        0.04999999999999999
+      ],
+      "horizon": 14,
+      "id": "sixhumpcamel:11:0:8",
+      "median_gap": 0.04999999999999999,
+      "median_gap_spread": 0.03142696805273544,
+      "n_actions": 4,
+      "n_pairs": 9,
+      "per_reroll_flip_rate": 0.4444444444444444
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "rastrigin",
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
         1,
         1,
         1,
@@ -1726,28 +3073,88 @@
         1
       ],
       "gaps": [
-        1.3882641063509895,
-        0.125,
-        1.2632641063509895,
-        1.3882641063509895,
-        0.125
+        0.01666666666666672,
+        0.06666666666666665,
+        0.7787311553075695,
+        0.04999999999999993,
+        0.7620644886409028,
+        0.7120644886409029
       ],
-      "horizon": 25,
-      "id": "hartmann:8:0:0",
-      "median_gap": 1.2632641063509895,
-      "median_gap_spread": 0.8424433829312282,
+      "horizon": 17,
+      "id": "rastrigin:4:0:4",
+      "median_gap": 0.38936557765378477,
+      "median_gap_spread": 0.05588885882563545,
       "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.4444444444444444
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "sixhumpcamel",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "gaps": [
+        0.04999999999999999,
+        0.04999999999999999,
+        0.04999999999999999,
+        0.04999999999999999
+      ],
+      "horizon": 12,
+      "id": "sixhumpcamel:15:0:8",
+      "median_gap": 0.04999999999999999,
+      "median_gap_spread": 0.031426968052735454,
+      "n_actions": 4,
+      "n_pairs": 12,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
       "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flips_any": [
         0,
         1,
         1,
         1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         1
       ],
@@ -1764,114 +3171,128 @@
       "median_gap": 0.04324551080043759,
       "median_gap_spread": 0.041722086081305544,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.3333333333333333
     },
     {
       "argmax_stable_across_rerolls": false,
-      "family": "sixhumpcamel",
+      "family": "hartmann",
       "flip_rate": 1.0,
-      "flips": [
+      "flips_any": [
+        1,
         1,
         1,
         1,
         1
       ],
-      "gaps": [
-        0.04999999999999999,
-        0.04999999999999999,
-        0.04999999999999999,
-        0.04999999999999999
-      ],
-      "horizon": 12,
-      "id": "sixhumpcamel:15:0:8",
-      "median_gap": 0.04999999999999999,
-      "median_gap_spread": 0.031426968052735454,
-      "n_actions": 4,
-      "n_pairs": 4
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "sixhumpcamel",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
+      "flips_per_roll": [
+        0,
+        0,
         1,
         1,
         1,
         1,
         0,
-        1
-      ],
-      "gaps": [
-        0.033333333333333326,
-        0.016666666666666663,
-        0.04999999999999999,
-        0.016666666666666663,
-        0.016666666666666663,
-        0.033333333333333326
-      ],
-      "horizon": 14,
-      "id": "sixhumpcamel:8:0:6",
-      "median_gap": 0.024999999999999994,
-      "median_gap_spread": 0.027235363740924425,
-      "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "sixhumpcamel",
-      "flip_rate": 1.0,
-      "flips": [
+        0,
         1,
+        0,
+        0,
+        1,
+        0,
         1,
         1
       ],
       "gaps": [
-        0.04999999999999999,
-        0.04999999999999999,
-        0.04999999999999999
+        1.3882641063509895,
+        0.125,
+        1.2632641063509895,
+        1.3882641063509895,
+        0.125
       ],
-      "horizon": 14,
-      "id": "sixhumpcamel:11:0:8",
-      "median_gap": 0.04999999999999999,
-      "median_gap_spread": 0.02270330385393352,
+      "horizon": 25,
+      "id": "hartmann:8:0:0",
+      "median_gap": 1.2632641063509895,
+      "median_gap_spread": 0.7247613704900412,
       "n_actions": 4,
-      "n_pairs": 3
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.5333333333333333
     },
     {
       "argmax_stable_across_rerolls": true,
-      "family": "sixhumpcamel",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
+      "family": "hartmann",
+      "flip_rate": 0.3333333333333333,
+      "flips_any": [
+        0,
+        0,
         1,
+        0,
+        1,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         1,
         1,
         1,
-        1
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
       ],
       "gaps": [
-        0.033333333333333326,
-        0.016666666666666663,
-        0.016666666666666663,
-        0.04999999999999999,
-        0.016666666666666663,
-        0.033333333333333326
+        5.102575706311056,
+        5.128346818549931,
+        3.2290775651327,
+        0.025771112238875016,
+        8.331653271443756,
+        8.35742438368263
       ],
-      "horizon": 13,
-      "id": "sixhumpcamel:5:0:8",
-      "median_gap": 0.024999999999999994,
-      "median_gap_spread": 0.023101229988786096,
+      "horizon": 14,
+      "id": "hartmann:18:0:6",
+      "median_gap": 5.115461262430493,
+      "median_gap_spread": 2.7011216288691138,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2222222222222222
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
         0,
         1,
         1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
         1,
         0,
         1
@@ -1887,48 +3308,42 @@
       "horizon": 16,
       "id": "sixhumpcamel:16:0:6",
       "median_gap": 0.018736909802697432,
-      "median_gap_spread": 0.03746647725893501,
+      "median_gap_spread": 0.047126747486311904,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 0.8333333333333334,
-      "flips": [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1
-      ],
-      "gaps": [
-        3.787339925866619,
-        0.016666666666666663,
-        0.03333333333333338,
-        3.8040065925332858,
-        3.754006592533286,
-        0.050000000000000044
-      ],
-      "horizon": 18,
-      "id": "hartmann:17:0:4",
-      "median_gap": 1.9020032962666429,
-      "median_gap_spread": 0.990284044041924,
-      "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.5
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
-      "flip_rate": 0.6666666666666666,
-      "flips": [
-        0,
+      "flip_rate": 0.8333333333333334,
+      "flips_any": [
         1,
         1,
         1,
         0,
+        1,
         1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
       ],
       "gaps": [
         0.042557391915304166,
@@ -1941,46 +3356,42 @@
       "horizon": 25,
       "id": "sixhumpcamel:6:0:0",
       "median_gap": 0.021278695957652083,
-      "median_gap_spread": 0.014324536402912359,
+      "median_gap_spread": 0.022508665868183196,
       "n_actions": 4,
-      "n_pairs": 6
-    },
-    {
-      "argmax_stable_across_rerolls": false,
-      "family": "hartmann",
-      "flip_rate": 0.6,
-      "flips": [
-        0,
-        0,
-        1,
-        1,
-        1
-      ],
-      "gaps": [
-        2.961652519147892,
-        0.4806263602126355,
-        2.961652519147892,
-        0.4806263602126355,
-        2.4810261589352565
-      ],
-      "horizon": 14,
-      "id": "hartmann:11:0:6",
-      "median_gap": 2.4810261589352565,
-      "median_gap_spread": 12.162553864868999,
-      "n_actions": 4,
-      "n_pairs": 5
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.6111111111111112
     },
     {
       "argmax_stable_across_rerolls": false,
       "family": "sixhumpcamel",
       "flip_rate": 0.6666666666666666,
-      "flips": [
+      "flips_any": [
         1,
         0,
         0,
         1,
         1,
         1
+      ],
+      "flips_per_roll": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0
       ],
       "gaps": [
         0.061392467683641816,
@@ -1993,17 +3404,38 @@
       "horizon": 25,
       "id": "sixhumpcamel:3:0:0",
       "median_gap": 0.08902956717515431,
-      "median_gap_spread": 0.12190339293254998,
+      "median_gap_spread": 0.1280913097257538,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.2777777777777778
     },
     {
       "argmax_stable_across_rerolls": true,
       "family": "sixhumpcamel",
       "flip_rate": 0.3333333333333333,
-      "flips": [
+      "flips_any": [
         1,
         1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -2020,21 +3452,67 @@
       "horizon": 25,
       "id": "sixhumpcamel:11:0:0",
       "median_gap": 0.09850301062871836,
-      "median_gap_spread": 0.02537258322824025,
+      "median_gap_spread": 0.019507774161912968,
       "n_actions": 4,
-      "n_pairs": 6
+      "n_pairs": 18,
+      "per_reroll_flip_rate": 0.16666666666666666
+    },
+    {
+      "argmax_stable_across_rerolls": false,
+      "family": "hartmann",
+      "flip_rate": 1.0,
+      "flips_any": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "flips_per_roll": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "gaps": [
+        2.961652519147892,
+        0.4806263602126355,
+        2.961652519147892,
+        0.4806263602126355,
+        2.4810261589352565
+      ],
+      "horizon": 14,
+      "id": "hartmann:11:0:6",
+      "median_gap": 2.4810261589352565,
+      "median_gap_spread": 10.164873311098667,
+      "n_actions": 4,
+      "n_pairs": 15,
+      "per_reroll_flip_rate": 0.4666666666666667
     }
   ],
   "summary": {
-    "argmax_stable_share": 0.25,
-    "flip_rate_above_median_gap": 0.7378640776699029,
-    "flip_rate_below_median_gap": 0.5436893203883495,
-    "mean_flip_rate": 0.6407766990291263,
-    "median_interroll_gap_spread": 0.08423410915246374,
+    "argmax_stable_share": 0.2875,
+    "flip_rate_above_median_gap": 0.7281553398058253,
+    "flip_rate_below_median_gap": 0.5728155339805825,
+    "mean_flip_rate_any_of_R": 0.6504854368932039,
+    "mean_per_reroll_flip_rate": 0.3551779935275081,
+    "median_interroll_gap_spread": 0.09150820953647537,
     "median_stored_gap": 0.04999999999999999,
     "n_records": 80,
+    "note": "flips_any is a conservative union over re-rolls; per_reroll_flip_rate is the per-re-roll probability; split-half reliability is computed separately from stored utility_replicas (2v2 independent-half agreement).",
     "repeats": 3,
     "verdict": "NOISE_DOMINATED",
-    "verdict_rule": "flip rate on pairs above the median stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED"
+    "verdict_rule": "ANY-of-R flip rate on pairs above the median stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED"
   }
 }

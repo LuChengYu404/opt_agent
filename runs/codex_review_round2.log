@@ -1,0 +1,3126 @@
+Reading additional input from stdin...
+OpenAI Codex v0.156.1
+--------
+workdir: /home/lcy/Documents/projects/opt_agent_v3
+model: gpt-6-sol
+provider: openai
+approval: on-request
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0e352-70e5-74c2-a826-90f2fa1bd4e1
+--------
+user
+You are reviewing a research branch for journal-submission readiness. Work in the current repo (opt_agent_v3, branch exp/rlcd-laya-finetune).
+
+Read these reports IN ORDER:
+1. runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md  (round 1: E1-E5)
+2. runs/EXP_JOURNAL_ROUND2_REPORT.md      (round 2: P0-P3)
+3. docs/RLCD_THEORY.md                    (theory companion)
+4. docs/ref_papers/journal_positioning.md (journal positioning)
+
+Then spot-check the underlying artifacts as needed:
+- runs/exp_rlcd_loo_confirmatory.json  (confirmatory transfer CIs)
+- runs/exp_teacher_noise_diagnostic.json, runs/exp_teacher_noise_diagnostic_r5.json
+- runs/exp_aligned_gates.json, runs/exp_r5_gates.json, runs/exp_longhorizon_gates.json (gate4 rows)
+- runs/exp_rlcd_closed_loop_aligned.json, runs/exp_rlcd_discrimination_aligned.json
+- runs/exp_geartrain_transfer_probe.json
+- scripts/exp_rlcd_loo_confirmatory.py, scripts/exp_teacher_noise_diagnostic.py (protocol soundness)
+
+Review dimensions:
+A. Claim validity: does any stated claim overreach its evidence? Check numbers in the reports against the JSON artifacts.
+B. Statistics: clustering level, CI method, multiplicity, exploratory vs confirmatory labeling. Is the pooled +0.140 CI claim sound as stated? Is the 5/5-fold sign argument double-counted with the pooled CI?
+C. Protocol soundness: noise diagnostic design (re-roll comparison, split-half), aligned-teacher construction (is "label/evaluation alignment" as strong as claimed?), GearTrain probe limitations.
+D. Theory: are R1-R4/T1-T5 statements correctly scoped relative to what was run?
+E. Journal readiness: given docs/ref_papers/journal_positioning.md, what remains P0-blocking?
+
+Output format:
+- VERDICT: APPROVE | REVISE (one line)
+- Then numbered issues, each with severity (BLOCKER / MAJOR / MINOR), the exact quote or claim it concerns, and a concrete fix.
+- End with the 3 highest-priority remaining experiments/actions before journal submission.
+warning: Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+codex
+I’ll read the four documents in the requested order, then check the cited numbers and protocols against the JSON and scripts. I’ll focus the verdict on claims that would affect a journal submission.
+exec
+/bin/bash -c pwd in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+/home/lcy/Documents/projects/opt_agent_v3
+
+exec
+/bin/bash -c 'cat runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# EXP-RLCD journal round — E1–E5 consolidated report (2026-09-27)
+
+Branch `exp/rlcd-laya-finetune`. Five experiments closing the journal-level
+gaps identified in `docs/ref_papers/journal_positioning.md` for the
+fine-tuning line. All CPU tracks ran as parallel workers (the 450-trajectory
+router panel: 6 GPU workers, ~5 min wall-clock).
+
+## Summary table
+
+| # | Question | Result | Verdict |
+|---|---|---|---|
+| E1 | Proper-score training vs BT + post-hoc temperature | proper is the only arm with good joint (log −2.07, ECE 0.11); BT+T* recovers log (−2.07) but destroys ECE (0.02→0.26); **no arm has confidence discrimination** (conf_gap ≤ 0.013, AURC ≈ 1−acc) | objective sets calibration *shape*; discrimination absent everywhere |
+| E2 | Long-horizon quota teacher quality | Gate 3 adjusted_lift **12.9** (h3: 1.29 — 10×) ; Gate 2 FAIL, Gate 4 FAIL | much stronger early-exploration signal; terminal validity still open |
+| E3 | Do long-horizon fine-tunes escape constant-collapse? | No — but to *different* modes: bt_lh → all `local_exploitation`, proper_lh → all `error_guided_sampling` (1250/1250 each) | teacher's argmax is mode-dominated at any horizon |
+| E4 | Does calibrated confidence pay in routing? (predeclared) | **Criterion FAIL.** Hartmann: routed beats pure +5.87*** but by degenerating to exactly-surrogate trajectories (diffs ≡ 0); Rastrigin mirrors it negatively; no routed arm beats both parents anywhere | routing degenerates to family-level switching; consistent with E1's zero discrimination |
+| E5 | Cross-family transfer (LOO, decision-level) | **bt 0.866 mean pairwise on UNSEEN families (in-family 0.873 — 99% retention); proper 0.746 with log −2.07 retained; RF 0.720. bt > RF on 5/5 folds (sign p = 0.031 one-sided); gap grows from +0.056 (in-family) to +0.146 (cross-family)** | **the journal positive: distilled decision models generalize across problem families where feature-imitation does not** |
+
+Raw artifacts: `runs/exp_rlcd_calibration_ablation.json`,
+`runs/exp_longhorizon_gates.json`,
+`runs/exp_rlcd_closed_loop_longhorizon.json`,
+`runs/exp_rlcd_router_panel.json` (+ log with taus),
+`runs/exp_rlcd_loo_transfer.json`.
+
+## E1 — calibration ablation (details)
+
+Honest split (temperature fitted on seeds 16–17, metrics on 18–19; 60/55
+records):
+
+| arm | log score | ECE | conf_gap | AURC | max prob |
+|---|---:|---:|---:|---:|---:|
+| bt raw | −3.068 | 0.021 | 0.013 | 0.557 | 0.405 |
+| bt + T* (16.5) | −2.073 | 0.257 | 0.0004 | 0.553 | 0.143 |
+| proper | −2.070 | 0.114 | 0.005 | 0.657 | 0.158 |
+| proper + T* (1.6) | −2.068 | 0.127 | 0.003 | 0.660 | 0.146 |
+
+Reading: post-hoc temperature recovers the soft-distribution metric for BT
+but breaks its argmax calibration; proper training is the only way to hold
+both simultaneously (R1's joint identification). **However** the
+routing-relevant property — confidence discriminating correct from
+incorrect decisions — is absent in every arm (AURC ≈ 1 − accuracy). The
+teacher's thin state-conditional signal (Gate 2 FAIL) leaves nothing for
+confidence to carry.
+
+## E4 — router panel (predeclared criterion and outcome)
+
+Arms: surrogate / proper_only / bt_only / {proper,bt}_q{20,40,60} (quantile
+thresholds frozen on the calib slice: proper τ ∈ [0.152, 0.157] — the
+confidence distribution is nearly state-invariant; bt τ ∈ [0.376, 0.426]).
+Panel: 5 families × seeds 300–309 × budget 30, paired (450 trajectories).
+
+- Hartmann: every routed arm beats its pure arm **+5.87 [+2.29, +10.59]**
+  (CI excludes 0) — but at q40/q60 the routed trajectories are *identical*
+  to always-Surrogate (all diffs 0): the router switched essentially every
+  decision.
+- Rastrigin: mirrored, negative (−0.23 vs pure, CI crosses 0; the same
+  all-switch behavior lands on the wrong family).
+- Branin/SixHumpCamel: small CI-positive gains over pure (+0.010***),
+  losses vs surrogate for bt_q20.
+- Predeclared success ("beat BOTH parents, never lose to the better one")
+  is NOT met anywhere.
+
+Mechanism: with zero confidence discrimination (E1), quantile routing
+degenerates into near-deterministic whole-trajectory switching determined
+by threshold placement relative to each family's confidence level — a
+family-level, not state-level, decision. This is P3's degeneracy reproduced
+for the Laya System-1 line, and it sharpens the RQ3 story: the missing
+ingredient is a *discriminative* uncertainty signal, not a better-calibrated
+one.
+
+## E5 — cross-family transfer (the positive)
+
+5-fold leave-one-family-out (train: other four families, early stop on
+their held-out seeds; test: all records of the held-out family):
+
+| held-out family | proper | bt | rf |
+|---|---:|---:|---:|
+| ackley | 0.758 | 0.869 | 0.666 |
+| branin | 0.750 | 0.871 | 0.817 |
+| hartmann | 0.757 | 0.829 | 0.812 |
+| rastrigin | 0.734 | 0.844 | 0.697 |
+| sixhumpcamel | 0.732 | 0.915 | 0.608 |
+| **mean** | **0.746** | **0.866** | **0.720** |
+
+- BT retains 99% of its in-family ranking accuracy (0.866 vs 0.873) on
+  unseen families; proper retains its log score (−2.073 vs −2.071).
+- bt > rf on 5/5 folds (one-sided sign test p = 0.031); the mean gap more
+  than doubles under family shift (+0.056 → +0.146), and rf collapses
+  hardest exactly where its features mislead (sixhumpcamel 0.608).
+- Exploratory caveat: per-fold aggregates; the confirmatory rerun should
+  log per-record predictions for record-clustered bootstrap CIs (the
+  fold checkpoints are deleted after eval; retraining is ~2 min/fold).
+
+Interpretation: the option-conditioned, semantically prompted Laya policy
+distills a *representation* of the decision rule that transfers across
+problem families; the axis-aligned-feature RF imitates the rule in-distribution
+but does not carry it across shift (L1's corollary). This is the RQ2-style
+positive the journal positioning asked for, and it is the strongest
+candidate headline of the fine-tuning line.
+
+## What this round establishes for the journal
+
+1. **Positive (E5)**: counterfactual-distilled typed-decision models
+   transfer across optimization families at ~full in-family accuracy,
+   beating feature-imitation baselines with a gap that grows under shift.
+2. **Method (E1 + theory R1)**: objective choice trades ranking vs
+   calibration shape; proper-score training is uniquely joint-calibrated;
+   post-hoc temperature cannot substitute.
+3. **Mechanism (E1+E4+T4/L1)**: closed-loop value is capped by the
+   teacher's thin state-conditional signal; confidence carries no
+   state-level routing information, so routing degenerates to family-level
+   switching — the RQ3 frontier stays degenerate for a deeper reason than
+   "the RF is flat": *no current supervision provides discriminative
+   uncertainty*.
+4. **Open (E2/E3)**: the long-horizon teacher amplifies exploration mass
+   10× but still fails terminal validity; fine-tunes at any horizon
+   collapse to the teacher's dominant mode.
+
+## Next steps toward the journal claim set
+
+1. Confirmatory E5: per-record logging + record-clustered CIs; 2 seeds
+   of training per fold for stability.
+2. Discriminative-uncertainty direction: OOD/entropy router inputs
+   (DISCUSS Q-T4), or learned abstention — motivated by E1's null.
+3. Gate-4-valid teacher: utility revision on the long-horizon corpus
+   (Phase 8.7+ line) — everything downstream (closed-loop, routing)
+   inherits its validity.
+
+exec
+/bin/bash -c 'cat runs/EXP_JOURNAL_ROUND2_REPORT.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# Journal round 2 — P0–P3 consolidated report (2026-09-27/28)
+
+Branch `exp/rlcd-laya-finetune`. Executes the plan agreed after the GPT
+assessment: lock the transfer positive (P0), diagnose and fix the teacher
+(P1), retest the full chain on the fixed teacher (P2), extend to an
+engineering problem (P3).
+
+## Headlines
+
+1. **P0 — the transfer positive is now confirmatory.** Record-clustered
+   paired bootstrap over 663 held-out records, dual training seeds per
+   fold: **bt − RF pooled = +0.140, 95% CI [+0.126, +0.154]; CI excludes
+   zero on 5/5 folds** (ackley +0.209, branin +0.045, hartmann +0.016,
+   rastrigin +0.151, sixhumpcamel +0.305); per-fold training seeds stable
+   (e.g. rastrigin bt [0.840, 0.850]). proper − RF pooled +0.019
+   [+0.007, +0.032] — CI-positive but small; per-fold mixed (loses
+   Branin/Hartmann CI-detectably).
+   (`runs/exp_rlcd_loo_confirmatory.json`)
+
+2. **P1 — the teacher diagnosis chain is complete and decisive.**
+   - P1a: single-roll labels are **noise-dominated** — re-roll flip rate
+     0.74 on pairs above the median gap; inter-roll gap spread (0.084)
+     exceeds the median stored gap (0.05); argmax stable across re-rolls
+     for only 25% of records.
+   - P1b/denoising: R=5 replicate-averaging (generator gained
+     `rollout_replicates`; 661-record dataset in 141 s) reduces split-half
+     flip to 0.37 (residual label-vs-true ≈ 19% at median gap). Gate 3
+     holds (13.3). **Gate 4 still fails.**
+   - P1b/alignment: a Gate-4-ALIGNED teacher (rule continuation + pure
+     terminal-Δbest utility, R=5) removes the label/evaluation mismatch
+     entirely — **Gate 4 still fails**: behavior-gain ackley +0.25,
+     rastrigin +0.04, branin −0.02, hartmann −0.24, sixhump +0.00. With
+     noise reduced AND alignment exact, the residual is the truth: **the
+     first action's true terminal advantage over the behavior policy is
+     ≈ 0 at these budgets/action granularity.** Gate 4 as a criterion for
+     single-action labels is unattainable in this regime; decision value
+     lives in schedules/continuations (Phase 8.6F's conclusion, now
+     reproduced on clean, aligned labels).
+
+3. **P2 — the thin-signal ceiling propagates through every stage.**
+   Models trained on the aligned teacher: decision-level ranking 0.67
+   (harder k=4 partial regime); closed-loop still collapses to the same
+   per-objective constants (bt_al→`local_exploitation` 1250/1250,
+   proper_al→`error_guided_sampling` 1250/1250); confidence
+   discrimination still zero (conf_gap ≤ 0.001, AURC ≈ 1 − accuracy;
+   teacher-argmax agreement of the models themselves only 0.12–0.22 —
+   the aligned teacher's argmax is nearly random across its rolled
+   actions). No supervision tried tonight — h3, long-horizon, denoised,
+   aligned — produces a state-conditional signal strong enough to escape
+   constant-collapse or seed a router.
+
+4. **P3 — engineering extension (probe-level).** GearTrain (the only
+   BOCoDe engineering problem passing the backend's single-objective /
+   unconstrained gates) added to the allowlist with 4 integration tests.
+   Numerical→engineering decision probe (no retraining): bt_h3 0.893 /
+   rf_synthetic 0.890 / proper_h3 0.801 / zero-shot 0.423 on 65 GearTrain
+   decision records — synthetic-trained policies transfer to an
+   engineering problem's states at ~0.89; the Laya-vs-RF advantage does
+   not clearly extend on this single small probe (exploratory, no CI).
+   All other engineering problems need constraint semantics (documented
+   P3 remainder). External optimizer baselines (SMAC3/HEBO/LLAMBO) not
+   installed — remains the P0 list's mechanical remainder.
+
+## What the paper can now claim (updated claim set)
+
+- **Positive (confirmatory)**: counterfactual-rollout distillation of a
+  typed-decision foundation model transfers across optimization families
+  at near in-family accuracy and beats feature-imitation (RF) with CI
+  excluding zero on 5/5 held-out families; it also transfers to an
+  engineering problem's decision states at ~0.89 (probe-level).
+- **Method**: objective choice trades ranking vs calibration (proper
+  uniquely joint-calibrated; post-hoc temperature cannot substitute);
+  pairwise supervision is the quota-correct estimator (T3/R3); rollout
+  replicate-averaging is necessary hygiene (P1a) and cheap (T2).
+- **Mechanism (complete chain)**: single-roll labels are noise-dominated
+  (0.74 flip) → even noise-free, Gate-4-aligned single-action labels have
+  ≈0 true terminal advantage → distilled policies collapse to per-objective
+  constants → confidence carries no discrimination → routing degenerates
+  to family-level switching. Every link now has a direct measurement.
+- **Consequent redirection**: the learnable-and-transferable object at
+  this action granularity is the RANKING (which transfers); the
+  value-bearing object is the SCHEDULE/continuation — the next
+  supervision design should label policies, not first actions.
+
+## Artifacts
+
+```
+runs/exp_rlcd_loo_confirmatory.json       # P0 (per-record, dual-seed, CIs)
+runs/exp_teacher_noise_diagnostic.json    # P1a (R=1 verdict)
+runs/exp_teacher_noise_diagnostic_r5.json # P1a on averaged labels
+runs/longhorizon_k4r5_20seed_5family.jsonl      # P1b denoised teacher
+runs/longhorizon_k4r5_aligned_20seed_5family.jsonl  # P1b aligned teacher
+runs/exp_r5_gates.json, runs/exp_aligned_gates.json  # P1b gates
+runs/exp_rlcd_aligned_train.json          # P2 training (both arms)
+runs/exp_rlcd_closed_loop_aligned.json    # P2 closed-loop (collapse)
+runs/exp_rlcd_discrimination_aligned.json # P2 discrimination (zero)
+runs/geartrain_h3_10seed.jsonl            # P3 engineering dataset
+runs/exp_geartrain_transfer_probe.json    # P3 probe
+scripts/exp_rlcd_loo_confirmatory.py, exp_teacher_noise_diagnostic.py,
+        exp_geartrain_transfer_probe.py
+src: DatasetConfig.rollout_replicates (+_average_rollouts),
+     GearTrain in backend allowlist; tests: 3 replicate + 4 GearTrain
+```
+
+exec
+/bin/bash -c 'cat docs/RLCD_THEORY.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# RLCD theory companion — fine-tuning Laya on the counterfactual teacher
+
+> Status: 2026-09-27, branch `exp/rlcd-laya-finetune`. **Objective
+> reference corrected 2026-09-27 after verifying the term's origin** (see
+> §0.1). This document is the theoretical support for fine-tuning Laya with
+> RLCD — the training method of the Jev/Laya lineage of typed decision
+> models — on the counterfactual rollout supervision. It follows the
+> conventions of `docs/THEORY.md`: formal statements, proofs or proof
+> sketches under explicitly listed scope conditions, and a
+> proposition-to-evidence map. Code anchor: `src/opt_agent/system1/rlcd.py`.
+
+## 0. Setup
+
+### 0.1 Name disambiguation (verified 2026-09-27)
+
+**RLCD, in the sense used by Laya and this project: "Reinforcement
+Learning for Calibrated Decisions."** RL whose reward is a *strictly
+proper scoring rule*, so that the expected-reward optimum is the true
+outcome distribution — calibration by construction, unlike preference-based
+RLHF/DPO-family training which identifies only a ranking (a tilted
+distribution). Laya ships the objective in its SDK as
+`laya.common.proper_reward` — log score + 0.5·spherical score, minus a
+ranked-probability term on ordinal `score`-type questions — with
+`td_lambda_targets` for multi-turn credit assignment and `act_costs`
+escalation economics. **No method paper has been published** (noted by
+arXiv:2609.24574 and third-party independent tests); the most complete
+public description is the survey arXiv:2609.28940 ("JEV and Laya as System
+One Decision Layers for LLM", Table II/IX), which also documents Laya
+training against the Brier score — another member of the same strictly
+proper family. Our implementation calls the SDK's `proper_reward` itself.
+
+This is **not** the identically abbreviated "RLCD: Reinforcement Learning
+from Contrastive Distillation" (Yang et al., ICLR 2024, arXiv:2307.12950),
+which builds preference pairs by contrastive prompting. That paper's
+pairwise construction is related to our *baseline arm* (§2, T1–T5), which
+is why the confusion was easy to make and worth a paragraph here.
+
+### 0.2 The two objectives implemented on this branch
+
+Let `s` be an optimization state, `A(s)` the offered typed actions
+(`m = |A| = 8` on full-vocabulary records), `U(a, s)` the counterfactual
+rollout utility (`THEORY.md` §0), and
+`gold_probs(·|s) = softmax(U(·, s)/T)` the teacher distribution. Laya's
+forward pass produces per-option logits `z_θ(a|s)`; the reported
+distribution is `q_θ(a|s) = softmax(z_θ)`.
+
+- **RLCD (proper-score arm; primary).** Maximize the strictly proper score
+  of the reported distribution against the teacher:
+
+  ```
+  max_θ  E_s [ S( q_θ(·|s), gold_probs(·|s) ) ],
+  S(q, t) = log-score(q, t) + 0.5 · spherical(q, t)
+          = Σ_a t_a log q_a  +  0.5 · (Σ_a t_a q_a) / ‖q‖₂
+  ```
+
+  (`proper_score_loss` = −S, using the SDK's `proper_reward` verbatim; the
+  RPS term is masked to ordinal questions and inert for `choice`.)
+  When the target distribution is known the RL objective reduces to this
+  differentiable form — no sampling is needed; the genuinely RL form
+  (score against *realized* outcomes) is §R4.
+
+- **BT pairwise arm (baseline).** Bradley-Terry loss on utility-ordered
+  pairs `a⁺ ≻ a⁻ ⟺ U(a⁺, s) > U(a⁻, s)`:
+  `ℓ = −log σ(β(z_θ(a⁺|s) − z_θ(a⁻|s)))` (`bradley_terry_loss`). Kept
+  because it is the estimator that remains unbiased under
+  action-subsampled rollout quotas (T3).
+
+---
+
+## 1. RLCD (proper-score) theory
+
+### R1. Strict properness ⇒ full-distribution identification and calibration by construction
+
+**Proposition R1.** Let `S(q, t) = Σ_a t_a log q_a + 0.5·(Σ_a t_a q_a)/‖q‖₂`
+(the SDK's composite on the simplex). Then:
+
+(i) `S` is **strictly proper**: for every target `t` and every report
+`q ≠ t` on the support of `t`, `S(t, t) > S(q, t)`.
+
+(ii) Consequently the population RLCD objective
+`E_s[S(q_θ(·|s), gold_probs(·|s))]` is uniquely maximized (over an
+unconstrained conditional-distribution family) by
+`q*(a|s) = gold_probs(a|s)` — the fine-tune target is the teacher
+*distribution*, not merely its ranking, and the model's reported
+confidence is calibrated against the teacher in the properness sense:
+argmax, all pairwise orderings, and every moment of the reported
+distribution match the teacher's.
+
+(iii) Identification hierarchy: proper-score training identifies the
+teacher up to equality; BT training (§2) identifies it only up to a
+strictly increasing per-state transform (ranking alone). Properness buys
+calibration; the price is exact sensitivity to target *magnitudes* (R2).
+
+**Proof.** (i) The log score `Σ t_a log q_a` is strictly proper (Gibbs/
+information inequality: `KL(t‖q) > 0` for `q ≠ t` on supp(t)). The
+spherical score `(Σ t_a q_a)/‖q‖₂` is strictly proper (Shuford–Albert–
+Massengill 1966). A positive-weighted sum of strictly proper scoring rules
+is strictly proper: if each term is uniquely maximized at `q = t`, so is
+the sum. (ii) Pointwise maximization; take expectation. (iii) is the
+statement that BT's likelihood depends only on score *differences* (T1)
+while `S` depends on `q` itself. ∎
+
+**Why it matters here.** MASTER_PLAN §13 makes calibration the System-1
+requirement ("does it know when it is unreliable?"), and the EXP-RQ3
+router failure traced to the RF softmax never exceeding 0.25 — a
+distribution-level pathology a ranking-only objective cannot even express.
+RLCD is the objective whose optimum is a *calibrated* copy of the
+counterfactual teacher, which is what the Router (Phase 12) needs as its
+input signal. (Post-hoc temperature scaling — as Laya's checkpoint already
+ships — is the cheap partial substitute; R1 makes it a no-op at the
+optimum.)
+
+### R2. Behavior under noisy rollout targets
+
+Rollout utilities are noisy (GP refit nondeterminism Q-T8, continuation
+coupling Q-T2), so the teacher distribution
+`t̃ = softmax((U + ε)/T)` is a noisy instance of a clean `t*`.
+
+**Proposition R2.** For the log-score component, the population optimum
+over the simplex satisfies
+`q*(a|s) = E_t̃[ t̃(a|s) ]` for every `a`: maximizing
+`E[ Σ_a t̃_a log q_a ]` over `q` yields the **mean of the noisy targets**,
+because the objective is linear in `t̃`. The spherical component's optimum
+is a monotone function of the same mean near interior points; the composite
+therefore anchors `q*` to the noise-averaged teacher — a T-tempered,
+noise-smoothed version of `softmax(U*/T)`.
+
+**Contrast (deliberate).** BT under the same noise recovers only the
+ranking of `U*` (T2) and is *sign-stable*; proper-score training tracks
+the smoothed *distribution*, absorbing noise into a flatter target rather
+than discarding magnitude. Neither is uniformly better: the proper-score
+optimum is the right target when the noise is i.i.d.-across-actions
+(averaging is the correct aggregator); the BT objective is the right one
+when only ordering is trusted (asymmetric/action-correlated noise —
+T1's exception clause). The branch's 4-arm comparison measures which
+assumption the rollout noise actually satisfies.
+
+**Proof.** `∇_q E[Σ_a t̃_a log q_a] = E[t̃]/q + λ` under the simplex
+constraint ⇒ stationary at `q ∝ E[t̃]` (Gibbs). Linearity in `t̃` is the
+whole argument. ∎
+
+### R3. Subset conditioning changes the quota calculus (refining T3)
+
+Deployment offers the model a *state-filtered* option subset
+(`candidate_actions_for_state`), and Laya's architecture is
+option-conditioned: the options are in the prompt and the softmax is over
+the offered set only. Under quota subsampling (k-of-m rolled out per
+record), training items carry the teacher renormalized **on the offered
+subset**.
+
+**Proposition R3.** For an option-conditioned model trained per subset
+`R` with target `t^R = softmax(U|_{R})/Z_R`:
+
+(i) On each subset, proper-score training identifies `t^R` exactly (R1
+applies conditionally); no forced-zero supervision is emitted for absent
+actions because absent actions receive no logit in that forward pass.
+
+(ii) The composite full-vocabulary distribution the model would report if
+offered all of `A` is *not* constrained to equal `softmax(U/T)` by
+subset-only training: cross-subset consistency
+(`t^R = softmax(U/T)|_R / Z_R` for all `R`) is implied only if the model
+represents a single underlying utility score per (s, a). Laya does — one
+scalar `z_θ(a|s)` per option — so subset training is consistent with a
+shared-score representation; models with subset-specific heads would not
+have this guarantee.
+
+(iii) The pairwise objective remains the weakest-assumption estimator: it
+uses only co-observed ordering and requires no renormalization or
+shared-score assumption at all.
+
+**Empirical tie.** `metadata["partial_rollout"]` (main 8c70b79) exists
+precisely because *non*-option-conditioned consumers (e.g. an RF over a
+fixed 8-wide head) cannot consume subset targets without bias — T3's
+original statement, which remains valid for fixed-head models. R3
+delimits it: Laya-style option conditioning is the architecture under
+which quota-subsampled records are consumable by proper-score training.
+
+### R4. Where the "RL" lives: realized-outcome scoring and TD(λ)
+
+The teacher-distribution form above is the differentiable reduction of
+RLCD; the reinforcement-learning form matters when the target is not a
+distribution but a **realized outcome** `o ∈ A(s)` (which action proved
+right), because a strictly proper scoring rule `S(q, o)` scores a report
+against a realized event using the same properness machinery
+(`S(q, o) = Σ_a 1[a = o] s_a` for scoring functions `s`; the Brier and
+log scores the Laya lineage documents are exactly this form —
+arXiv:2609.28940 quotes Brier explicitly).
+
+**Consequences for this project.**
+
+- **Stage 2 (closed loop) gets a dense, per-decision reward for free.**
+  Scoring `q_θ(·|s_t)` against the realized outcome at `s_t` (e.g. the
+  action whose branch actually improved `best_value`, or a graded
+  outcome) is a proper-score reward available at *every* decision, unlike
+  sparse terminal-Δbest REINFORCE. Combined with the SDK's TD(λ)
+  bootstrap (`td_lambda_targets`) over decision-loop trajectories, this
+  is the faithful Laya-lineage recipe for the closed-loop stage T5
+  designs — and it optimizes the *reported distribution*, so calibration
+  pressure persists during RL (RLHF's overconfidence failure mode is
+  structurally absent, per the Table II contrast in 2609.28940).
+- **Escalation economics.** `act_costs`/`cost_wrong_act` in the shipped
+  config make the reward cost-aware — the same term structure as our
+  utility's evaluation/fit costs (`w_eval`, `w_fit`), so the teacher `U`
+  and the RLCD reward can be composed without double-counting if stage 2
+  adopts the SDK's convention.
+
+---
+
+## 2. The BT pairwise baseline arm (T1–T5, references corrected)
+
+The propositions below analyze the pairwise objective kept as the
+comparison arm. They are the theory of *paired-comparison distillation of
+the rollout teacher* (Bradley-Terry 1952; the DPO literature analyzes the
+same likelihood) — **not** of Laya's RLCD; the identically-named Yang
+et al. 2024 paper is related work only.
+
+**T1 (invariance/sufficiency).** Pairwise labels inherit P1's affine
+invariance exactly and cancel any per-state additive teacher shift
+`g(s)`: `Ũ(a,s) = U(a,s) + g(s)` leaves every pair label unchanged, and
+the BT loss's difference structure makes minimizers identified only up to
+`s`-measurable offsets, which do not affect argmax. *Delimits the
+misspecification immunity of the pairwise arm:* STOP-term calibration
+errors and per-state opportunity costs are invisible to it;
+action-dependent perturbations `h(a)` are not. ∎ (differences cancel
+`g(s)`; P1 term-by-term.)
+
+**T2 (noise consistency).** With symmetric zero-mean utility noise, the
+flip rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
+through `η(0) = 1/2`; the noisy-BT population optimum satisfies
+`βΔf* = log((1−η(g))/η(g))` — a strictly increasing reparametrization of
+`U*`, so the ranking (and argmax) is preserved while score magnitudes
+shrink. Margin filtering (`margin=δ`) bounds the retained flip rate
+strictly below 1/2, restoring learnability (Angluin–Laird). *Contrast
+with R2:* BT discards magnitude by design and is sign-stable; proper-score
+training keeps magnitude and averages noise instead.
+
+**T3 (quota compatibility, for fixed-head consumers).** Pairs mined from
+a k-of-m subsample are the full pair set restricted to the subset; any
+scorer correct on all covered subsets ranks `A` correctly (pair
+co-observation probability `k(k−1)/(m(m−1))`, misses vanish as records
+accumulate). Renormalized subset softmax targets are biased for a *fixed
+full-vocabulary* distribution and stay biased at fixed k (3-action
+counterexample: `U = (0,−1,−1)`, subset targets give the global best mass
+0 whenever absent, 0.73 vs 0.58 when present). See R3 for the
+option-conditioned refinement under which proper-score training escapes
+this objection.
+
+**T4 (ceiling + decision-level readout).** Any U-supervised policy
+inherits P2's `D` ceiling on one-step value; one-step regret vs the
+per-state oracle is at most `E[range(s) · 1{top-1 wrong}]`, so the
+branch's decision-level metrics bound deployable value. Applies to both
+arms — and to the RF baseline.
+
+**T5 (RL stage).** Against the BT model's own reward the argmax policy is
+already optimal, so pairwise stage-2 RL is vacuous; the RL that pays is
+against closed-loop return — now sharpened by R4: use proper-score
+rewards on realized outcomes with TD(λ), not sparse terminal REINFORCE.
+
+---
+
+## Proposition-to-evidence map
+
+| Statement | Type | Code anchor | Evidence |
+|---|---|---|---|
+| R1 strict properness ⇒ calibrated teacher recovery | identification (Gibbs + Shuford et al.) | `proper_score_loss` (SDK `proper_reward`) | proper-score arm vs zero-shot vs BT: pairwise acc **and** mean log score (`runs/EXP_RLCD_REPORT.md`) |
+| R2 noise → mean-target tracking | population optimum (linearity) | idem | arm comparison under rollout noise; which arm wins separates R2 vs T2 noise models |
+| R3 subset conditioning consumes quota records | architectural lemma | `build_item` target on offered options; `partial_rollout` metadata | partial-record tests; long-horizon partial datasets (main 8c70b79) |
+| R4 realized-outcome RL + TD(λ) design | design proposition | deferred; uses SDK `td_lambda_targets` | stage-2 once trajectories logged |
+| T1–T5 pairwise-arm theory | as above | `mine_pairs`, `bradley_terry_loss` | BT arm rows in the same report; unit tests |
+
+## What is deliberately *not* claimed
+
+- RLCD has **no published method paper**; R1–R4 analyze the objective as
+  shipped in the SDK (and as described second-hand in arXiv:2609.28940 /
+  2609.24574). If the lineage publishes the method and it differs (e.g.
+  the Brier-score-only variant the survey reports), R1 still holds for
+  the composite we run, and the Brier variant satisfies the same
+  properness statements.
+- R1's "calibration by construction" is calibration **against the
+  counterfactual teacher**, not against ground-truth closed-loop
+  outcomes; the teacher itself is horizon- and continuation-dependent
+  (Phase 8.6C/F). Calibrating to a mis-specified teacher is precise
+  error — the closed-loop stage (R4) is where that is addressed.
+- T4's ceiling applies to both arms; decision-level wins do not
+  establish closed-loop optimization gains.
+- T2/R2's noise models are symmetric; action-correlated noise violates
+  both.
+
+## References
+
+- Laya SDK (`pip install laya`, v0.3.7): `laya.common.proper_reward`,
+  `td_lambda_targets`; checkpoint `convaiinnovations/laya`.
+- *JEV and Laya as System One Decision Layers for LLM.* arXiv:2609.28940
+  — closest public description of RLCD (Table II: calibration by
+  construction; Table IX: Laya fine-tuning "RL with proper scoring
+  rules"; Brier score quoted).
+- *Evaluating Decision Models for Text Annotation.* arXiv:2609.24574 —
+  notes RLCD has no published method paper.
+- Gneiting, T., Raftery, A. E. *Strictly Proper Scoring Rules,
+  Prediction, and Estimation.* JASA 102(477), 2007.
+- Brier, G. W. *Verification of Forecasts Expressed in Terms of
+  Probability.* Monthly Weather Review 78(1), 1950.
+- Shuford, E. H., Albert, A., Massengill, H. E. *Admissible Probability
+  Measurement Procedures.* Psychometrika 31(2), 1966 (spherical rule).
+- Bernardo, J. M. *Expected Information as Expected Utility.* Ann.
+  Statist. 7(3), 1979 (log score propriety).
+- Bradley, R. A., Terry, M. E. *Rank Analysis of Incomplete Block
+  Designs.* Biometrika 39(3–4), 1952 (BT arm).
+- Rafailov, L. et al. *Direct Preference Optimization.* NeurIPS 2023
+  (same likelihood family as the BT arm).
+- Angluin, D., Laird, P. *Learning from Noisy Examples.* ML 2, 1988
+  (T2). Yue, Y., Joachims, T. ICML 2009 (dueling-bandit identification,
+  T3).
+- Yang, K. et al. *RLCD: Reinforcement Learning from Contrastive
+  Distillation.* ICLR 2024, arXiv:2307.12950 — **the other RLCD**;
+  cited here only to anchor the disambiguation in §0.1.
+
+exec
+/bin/bash -c 'cat docs/ref_papers/journal_positioning.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# 期刊论文定位：创新性主张与完整性缺口
+
+> 2026-09-27 整理。目标：从 workshop paper 升级为期刊论文（目标档次参考
+> JMLR / JAIR / ML journal / 或 BO 强相关的期刊）。本文回答两个问题：
+> **相对 2024–2026 最近邻工作，我们的创新点是什么**；**期刊审稿人会要求
+> 补什么**。
+
+---
+
+## 一、与最近邻工作的差异定位
+
+### vs. Sara/lenz（Brunzema et al., arXiv:2608.00316, 2026）——最重要的对照
+
+| 维度 | Sara/lenz (2026) | 本项目 |
+|---|---|---|
+| 决策形式 | LLM agent 自由探查/提点/改配置/停止（open-ended） | 8 个 typed action 的封闭决策空间 |
+| 策略来源 | 系统 prompt 指令，无学习 | 反事实 oracle 监督 → 训练的校准 System-1（RF） |
+| LLM 成本 | **只报告不优化**（token 记录在附录 C.2） | **选择性 System-2：置信度路由 + 预设非劣效 margin 的成本前沿** |
+| 统计处理 | 10 seeds 中位数 + IQR + Mann–Whitney | 配对 seed bootstrap CI、预设定验收标准、诚实阴性结果 |
+| 计算成本入模 | future work（附录 E meta-MDP） | **已做**（RQ3 全网格，含 10-seed 确认） |
+
+**核心论点：我们正面回答了该文留下的开放问题（计算成本何时值得花）。**
+他们证明了 LLM 能坐进决策环；我们回答"什么时候值得让它坐进来"。
+
+### vs. LLAMBO（ICLR 2024）
+
+- LLAMBO 把 LLM 放进环里（当 surrogate/提议器）但无成本治理；2026 复现研究
+  （arXiv:2603.24647）指出其结果对实现细节高度敏感。
+- 我们的对应设计：typed action 空间 + 冻结提示 + 确定性 RF + mock/real 双模式
+  对照——稳健性是设计出来的，不是调出来的。
+
+### vs. GPTOpt / AdaEvolve（2025–2026）
+
+- 它们让 LLM **本身当优化器**；我们研究 **meta 决策层**上 LLM 推理何时值得花
+  （决策对象是"下一步采取什么优化策略"，不是"下一个 x"）。层面不同，可互补。
+
+### 我们独有的框架贡献
+
+**Decision Landscape（adaptive-value 三 regime 分类）**：Flat / Heavy-tailed /
+Frequent-opportunity。在上述所有近邻工作中都没有对应物——这是"在哪类问题上
+值得用学习策略/LLM"的先验刻画，直接解释我们的阴性结果（Flat 家族上 LLM/学习
+策略赚不回成本）。
+
+---
+
+## 二、一句话卖点（摘要/引言用）
+
+> Agentic Bayesian Optimization 已经证明 LLM 能坐进优化决策环；本文回答
+> **"它什么时候值得坐进来"**：我们用反事实 oracle 监督训练校准的 System-1，
+> 以预设定非劣效 margin 在五个优化家族上给出首个优化决策环内的质量-成本
+> 前沿——结论是诚实的阴性：冻结 System-1（0 次 LLM 调用）在 5/5 家族上
+> 支配 always-LLM，且没有任何置信度/随机路由策略能赚回成本；机制分析表明
+> LLM 的价值在于"全局→局部"的调度结构而非逐步选择。我们同时给出
+> decision-landscape 刻画（三类 regime）与跨家族/跨维度迁移的系统性阴性结果。
+
+**阴性结果为什么是贡献而非弱点**：agentic BO 文献（Sara/lenz、LLAMBO 及其
+复现研究）普遍只报告 LLM 参与的正向故事；第一个系统性的成本前沿阴性 + 机制
+解释 + 预设定标准，是该领域目前缺失的对照证据。写作时要主动把阴性结果
+框定为"成本治理的 benchmark 时刻"。
+
+---
+
+## 三、期刊级完整性缺口（按优先级，审稿人视角）
+
+### P0 — 基准面（最大风险）
+
+- 现状：5 个合成 BOCoDe 家族 + 少量 IOH。Sara/lenz 用了 HPO（LCBench）+
+  化学反应 + scaling law；审稿人会照此标准要求。
+- 必补：
+  1. **BBOB/COCO 全套或 IOH 更广覆盖**（IOH backend 已有，扩函数/维度即可）；
+  2. **≥1 个 HPO 任务**（LCBench 或 Optuna benchmarking 类）；
+  3. **≥1 个真实工程/仿真问题**——Phase 14 不能再是占位符；若车辆悬架仿真器
+     不可得，用 BBOB-exp / 工程参数辨识类问题垫，并在 limitations 说明。
+
+### P0 — 外部基线
+
+- 现状：全部内部基线（Rule/Surrogate/Local/Jev/LLM）。
+- 必补：**Sobol/Ax/SMAC3 或 HEBO**（经典优化器锚点）+ **LLAMBO**
+  （OptunaHub 移植版，注意引用 2603.24647 的保真度差异表）。
+- 可选：GPTOpt 作为"微调 LLM 优化器"参照。
+
+### P1 — 缺一个"赢"的 regime
+
+- 全阴性对 workshop 够、对期刊需至少一个正向结果。（2026-09-27 更新：
+  **部分达成，走的是"蒸馏泛化"而非"调度蒸馏"路径**——EXP-RLCD-JOURNAL
+  轮的 E5 显示：反事实蒸馏的 Laya typed-decision 模型在 leave-one-family-
+  out 下保持 ~99% 族内排序精度（0.866 vs 0.873），对 RF 基线的优势在家族
+  偏移下从 +0.056 翻倍到 +0.146，5/5 折全胜（符号检验 p=0.031）。这是
+  RQ2 式的"跨问题泛化"阳性。机制边界的诚实刻画同时到手：置信度无判别力
+  （AURC≈1−acc，E1）→ 量化路由退化为家族级整体切换（E4，预申明标准未过）
+  → RQ3 前沿保持退化的原因比"RF 平"更深：现有监督不提供判别性不确定性。
+  详见 `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`。原"调度蒸馏"路径仍是
+  备选：机制检查里确定性 global-then-local 基线已在 dev seeds 上赢过 LLM；
+  在多峰问题族上展示 learned schedule > 固定规则仍是可选的第二个"赢"。）
+- 确认性补强（E5 后续）：per-record 日志 + record-clustered CI；每折
+  2 个训练种子。
+
+### P1 — 统计完整化
+
+- 多重比较校正（Benjamini–Hochberg 或按家族分层）；全实验统一 ≥10 seeds
+  （RQ3 已到，RQ1/RQ2 对齐）；报告 IQM（Agarwal 2021 处方）。
+- σ_family 等预设定量的定义先于实验写进脚本（本次 10-seed 复核发现原报告
+  未记录 σ 定义——流程教训写进论文可加分）。
+
+### P2 — 保持并显式声称的强项
+
+- 385 unit tests、数据集 SHA-256 溯源、预设定验收标准、阴性结果全保留、
+  符号错误主动修正——写进 reproducibility 段落，是对审稿人的差异化卖点。
+- Phase 14 工程迁移：若 P0 补了一个工程问题，该段落从"占位符"转为真实结果。
+
+---
+
+## 四、写作映射（结构 → 文献支撑）
+
+| 论文段落 | 支撑文献 |
+|---|---|
+| §1 引言 | agentic BO 叙事：LLAMBO → 复现批判 → Sara/lenz → 我们的成本前沿 |
+| §2 Related work | papers_2024plus.md 四条线各一段 |
+| §3 方法 | OPE 术语接口（arXiv:2501.05278）+ temperature scaling（Guo 2017）+ 非劣效 margin（CONSORT 扩展） |
+| §5 RQ3 | 路由线 8–13 + 阴性结果框定 |
+| §6/§7 Limitations | Ross & Bagnell 2011（单步 vs 闭环分叉）+ 基准面/多重比较 |
+| 附录 | Agarwal 2021 统计处方、预设定标准全文 |
+
+相关文件：`docs/workshop_paper_outline.md`（现有 8 页骨架，可直接扩展）；
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`（10-seed 修正版结论）；
+`PROGRESS.md`（三 RQ 现状）。
+
+codex
+The round-two report treats the transfer result as confirmatory and the aligned teacher as a decisive diagnosis. I’m checking those two points first: how the confidence intervals cluster observations, and what the alignment experiment actually holds fixed.
+exec
+/bin/bash -c "rg --files -g 'AGENTS.md' -g 'runs/exp_rlcd_loo_confirmatory.json' -g 'runs/exp_teacher_noise_diagnostic*.json' -g 'runs/exp_*gates.json' -g 'runs/exp_rlcd_*aligned.json' -g 'runs/exp_geartrain_transfer_probe.json' -g 'scripts/exp_rlcd_loo_confirmatory.py' -g 'scripts/exp_teacher_noise_diagnostic.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+runs/exp_rlcd_loo_confirmatory.json
+runs/exp_teacher_noise_diagnostic_r5.json
+runs/exp_rlcd_closed_loop_aligned.json
+runs/exp_aligned_gates.json
+runs/exp_longhorizon_gates.json
+runs/exp_teacher_noise_diagnostic.json
+runs/exp_rlcd_discrimination_aligned.json
+runs/exp_r5_gates.json
+runs/exp_geartrain_transfer_probe.json
+scripts/exp_teacher_noise_diagnostic.py
+scripts/exp_rlcd_loo_confirmatory.py
+
+exec
+/bin/bash -c 'head -c 500 runs/exp_rlcd_loo_confirmatory.json' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+{
+  "contrasts": {
+    "POOLED/bt_pairs_vs_rf": {
+      "ci95": [
+        0.12551344779984652,
+        0.1540170129738491
+      ],
+      "ci_excludes_zero": true,
+      "mean_per_record_diff": 0.14004630097013204,
+      "n_records": 663
+    },
+    "POOLED/proper_score_vs_rf": {
+      "ci95": [
+        0.007270584546780095,
+        0.03177500370074232
+      ],
+      "ci_excludes_zero": true,
+      "mean_per_record_diff": 0.019381260726083725,
+      "n_records": 663
+    },
+    "ackley/bt_pairs_vs_
+exec
+/bin/bash -c "python - <<'PY'
+import json
+from pathlib import Path
+files=['exp_rlcd_loo_confirmatory','exp_teacher_noise_diagnostic','exp_teacher_noise_diagnostic_r5','exp_aligned_gates','exp_r5_gates','exp_longhorizon_gates','exp_rlcd_closed_loop_aligned','exp_rlcd_discrimination_aligned','exp_geartrain_transfer_probe']
+for f in files:
+ p=Path('runs')/(f+'.json'); d=json.loads(p.read_text()); print('\\n',f,p.stat().st_size, list(d) if isinstance(d,dict) else type(d).__name__)
+ for k,v in d.items():
+  if isinstance(v,dict): print(' ',k,'dict',len(v),'keys',list(v)[:12])
+  elif isinstance(v,list): print(' ',k,'list',len(v),'sample type',type(v[0]).__name__ if v else '')
+  else: print(' ',k,repr(v))
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+
+ exp_rlcd_loo_confirmatory 271194 ['contrasts', 'folds']
+  contrasts dict 12 keys ['POOLED/bt_pairs_vs_rf', 'POOLED/proper_score_vs_rf', 'ackley/bt_pairs_vs_rf', 'ackley/proper_score_vs_rf', 'branin/bt_pairs_vs_rf', 'branin/proper_score_vs_rf', 'hartmann/bt_pairs_vs_rf', 'hartmann/proper_score_vs_rf', 'rastrigin/bt_pairs_vs_rf', 'rastrigin/proper_score_vs_rf', 'sixhumpcamel/bt_pairs_vs_rf', 'sixhumpcamel/proper_score_vs_rf']
+  folds list 5 sample type dict
+
+ exp_teacher_noise_diagnostic 44438 ['records', 'summary']
+  records list 80 sample type dict
+  summary dict 10 keys ['argmax_stable_share', 'flip_rate_above_median_gap', 'flip_rate_below_median_gap', 'mean_flip_rate', 'median_interroll_gap_spread', 'median_stored_gap', 'n_records', 'repeats', 'verdict', 'verdict_rule']
+
+ exp_teacher_noise_diagnostic_r5 46077 ['records', 'summary']
+  records list 80 sample type dict
+  summary dict 10 keys ['argmax_stable_share', 'flip_rate_above_median_gap', 'flip_rate_below_median_gap', 'mean_flip_rate', 'median_interroll_gap_spread', 'median_stored_gap', 'n_records', 'repeats', 'verdict', 'verdict_rule']
+
+ exp_aligned_gates 71304 ['dataset', 'gate2', 'gate3', 'gate4', 'n_records']
+  dataset 'runs/longhorizon_k4r5_aligned_20seed_5family.jsonl'
+  gate2 dict 4 keys ['min_phase_seeds', 'min_problem_seeds', 'pass', 'problems']
+  gate3 dict 4 keys ['adjusted_lift_mean', 'pass', 'seed_clustered_ci95', 'seed_rows']
+  gate4 dict 3 keys ['pass', 'rows', 'summary']
+  n_records 661
+
+ exp_r5_gates 70918 ['dataset', 'gate2', 'gate3', 'gate4', 'n_records']
+  dataset 'runs/longhorizon_k4r5_20seed_5family.jsonl'
+  gate2 dict 4 keys ['min_phase_seeds', 'min_problem_seeds', 'pass', 'problems']
+  gate3 dict 4 keys ['adjusted_lift_mean', 'pass', 'seed_clustered_ci95', 'seed_rows']
+  gate4 dict 3 keys ['pass', 'rows', 'summary']
+  n_records 661
+
+ exp_longhorizon_gates 70848 ['dataset', 'gate2', 'gate3', 'gate4', 'n_records']
+  dataset 'runs/longhorizon_k4_20seed_5family.jsonl'
+  gate2 dict 4 keys ['min_phase_seeds', 'min_problem_seeds', 'pass', 'problems']
+  gate3 dict 4 keys ['adjusted_lift_mean', 'pass', 'seed_clustered_ci95', 'seed_rows']
+  gate4 dict 3 keys ['pass', 'rows', 'summary']
+  n_records 661
+
+ exp_rlcd_closed_loop_aligned 236375 ['checkpoints', 'rows', 'summary']
+  checkpoints list 2 sample type str
+  rows list 200 sample type dict
+  summary dict 50 keys ['Ackley/bt_al', 'Ackley/bt_al/vs_rule_full_budget', 'Ackley/bt_al/vs_surrogate', 'Ackley/proper_al', 'Ackley/proper_al/vs_rule_full_budget', 'Ackley/proper_al/vs_surrogate', 'Ackley/rule_full_budget', 'Ackley/rule_full_budget/vs_surrogate', 'Ackley/surrogate', 'Ackley/surrogate/vs_rule_full_budget', 'Branin/bt_al', 'Branin/bt_al/vs_rule_full_budget']
+
+ exp_rlcd_discrimination_aligned 783 ['bt_al', 'proper_al', 'bt_h3', 'proper_h3']
+  bt_al dict 6 keys ['n', 'acc', 'conf_ok', 'conf_bad', 'conf_gap', 'aurc']
+  proper_al dict 6 keys ['n', 'acc', 'conf_ok', 'conf_bad', 'conf_gap', 'aurc']
+  bt_h3 dict 6 keys ['n', 'acc', 'conf_ok', 'conf_bad', 'conf_gap', 'aurc']
+  proper_h3 dict 6 keys ['n', 'acc', 'conf_ok', 'conf_bad', 'conf_gap', 'aurc']
+
+ exp_geartrain_transfer_probe 587 ['bt_h3', 'proper_h3', 'rf_synthetic', 'zero_shot']
+  bt_h3 dict 4 keys ['pairs', 'pairwise_accuracy', 'records', 'top1_agreement']
+  proper_h3 dict 4 keys ['pairs', 'pairwise_accuracy', 'records', 'top1_agreement']
+  rf_synthetic dict 4 keys ['pairs', 'pairwise_accuracy', 'records', 'top1_agreement']
+  zero_shot dict 4 keys ['pairs', 'pairwise_accuracy', 'records', 'top1_agreement']
+
+exec
+/bin/bash -c 'cat scripts/exp_rlcd_loo_confirmatory.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""EXP-RLCD-LOO confirmatory rerun — per-record CIs, dual training seeds.
+
+Upgrades the exploratory E5 (five-fold leave-one-family-out, per-fold
+aggregates) to the journal's confirmatory standard:
+
+  - per-record predictions logged for every arm;
+  - TWO training seeds per fold per Laya arm (per-record results averaged
+    over seeds for the CI, both reported);
+  - record-clustered paired bootstrap CIs for bt/proper vs RF on each
+    held-out family and pooled;
+  - RF retrained per fold on full-width raw-utility records.
+
+Usage:
+    .venv/bin/python scripts/exp_rlcd_loo_confirmatory.py --workers 2
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import statistics
+import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from opt_agent.dataset import iter_jsonl  # noqa: E402
+
+ACTIONS_T = ("global_exploration", "local_exploitation", "uncertainty_sampling",
+             "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
+             "retrain_surrogate", "stop")
+
+
+def _raw_gold(record) -> dict[str, float] | None:
+    gold = {}
+    for a, cell in record.rollout_results.items():
+        if cell.get("status") != "valid":
+            continue
+        u = cell.get("utility")
+        if isinstance(u, (int, float)) and u == u:
+            gold[a] = float(u)
+    return gold if len(gold) >= 2 else None
+
+
+def _per_record_laya(model, tok, records, device_str: str) -> dict[str, list]:
+    """record_id → [(correct, total, top1, log_score)] (one per record)."""
+    import torch
+
+    from opt_agent.system1.rlcd import (  # noqa: F401
+        RLCDConfig,
+        _collate,
+        build_item,
+    )
+
+    device = torch.device(device_str)
+    model.to(device).eval()
+    out: dict[str, list] = {}
+    with torch.no_grad():
+        for r in records:
+            item = build_item(r, tok, max_len=512, head_max_len=192)
+            if item is None or _raw_gold(r) is None:
+                continue
+            batch = _collate([item], tok.pad_token_id)
+            tensors = {k: v.to(device) for k, v in batch.items()
+                       if torch.is_tensor(v)}
+            with torch.autocast(device_type=device.type,
+                                dtype=torch.bfloat16,
+                                enabled=device.type == "cuda"):
+                logits, _ = model(
+                    tensors["input_ids"], tensors["attention_mask"],
+                    tensors["marker_pos"], tensors["marker_mask"],
+                    tensors["qtype"],
+                )
+            row = logits[0].float().cpu()
+            index_of = {a: i for i, a in enumerate(item["option_ids"])}
+            gold = _raw_gold(r)
+            gold_top = max(gold, key=lambda a: gold[a])
+            model_top = max((a for a in gold if a in index_of),
+                            key=lambda a: float(row[index_of[a]]))
+            # item["pairs"] carries option indices already.
+            correct = sum(int(row[i] > row[j]) for i, j, _ in item["pairs"])
+            log_score = None
+            if item.get("target") is not None:
+                logq = torch.log_softmax(row, -1).clamp_min(-9.21)
+                t = torch.tensor(item["target"], dtype=logq.dtype)
+                log_score = float((t * logq).sum())
+            out[r.id] = (correct, len(item["pairs"]),
+                         int(model_top == gold_top), log_score)
+    model.to("cpu")
+    return out
+
+
+def _rf_per_record(train_records, test_records) -> dict[str, tuple]:
+    from sklearn.ensemble import RandomForestRegressor
+
+    from _shared_rq_features import extract_features
+    from opt_agent.dataset import phase_of_ratio
+
+    def feats(r):
+        return extract_features(
+            r.state, phase_of_ratio(
+                float(r.state["resource"]["remaining_budget_ratio"])
+            )
+        )
+
+    X, Y = [], []
+    for r in train_records:
+        gold = _raw_gold(r)
+        if gold is None or set(gold) != set(ACTIONS_T):
+            continue
+        X.append(feats(r))
+        Y.append([gold[a] for a in ACTIONS_T])
+    rf = RandomForestRegressor(
+        n_estimators=200, max_depth=8, min_samples_leaf=5,
+        random_state=0, n_jobs=8,
+    )
+    rf.fit(X, Y)
+    out: dict[str, tuple] = {}
+    for r in test_records:
+        gold = _raw_gold(r)
+        if gold is None:
+            continue
+        pred = dict(zip(ACTIONS_T, rf.predict([feats(r)])[0]))
+        actions = sorted(gold)
+        correct = total = 0
+        for i, a in enumerate(actions):
+            for b in actions[i + 1:]:
+                g = gold[a] - gold[b]
+                if abs(g) <= 1e-12:
+                    continue
+                total += 1
+                correct += int((pred[a] - pred[b] > 0) == (g > 0))
+        top1 = int(max(actions, key=lambda a: pred[a])
+                   == max(actions, key=lambda a: gold[a]))
+        out[r.id] = (correct, total, top1, None)
+    return out
+
+
+def _bootstrap_ci(diffs: list[float], repetitions: int = 2000,
+                  seed: int = 0) -> tuple[float, float]:
+    rng = random.Random(seed)
+    n = len(diffs)
+    if n == 0:
+        return (0.0, 0.0)
+    means = sorted(
+        statistics.fmean(diffs[rng.randrange(n)] for _ in range(n))
+        for _ in range(repetitions)
+    )
+    return means[int(0.025 * repetitions)], means[int(0.975 * repetitions)]
+
+
+def _paired_diffs(a: dict[str, tuple], b: dict[str, tuple]) -> list[float]:
+    """Record-clustered accuracy diffs: per-record correct-rate difference."""
+    ids = sorted(set(a) & set(b))
+    out = []
+    for i in ids:
+        ca, ta = a[i][0], a[i][1]
+        cb, tb = b[i][0], b[i][1]
+        if ta == 0 or tb == 0:
+            continue
+        out.append(ca / ta - cb / tb)
+    return out
+
+
+def _run_fold(task: dict) -> dict:
+    import shutil
+
+    import torch
+
+    torch.set_num_threads(4)
+    from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
+
+    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    held_out = task["family"]
+    train_pool = [r for r in records if r.problem["family"] != held_out]
+    test = [r for r in records if r.problem["family"] == held_out]
+    tr = [r for r in train_pool if int(r.problem["seed"]) < 16]
+    va = [r for r in train_pool if int(r.problem["seed"]) >= 16]
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    out = {"family": held_out, "test_records": len(test), "arms": {}}
+    for objective in ("proper_score", "bt_pairs"):
+        seed_rows = []
+        for tseed in task["train_seeds"]:
+            tmp = Path(f"runs/.rlcd_loo_c/{held_out}_{objective}_s{tseed}")
+            cfg = RLCDConfig(
+                output_dir=str(tmp), objective=objective,
+                num_epochs=task["epochs"], seed=tseed,
+            )
+            torch.manual_seed(tseed)
+            train_rlcd(tr, va, cfg)
+            import laya
+
+            agent = laya.load(str(tmp))
+            per_rec = _per_record_laya(agent.model, agent.tok, test, device)
+            seed_rows.append(per_rec)
+            del agent
+            torch.cuda.empty_cache()
+            shutil.rmtree(tmp, ignore_errors=True)
+        # Average per-record counts over training seeds.
+        ids = sorted({i for row in seed_rows for i in row})
+        merged = {}
+        for i in ids:
+            rows = [row[i] for row in seed_rows if i in row]
+            merged[i] = (
+                statistics.fmean(r[0] for r in rows),
+                statistics.fmean(r[1] for r in rows),
+                statistics.fmean(r[2] for r in rows),
+                (statistics.fmean([r[3] for r in rows if r[3] is not None])
+                 if any(r[3] is not None for r in rows) else None),
+            )
+        out["arms"][objective] = {
+            "n_train_seeds": len(seed_rows),
+            "per_seed_acc": [
+                (sum(v[0] for v in row.values()) /
+                 max(1, sum(v[1] for v in row.values())))
+                for row in seed_rows
+            ],
+            "per_record": {k: list(v) for k, v in merged.items()},
+        }
+    rf_rec = _rf_per_record(train_pool, test)
+    out["arms"]["rf"] = {
+        "per_record": {k: list(v) for k, v in rf_rec.items()},
+    }
+    return out
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--dataset", type=Path,
+                        default=Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+    parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument("--train-seeds", nargs="+", type=int, default=[0, 1])
+    parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument("--json-out", type=Path,
+                        default=Path("runs/exp_rlcd_loo_confirmatory.json"))
+    args = parser.parse_args()
+
+    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
+    tasks = [{"family": f, "dataset": str(args.dataset),
+              "epochs": args.epochs, "train_seeds": args.train_seeds}
+             for f in families]
+    results = []
+    import multiprocessing
+
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx) as pool:
+        futures = {pool.submit(_run_fold, t): t for t in tasks}
+        for fut in as_completed(futures):
+            r = fut.result()
+            results.append(r)
+            for arm in ("proper_score", "bt_pairs"):
+                accs = r["arms"][arm]["per_seed_acc"]
+                rf = r["arms"]["rf"]["per_record"]
+                rf_acc = (sum(v[0] for v in rf.values())
+                          / max(1, sum(v[1] for v in rf.values())))
+                print(f"[loo-c:{r['family']}] {arm:<13} "
+                      f"seeds={[round(a,3) for a in accs]} "
+                      f"rf={rf_acc:.3f}", flush=True)
+
+    # Pooled + per-fold record-clustered CIs (bt/proper vs rf).
+    contrasts = {}
+    pooled = {"bt_pairs": [], "proper_score": []}
+    for r in results:
+        rf = {k: tuple(v) for k, v in r["arms"]["rf"]["per_record"].items()}
+        for arm in ("bt_pairs", "proper_score"):
+            laya = {k: tuple(v) for k, v in r["arms"][arm]["per_record"].items()}
+            diffs = _paired_diffs(laya, rf)
+            ci = _bootstrap_ci(diffs)
+            contrasts[f"{r['family']}/{arm}_vs_rf"] = {
+                "n_records": len(diffs),
+                "mean_per_record_diff": statistics.fmean(diffs),
+                "ci95": ci,
+                "ci_excludes_zero": ci[0] > 0 or ci[1] < 0,
+            }
+            pooled[arm].extend(diffs)
+    for arm, diffs in pooled.items():
+        ci = _bootstrap_ci(diffs)
+        contrasts[f"POOLED/{arm}_vs_rf"] = {
+            "n_records": len(diffs),
+            "mean_per_record_diff": statistics.fmean(diffs),
+            "ci95": ci,
+            "ci_excludes_zero": ci[0] > 0 or ci[1] < 0,
+        }
+
+    args.json_out.write_text(
+        json.dumps({"folds": results, "contrasts": contrasts}, indent=2,
+                   sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(contrasts, indent=2, sort_keys=True), flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+exec
+/bin/bash -c 'cat scripts/exp_teacher_noise_diagnostic.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""P1a — teacher label noise vs misspecification diagnostic (2026-09-27).
+
+Gate 4 has failed at every horizon (h3, Phase 8.6D hfull, k=4 quota). Before
+choosing a fix (replicate-and-average denoising vs target redefinition),
+separate the two candidate causes:
+
+  NOISE      — rollout utilities are stochastic (candidate seeds, continuation
+               seeds, GP refits); sign(U_a − U_b) flips under re-rolls.
+  MISSPEC    — the utility is a deterministic-but-wrong functional of the
+               trajectory; re-rolls agree with each other and with the stored
+               labels, but the labels still fail Gate 4.
+
+Protocol: sample records from the k=4 long-horizon dataset (stratified by
+family), restore each record's replayed backend checkpoint, re-run the SAME
+rolled-out candidate actions R times with fresh seeds, and measure:
+
+  - pair-sign agreement between stored labels and each re-roll,
+    stratified by stored |ΔU| quartile (below/above median);
+  - argmax stability across re-rolls;
+  - utility gap scale (median |ΔU| vs the inter-roll std of ΔU).
+
+Verdict heuristic (predeclared): flip rate on pairs ABOVE the median gap
+≥ 0.25 ⇒ NOISE-dominated (denoise first); ≤ 0.10 ⇒ MISSPEC-dominated
+(redefine the target); in between ⇒ MIXED.
+
+Runs one record per parallel CPU worker (spawn).
+
+Usage:
+    .venv/bin/python scripts/exp_teacher_noise_diagnostic.py --repeats 3 --workers 12
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import statistics
+import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from opt_agent.dataset import iter_jsonl  # noqa: E402
+
+
+def _reroll_record(task: dict) -> dict | None:
+    """Restore a record's backend; re-roll its rolled-out actions R times."""
+    import torch
+
+    torch.set_num_threads(1)
+    from opt_agent.actions.models import ActionType, OptimizationAction
+    from opt_agent.backend.bocode_botorch import (
+        BackendConfig,
+        BocodeBotorchBackend,
+    )
+    from opt_agent.dataset.generator import derive_seed
+    from opt_agent.dataset.validation import _reconstruct_checkpoint
+    from opt_agent.rollout import Candidate, CounterfactualRollout
+    from opt_agent.rollout.specs import ContinuationPolicySpec
+    from opt_agent.state import extract_state
+
+    rec = task["record"]
+    cp = _reconstruct_checkpoint(rec)
+    backend = BocodeBotorchBackend()
+    backend.initialize(BackendConfig(
+        problem_id=cp.problem_id, seed=int(rec.problem["seed"]), n_init=1,
+    ))
+    backend.restore(cp)
+    state = extract_state(
+        backend,
+        total_budget=int(rec.state["resource"]["total_budget"]),
+        last_action=rec.state["history"].get("last_action"),
+    )
+
+    horizon = int(rec.metadata.get("horizon", 1))
+    md = rec.metadata
+    run_seed = int(md["run_seed"])
+    rerun: list[dict[str, float]] = []
+    for rep in range(task["repeats"]):
+        cands = []
+        for spec in rec.candidate_actions:
+            if spec["action_id"] not in rec.rollout_results:
+                continue
+            merged = dict(spec["params"])
+            if "seed" in spec["params"]:
+                merged["seed"] = derive_seed(
+                    run_seed, rep, 987654321,
+                    abs(hash(spec["action_id"])) & 0xFFFF,
+                )
+            cands.append(Candidate(
+                action_id=spec["action_id"],
+                action=OptimizationAction(ActionType(spec["type"]), merged),
+            ))
+        cont = ContinuationPolicySpec(
+            name=md.get("continuation_policy", {}).get("name", "on_policy"),
+            seed=derive_seed(run_seed, rep, 555555),
+            extras=md.get("continuation_policy", {}).get("extras", {}),
+        )
+        out = CounterfactualRollout(
+            backend,
+            horizon=max(1, horizon),
+            continuation_spec=cont,
+            max_rollout_steps=max(200, len(cands) * horizon + 32),
+            optimization_scale=float(md.get("optimization_scale", 1.0)),
+            evaluation_scale=float(md.get("evaluation_scale", 30.0)),
+            fit_scale=float(md.get("fit_scale", 30.0)),
+        ).rollout(state, cands)
+        rerun.append({
+            r.action_id: float(r.utility)
+            for r in out.results if r.status == "valid"
+        })
+
+    stored = {
+        a: float(cell["utility"])
+        for a, cell in rec.rollout_results.items()
+        if cell.get("status") == "valid"
+    }
+    flips, gaps, spread = [], [], []
+    actions = sorted(stored)
+    for i, a in enumerate(actions):
+        for b in actions[i + 1:]:
+            g = stored[a] - stored[b]
+            if abs(g) <= 1e-12:
+                continue
+            per_roll = [r[a] - r[b] for r in rerun if a in r and b in r]
+            agree = all(d * g > 0 for d in per_roll)
+            flips.append(0 if agree else 1)
+            gaps.append(abs(g))
+            if len(per_roll) >= 2:
+                spread.append(statistics.pstdev(per_roll))
+    argmax_stable = len({
+        max(r, key=lambda a: r[a]) for r in rerun if r
+    }) == 1
+    return {
+        "id": rec.id,
+        "family": rec.problem["family"],
+        "horizon": horizon,
+        "n_actions": len(stored),
+        "n_pairs": len(flips),
+        "flip_rate": (sum(flips) / len(flips)) if flips else None,
+        "median_gap": statistics.median(gaps) if gaps else None,
+        "median_gap_spread": statistics.median(spread) if spread else None,
+        "argmax_stable_across_rerolls": argmax_stable,
+        "flips": flips,
+        "gaps": gaps,
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--dataset", type=Path,
+                        default=Path("runs/longhorizon_k4_20seed_5family.jsonl"))
+    parser.add_argument("--per-family", type=int, default=16)
+    parser.add_argument("--repeats", type=int, default=3)
+    parser.add_argument("--workers", type=int, default=12)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--json-out", type=Path,
+                        default=Path("runs/exp_teacher_noise_diagnostic.json"))
+    args = parser.parse_args()
+
+    records = list(iter_jsonl(args.dataset))
+    rng = random.Random(args.seed)
+    by_fam: dict[str, list] = {}
+    for r in records:
+        by_fam.setdefault(r.problem["family"], []).append(r)
+    sample = []
+    for fam in sorted(by_fam):
+        pool = by_fam[fam]
+        sample.extend(rng.sample(pool, min(args.per_family, len(pool))))
+    tasks = [{"record": r, "repeats": args.repeats} for r in sample]
+    print(f"{len(tasks)} records × {args.repeats} re-rolls", flush=True)
+
+    results = []
+    import multiprocessing
+
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx) as pool:
+        futures = {pool.submit(_reroll_record, t): t for t in tasks}
+        for i, fut in enumerate(as_completed(futures), 1):
+            r = fut.result()
+            if r is None:
+                continue
+            results.append(r)
+            if i % 10 == 0 or i == len(tasks):
+                print(f"[{i}/{len(tasks)}] flip_rate={r['flip_rate']}",
+                      flush=True)
+
+    all_flips = [f for r in results for f in r["flips"]]
+    all_gaps = [g for r in results for g in r["gaps"]]
+    order = sorted(range(len(all_gaps)), key=lambda i: all_gaps[i])
+    half = len(order) // 2
+    below = [all_flips[i] for i in order[:half]]
+    above = [all_flips[i] for i in order[half:]]
+    above_rate = statistics.fmean(above) if above else None
+    verdict = None
+    if above_rate is not None:
+        if above_rate >= 0.25:
+            verdict = "NOISE_DOMINATED"
+        elif above_rate <= 0.10:
+            verdict = "MISSPEC_DOMINATED"
+        else:
+            verdict = "MIXED"
+    summary = {
+        "n_records": len(results),
+        "repeats": args.repeats,
+        "mean_flip_rate": (statistics.fmean(all_flips)
+                           if all_flips else None),
+        "flip_rate_below_median_gap": (statistics.fmean(below)
+                                       if below else None),
+        "flip_rate_above_median_gap": above_rate,
+        "median_stored_gap": (statistics.median(all_gaps)
+                              if all_gaps else None),
+        "median_interroll_gap_spread": statistics.median([
+            r["median_gap_spread"] for r in results
+            if r["median_gap_spread"] is not None
+        ]) if any(r["median_gap_spread"] is not None
+                  for r in results) else None,
+        "argmax_stable_share": (
+            statistics.fmean([r["argmax_stable_across_rerolls"]
+                              for r in results]) if results else None
+        ),
+        "verdict": verdict,
+        "verdict_rule": ("flip rate on pairs above the median stored gap: "
+                         ">=0.25 NOISE; <=0.10 MISSPEC; else MIXED"),
+    }
+    args.json_out.write_text(
+        json.dumps({"summary": summary, "records": results}, indent=2,
+                   sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+exec
+/bin/bash -c "python - <<'PY'
+import json
+from pathlib import Path
+for name in ['exp_rlcd_loo_confirmatory','exp_teacher_noise_diagnostic','exp_teacher_noise_diagnostic_r5','exp_aligned_gates','exp_r5_gates','exp_longhorizon_gates','exp_rlcd_discrimination_aligned','exp_geartrain_transfer_probe']:
+ d=json.loads((Path('runs')/(name+'.json')).read_text()); print('\\n###',name)
+ if 'contrasts' in d:
+  for k,v in d['contrasts'].items(): print(k, v)
+  for f in d['folds']:
+   print('FOLD',f['family'],f['test_records'],{k:{'n':len(v['per_record']),'seeds':v.get('per_seed_acc')} for k,v in f['arms'].items()})
+ elif 'summary' in d and 'gate4' not in d: print(d['summary'])
+ elif 'gate4' in d:
+  print('gate2', d['gate2']['pass'], 'gate3', d['gate3']['adjusted_lift_mean'],d['gate3']['seed_clustered_ci95']);print('gate4 summary',d['gate4']['summary']); print('gate4 rows sample',d['gate4']['rows'][:2])
+ else: print(d)
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+
+### exp_rlcd_loo_confirmatory
+POOLED/bt_pairs_vs_rf {'ci95': [0.12551344779984652, 0.1540170129738491], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.14004630097013204, 'n_records': 663}
+POOLED/proper_score_vs_rf {'ci95': [0.007270584546780095, 0.03177500370074232], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.019381260726083725, 'n_records': 663}
+ackley/bt_pairs_vs_rf {'ci95': [0.1772481556067529, 0.2400158288167338], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.2087284160870134, 'n_records': 130}
+ackley/proper_score_vs_rf {'ci95': [0.06690459201432053, 0.11283052346513886], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.08934407418457192, 'n_records': 130}
+branin/bt_pairs_vs_rf {'ci95': [0.03070239881883716, 0.06104282260104177], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.04537716912716911, 'n_records': 146}
+branin/proper_score_vs_rf {'ci95': [-0.11545524554086199, -0.07300449677162006], 'ci_excludes_zero': True, 'mean_per_record_diff': -0.09481763480051152, 'n_records': 146}
+hartmann/bt_pairs_vs_rf {'ci95': [0.0037108638960490874, 0.027807654622469438], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.015769765899395525, 'n_records': 135}
+hartmann/proper_score_vs_rf {'ci95': [-0.0868101946064909, -0.04393919866142089], 'ci_excludes_zero': True, 'mean_per_record_diff': -0.0653844947919022, 'n_records': 135}
+rastrigin/bt_pairs_vs_rf {'ci95': [0.1200586995548236, 0.18138521326505821], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.1510305707786328, 'n_records': 129}
+rastrigin/proper_score_vs_rf {'ci95': [0.033558153732572336, 0.06185847743987279], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.04770174915523753, 'n_records': 129}
+sixhumpcamel/bt_pairs_vs_rf {'ci95': [0.26942262583582527, 0.3349695465011104], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.30470792465412266, 'n_records': 123}
+sixhumpcamel/proper_score_vs_rf {'ci95': [0.11779481885172943, 0.17027757924099388], 'ci_excludes_zero': True, 'mean_per_record_diff': 0.1443235939362195, 'n_records': 123}
+FOLD ackley 130 {'bt_pairs': {'n': 130, 'seeds': [0.8671415298854135, 0.8730257045524931]}, 'proper_score': {'n': 130, 'seeds': [0.7624651594921028, 0.742954475069681]}, 'rf': {'n': 130, 'seeds': None}}
+FOLD branin 146 {'bt_pairs': {'n': 146, 'seeds': [0.8676633444075305, 0.8560354374307863]}, 'proper_score': {'n': 146, 'seeds': [0.7333887043189369, 0.7131782945736435]}, 'rf': {'n': 146, 'seeds': None}}
+FOLD hartmann 135 {'bt_pairs': {'n': 135, 'seeds': [0.8326105810928014, 0.8216247470367158]}, 'proper_score': {'n': 135, 'seeds': [0.7525296328418618, 0.7464585140213935]}, 'rf': {'n': 135, 'seeds': None}}
+FOLD rastrigin 129 {'bt_pairs': {'n': 129, 'seeds': [0.840301791889343, 0.8503615215341088]}, 'proper_score': {'n': 129, 'seeds': [0.7378182961332914, 0.7494498585350519]}, 'rf': {'n': 129, 'seeds': None}}
+FOLD sixhumpcamel 123 {'bt_pairs': {'n': 123, 'seeds': [0.9021810971579644, 0.9187045604758758]}, 'proper_score': {'n': 123, 'seeds': [0.7382683410442828, 0.764375413086583]}, 'rf': {'n': 123, 'seeds': None}}
+
+### exp_teacher_noise_diagnostic
+{'argmax_stable_share': 0.25, 'flip_rate_above_median_gap': 0.7378640776699029, 'flip_rate_below_median_gap': 0.5436893203883495, 'mean_flip_rate': 0.6407766990291263, 'median_interroll_gap_spread': 0.08423410915246374, 'median_stored_gap': 0.04999999999999999, 'n_records': 80, 'repeats': 3, 'verdict': 'NOISE_DOMINATED', 'verdict_rule': 'flip rate on pairs above the median stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED'}
+
+### exp_teacher_noise_diagnostic_r5
+{'argmax_stable_share': 0.25, 'flip_rate_above_median_gap': 0.6327433628318584, 'flip_rate_below_median_gap': 0.7168141592920354, 'mean_flip_rate': 0.6747787610619469, 'median_interroll_gap_spread': 0.09877918779492739, 'median_stored_gap': 0.05036136547245408, 'n_records': 80, 'repeats': 3, 'verdict': 'NOISE_DOMINATED', 'verdict_rule': 'flip rate on pairs above the median stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED'}
+
+### exp_aligned_gates
+gate2 False gate3 13.335065699670281 [11.140847939395139, 15.58142442953125]
+gate4 summary {'ackley': {'comparisons': {'behavior': {'ci95': [-0.17930184015872683, 0.7754127262670092], 'mean_gain': 0.24975797344006873, 'positive_seeds': 8}, 'stop': {'ci95': [1.5328633706415036, 3.3420351699810147], 'mean_gain': 2.373292812201113, 'positive_seeds': 19}, 'uniform': {'ci95': [0.10213958839172707, 1.0773883123986763], 'mean_gain': 0.5144417559047441, 'positive_seeds': 13}}, 'n_seeds': 20}, 'branin': {'comparisons': {'behavior': {'ci95': [-0.037573876639174816, -0.0040180324396200924], 'mean_gain': -0.01968256706630956, 'positive_seeds': 5}, 'stop': {'ci95': [0.12334900993657297, 0.34097111531012037], 'mean_gain': 0.22400668881999128, 'positive_seeds': 15}, 'uniform': {'ci95': [-0.01971536165820734, 0.05605683782541826], 'mean_gain': 0.01531833324462493, 'positive_seeds': 11}}, 'n_seeds': 20}, 'hartmann': {'comparisons': {'behavior': {'ci95': [-2.631274179387719, 1.9230171106175564], 'mean_gain': -0.23743233530224211, 'positive_seeds': 9}, 'stop': {'ci95': [2.387690056125933, 14.140145970262584], 'mean_gain': 6.71677071212901, 'positive_seeds': 15}, 'uniform': {'ci95': [-1.5151708369817793, 8.219357461334749], 'mean_gain': 2.310602474456622, 'positive_seeds': 10}}, 'n_seeds': 20}, 'rastrigin': {'comparisons': {'behavior': {'ci95': [-0.0975506629800422, 0.17294188893330797], 'mean_gain': 0.038357732621782305, 'positive_seeds': 6}, 'stop': {'ci95': [0.7869202217414243, 1.9944645384879194], 'mean_gain': 1.320090645703319, 'positive_seeds': 18}, 'uniform': {'ci95': [0.03978409348989667, 0.39401185199834365], 'mean_gain': 0.2127286853270169, 'positive_seeds': 12}}, 'n_seeds': 20}, 'sixhumpcamel': {'comparisons': {'behavior': {'ci95': [-0.009614375996510372, 0.010023928519512414], 'mean_gain': 0.000553872247256847, 'positive_seeds': 10}, 'stop': {'ci95': [0.03366463301243995, 0.08045438027312392], 'mean_gain': 0.05643084485472714, 'positive_seeds': 18}, 'uniform': {'ci95': [0.0015831148788482338, 0.022613646668612687], 'mean_gain': 0.012313154200917577, 'positive_seeds': 15}}, 'n_seeds': 20}}
+gate4 rows sample [{'family': 'ackley', 'gains': {'behavior': 2.731977073547649, 'stop': 4.500325711251407, 'uniform': 0.6829942683869099}, 'gold_action': 'uncertainty_sampling', 'record_id': 'ackley:0:0:0', 'seed': 0, 'terminal': {'behavior': -20.07900971424346, 'gold': -19.026761926893315, 'stop': -20.76010655041534, 'uniform': -19.28982387373085}}, {'family': 'ackley', 'gains': {'behavior': 0.5629315002639671, 'stop': 4.403782904163241, 'uniform': 0.29678546258881905}, 'gold_action': 'local_exploitation', 'record_id': 'ackley:1:0:0', 'seed': 1, 'terminal': {'behavior': -19.902101290669798, 'gold': -19.76291863629578, 'stop': -20.8517370690908, 'uniform': -19.83629770363055}}]
+
+### exp_r5_gates
+gate2 False gate3 13.25415872157611 [11.16426346935562, 15.429714182982494]
+gate4 summary {'ackley': {'comparisons': {'behavior': {'ci95': [-0.7200354093206058, 0.39135478435570764], 'mean_gain': -0.14467335286227634, 'positive_seeds': 8}, 'stop': {'ci95': [1.3105917842690293, 2.7989923543597537], 'mean_gain': 1.9788614858987679, 'positive_seeds': 18}, 'uniform': {'ci95': [-0.45492571850278873, 0.5862423131789437], 'mean_gain': 0.12001042960239897, 'positive_seeds': 12}}, 'n_seeds': 20}, 'branin': {'comparisons': {'behavior': {'ci95': [-0.05244167834282165, -0.012120374842462618], 'mean_gain': -0.03128190221638173, 'positive_seeds': 4}, 'stop': {'ci95': [0.1102844203916302, 0.33192489897786837], 'mean_gain': 0.21240735366991914, 'positive_seeds': 12}, 'uniform': {'ci95': [-0.03101621884685663, 0.04646903248145584], 'mean_gain': 0.0037189980945527583, 'positive_seeds': 8}}, 'n_seeds': 20}, 'hartmann': {'comparisons': {'behavior': {'ci95': [-0.5581202291255996, 2.2498342637668634], 'mean_gain': 0.6735909366138214, 'positive_seeds': 9}, 'stop': {'ci95': [2.5949982774299287, 15.695642636191044], 'mean_gain': 7.627793984045075, 'positive_seeds': 15}, 'uniform': {'ci95': [0.043979367343883934, 8.653321883963638], 'mean_gain': 3.221625746372685, 'positive_seeds': 11}}, 'n_seeds': 20}, 'rastrigin': {'comparisons': {'behavior': {'ci95': [-0.22655338805377653, 0.06376026279995202], 'mean_gain': -0.08901310903367278, 'positive_seeds': 3}, 'stop': {'ci95': [0.6570339066031451, 1.8784699171259096], 'mean_gain': 1.192719804047864, 'positive_seeds': 17}, 'uniform': {'ci95': [-0.09717703155895124, 0.2863842813987071], 'mean_gain': 0.08535784367156182, 'positive_seeds': 10}}, 'n_seeds': 20}, 'sixhumpcamel': {'comparisons': {'behavior': {'ci95': [-0.018900274232062173, -0.0005478489177285254], 'mean_gain': -0.009282876470429396, 'positive_seeds': 5}, 'stop': {'ci95': [0.024912431231422925, 0.0692446632321964], 'mean_gain': 0.046594096137040894, 'positive_seeds': 12}, 'uniform': {'ci95': [-0.009767057749112308, 0.014441706395962572], 'mean_gain': 0.0024764054832313353, 'positive_seeds': 10}}, 'n_seeds': 20}}
+gate4 rows sample [{'family': 'ackley', 'gains': {'behavior': 2.731977073547649, 'stop': 4.500325711251407, 'uniform': 0.6829942683869099}, 'gold_action': 'uncertainty_sampling', 'record_id': 'ackley:0:0:0', 'seed': 0, 'terminal': {'behavior': -20.07900971424346, 'gold': -19.026761926893315, 'stop': -20.76010655041534, 'uniform': -19.28982387373085}}, {'family': 'ackley', 'gains': {'behavior': 0.5629315002639671, 'stop': 4.403782904163241, 'uniform': 0.29678546258881905}, 'gold_action': 'error_guided_sampling', 'record_id': 'ackley:1:0:0', 'seed': 1, 'terminal': {'behavior': -19.902101290669798, 'gold': -19.76291863629578, 'stop': -20.8517370690908, 'uniform': -19.83629770363055}}]
+
+### exp_longhorizon_gates
+gate2 False gate3 12.907615016088233 [10.810349355526283, 15.002015649309124]
+gate4 summary {'ackley': {'comparisons': {'behavior': {'ci95': [-0.6343532309273906, 1.0132890561551091], 'mean_gain': 0.16341729672890365, 'positive_seeds': 8}, 'stop': {'ci95': [1.2719220486158325, 3.4982620810069585], 'mean_gain': 2.286952135489948, 'positive_seeds': 18}, 'uniform': {'ci95': [-0.5023819519711785, 1.3808783978061054], 'mean_gain': 0.4281010791935789, 'positive_seeds': 13}}, 'n_seeds': 20}, 'branin': {'comparisons': {'behavior': {'ci95': [-0.0771944407052346, -0.01474490499202374], 'mean_gain': -0.04486161192272722, 'positive_seeds': 5}, 'stop': {'ci95': [0.09646463029198163, 0.3256465954510219], 'mean_gain': 0.19882764396357364, 'positive_seeds': 12}, 'uniform': {'ci95': [-0.05294207714307675, 0.037953438027871725], 'mean_gain': -0.009860711611792729, 'positive_seeds': 9}}, 'n_seeds': 20}, 'hartmann': {'comparisons': {'behavior': {'ci95': [-0.1906641735593912, 2.804055022423312], 'mean_gain': 1.1585281782643573, 'positive_seeds': 9}, 'stop': {'ci95': [2.952904145074331, 16.066907076431818], 'mean_gain': 8.11273122569561, 'positive_seeds': 14}, 'uniform': {'ci95': [0.5049494317801855, 9.111317930651555], 'mean_gain': 3.706562988023221, 'positive_seeds': 12}}, 'n_seeds': 20}, 'rastrigin': {'comparisons': {'behavior': {'ci95': [-0.16284349078650623, 0.16857358386825716], 'mean_gain': 0.005879658150173755, 'positive_seeds': 6}, 'stop': {'ci95': [0.808817189398221, 1.8747812430613806], 'mean_gain': 1.2876125712317106, 'positive_seeds': 17}, 'uniform': {'ci95': [0.010021667769103808, 0.37290180090695524], 'mean_gain': 0.18025061085540833, 'positive_seeds': 13}}, 'n_seeds': 20}, 'sixhumpcamel': {'comparisons': {'behavior': {'ci95': [-0.05243651068882921, -0.010443669999406349], 'mean_gain': -0.031165991766148992, 'positive_seeds': 2}, 'stop': {'ci95': [0.008747544003980664, 0.044395959744862795], 'mean_gain': 0.024710980841321305, 'positive_seeds': 8}, 'uniform': {'ci95': [-0.03824493630286045, -8.666073748053724e-05], 'mean_gain': -0.01940670981248826, 'positive_seeds': 6}}, 'n_seeds': 20}}
+gate4 rows sample [{'family': 'ackley', 'gains': {'behavior': -0.6829942683869099, 'stop': 1.0853543693168488, 'uniform': -2.731977073547649}, 'gold_action': 'global_exploration', 'record_id': 'ackley:0:0:0', 'seed': 0, 'terminal': {'behavior': -20.07900971424346, 'gold': -20.342071661080993, 'stop': -20.76010655041534, 'uniform': -19.28982387373085}}, {'family': 'ackley', 'gains': {'behavior': 0.5629315002639671, 'stop': 4.403782904163241, 'uniform': 0.29678546258881905}, 'gold_action': 'local_exploitation', 'record_id': 'ackley:1:0:0', 'seed': 1, 'terminal': {'behavior': -19.902101290669798, 'gold': -19.76291863629578, 'stop': -20.8517370690908, 'uniform': -19.83629770363055}}]
+
+### exp_rlcd_discrimination_aligned
+{'bt_al': {'n': 115, 'acc': 0.21739130434782608, 'conf_ok': 0.2244690799713135, 'conf_bad': 0.22383556779887942, 'conf_gap': 0.0006335121724340698, 'aurc': 0.7902884739333689}, 'proper_al': {'n': 115, 'acc': 0.21739130434782608, 'conf_ok': 0.13854774773120881, 'conf_bad': 0.13879226098457972, 'conf_gap': -0.00024451325337090934, 'aurc': 0.8268684942391066}, 'bt_h3': {'n': 115, 'acc': 0.12173913043478261, 'conf_ok': 0.39698598214558195, 'conf_bad': 0.4070727291083572, 'conf_gap': -0.010086746962775228, 'aurc': 0.9197070343502685}, 'proper_h3': {'n': 115, 'acc': 0.17391304347826086, 'conf_ok': 0.15808219462633133, 'conf_bad': 0.15867519676685332, 'conf_gap': -0.0005930021405219921, 'aurc': 0.8330962478740163}}
+
+### exp_geartrain_transfer_probe
+{'bt_h3': {'pairs': 1595, 'pairwise_accuracy': 0.8927899686520376, 'records': 65, 'top1_agreement': 0.5538461538461539}, 'proper_h3': {'pairs': 1595, 'pairwise_accuracy': 0.8006269592476489, 'records': 65, 'top1_agreement': 0.2923076923076923}, 'rf_synthetic': {'pairs': 1595, 'pairwise_accuracy': 0.890282131661442, 'records': 65, 'top1_agreement': 0.49230769230769234}, 'zero_shot': {'pairs': 1595, 'pairwise_accuracy': 0.4225705329153605, 'records': 65, 'top1_agreement': 0.03076923076923077}}
+
+exec
+/bin/bash -c "rg -n \"split.half|0\\.37|residual label|19%|Gate-4-ALIGNED|aligned|rollout_replicates|def mine_pairs|def build_item|def _average_rollouts|gate4\" scripts src/opt_agent runs/EXP_JOURNAL_ROUND2_REPORT.md | head -n 180" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+runs/EXP_JOURNAL_ROUND2_REPORT.md:26:     `rollout_replicates`; 661-record dataset in 141 s) reduces split-half
+runs/EXP_JOURNAL_ROUND2_REPORT.md:27:     flip to 0.37 (residual label-vs-true ≈ 19% at median gap). Gate 3
+runs/EXP_JOURNAL_ROUND2_REPORT.md:29:   - P1b/alignment: a Gate-4-ALIGNED teacher (rule continuation + pure
+runs/EXP_JOURNAL_ROUND2_REPORT.md:38:     reproduced on clean, aligned labels).
+runs/EXP_JOURNAL_ROUND2_REPORT.md:41:   Models trained on the aligned teacher: decision-level ranking 0.67
+runs/EXP_JOURNAL_ROUND2_REPORT.md:47:   the aligned teacher's argmax is nearly random across its rolled
+runs/EXP_JOURNAL_ROUND2_REPORT.md:49:   aligned — produces a state-conditional signal strong enough to escape
+runs/EXP_JOURNAL_ROUND2_REPORT.md:76:  (0.74 flip) → even noise-free, Gate-4-aligned single-action labels have
+runs/EXP_JOURNAL_ROUND2_REPORT.md:92:runs/longhorizon_k4r5_aligned_20seed_5family.jsonl  # P1b aligned teacher
+runs/EXP_JOURNAL_ROUND2_REPORT.md:93:runs/exp_r5_gates.json, runs/exp_aligned_gates.json  # P1b gates
+runs/EXP_JOURNAL_ROUND2_REPORT.md:94:runs/exp_rlcd_aligned_train.json          # P2 training (both arms)
+runs/EXP_JOURNAL_ROUND2_REPORT.md:95:runs/exp_rlcd_closed_loop_aligned.json    # P2 closed-loop (collapse)
+runs/EXP_JOURNAL_ROUND2_REPORT.md:96:runs/exp_rlcd_discrimination_aligned.json # P2 discrimination (zero)
+runs/EXP_JOURNAL_ROUND2_REPORT.md:101:src: DatasetConfig.rollout_replicates (+_average_rollouts),
+scripts/generate_dataset_longhorizon.py:194:        rollout_replicates=args.replicates,
+src/opt_agent/system1/rlcd.py:80:def mine_pairs(
+src/opt_agent/system1/rlcd.py:149:def build_item(
+src/opt_agent/system1/rlcd.py:160:      - ``target``: the teacher distribution ``gold_probs`` aligned to
+src/opt_agent/system1/rlcd.py:247:    each item (``item["target"]``, gold_probs aligned to option order).
+scripts/ablate_phase8_6d_utility.py:148:    gate_rows = {r["record_id"]: r for r in json.loads(args.gate_report.read_text())["gate4"]["rows"]}
+src/opt_agent/system1/_prompt.py:4:so the candidate vocabulary stays aligned. The four helpers below were moved
+scripts/diagnose_qs5.py:321:    """Symmetric KL on aligned vocabulary, eps-smoothed."""
+scripts/validate_phase8_6b.py:94:    gate4_pass = bool(oracle_summary) and all(
+scripts/validate_phase8_6b.py:119:        "gate4": {
+scripts/validate_phase8_6b.py:120:            "pass": gate4_pass,
+scripts/validate_phase8_6b.py:130:        "gate4": report["gate4"]["pass"],
+src/opt_agent/dataset/generator.py:8:    are deterministic to ensure aligned vocabulary across records.
+src/opt_agent/dataset/generator.py:90:    partial records replayable and keeps affine-transform pairs aligned
+src/opt_agent/dataset/generator.py:104:def _average_rollouts(outputs: list) -> "RolloutOutput":
+src/opt_agent/dataset/generator.py:221:    rollout_replicates: int = 1
+src/opt_agent/dataset/generator.py:265:        if not 1 <= self.rollout_replicates <= 8:
+src/opt_agent/dataset/generator.py:267:                f"rollout_replicates must be in [1, 8]; "
+src/opt_agent/dataset/generator.py:268:                f"got {self.rollout_replicates}"
+src/opt_agent/dataset/generator.py:389:                R = self.config.rollout_replicates
+src/opt_agent/rollout/rollout.py:314:        probability 0.0 (preserves aligned vocabulary). Default False: only
+src/opt_agent/dataset/analysis.py:4:  - `validate_record` enforces the aligned-vocabulary invariant.
+src/opt_agent/dataset/analysis.py:33:    """Enforce aligned vocabulary and probability invariants."""
+src/opt_agent/dataset/analysis.py:38:        raise ValueError(f"{record.id}: unaligned action vocabulary")
+src/opt_agent/dataset/analysis.py:72:        If any record violates the aligned-vocabulary / probability invariants.
+src/opt_agent/actions/factory.py:37:# reference the same constant so the coverage metric stays aligned with
+
+exec
+/bin/bash -c 'rg -n "gate4|aligned|rule continuation|utility_mode|terminal_delta|split" scripts/generate_dataset_longhorizon.py scripts/validate_phase8_6b.py src/opt_agent/dataset/generator.py src/opt_agent/rollout src/opt_agent/system1/rlcd.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+src/opt_agent/system1/rlcd.py:160:      - ``target``: the teacher distribution ``gold_probs`` aligned to
+src/opt_agent/system1/rlcd.py:172:    option_ids = [opt.split(":")[0] for opt in render_options(q)]
+src/opt_agent/system1/rlcd.py:247:    each item (``item["target"]``, gold_probs aligned to option order).
+scripts/validate_phase8_6b.py:94:    gate4_pass = bool(oracle_summary) and all(
+scripts/validate_phase8_6b.py:119:        "gate4": {
+scripts/validate_phase8_6b.py:120:            "pass": gate4_pass,
+scripts/validate_phase8_6b.py:130:        "gate4": report["gate4"]["pass"],
+src/opt_agent/dataset/generator.py:8:    are deterministic to ensure aligned vocabulary across records.
+src/opt_agent/dataset/generator.py:90:    partial records replayable and keeps affine-transform pairs aligned
+scripts/generate_dataset_longhorizon.py:131:    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+src/opt_agent/rollout/rollout.py:314:        probability 0.0 (preserves aligned vocabulary). Default False: only
+
+exec
+/bin/bash -c "sed -n '1,230p' scripts/generate_dataset_longhorizon.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Long-horizon decision-dataset generator with rollout-quota control (2026-09-27).
+
+Motivation
+----------
+PROGRESS.md (EXP-RQ1.2 naming correction) records that true full-horizon
+labels — horizon = remaining_budget, the semantics the Phase 8.6C horizon
+diagnosis identified as decisive — were "not in scope for RQ1; cost ≈ 90
+minutes" for a 226-record 3-family dataset. The blocker is the rollout quota:
+8 candidates × horizon-H branches per decision point, each step a GP-bound
+backend operation.
+
+This driver makes that quota controllable along two orthogonal axes:
+
+  --horizon remaining     per-decision-point horizon = remaining_budget
+                         (true long-horizon labels)
+  --subsample-k K         roll out only K of the 8 candidates per decision
+                         point (deterministic subset; quota scales K/8).
+                         Records carry metadata["partial_rollout"]; pairwise
+                         (contrastive) supervision is unaffected.
+
+and operational axes:
+
+  --workers W             process-parallel over (problem, seed) trajectories
+  --resume                append-only; trajectories whose records already
+                         exist in the output are skipped
+  cost accounting         per-record backend cost units
+                         (Σ n_new_samples + n_model_fits over rolled-out
+                         branches) are summarized at the end
+
+Usage
+-----
+    .venv/bin/python scripts/generate_dataset_longhorizon.py \
+        runs/longhorizon_pilot.jsonl \
+        --horizon remaining --subsample-k 4 --seeds 3 --workers 6
+
+    .venv/bin/python scripts/generate_dataset_longhorizon.py \
+        runs/longhorizon_full8.jsonl \
+        --horizon remaining --subsample-k 8 --seeds 10 --workers 8
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import asdict, replace
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from opt_agent.dataset import (  # noqa: E402
+    DatasetConfig,
+    DatasetGenerator,
+    iter_jsonl,
+    write_jsonl,
+)
+
+PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
+
+
+def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
+    """(family, problem_seed, trajectory_id) triples already on disk."""
+    keys: set[tuple[str, int, int]] = set()
+    if not path.exists():
+        return keys
+    for rec in iter_jsonl(path):
+        meta = rec.metadata
+        keys.add((
+            rec.problem["family"],
+            int(rec.problem["seed"]),
+            int(meta.get("trajectory_id", 0)),
+        ))
+    return keys
+
+
+def _config_from_task(cfg: dict) -> "DatasetConfig":
+    """Rebuild DatasetConfig from its asdict() form (nested dataclasses back)."""
+    from opt_agent.rollout.specs import ContinuationPolicySpec
+    from opt_agent.rollout.utility import UtilityWeights
+
+    fixed = dict(cfg)
+    if isinstance(fixed.get("utility_weights"), dict):
+        fixed["utility_weights"] = UtilityWeights(**fixed["utility_weights"])
+    if isinstance(fixed.get("continuation_spec"), dict):
+        fixed["continuation_spec"] = ContinuationPolicySpec(
+            **fixed["continuation_spec"]
+        )
+    return DatasetConfig(**fixed)
+
+
+def _run_trajectory(task: dict) -> list:
+    """Worker: generate all records for one (problem, seed, trajectory_id).
+
+    Pin torch to a single thread: GP fitting is the bottleneck, and with
+    many process workers the default (all cores) oversubscribes the machine.
+    """
+    import torch
+
+    torch.set_num_threads(1)
+    from dataclasses import replace as _replace
+
+    base = _config_from_task(task["config"])
+    spec = _replace(
+        base,
+        problems=(task["family"],),
+        seeds=(task["seed"],),
+        trajectories_per_problem_seed=1,
+    )
+    return list(DatasetGenerator(spec).generate())
+
+
+def _record_line(rec) -> str:
+    from opt_agent.dataset.decision_record import _json_safe
+
+    return json.dumps(_json_safe(rec), sort_keys=True) + "\n"
+
+
+def _cost_units(records: list) -> int:
+    """Backend cost proxy: total new samples + GP fits across rolled branches."""
+    total = 0
+    for rec in records:
+        for r in rec.rollout_results.values():
+            total += int(r.get("n_new_samples", 0)) + int(r.get("n_model_fits", 0))
+    return total
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("output", type=Path)
+    parser.add_argument("--horizon", default="remaining",
+                        help="'remaining' (to budget exhaustion) or a fixed int")
+    parser.add_argument("--subsample-k", type=int, default=4,
+                        help="Candidates rolled out per decision point (1-8)")
+    parser.add_argument("--replicates", type=int, default=1,
+                        help="Rollout replicates per decision point; utilities averaged (P1b denoising)")
+    parser.add_argument("--continuation", default="on_policy", choices=["on_policy", "rule"],
+                        help="Rollout continuation policy (P1b alignment: rule matches Gate 4)")
+    parser.add_argument("--terminal-utility", action="store_true",
+                        help="Pure terminal-delta-best utility (w_opt=1, cost/stop terms zeroed)")
+    parser.add_argument("--problems", nargs="+", default=list(PROBLEMS_5FAMILY))
+    parser.add_argument("--seeds", type=int, default=5,
+                        help="Number of problem seeds (0..N-1)")
+    parser.add_argument("--budget", type=int, default=30)
+    parser.add_argument("--max-actions", type=int, default=25)
+    parser.add_argument("--decision-every-k", type=int, default=2)
+    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--resume", action="store_true",
+                        help="Skip trajectories whose records already exist")
+    parser.add_argument("--force", action="store_true",
+                        help="Overwrite existing output (ignored with --resume)")
+    args = parser.parse_args()
+
+    if args.horizon == "remaining":
+        horizon, horizon_mode = 1, "remaining"
+    else:
+        try:
+            horizon = int(args.horizon)
+        except ValueError:
+            parser.error(f"--horizon must be 'remaining' or an int; got {args.horizon!r}")
+        horizon_mode = "fixed"
+
+    if args.output.exists() and not args.resume and not args.force:
+        print(f"error: {args.output} exists; pass --force or --resume", file=sys.stderr)
+        return 1
+
+    from opt_agent.rollout.specs import ContinuationPolicySpec
+    from opt_agent.rollout.utility import UtilityWeights
+
+    weights = UtilityWeights()
+    if args.terminal_utility:
+        weights = UtilityWeights(
+            w_optimization=1.0, w_surrogate=0.0, w_coverage=0.0,
+            w_evaluation=0.0, w_fit=0.0, w_stop_opportunity=0.0,
+        )
+    cont = ContinuationPolicySpec(
+        name=args.continuation, seed=0,
+        extras={"rule_weight": 0.8} if args.continuation == "on_policy" else {},
+    )
+    spec = replace(
+        DatasetConfig(),
+        problems=tuple(args.problems),
+        continuation_spec=cont,
+        utility_weights=weights,
+        seeds=tuple(range(args.seeds)),
+        total_budget=args.budget,
+        max_actions=args.max_actions,
+        decision_every_k_actions=args.decision_every_k,
+        horizon=horizon,
+        horizon_mode=horizon_mode,
+        rollout_action_subsample=args.subsample_k,
+        rollout_replicates=args.replicates,
+    )
+
+    done_keys = _existing_trajectory_keys(args.output) if args.resume else set()
+    tasks = [
+        {"family": p, "seed": s, "trajectory_id": t, "config": asdict(spec)}
+        for p in spec.problems
+        for s in spec.seeds
+        for t in range(spec.trajectories_per_problem_seed)
+        if (p.lower(), s, t) not in done_keys
+    ]
+    skipped = len(done_keys)
+
+    tmp = args.output.with_suffix(args.output.suffix + ".tmp")
+    collected: list = []
+    t0 = time.time()
+    n_tasks = len(tasks)
+    if tasks:
+        import multiprocessing
+
+        # spawn: workers import cleanly (no fork-safety issues with torch
+        # state); each worker pins itself to 1 torch thread.
+        ctx = multiprocessing.get_context("spawn")
+        # Serialise the already-present records into tmp first when resuming.
+        if args.resume and args.output.exists():
+            tmp.write_text(args.output.read_text(), encoding="utf-8")
+        else:
+            tmp.write_text("", encoding="utf-8")
+        with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx) as pool:
+            futures = {pool.submit(_run_trajectory, t): t for t in tasks}
+            for fut in as_completed(futures):
+                task = futures[fut]
+                recs = fut.result()
+                collected.extend(recs)
+                with tmp.open("a", encoding="utf-8") as fh:
+                    for rec in recs:
+                        fh.write(_record_line(rec))
+
+exec
+/bin/bash -c 'rg -n "gate4|Gate 4|gate_4|oracle_summary" scripts/exp* scripts/validate* | head -n 100' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/validate_phase8_6b.py:78:    oracle_summary = {}
+scripts/validate_phase8_6b.py:89:        oracle_summary[family] = {
+scripts/validate_phase8_6b.py:94:    gate4_pass = bool(oracle_summary) and all(
+scripts/validate_phase8_6b.py:99:        for family in oracle_summary.values()
+scripts/validate_phase8_6b.py:119:        "gate4": {
+scripts/validate_phase8_6b.py:120:            "pass": gate4_pass,
+scripts/validate_phase8_6b.py:121:            "summary": oracle_summary,
+scripts/validate_phase8_6b.py:130:        "gate4": report["gate4"]["pass"],
+scripts/validate_phase8_6b.py:131:        "oracle_summary": oracle_summary,
+scripts/exp_teacher_noise_diagnostic.py:3:Gate 4 has failed at every horizon (h3, Phase 8.6D hfull, k=4 quota). Before
+scripts/exp_teacher_noise_diagnostic.py:11:               labels, but the labels still fail Gate 4.
+
+exec
+/bin/bash -c 'cat scripts/validate_phase8_6b.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Report replayable decision-label gates on a DecisionDataset JSONL.
+
+One early decision point per (problem, seed) enters the paired terminal test,
+so extra records from a long trajectory do not count as independent trials.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import statistics
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from opt_agent.dataset import (  # noqa: E402
+    aggregate_mass,
+    gate2_stability,
+    iter_jsonl,
+    oracle_test_from_record,
+    phase_of,
+)
+
+
+def _bootstrap_ci(values: list[float], *, repetitions: int = 2000) -> tuple[float, float]:
+    rng = random.Random(0)
+    n = len(values)
+    means = sorted(
+        statistics.fmean(values[rng.randrange(n)] for _ in range(n))
+        for _ in range(repetitions)
+    )
+    return means[int(0.025 * repetitions)], means[int(0.975 * repetitions)]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--random-replicates", type=int, default=5)
+    parser.add_argument("--max-actions", type=int, default=30)
+    args = parser.parse_args()
+
+    records = list(iter_jsonl(args.dataset))
+    if not records:
+        parser.error("dataset is empty")
+    gate2 = gate2_stability(records)
+    gate3 = aggregate_mass(records)
+
+    selected = {}
+    for record in records:
+        if phase_of(record) == "early":
+            key = (record.problem["family"], int(record.problem["seed"]))
+            selected.setdefault(key, record)
+
+    oracle_rows = []
+    for (family, seed), record in sorted(selected.items()):
+        result = oracle_test_from_record(
+            record,
+            random_replicates=args.random_replicates,
+            max_actions=args.max_actions,
+        )
+        oracle_rows.append({
+            "family": family,
+            "seed": seed,
+            "record_id": record.id,
+            "gold_action": result.gold_action,
+            "terminal": result.terminal,
+            "gains": result.gains,
+        })
+
+    by_family: dict[str, list[dict]] = defaultdict(list)
+    for row in oracle_rows:
+        by_family[row["family"]].append(row)
+    oracle_summary = {}
+    for family, rows in sorted(by_family.items()):
+        comparisons = {}
+        for baseline in ("stop", "uniform", "behavior"):
+            values = [row["gains"][baseline] for row in rows]
+            lo, hi = _bootstrap_ci(values)
+            comparisons[baseline] = {
+                "mean_gain": statistics.fmean(values),
+                "ci95": [lo, hi],
+                "positive_seeds": sum(value > 0 for value in values),
+            }
+        oracle_summary[family] = {
+            "n_seeds": len(rows),
+            "comparisons": comparisons,
+        }
+
+    gate4_pass = bool(oracle_summary) and all(
+        family["n_seeds"] >= 10
+        and family["comparisons"]["behavior"]["ci95"][0] > 0
+        and family["comparisons"]["uniform"]["ci95"][0] > 0
+        and family["comparisons"]["stop"]["ci95"][0] > 0
+        for family in oracle_summary.values()
+    )
+    report = {
+        "dataset": str(args.dataset),
+        "n_records": len(records),
+        "gate2": {
+            "pass": gate2.pass_,
+            "min_problem_seeds": gate2.total_seeds,
+            "min_phase_seeds": gate2.min_phase_seeds,
+            "problems": gate2.problems,
+        },
+        "gate3": {
+            "pass": gate3.pass_,
+            "adjusted_lift_mean": gate3.adjusted_lift_mean,
+            "seed_clustered_ci95": (
+                list(gate3.seed_clustered_ci95)
+                if gate3.seed_clustered_ci95 is not None else None
+            ),
+            "seed_rows": gate3.seed_rows,
+        },
+        "gate4": {
+            "pass": gate4_pass,
+            "summary": oracle_summary,
+            "rows": oracle_rows,
+        },
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    print(json.dumps({
+        "gate2": report["gate2"]["pass"],
+        "gate3": report["gate3"]["pass"],
+        "gate4": report["gate4"]["pass"],
+        "oracle_summary": oracle_summary,
+    }, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+exec
+/bin/bash -c 'rg -n "def oracle_test_from_record|def _average_rollouts|def mine_pairs|def build_item|def rollout|class UtilityWeights|def compute_utility|continuation" src/opt_agent/dataset/validation.py src/opt_agent/dataset/generator.py src/opt_agent/system1/rlcd.py src/opt_agent/rollout/utility.py | head -n 120' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+src/opt_agent/rollout/utility.py:30:class UtilityWeights:
+src/opt_agent/rollout/utility.py:75:def compute_utility(
+src/opt_agent/dataset/generator.py:104:def _average_rollouts(outputs: list) -> "RolloutOutput":
+src/opt_agent/dataset/generator.py:216:    # rollout is repeated R times with fresh candidate/continuation seeds and
+src/opt_agent/dataset/generator.py:222:    # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
+src/opt_agent/dataset/generator.py:224:    # so records can be replayed with a different continuation. Default:
+src/opt_agent/dataset/generator.py:226:    continuation_spec: ContinuationPolicySpec = field(
+src/opt_agent/dataset/generator.py:394:                    # fresh action seeds and continuation seed per replicate.
+src/opt_agent/dataset/generator.py:406:                        continuation_spec=(
+src/opt_agent/dataset/generator.py:407:                            self.config.continuation_spec if R == 1 else
+src/opt_agent/dataset/generator.py:409:                                self.config.continuation_spec,
+src/opt_agent/dataset/generator.py:411:                                    int(self.config.continuation_spec.seed),
+src/opt_agent/dataset/generator.py:564:                # and continuation_policy spec, so any record is replayable
+src/opt_agent/dataset/generator.py:574:                "continuation_policy": spec_to_metadata(self.config.continuation_spec),
+src/opt_agent/system1/rlcd.py:80:def mine_pairs(
+src/opt_agent/system1/rlcd.py:149:def build_item(
+src/opt_agent/dataset/validation.py:19:    (continuation_spec / utility_weights / horizon / temperature) without
+src/opt_agent/dataset/validation.py:243:    """Compare first actions with the same RulePolicy continuation.
+src/opt_agent/dataset/validation.py:260:    continuation_seed = derive_seed(int(record.metadata["run_seed"]), 1)
+src/opt_agent/dataset/validation.py:261:    continuation_policy = RulePolicy(seed=continuation_seed)
+src/opt_agent/dataset/validation.py:262:    def choose_continuation(s, b):
+src/opt_agent/dataset/validation.py:263:        return continuation_policy.select_action(s, b)
+src/opt_agent/dataset/validation.py:266:        # Gold: gold top action, then RulePolicy continuation.
+src/opt_agent/dataset/validation.py:272:            choose_next=choose_continuation,
+src/opt_agent/dataset/validation.py:288:        # use the same continuation, isolating the decision being evaluated.
+src/opt_agent/dataset/validation.py:299:                choose_next=choose_continuation,
+src/opt_agent/dataset/validation.py:321:                choose_next=choose_continuation,
+src/opt_agent/dataset/validation.py:349:def oracle_test_from_record(
+src/opt_agent/dataset/validation.py:744:    continuation_spec: ContinuationPolicySpec | None = None,
+src/opt_agent/dataset/validation.py:756:    {continuation_spec × utility_weights × horizon} without re-running
+src/opt_agent/dataset/validation.py:764:    continuation_spec : ContinuationPolicySpec | None
+src/opt_agent/dataset/validation.py:765:        Override for the continuation policy. Defaults to the spec recorded
+src/opt_agent/dataset/validation.py:766:        in `record.metadata["continuation_policy"]`.
+src/opt_agent/dataset/validation.py:794:    spec = continuation_spec if continuation_spec is not None else spec_from_metadata(
+src/opt_agent/dataset/validation.py:795:        meta.get("continuation_policy")
+src/opt_agent/dataset/validation.py:833:            continuation_spec=spec,
+
+exec
+/bin/bash -c "sed -n '215,390p' src/opt_agent/dataset/validation.py && sed -n '80,205p' src/opt_agent/system1/rlcd.py && sed -n '100,155p' src/opt_agent/dataset/generator.py && sed -n '30,145p' src/opt_agent/rollout/utility.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+        action = first_action if step == 0 else choose_next(current, backend)
+        result = execute_action(backend, current, action)
+        current = extract_state(
+            backend, total_budget=total_budget, last_action=action.type.value
+        )
+        if result.should_stop or current.resource.remaining_budget == 0:
+            return float(current.optimization.best_value), int(
+                current.resource.remaining_budget
+            )
+    return float(current.optimization.best_value), int(
+        current.resource.remaining_budget
+    )
+
+
+def _restore_backend(backend, base) -> None:
+    """Restore backend to base state. Caller-supplied to make arm semantics explicit."""
+    backend.restore(base)
+
+
+def oracle_test(
+    backend,
+    state,
+    record: DecisionRecord,
+    *,
+    objective_scale: float = 1.0,
+    random_replicates: int = 5,
+    max_actions: int = 50,
+) -> OracleResult:
+    """Compare first actions with the same RulePolicy continuation.
+
+    The backend is restored to its pre-call state at the end (try/finally).
+    """
+    if not math.isfinite(objective_scale) or objective_scale <= 0:
+        raise ValueError("objective_scale must be finite and positive")
+    if random_replicates < 1:
+        raise ValueError("random_replicates must be positive")
+    base = backend.checkpoint()
+    total_budget = int(state.resource.total_budget)
+    specs = {x["action_id"]: x for x in record.candidate_actions}
+    gold_id = max(record.gold_probs, key=record.gold_probs.get)
+
+    def action_from_id(action_id: str) -> OptimizationAction:
+        spec = specs[action_id]
+        return OptimizationAction(ActionType(spec["type"]), dict(spec["params"]))
+
+    continuation_seed = derive_seed(int(record.metadata["run_seed"]), 1)
+    continuation_policy = RulePolicy(seed=continuation_seed)
+    def choose_continuation(s, b):
+        return continuation_policy.select_action(s, b)
+
+    try:
+        # Gold: gold top action, then RulePolicy continuation.
+        _restore_backend(backend, base)
+        gold = _run_arm(
+            backend,
+            initial_state=state,
+            first_action=action_from_id(gold_id),
+            choose_next=choose_continuation,
+            total_budget=total_budget,
+            max_actions=max_actions,
+        )
+        # STOP: STOP, then STOP.
+        stop_action = OptimizationAction(ActionType.STOP)
+        _restore_backend(backend, base)
+        stopped = _run_arm(
+            backend,
+            initial_state=state,
+            first_action=stop_action,
+            choose_next=lambda s, b: stop_action,
+            total_budget=total_budget,
+            max_actions=max_actions,
+        )
+        # Baselines differ only in their first action; all non-STOP arms then
+        # use the same continuation, isolating the decision being evaluated.
+        uniform_results: list[float] = []
+        behavior_results: list[float] = []
+        for rep in range(random_replicates):
+            u_seed = derive_seed(int(record.metadata["run_seed"]), 1000, rep)
+            u_policy = RandomPolicy(seed=u_seed)
+            _restore_backend(backend, base)
+            u = _run_arm(
+                backend,
+                initial_state=state,
+                first_action=u_policy.select_action(state, backend),
+                choose_next=choose_continuation,
+                total_budget=total_budget,
+                max_actions=max_actions,
+            )
+            uniform_results.append(u[0])
+
+            b_rng = random.Random(derive_seed(u_seed, 1))
+            b_rule = RulePolicy(seed=derive_seed(u_seed, 2))
+            b_random = RandomPolicy(seed=derive_seed(u_seed, 3))
+
+            def choose_behavior(s, b):
+                return (
+                    b_random.select_action(s, b)
+                    if b_rng.random() < 0.2
+                    else b_rule.select_action(s, b)
+                )
+
+            _restore_backend(backend, base)
+            behavior_results.append(_run_arm(
+                backend,
+                initial_state=state,
+                first_action=choose_behavior(state, backend),
+                choose_next=choose_continuation,
+                total_budget=total_budget,
+                max_actions=max_actions,
+            )[0])
+
+        terminal = {
+            "gold": gold[0],
+            "stop": stopped[0],
+            "uniform": statistics.fmean(uniform_results),
+            "behavior": statistics.fmean(behavior_results),
+        }
+        gains = {
+            arm: (terminal["gold"] - value) / objective_scale
+            for arm, value in terminal.items()
+            if arm != "gold"
+        }
+        return OracleResult(
+            gold_action=gold_id, terminal=terminal, gains=gains
+        )
+    finally:
+        backend.restore(base)
+
+
+# ---------------------------------------------------------------------------
+# Gate 4 — replayable oracle test (Phase 8.6B)
+# ---------------------------------------------------------------------------
+
+
+def oracle_test_from_record(
+    record: DecisionRecord,
+    *,
+    random_replicates: int = 5,
+    max_actions: int = 200,
+    backend_factory: Callable | None = None,
+) -> OracleResult:
+    """Replay a DecisionRecord's backend state and run the oracle test.
+
+    The record must contain a complete backend checkpoint. A fresh backend
+    restores that checkpoint before the paired oracle arms are run.
+
+    Parameters
+    ----------
+    backend_factory : Callable | None
+        Optional factory returning a fresh backend. Defaults to a
+        BocodeBotorchBackend reconstructed with the problem id from the record.
+    """
+    from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
+
+    cp = _reconstruct_checkpoint(record)
+    if backend_factory is None:
+        # Phase 9 Gate 5 — thread the affine objective transform from record
+        # metadata so that future evaluate() calls append transformed values
+        # to the (already-transformed) history loaded from the checkpoint.
+        affine = _affine_kwargs_from_metadata(record.metadata)
+        backend = BocodeBotorchBackend(**affine)
+        backend.initialize(BackendConfig(
+            problem_id=cp.problem_id,
+            seed=int(record.problem["seed"]),
+            n_init=1,
+        ))
+    else:
+        backend = backend_factory()
+    backend.restore(cp)
+
+    state = extract_state(
+        backend,
+        total_budget=int(record.state["resource"]["total_budget"]),
+        last_action=record.state["history"].get("last_action"),
+    )
+    if state.sampling.n_samples != int(record.state["sampling"]["n_samples"]):
+def mine_pairs(
+    record: DecisionRecord,
+    *,
+    margin: float = 0.0,
+    max_pairs: int | None = None,
+    rng: random.Random | None = None,
+) -> list[ContrastivePair]:
+    """All (or sampled) strict utility-order pairs among valid rolled branches.
+
+    Works identically on full-vocabulary and partial (quota-subsampled)
+    records — pairs are mined from whatever `rollout_results` contains.
+    Invalid branches and non-finite utilities are skipped. Ties within
+    1e-12 produce no pair (a tie carries no ordering information).
+    """
+    valid: list[tuple[str, float]] = []
+    for action_id, res in record.rollout_results.items():
+        if res.get("status") != "valid":
+            continue
+        u = float(res.get("utility", float("nan")))
+        if math.isfinite(u):
+            valid.append((action_id, u))
+    valid.sort(key=lambda kv: (-kv[1], kv[0]))
+    pairs: list[ContrastivePair] = []
+    for i, (a_hi, u_hi) in enumerate(valid):
+        for a_lo, u_lo in valid[i + 1:]:
+            m = u_hi - u_lo
+            if m <= 1e-12 or m < margin:
+                continue
+            pairs.append(ContrastivePair(record.id, a_hi, a_lo, m))
+    if max_pairs is not None and len(pairs) > max_pairs:
+        rng = rng or random.Random(0)
+        pairs = rng.sample(pairs, max_pairs)
+        pairs.sort(key=lambda p: -p.margin)
+    return pairs
+
+
+# ---------------------------------------------------------------------------
+# Sequence / loss plumbing (Laya-side)
+# ---------------------------------------------------------------------------
+
+
+def _record_choice_parts(record: DecisionRecord) -> tuple[dict, dict]:
+    """(state_arg, internal question dict) using the deployment prompt shape.
+
+    Goes through the same `build_choice_request` helper the deployed
+    LayaPolicy uses (structured state, legacy criteria — the prompt shape
+    behind `runs/phase9_5_laya_zero_shot_5x5.json`), so the fine-tuned model
+    is trained on its deployment input distribution. Option order follows
+    `record.candidate_actions` (criteria dict insertion order).
+    """
+    from opt_agent.actions import ActionType, OptimizationAction
+
+    choices = {
+        spec["action_id"]: OptimizationAction(
+            ActionType(spec["type"]), dict(spec["params"])
+        )
+        for spec in record.candidate_actions
+    }
+    state_arg, question = build_choice_request(
+        record.state,  # type: ignore[arg-type]
+        choices,
+        state_format="structured",
+        criteria_format="legacy",
+    )
+    inner = question["next_action"]
+    return state_arg, {"t": inner["type"], "ins": inner["instructions"],
+                       "crit": inner["criteria"]}
+
+
+def build_item(
+    record: DecisionRecord,
+    tokenizer,
+    *,
+    max_len: int = 512,
+    head_max_len: int = 192,
+) -> dict | None:
+    """Build one Laya training item for a record: ids/markers/qtype + target.
+
+    The item carries both supervision forms:
+      - ``pairs``: option-index pairs for the BT baseline arm (utility order);
+      - ``target``: the teacher distribution ``gold_probs`` aligned to
+        ``option_ids`` order (renormalized over the offered options), for the
+        RLCD proper-score objective.
+
+    Returns None when options truncate past `head_max_len` (indices could
+    misalign) or when the record yields no supervision (no pair AND no
+    nonzero-mass target).
+    """
+    from laya.common import QTYPES, build_sequence, render_options
+
+    state_arg, q = _record_choice_parts(record)
+    ids, markers = build_sequence(tokenizer, state_arg, q, max_len, head_max_len)
+    option_ids = [opt.split(":")[0] for opt in render_options(q)]
+    if len(markers) != len(option_ids):
+        return None
+    index_of = {a: i for i, a in enumerate(option_ids)}
+    pairs = [
+        (index_of[p.pos], index_of[p.neg], p.margin)
+        for p in mine_pairs(record)
+        if p.pos in index_of and p.neg in index_of
+    ]
+    offered = [a for a in option_ids if a in record.gold_probs]
+    mass = sum(record.gold_probs[a] for a in offered)
+    target = (
+        [
+            (record.gold_probs[a] / mass) if a in record.gold_probs else 0.0
+            for a in option_ids
+        ]
+        if offered and mass > 0 else None
+    )
+    if not pairs and target is None:
+        return None
+    return {
+        "ids": ids,
+        "markers": markers,
+        "qtype": QTYPES[q["t"]],
+        "pairs": pairs,
+        "record_id": record.id,
+        "option_ids": option_ids,
+        "target": target,
+    }
+
+
+def bradley_terry_loss(
+    logits: torch.Tensor,
+    items: Sequence[Mapping],
+    chosen = set(rng.sample(range(len(candidates)), k))
+    return [c for i, c in enumerate(candidates) if i in chosen]
+
+
+def _average_rollouts(outputs: list) -> "RolloutOutput":
+    """Merge replicate rollouts of the SAME candidate subset (P1b denoising).
+
+    Per action: utility/deltas/counts are means over the replicas where the
+    action was valid; the per-replica utilities and their std are stashed in
+    ``metrics['utility_replicas']`` / ``metrics['utility_std']``. An action
+    valid in no replica is emitted as-is from the first output (invalid).
+    T2: averaging leaves the expected ranking unchanged and shrinks utility
+    noise as 1/sqrt(R).
+    """
+    import statistics as _stats
+
+    from opt_agent.rollout import CounterfactualResult, RolloutOutput
+
+    base = outputs[0]
+    merged: list[CounterfactualResult] = []
+    for first in base.results:
+        replicas = [
+            r for out in outputs
+            for r in out.results
+            if r.action_id == first.action_id and r.status == "valid"
+        ]
+        if not replicas:
+            merged.append(first)
+            continue
+
+        def _mean(attr: str) -> float:
+            vals = [getattr(r, attr) for r in replicas]
+            return float(_stats.fmean(vals))
+
+        utilities = [r.utility for r in replicas]
+        metrics = dict(first.metrics)
+        metrics["utility_replicas"] = utilities
+        metrics["utility_std"] = (
+            float(_stats.pstdev(utilities)) if len(utilities) > 1 else 0.0
+        )
+        merged.append(CounterfactualResult(
+            action_id=first.action_id,
+            action=first.action,
+            status="valid",
+            n_new_samples=_mean("n_new_samples"),
+            n_model_fits=_mean("n_model_fits"),
+            delta_optimization=_mean("delta_optimization"),
+            delta_surrogate=_mean("delta_surrogate"),
+            delta_coverage=_mean("delta_coverage"),
+            utility=float(_stats.fmean(utilities)),
+            metrics=metrics,
+            trajectory_tail=first.trajectory_tail,
+            error=None,
+        ))
+    return RolloutOutput(s_t=base.s_t, results=tuple(merged))
+
+class UtilityWeights:
+    """Weights for the 5-term utility function.
+
+    Phase 8.5 defaults (per codex review):
+      - w_surrogate = 0: validation_rmse is in-sample training RMSE, not
+        leave-one-out; cannot be trusted until surrogate metric is fixed.
+      - w_coverage = 0: `boundary_coverage` is fraction near edge, not a
+        proper coverage metric; needs a grid/fill-distance version.
+      - w_stop_opportunity = 0: optional linear STOP penalty proportional
+        to remaining_budget_ratio. Default 0 so backward-compatible.
+    """
+    w_optimization: float = 1.0
+    w_surrogate: float = 0.0
+    w_coverage: float = 0.0
+    w_evaluation: float = 1.0
+    w_fit: float = 0.5
+    # Phase 8.5 default: 0.75 (codex-empirical) keeps STOP below non-STOP
+    # actions in early phase; rises above them in late phase. Set to 0 to
+    # disable the STOP opportunity penalty.
+    w_stop_opportunity: float = 0.75
+
+    def to_dict(self) -> dict[str, float]:
+        """Single-source-of-truth dict form used by JSONL metadata."""
+        return {
+            "w_optimization": self.w_optimization,
+            "w_surrogate": self.w_surrogate,
+            "w_coverage": self.w_coverage,
+            "w_evaluation": self.w_evaluation,
+            "w_fit": self.w_fit,
+            "w_stop_opportunity": self.w_stop_opportunity,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "UtilityWeights":
+        """Reverse of ``to_dict``. Missing fields fall back to defaults."""
+        return cls(
+            w_optimization=float(data.get("w_optimization", 1.0)),
+            w_surrogate=float(data.get("w_surrogate", 0.0)),
+            w_coverage=float(data.get("w_coverage", 0.0)),
+            w_evaluation=float(data.get("w_evaluation", 1.0)),
+            w_fit=float(data.get("w_fit", 0.5)),
+            w_stop_opportunity=float(data.get("w_stop_opportunity", 0.75)),
+        )
+
+
+def compute_utility(
+    *,
+    delta_optimization: float,
+    delta_surrogate: float = 0.0,
+    delta_coverage: float = 0.0,
+    n_new_samples: int,
+    n_model_fits: int,
+    weights: UtilityWeights,
+    optimization_scale: float = 1.0,
+    evaluation_scale: float = 1.0,
+    fit_scale: float = 1.0,
+    is_stop: bool = False,
+    remaining_budget_ratio: float = 0.0,
+) -> float:
+    """Scalar utility of a counterfactual branch.
+
+    Raises
+    ------
+    ValueError
+        If any scale is non-positive, counts are negative, or
+        delta_optimization is non-finite (programmer error).
+    """
+    if not math.isfinite(delta_optimization):
+        raise ValueError("delta_optimization must be finite")
+    scales = (optimization_scale, evaluation_scale, fit_scale)
+    if not all(math.isfinite(x) and x > 0 for x in scales):
+        raise ValueError(
+            f"utility scales must be finite and positive; got {scales}"
+        )
+    if n_new_samples < 0 or n_model_fits < 0:
+        raise ValueError("resource counts must be non-negative")
+
+    ds = 0.0 if not math.isfinite(delta_surrogate) else float(delta_surrogate)
+    dc = 0.0 if not math.isfinite(delta_coverage) else float(delta_coverage)
+    stop_penalty = (
+        weights.w_stop_opportunity * float(remaining_budget_ratio)
+        if is_stop else 0.0
+    )
+    return (
+        weights.w_optimization * float(delta_optimization) / optimization_scale
+        + weights.w_surrogate * ds
+        + weights.w_coverage * dc
+        - weights.w_evaluation * int(n_new_samples) / evaluation_scale
+        - weights.w_fit * int(n_model_fits) / fit_scale
+        - stop_penalty
+    )
+
+codex
+The pooled +0.140 value matches the JSON. Its CI resamples records, though, while records share problem seeds and the five folds share training families. The noise diagnostic also counts a pair as flipped if *any* of three re-rolls disagrees, so the reported 0.74 is not a single re-roll error rate.
+exec
+/bin/bash -c "python - <<'PY'
+import json
+from pathlib import Path
+for n in ['longhorizon_k4r5_20seed_5family','longhorizon_k4r5_aligned_20seed_5family','longhorizon_k4_20seed_5family']:
+ p=Path('runs')/(n+'.jsonl'); d=json.loads(p.open().readline()); print('\\n',n);print('id',d['id']);print('metadata keys',list(d['metadata']));
+ for k in ['horizon','horizon_mode','continuation_policy','utility_weights','rollout_replicates','partial_rollout','run_seed','optimization_scale']:
+  print(k,d['metadata'].get(k))
+ print('result sample',next(iter(d['rollout_results'].items())))
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+
+ longhorizon_k4r5_20seed_5family
+id branin:17:0:0
+metadata keys ['backend_X', 'backend_constraints', 'backend_fitted', 'backend_id', 'backend_model_state_b64', 'backend_objectives', 'backend_problem_bounds', 'backend_problem_id', 'backend_rng_state_b64', 'continuation_policy', 'evaluation_scale', 'fit_scale', 'horizon', 'horizon_mode', 'objective_scale', 'objective_shift', 'optimization_scale', 'partial_rollout', 'run_seed', 'step', 'trajectory_id', 'utility_version', 'utility_weights', 'w_stop_opportunity']
+horizon 25
+horizon_mode remaining
+continuation_policy {'extras': {'rule_weight': 0.8}, 'k': None, 'name': 'on_policy', 'seed': 0}
+utility_weights {'w_coverage': 0.0, 'w_evaluation': 1.0, 'w_fit': 0.5, 'w_optimization': 1.0, 'w_stop_opportunity': 0.75, 'w_surrogate': 0.0}
+rollout_replicates None
+partial_rollout {'action_ids': ['global_exploration', 'uncertainty_sampling', 'error_guided_sampling', 'retrain_surrogate'], 'k': 4, 'note': 'gold_probs and rollout_results cover only these action_ids; do not renormalize to the full vocabulary. Pairwise (contrastive) consumers are unaffected by construction.'}
+run_seed 457471263
+optimization_scale 37.23066149852672
+result sample ('error_guided_sampling', {'delta_coverage': 0.24142450142450142, 'delta_optimization': 16.07294625223791, 'delta_surrogate': None, 'error': None, 'n_model_fits': 7.2, 'n_new_samples': 19.4, 'status': 'valid', 'utility': -0.33495405116898225, 'utility_replicas': [-0.3716971173824978, -0.5129679649386368, -0.3112782879761849, -0.36505173139919117, -0.11377515414840042], 'utility_std': 0.129170834955576})
+
+ longhorizon_k4r5_aligned_20seed_5family
+id branin:9:0:0
+metadata keys ['backend_X', 'backend_constraints', 'backend_fitted', 'backend_id', 'backend_model_state_b64', 'backend_objectives', 'backend_problem_bounds', 'backend_problem_id', 'backend_rng_state_b64', 'continuation_policy', 'evaluation_scale', 'fit_scale', 'horizon', 'horizon_mode', 'objective_scale', 'objective_shift', 'optimization_scale', 'partial_rollout', 'run_seed', 'step', 'trajectory_id', 'utility_version', 'utility_weights', 'w_stop_opportunity']
+horizon 25
+horizon_mode remaining
+continuation_policy {'extras': {}, 'k': None, 'name': 'rule', 'seed': 0}
+utility_weights {'w_coverage': 0.0, 'w_evaluation': 0.0, 'w_fit': 0.0, 'w_optimization': 1.0, 'w_stop_opportunity': 0.0, 'w_surrogate': 0.0}
+rollout_replicates None
+partial_rollout {'action_ids': ['uncertainty_sampling', 'error_guided_sampling', 'boundary_sampling', 'retrain_surrogate'], 'k': 4, 'note': 'gold_probs and rollout_results cover only these action_ids; do not renormalize to the full vocabulary. Pairwise (contrastive) consumers are unaffected by construction.'}
+run_seed 1024022776
+optimization_scale 69.13635840591805
+result sample ('boundary_sampling', {'delta_coverage': 0.1792022792022792, 'delta_optimization': 0.48534620061747696, 'delta_surrogate': None, 'error': None, 'n_model_fits': 1.4, 'n_new_samples': 21.8, 'status': 'valid', 'utility': 0.007020129665607779, 'utility_replicas': [0.01838780935727756, 0.0, 0.0, 0.004016066951558146, 0.012696772019203184], 'utility_std': 0.007335356076113426})
+
+ longhorizon_k4_20seed_5family
+id branin:16:0:0
+metadata keys ['backend_X', 'backend_constraints', 'backend_fitted', 'backend_id', 'backend_model_state_b64', 'backend_objectives', 'backend_problem_bounds', 'backend_problem_id', 'backend_rng_state_b64', 'continuation_policy', 'evaluation_scale', 'fit_scale', 'horizon', 'horizon_mode', 'objective_scale', 'objective_shift', 'optimization_scale', 'partial_rollout', 'run_seed', 'step', 'trajectory_id', 'utility_version', 'utility_weights', 'w_stop_opportunity']
+horizon 25
+horizon_mode remaining
+continuation_policy {'extras': {'rule_weight': 0.8}, 'k': None, 'name': 'on_policy', 'seed': 0}
+utility_weights {'w_coverage': 0.0, 'w_evaluation': 1.0, 'w_fit': 0.5, 'w_optimization': 1.0, 'w_stop_opportunity': 0.75, 'w_surrogate': 0.0}
+rollout_replicates None
+partial_rollout {'action_ids': ['global_exploration', 'uncertainty_sampling', 'error_guided_sampling', 'retrain_surrogate'], 'k': 4, 'note': 'gold_probs and rollout_results cover only these action_ids; do not renormalize to the full vocabulary. Pairwise (contrastive) consumers are unaffected by construction.'}
+run_seed 1207650565
+optimization_scale 15.277727246327277
+result sample ('error_guided_sampling', {'delta_coverage': -0.007692307692307693, 'delta_optimization': 0.0, 'delta_surrogate': None, 'error': None, 'n_model_fits': 3, 'n_new_samples': 21, 'status': 'valid', 'utility': -0.75})
+
+exec
+/bin/bash -c "rg -n \"name == \\\"rule\\\"|name == 'rule'|RulePolicy|continuation_spec.seed|derive_seed.*continuation|continuation_spec\" src/opt_agent/rollout src/opt_agent/dataset/generator.py | head -n 110" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+src/opt_agent/dataset/generator.py:4:  - Behavior policy (RulePolicy + random mix) is INDEPENDENT of gold_probs;
+src/opt_agent/dataset/generator.py:32:from opt_agent.loop.policies import RandomPolicy, RulePolicy
+src/opt_agent/dataset/generator.py:226:    continuation_spec: ContinuationPolicySpec = field(
+src/opt_agent/dataset/generator.py:355:        rule = RulePolicy(seed=run_seed)
+src/opt_agent/dataset/generator.py:406:                        continuation_spec=(
+src/opt_agent/dataset/generator.py:407:                            self.config.continuation_spec if R == 1 else
+src/opt_agent/dataset/generator.py:409:                                self.config.continuation_spec,
+src/opt_agent/dataset/generator.py:411:                                    int(self.config.continuation_spec.seed),
+src/opt_agent/dataset/generator.py:574:                "continuation_policy": spec_to_metadata(self.config.continuation_spec),
+src/opt_agent/rollout/specs.py:51:    from opt_agent.loop.policies import RulePolicy
+src/opt_agent/rollout/specs.py:52:    return RulePolicy(seed=spec.seed)
+src/opt_agent/rollout/rollout.py:93:# None for `continuation_spec`.
+src/opt_agent/rollout/rollout.py:110:    continuation_spec : ContinuationPolicySpec | None
+src/opt_agent/rollout/rollout.py:126:        continuation_spec: ContinuationPolicySpec | None = None,
+src/opt_agent/rollout/rollout.py:142:        self.continuation_spec = continuation_spec or DEFAULT_CONTINUATION_SPEC
+src/opt_agent/rollout/rollout.py:213:            build_continuation_policy(self.continuation_spec)
+
+exec
+/bin/bash -c "sed -n '345,440p' src/opt_agent/dataset/generator.py && sed -n '30,65p' src/opt_agent/rollout/specs.py && sed -n '185,250p' src/opt_agent/rollout/rollout.py && sed -n '395,430p' src/opt_agent/dataset/validation.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+            float(self.config.total_budget)
+            if self.config.evaluation_scale is None
+            else float(self.config.evaluation_scale)
+        )
+        fit_scale = (
+            float(self.config.total_budget)
+            if self.config.fit_scale is None
+            else float(self.config.fit_scale)
+        )
+
+        rule = RulePolicy(seed=run_seed)
+        random_policy = RandomPolicy(seed=run_seed)
+        behavior_rng = random.Random(run_seed)
+        last_action_name: str | None = None  # Phase 8.5 fix: track for state.history.last_action
+
+        for step in range(self.config.max_actions):
+            state = extract_state(
+                backend,
+                total_budget=self.config.total_budget,
+                last_action=last_action_name,
+            )
+
+            # Decision point?
+            if step % self.config.decision_every_k_actions == 0:
+                remaining = int(state.resource.remaining_budget)
+                h_step = (
+                    max(1, remaining)
+                    if self.config.horizon_mode == "remaining"
+                    else self.config.horizon
+                )
+                if self.config.horizon_mode == "remaining" and remaining <= 0:
+                    break  # nothing left to decide; budget exhausted
+                cands = full_candidates(seed=derive_seed(run_seed, step))
+                k = self.config.rollout_action_subsample
+                if k is not None and k < len(cands):
+                    rolled = subsample_candidates(
+                        cands, k, derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                    )
+                else:
+                    rolled = cands
+                # Sprint 0 fix: scale the rollout cap to rolled candidates ×
+                # horizon so long-horizon runs (e.g. horizon=total_budget)
+                # don't hit the default cap of 200.
+                rollout_cap = max(200, len(rolled) * h_step + 32)
+                R = self.config.rollout_replicates
+                subset_seed = derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                outputs = []
+                for rep in range(R):
+                    # Same rolled subset every replicate (deterministic salt);
+                    # fresh action seeds and continuation seed per replicate.
+                    rep_cands = (
+                        cands if R == 1
+                        else full_candidates(seed=derive_seed(run_seed, step, rep))
+                    )
+                    rep_rolled = rolled if R == 1 else subsample_candidates(
+                        rep_cands, len(rolled), subset_seed
+                    )
+                    outputs.append(CounterfactualRollout(
+                        backend,
+                        horizon=h_step,
+                        utility_weights=self.config.utility_weights,
+                        continuation_spec=(
+                            self.config.continuation_spec if R == 1 else
+                            replace(
+                                self.config.continuation_spec,
+                                seed=derive_seed(
+                                    int(self.config.continuation_spec.seed),
+                                    rep, 424242,
+                                ),
+                            )
+                        ),
+                        max_rollout_steps=rollout_cap,
+                        optimization_scale=optimization_scale,
+                        evaluation_scale=evaluation_scale,
+                        fit_scale=fit_scale,
+                    ).rollout(state, rep_rolled))
+                output = outputs[0] if R == 1 else _average_rollouts(outputs)
+                probs = to_gold_probs(
+                    output.results,
+                    temperature=self.config.temperature,
+                    include_invalid_as_zero=True,
+                )
+                partial_meta: dict | None = None
+                if rolled is not cands:
+                    partial_meta = {
+                        "k": int(k),
+                        "action_ids": [c.action_id for c in rolled],
+                        "note": (
+                            "gold_probs and rollout_results cover only these "
+                            "action_ids; do not renormalize to the full "
+                            "vocabulary. Pairwise (contrastive) consumers are "
+                            "unaffected by construction."
+                        ),
+                    }
+                # Preserve the complete decision point, including a fitted GP
+                # and RNG state. History alone cannot faithfully replay it.
+    `seed` is the canonical seed passed to the policy's constructor.
+
+    `k` is reserved for the future `best_of_k` policy (not implemented in
+    Sprint 0).
+
+    `extras` holds policy-specific kwargs (e.g. `rule_weight` for the
+    `on_policy` mix). Default empty mapping.
+    """
+    name: str
+    seed: int = 0
+    k: int | None = None
+    extras: Mapping[str, Any] = field(default_factory=dict)
+
+
+# ---------------------------------------------------------------------------
+# Registry — lazy imports inside factories to avoid circular dependency with
+# opt_agent.loop.policies (which in turn doesn't import this module).
+# ---------------------------------------------------------------------------
+
+
+def _make_rule(spec: ContinuationPolicySpec) -> Any:
+    from opt_agent.loop.policies import RulePolicy
+    return RulePolicy(seed=spec.seed)
+
+
+def _make_uniform(spec: ContinuationPolicySpec) -> Any:
+    from opt_agent.loop.policies import UniformPolicy
+    return UniformPolicy(seed=spec.seed)
+
+
+def _make_on_policy(spec: ContinuationPolicySpec) -> Any:
+    from opt_agent.loop.policies import OnPolicyMix
+    rule_weight = float(spec.extras.get("rule_weight", 0.8))
+    return OnPolicyMix(seed=spec.seed, rule_weight=rule_weight)
+
+
+        results: list[CounterfactualResult] = []
+        try:
+            for candidate in candidates:
+                results.append(self._run_one_branch(state, candidate, base))
+        finally:
+            self.backend.restore(base)
+
+        return RolloutOutput(s_t=state, results=tuple(results))
+
+    def _run_one_branch(
+        self,
+        state: OptimizationState,
+        candidate: Candidate,
+        base: Checkpoint,
+    ) -> CounterfactualResult:
+        self.backend.restore(base)
+        # Re-extract branch's starting state from the restored backend.
+        branch_state = extract_state(
+            self.backend,
+            total_budget=state.resource.total_budget,
+            last_action=state.history.last_action,
+        )
+        steps: list = []
+        n_new = 0
+        n_fits = 0
+        status = "valid"
+        error: Optional[str] = None
+        policy = (
+            build_continuation_policy(self.continuation_spec)
+            if self.horizon > 1 else None
+        )
+        try:
+            action = candidate.action
+            for step_index in range(self.horizon):
+                if step_index > 0:
+                    if branch_state.resource.remaining_budget <= 0:
+                        break
+                    assert policy is not None
+                    action = policy.select_action(branch_state, self.backend)
+
+                result = execute_action(self.backend, branch_state, action)
+                n_new += result.n_new_samples
+                n_fits += result.n_model_fits
+
+                next_state = extract_state(
+                    self.backend,
+                    total_budget=state.resource.total_budget,
+                    last_action=action.type.value,
+                )
+                steps.append((branch_state, action, result, next_state))
+                branch_state = next_state
+
+                if result.should_stop:
+                    break
+        except ValueError as exc:
+            status, error = "invalid", str(exc)
+
+        # Phase 7: Δopt = best_after − best_before (positive = improvement).
+        delta_opt = branch_state.optimization.best_value - state.optimization.best_value
+
+        # Phase 7: Δsurrogate = validation_rmse_before − validation_rmse_after
+        # (positive = surrogate improved). NaN if either side is NaN.
+        rs_before = state.surrogate.validation_rmse
+        rs_after = branch_state.surrogate.validation_rmse
+        if math.isfinite(rs_before) and math.isfinite(rs_after):
+            delta_surrogate = float(rs_before - rs_after)
+        rel_tol=1e-9,
+        abs_tol=1e-9,
+    ):
+        raise ValueError(f"record {record.id!r} replay best value differs")
+    if state.surrogate.is_current != bool(record.state["surrogate"]["is_current"]):
+        raise ValueError(f"record {record.id!r} replay surrogate status differs")
+    objective_scale = float(record.metadata.get("optimization_scale", 1.0))
+    return oracle_test(
+        backend,
+        state,
+        record,
+        objective_scale=objective_scale,
+        random_replicates=random_replicates,
+        max_actions=max_actions,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Gate 5 — affine_rescaling_test
+# ---------------------------------------------------------------------------
+
+
+def affine_rescaling_test(
+    generate_for_transform: Callable[[float, float], Iterable[DecisionRecord]],
+) -> dict:
+    """Compare top-action distribution across (scale, shift) transforms.
+
+    Pass criteria per (problem, phase): median Spearman ≥ 0.9, top-1
+    agreement ≥ 0.8, mean JS divergence ≤ 0.02.
+    """
+    transforms = ((1.0, 0.0), (0.1, 0.0), (10.0, 0.0), (1.0, 5.0))
+    datasets = {
+        t: {r.id: r for r in generate_for_transform(*t)}
+        for t in transforms
+    }
+    base = datasets[(1.0, 0.0)]
+
+exec
+/bin/bash -c "python - <<'PY'
+import json,random,statistics,collections
+D=json.load(open('runs/exp_rlcd_loo_confirmatory.json'))
+rng=random.Random(7)
+for f in D['folds']:
+ a=f['arms']['bt_pairs']['per_record']; b=f['arms']['rf']['per_record']; by=collections.defaultdict(list)
+ for rid in a.keys() & b.keys():
+  va,vb=a[rid],b[rid];by[int(rid.split(':')[1])].append(va[0]/va[1]-vb[0]/vb[1])
+ keys=list(by);samples=[]
+ for _ in range(4000):
+  x=[v for k in (rng.choice(keys) for i in keys) for v in by[k]]
+  samples.append(statistics.fmean(x))
+ samples.sort(); print(f['family'],'n seeds',len(keys),'record mean',statistics.fmean(v for row in by.values() for v in row),'seed-cluster CI',samples[100],samples[3900], 'seed positive',sum(statistics.fmean(v)>0 for v in by.values()))
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+ackley n seeds 20 record mean 0.2087284160870134 seed-cluster CI 0.16834413609309395 0.2523366154188727 seed positive 20
+branin n seeds 20 record mean 0.04537716912716911 seed-cluster CI 0.03130281103872652 0.059142368487196055 seed positive 18
+hartmann n seeds 20 record mean 0.015769765899395525 seed-cluster CI 0.006723312507984037 0.025750780614061865 seed positive 15
+rastrigin n seeds 20 record mean 0.1510305707786328 seed-cluster CI 0.11504823372974057 0.1868938013239484 seed positive 19
+sixhumpcamel n seeds 20 record mean 0.30470792465412266 seed-cluster CI 0.26879218671999416 0.33546507163023 seed positive 20
+
+exec
+/bin/bash -c "python - <<'PY'
+import json,itertools,statistics
+p='runs/longhorizon_k4r5_20seed_5family.jsonl'; n=flips=0; gaps=[]
+for line in open(p):
+ d=json.loads(line);r={a:v['utility_replicas'] for a,v in d['rollout_results'].items() if v['status']=='valid' and len(v.get('utility_replicas',[]))==5}
+ for a,b in itertools.combinations(r,2):
+  x=statistics.fmean(r[a][:2])-statistics.fmean(r[b][:2]);y=statistics.fmean(r[a][2:4])-statistics.fmean(r[b][2:4]);n+=1;flips+=x*y<0;gaps.append(abs(d['rollout_results'][a]['utility']-d['rollout_results'][b]['utility']))
+print('2v2 half pair sign disagreement',flips,n,flips/n,'median stored gap',statistics.median(gaps))
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+2v2 half pair sign disagreement 1128 3966 0.2844175491679274 median stored gap 0.0495724924413776
+
+exec
+/bin/bash -c 'cat scripts/exp_geartrain_transfer_probe.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""P3 — numerical → engineering transfer probe on GearTrain (2026-09-27).
+
+Journal P0 gap ("≥1 real engineering task"): GearTrain is the only BOCoDe
+engineering problem passing the backend's Phase-1 gates (single-objective,
+unconstrained, d=4). This probe asks whether System-1 models trained on the
+FIVE SYNTHETIC families rank correctly on an engineering problem's decision
+states — the RQ2.3 "numerical → engineering" decision-level probe.
+
+Arms (no retraining): zero-shot Laya, the h3 fine-tuned proper/bt
+checkpoints, and the RF trained on the synthetic families (raw utilities;
+decision-level metrics are invariant to per-record monotone transforms).
+
+Usage:
+    .venv/bin/python scripts/exp_geartrain_transfer_probe.py
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from dataclasses import asdict
+from pathlib import Path
+
+import torch
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.system1.rlcd import (  # noqa: E402
+    RLCDConfig,
+    _collate,
+    build_item,
+    load_laya_for_training,
+)
+
+ACTIONS_T = ("global_exploration", "local_exploitation", "uncertainty_sampling",
+             "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
+             "retrain_surrogate", "stop")
+
+
+def _raw_gold(record) -> dict[str, float] | None:
+    gold = {}
+    for a, cell in record.rollout_results.items():
+        if cell.get("status") != "valid":
+            continue
+        u = cell.get("utility")
+        if isinstance(u, (int, float)) and u == u:
+            gold[a] = float(u)
+    return gold if len(gold) >= 2 else None
+
+
+def _laya_arm(model, tok, records, device) -> dict:
+    model.to(device).eval()
+    n_pairs = n_correct = n_top1 = n = 0
+    with torch.no_grad():
+        for r in records:
+            item = build_item(r, tok, max_len=512, head_max_len=192)
+            gold = _raw_gold(r)
+            if item is None or gold is None:
+                continue
+            batch = _collate([item], tok.pad_token_id)
+            tensors = {k: v.to(device) for k, v in batch.items()
+                       if torch.is_tensor(v)}
+            with torch.autocast(device_type=device.type, dtype=torch.bfloat16,
+                                enabled=device.type == "cuda"):
+                logits, _ = model(
+                    tensors["input_ids"], tensors["attention_mask"],
+                    tensors["marker_pos"], tensors["marker_mask"],
+                    tensors["qtype"],
+                )
+            row = logits[0].float().cpu()
+            index_of = {a: i for i, a in enumerate(item["option_ids"])}
+            n += 1
+            n_top1 += int(
+                max(gold, key=lambda a: float(row[index_of[a]]))
+                == max(gold, key=lambda a: gold[a])
+            )
+            for i, j, _ in item["pairs"]:
+                n_pairs += 1
+                n_correct += int(row[i] > row[j])
+    model.to("cpu")
+    return {"records": n, "pairs": n_pairs,
+            "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
+            "top1_agreement": n_top1 / n if n else 0.0}
+
+
+def _rf_arm(train_records, test_records) -> dict:
+    from sklearn.ensemble import RandomForestRegressor
+
+    from _shared_rq_features import extract_features
+    from opt_agent.dataset import phase_of_ratio
+
+    def feats(r):
+        return extract_features(
+            r.state, phase_of_ratio(
+                float(r.state["resource"]["remaining_budget_ratio"])
+            )
+        )
+
+    X, Y = [], []
+    for r in train_records:
+        gold = _raw_gold(r)
+        if gold is None or set(gold) != set(ACTIONS_T):
+            continue
+        X.append(feats(r))
+        Y.append([gold[a] for a in ACTIONS_T])
+    rf = RandomForestRegressor(
+        n_estimators=200, max_depth=8, min_samples_leaf=5,
+        random_state=0, n_jobs=8,
+    )
+    rf.fit(X, Y)
+    n_pairs = n_correct = n_top1 = n = 0
+    for r in test_records:
+        gold = _raw_gold(r)
+        if gold is None:
+            continue
+        pred = dict(zip(ACTIONS_T, rf.predict([feats(r)])[0]))
+        actions = sorted(gold)
+        n += 1
+        n_top1 += int(max(actions, key=lambda a: pred[a])
+                      == max(actions, key=lambda a: gold[a]))
+        for i, a in enumerate(actions):
+            for b in actions[i + 1:]:
+                g = gold[a] - gold[b]
+                if abs(g) <= 1e-12:
+                    continue
+                n_pairs += 1
+                n_correct += int((pred[a] - pred[b] > 0) == (g > 0))
+    return {"records": n, "pairs": n_pairs,
+            "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
+            "top1_agreement": n_top1 / n if n else 0.0}
+
+
+def main() -> int:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    test = list(iter_jsonl(Path("runs/geartrain_h3_10seed.jsonl")))
+    train = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))]
+    print(f"geartrain records: {len(test)}", flush=True)
+
+    out: dict = {}
+    model, tok, _cfg, _ = load_laya_for_training("/home/lcy/.cache/opt_agent_v3/laya")
+    out["zero_shot"] = _laya_arm(model, tok, test, device)
+    del model
+    torch.cuda.empty_cache()
+    for name, path in (("proper_h3", "runs/rlcd_laya_proper_v1"),
+                       ("bt_h3", "runs/rlcd_laya_bt_v1")):
+        m, t2, _c, _ = load_laya_for_training(path)
+        out[name] = _laya_arm(m, t2, test, device)
+        del m
+        torch.cuda.empty_cache()
+    out["rf_synthetic"] = _rf_arm(train, test)
+
+    Path("runs/exp_geartrain_transfer_probe.json").write_text(
+        json.dumps(out, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    for k, v in out.items():
+        print(f"{k:<14} pair_acc={v['pairwise_accuracy']:.3f} "
+              f"top1={v['top1_agreement']:.3f} (n={v['records']})", flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+exec
+/bin/bash -c 'rg -n "GearTrain|geartrain" src/opt_agent/backend tests docs runs/EXP_JOURNAL_ROUND2_REPORT.md | head -n 100' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+runs/EXP_JOURNAL_ROUND2_REPORT.md:52:4. **P3 — engineering extension (probe-level).** GearTrain (the only
+runs/EXP_JOURNAL_ROUND2_REPORT.md:56:   rf_synthetic 0.890 / proper_h3 0.801 / zero-shot 0.423 on 65 GearTrain
+runs/EXP_JOURNAL_ROUND2_REPORT.md:97:runs/geartrain_h3_10seed.jsonl            # P3 engineering dataset
+runs/EXP_JOURNAL_ROUND2_REPORT.md:98:runs/exp_geartrain_transfer_probe.json    # P3 probe
+runs/EXP_JOURNAL_ROUND2_REPORT.md:100:        exp_geartrain_transfer_probe.py
+runs/EXP_JOURNAL_ROUND2_REPORT.md:102:     GearTrain in backend allowlist; tests: 3 replicate + 4 GearTrain
+src/opt_agent/backend/bocode_botorch.py:159:            # semantics. Verified by tests/test_engineering_geartrain.py.
+src/opt_agent/backend/bocode_botorch.py:160:            "GearTrain",
+tests/test_engineering_geartrain.py:1:"""GearTrain engineering-problem integration tests (P3, 2026-09-27).
+tests/test_engineering_geartrain.py:3:GearTrain is the first BOCoDe ENGINEERING problem in the backend allowlist
+tests/test_engineering_geartrain.py:27:    b.initialize(BackendConfig(problem_id="GearTrain", seed=seed, n_init=5))
+tests/test_engineering_geartrain.py:31:def test_geartrain_initialize_and_shapes() -> None:
+tests/test_engineering_geartrain.py:40:def test_geartrain_fit_and_propose_and_evaluate() -> None:
+tests/test_engineering_geartrain.py:52:def test_geartrain_objectives_finite_and_bounded_scale() -> None:
+tests/test_engineering_geartrain.py:59:def test_geartrain_decision_dataset_smoke() -> None:
+tests/test_engineering_geartrain.py:60:    """One decision point's rollout machinery works on GearTrain."""
+tests/test_engineering_geartrain.py:67:        problems=("GearTrain",),
+tests/test_engineering_geartrain.py:75:        assert r.problem["family"] == "geartrain"
+
+exec
+/bin/bash -c "python - <<'PY'
+import json,collections
+D=json.load(open('runs/exp_rlcd_closed_loop_aligned.json')); print('row keys',D['rows'][0].keys());print('first',D['rows'][0]);
+for m in ('bt_al','proper_al'):
+ rows=[r for r in D['rows'] if r.get('arm')==m or r.get('policy')==m];print(m,len(rows))
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+row keys dict_keys(['action_counts', 'actions', 'arm', 'budget', 'initial_best', 'new_evaluations', 'problem', 'scale', 'seed', 'terminal_best', 'termination'])
+first {'action_counts': {'global_exploration': 11, 'surrogate_acquisition': 3}, 'actions': ['surrogate_acquisition', 'global_exploration', 'global_exploration', 'global_exploration', 'global_exploration', 'surrogate_acquisition', 'surrogate_acquisition', 'global_exploration', 'global_exploration', 'global_exploration', 'global_exploration', 'global_exploration', 'global_exploration', 'global_exploration'], 'arm': 'rule_full_budget', 'budget': 30, 'initial_best': -3.8487016188467393, 'new_evaluations': 25, 'problem': 'Branin', 'scale': 53.98626697022833, 'seed': 201, 'terminal_best': -0.7737416573699321, 'termination': 'budget_exhausted'}
+bt_al 50
+proper_al 50
+
+exec
+/bin/bash -c "python - <<'PY'
+import json,collections
+D=json.load(open('runs/exp_rlcd_closed_loop_aligned.json'))
+for m in ('bt_al','proper_al'):
+ rows=[r for r in D['rows'] if r['arm']==m];c=collections.Counter(a for r in rows for a in r['actions']);print(m,len(rows),sum(c.values()),c)
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+bt_al 50 1250 Counter({'local_exploitation': 1250})
+proper_al 50 1250 Counter({'error_guided_sampling': 1250})
+
+codex
+The aligned teacher does use rule continuation and a terminal improvement utility, but Gate 4 still replays the chosen action once with a different continuation seed and compares it with sampled first-action baselines. That supports a failed gate under this protocol; it does not establish a noise-free, exact label/evaluation match or a universal zero value for first actions.
+exec
+/bin/bash -c "rg -n \"transfer positive is now confirmatory|Record-clustered|CI excludes|split-half|noise-free|alignment exact|unattainable|representation|full-distribution|strictly increasing|Spherical|spherical|single underlying|dense, per-decision|overconfidence|sign-stable|strictly decreasing|GearTrain|positive \\(confirmatory\\)|P0 —|P0 — 外部|多重比较\" runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md runs/EXP_JOURNAL_ROUND2_REPORT.md docs/RLCD_THEORY.md docs/ref_papers/journal_positioning.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+docs/ref_papers/journal_positioning.md:65:### P0 — 基准面（最大风险）
+docs/ref_papers/journal_positioning.md:75:### P0 — 外部基线
+docs/ref_papers/journal_positioning.md:100:- 多重比较校正（Benjamini–Hochberg 或按家族分层）；全实验统一 ≥10 seeds
+docs/ref_papers/journal_positioning.md:121:| §6/§7 Limitations | Ross & Bagnell 2011（单步 vs 闭环分叉）+ 基准面/多重比较 |
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:52:  (CI excludes 0) — but at q40/q60 the routed trajectories are *identical*
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:94:distills a *representation* of the decision rule that transfers across
+runs/EXP_JOURNAL_ROUND2_REPORT.md:10:1. **P0 — the transfer positive is now confirmatory.** Record-clustered
+runs/EXP_JOURNAL_ROUND2_REPORT.md:12:   fold: **bt − RF pooled = +0.140, 95% CI [+0.126, +0.154]; CI excludes
+runs/EXP_JOURNAL_ROUND2_REPORT.md:26:     `rollout_replicates`; 661-record dataset in 141 s) reduces split-half
+runs/EXP_JOURNAL_ROUND2_REPORT.md:33:     noise reduced AND alignment exact, the residual is the truth: **the
+runs/EXP_JOURNAL_ROUND2_REPORT.md:36:     single-action labels is unattainable in this regime; decision value
+runs/EXP_JOURNAL_ROUND2_REPORT.md:52:4. **P3 — engineering extension (probe-level).** GearTrain (the only
+runs/EXP_JOURNAL_ROUND2_REPORT.md:56:   rf_synthetic 0.890 / proper_h3 0.801 / zero-shot 0.423 on 65 GearTrain
+runs/EXP_JOURNAL_ROUND2_REPORT.md:76:  (0.74 flip) → even noise-free, Gate-4-aligned single-action labels have
+runs/EXP_JOURNAL_ROUND2_REPORT.md:102:     GearTrain in backend allowlist; tests: 3 replicate + 4 GearTrain
+docs/RLCD_THEORY.md:22:`laya.common.proper_reward` — log score + 0.5·spherical score, minus a
+docs/RLCD_THEORY.md:52:  S(q, t) = log-score(q, t) + 0.5 · spherical(q, t)
+docs/RLCD_THEORY.md:72:### R1. Strict properness ⇒ full-distribution identification and calibration by construction
+docs/RLCD_THEORY.md:91:strictly increasing per-state transform (ranking alone). Properness buys
+docs/RLCD_THEORY.md:96:spherical score `(Σ t_a q_a)/‖q‖₂` is strictly proper (Shuford–Albert–
+docs/RLCD_THEORY.md:123:because the objective is linear in `t̃`. The spherical component's optimum
+docs/RLCD_THEORY.md:129:ranking of `U*` (T2) and is *sign-stable*; proper-score training tracks
+docs/RLCD_THEORY.md:162:represents a single underlying utility score per (s, a). Laya does — one
+docs/RLCD_THEORY.md:164:shared-score representation; models with subset-specific heads would not
+docs/RLCD_THEORY.md:191:- **Stage 2 (closed loop) gets a dense, per-decision reward for free.**
+docs/RLCD_THEORY.md:199:  pressure persists during RL (RLHF's overconfidence failure mode is
+docs/RLCD_THEORY.md:228:flip rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
+docs/RLCD_THEORY.md:230:`βΔf* = log((1−η(g))/η(g))` — a strictly increasing reparametrization of
+docs/RLCD_THEORY.md:234:with R2:* BT discards magnitude by design and is sign-stable; proper-score
+docs/RLCD_THEORY.md:304:  Measurement Procedures.* Psychometrika 31(2), 1966 (spherical rule).
+
+exec
+/bin/bash -c "rg -n \"train_pool|seed\\]\\) < 16|_bootstrap_ci|pooled\\[arm\\]|for r in results|per_seed_acc|agree = all|flips.append|hash\\(|argmax_stable|repeats|RulePolicy\\(seed=continuation_seed|gold = _run_arm|behavior_results.append|rollout_replicates|rep_cands|seed=derive_seed|rf.fit|top1_agreement\" scripts/exp_rlcd_loo_confirmatory.py scripts/exp_teacher_noise_diagnostic.py scripts/exp_geartrain_transfer_probe.py src/opt_agent/dataset/validation.py src/opt_agent/dataset/generator.py | head -n 120" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_geartrain_transfer_probe.py:86:            "top1_agreement": n_top1 / n if n else 0.0}
+scripts/exp_geartrain_transfer_probe.py:113:    rf.fit(X, Y)
+scripts/exp_geartrain_transfer_probe.py:133:            "top1_agreement": n_top1 / n if n else 0.0}
+scripts/exp_geartrain_transfer_probe.py:160:              f"top1={v['top1_agreement']:.3f} (n={v['records']})", flush=True)
+src/opt_agent/dataset/generator.py:10:    `hash()`, which varies with PYTHONHASHSEED across processes).
+src/opt_agent/dataset/generator.py:160:    Uses SHA-256 of the problem name to avoid Python's built-in `hash()`
+src/opt_agent/dataset/generator.py:221:    rollout_replicates: int = 1
+src/opt_agent/dataset/generator.py:265:        if not 1 <= self.rollout_replicates <= 8:
+src/opt_agent/dataset/generator.py:267:                f"rollout_replicates must be in [1, 8]; "
+src/opt_agent/dataset/generator.py:268:                f"got {self.rollout_replicates}"
+src/opt_agent/dataset/generator.py:377:                cands = full_candidates(seed=derive_seed(run_seed, step))
+src/opt_agent/dataset/generator.py:389:                R = self.config.rollout_replicates
+src/opt_agent/dataset/generator.py:395:                    rep_cands = (
+src/opt_agent/dataset/generator.py:397:                        else full_candidates(seed=derive_seed(run_seed, step, rep))
+src/opt_agent/dataset/generator.py:400:                        rep_cands, len(rolled), subset_seed
+src/opt_agent/dataset/generator.py:410:                                seed=derive_seed(
+scripts/exp_teacher_noise_diagnostic.py:29:    .venv/bin/python scripts/exp_teacher_noise_diagnostic.py --repeats 3 --workers 12
+scripts/exp_teacher_noise_diagnostic.py:81:    for rep in range(task["repeats"]):
+scripts/exp_teacher_noise_diagnostic.py:90:                    abs(hash(spec["action_id"])) & 0xFFFF,
+scripts/exp_teacher_noise_diagnostic.py:98:            seed=derive_seed(run_seed, rep, 555555),
+scripts/exp_teacher_noise_diagnostic.py:128:            agree = all(d * g > 0 for d in per_roll)
+scripts/exp_teacher_noise_diagnostic.py:129:            flips.append(0 if agree else 1)
+scripts/exp_teacher_noise_diagnostic.py:133:    argmax_stable = len({
+scripts/exp_teacher_noise_diagnostic.py:145:        "argmax_stable_across_rerolls": argmax_stable,
+scripts/exp_teacher_noise_diagnostic.py:156:    parser.add_argument("--repeats", type=int, default=3)
+scripts/exp_teacher_noise_diagnostic.py:172:    tasks = [{"record": r, "repeats": args.repeats} for r in sample]
+scripts/exp_teacher_noise_diagnostic.py:173:    print(f"{len(tasks)} records × {args.repeats} re-rolls", flush=True)
+scripts/exp_teacher_noise_diagnostic.py:190:    all_flips = [f for r in results for f in r["flips"]]
+scripts/exp_teacher_noise_diagnostic.py:191:    all_gaps = [g for r in results for g in r["gaps"]]
+scripts/exp_teacher_noise_diagnostic.py:207:        "repeats": args.repeats,
+scripts/exp_teacher_noise_diagnostic.py:216:            r["median_gap_spread"] for r in results
+scripts/exp_teacher_noise_diagnostic.py:219:                  for r in results) else None,
+scripts/exp_teacher_noise_diagnostic.py:220:        "argmax_stable_share": (
+scripts/exp_teacher_noise_diagnostic.py:221:            statistics.fmean([r["argmax_stable_across_rerolls"]
+scripts/exp_teacher_noise_diagnostic.py:222:                              for r in results]) if results else None
+scripts/exp_rlcd_loo_confirmatory.py:121:    rf.fit(X, Y)
+scripts/exp_rlcd_loo_confirmatory.py:143:def _bootstrap_ci(diffs: list[float], repetitions: int = 2000,
+scripts/exp_rlcd_loo_confirmatory.py:179:    train_pool = [r for r in records if r.problem["family"] != held_out]
+scripts/exp_rlcd_loo_confirmatory.py:181:    tr = [r for r in train_pool if int(r.problem["seed"]) < 16]
+scripts/exp_rlcd_loo_confirmatory.py:182:    va = [r for r in train_pool if int(r.problem["seed"]) >= 16]
+scripts/exp_rlcd_loo_confirmatory.py:218:            "per_seed_acc": [
+scripts/exp_rlcd_loo_confirmatory.py:225:    rf_rec = _rf_per_record(train_pool, test)
+scripts/exp_rlcd_loo_confirmatory.py:257:                accs = r["arms"][arm]["per_seed_acc"]
+scripts/exp_rlcd_loo_confirmatory.py:268:    for r in results:
+scripts/exp_rlcd_loo_confirmatory.py:273:            ci = _bootstrap_ci(diffs)
+scripts/exp_rlcd_loo_confirmatory.py:280:            pooled[arm].extend(diffs)
+scripts/exp_rlcd_loo_confirmatory.py:282:        ci = _bootstrap_ci(diffs)
+src/opt_agent/dataset/validation.py:155:        seed_clustered_ci95 = _bootstrap_ci_mean(seed_lifts, repetitions=2000, seed=0)
+src/opt_agent/dataset/validation.py:167:def _bootstrap_ci_mean(
+src/opt_agent/dataset/validation.py:261:    continuation_policy = RulePolicy(seed=continuation_seed)
+src/opt_agent/dataset/validation.py:268:        gold = _run_arm(
+src/opt_agent/dataset/validation.py:306:            b_rule = RulePolicy(seed=derive_seed(u_seed, 2))
+src/opt_agent/dataset/validation.py:307:            b_random = RandomPolicy(seed=derive_seed(u_seed, 3))
+src/opt_agent/dataset/validation.py:317:            behavior_results.append(_run_arm(
+src/opt_agent/dataset/validation.py:465:        and x["top1_agreement"] >= 0.8
+src/opt_agent/dataset/validation.py:504:            "top1_agreement": statistics.fmean(top1s),
+
+exec
+/bin/bash -c 'git branch --show-current' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+exp/rlcd-laya-finetune
+
+exec
+/bin/bash -c 'rg -n "proper is the only|proper training is the only|post-hoc temperature cannot substitute|no current supervision|confidence discrimination|5/5 folds|sign p|mean gap|near in-family|RF|0.89|split-half|residual" runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md runs/EXP_JOURNAL_ROUND2_REPORT.md docs/RLCD_THEORY.md | head -n 110' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+docs/RLCD_THEORY.md:105:router failure traced to the RF softmax never exceeding 0.25 — a
+docs/RLCD_THEORY.md:172:precisely because *non*-option-conditioned consumers (e.g. an RF over a
+docs/RLCD_THEORY.md:252:arms — and to the RF baseline.
+docs/RLCD_THEORY.md:268:| R4 realized-outcome RL + TD(λ) design | design proposition | deferred; uses SDK `td_lambda_targets` | stage-2 once trajectories logged |
+runs/EXP_JOURNAL_ROUND2_REPORT.md:12:   fold: **bt − RF pooled = +0.140, 95% CI [+0.126, +0.154]; CI excludes
+runs/EXP_JOURNAL_ROUND2_REPORT.md:13:   zero on 5/5 folds** (ackley +0.209, branin +0.045, hartmann +0.016,
+runs/EXP_JOURNAL_ROUND2_REPORT.md:15:   (e.g. rastrigin bt [0.840, 0.850]). proper − RF pooled +0.019
+runs/EXP_JOURNAL_ROUND2_REPORT.md:26:     `rollout_replicates`; 661-record dataset in 141 s) reduces split-half
+runs/EXP_JOURNAL_ROUND2_REPORT.md:27:     flip to 0.37 (residual label-vs-true ≈ 19% at median gap). Gate 3
+runs/EXP_JOURNAL_ROUND2_REPORT.md:33:     noise reduced AND alignment exact, the residual is the truth: **the
+runs/EXP_JOURNAL_ROUND2_REPORT.md:55:   Numerical→engineering decision probe (no retraining): bt_h3 0.893 /
+runs/EXP_JOURNAL_ROUND2_REPORT.md:56:   rf_synthetic 0.890 / proper_h3 0.801 / zero-shot 0.423 on 65 GearTrain
+runs/EXP_JOURNAL_ROUND2_REPORT.md:58:   engineering problem's states at ~0.89; the Laya-vs-RF advantage does
+runs/EXP_JOURNAL_ROUND2_REPORT.md:68:  at near in-family accuracy and beats feature-imitation (RF) with CI
+runs/EXP_JOURNAL_ROUND2_REPORT.md:70:  engineering problem's decision states at ~0.89 (probe-level).
+runs/EXP_JOURNAL_ROUND2_REPORT.md:72:  uniquely joint-calibrated; post-hoc temperature cannot substitute);
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:12:| E1 | Proper-score training vs BT + post-hoc temperature | proper is the only arm with good joint (log −2.07, ECE 0.11); BT+T* recovers log (−2.07) but destroys ECE (0.02→0.26); **no arm has confidence discrimination** (conf_gap ≤ 0.013, AURC ≈ 1−acc) | objective sets calibration *shape*; discrimination absent everywhere |
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:16:| E5 | Cross-family transfer (LOO, decision-level) | **bt 0.866 mean pairwise on UNSEEN families (in-family 0.873 — 99% retention); proper 0.746 with log −2.07 retained; RF 0.720. bt > RF on 5/5 folds (sign p = 0.031 one-sided); gap grows from +0.056 (in-family) to +0.146 (cross-family)** | **the journal positive: distilled decision models generalize across problem families where feature-imitation does not** |
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:37:but breaks its argmax calibration; proper training is the only way to hold
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:62:Mechanism: with zero confidence discrimination (E1), quantile routing
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:86:- bt > rf on 5/5 folds (one-sided sign test p = 0.031); the mean gap more
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:95:problem families; the axis-aligned-feature RF imitates the rule in-distribution
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:107:   post-hoc temperature cannot substitute.
+runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:112:   "the RF is flat": *no current supervision provides discriminative
+
+codex
+VERDICT: REVISE
+
+1. **BLOCKER — “P0 — the transfer positive is now confirmatory.”** The reported BT–RF difference of **+0.140** and record-bootstrap CI **[+0.126, +0.154]** match the [JSON](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_rlcd_loo_confirmatory.json). But the [script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_confirmatory.py:268) resamples records, including multiple records from each problem seed, while averaging over just two training seeds. It also reuses the five families and test records that produced E5’s exploratory positive. The interval describes a fixed-family, fixed-training analysis; it does not establish uncertainty over new families or training runs. **Fix:** label this a confirmatory *analysis rerun* with that limited estimand, then run a locked evaluation on new families or tasks and report seed- and family-aware uncertainty.
+
+2. **MAJOR — “CI excludes zero on 5/5 folds” and “sign p = 0.031.”** The five intervals are unadjusted 95% intervals. The [round-one sign argument](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:86) and [round-two intervals](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_JOURNAL_ROUND2_REPORT.md:10) use the same five outcomes, so they are not independent confirmations; the folds also share much of their training data. **Fix:** designate one primary pooled contrast, adjust or explicitly label per-family comparisons exploratory, and present 5/5 as a descriptive consistency check rather than additional statistical evidence.
+
+3. **MAJOR — “single-roll labels are noise-dominated — re-roll flip rate 0.74” and “split-half flip to 0.37 (residual label-vs-true ≈19%).”** In the [diagnostic script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_teacher_noise_diagnostic.py:128), a pair counts as flipped when *any* of three re-rolls disagrees; 0.74 is not a per-re-roll flip probability. The named [R=5 diagnostic](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_teacher_noise_diagnostic_r5.json) reports **0.633** for that same above-median measure, and does not report a split-half or truth-error estimate. Re-roll seeds also use process-randomized Python `hash()` ([line 90](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_teacher_noise_diagnostic.py:90)). **Fix:** log a reproducible, paired per-re-roll comparison and an explicitly defined independent 2-versus-2 split-half estimate; remove the inferred 19% truth-error claim unless its assumptions and calculation are validated.
+
+4. **BLOCKER — “alignment exact,” “even noise-free,” and “Gate 4 … unattainable.”** The [aligned Gate 4 results](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_aligned_gates.json) establish a failed gate, but not zero first-action value: behavior-gain CIs include sizeable positive values for Ackley and Hartmann, while Branin’s is negative. The teacher averages five rollouts over four offered actions; [Gate 4](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/validation.py:261) replays the selected action once with a different rule seed and compares it with sampled first actions. **Fix:** use matched candidate and continuation randomness with repeated terminal evaluations, include the full eligible action set, and state the conclusion as “this tested teacher failed Gate 4.” Treat the schedule-value explanation as a hypothesis pending a schedule experiment.
+
+5. **MAJOR — “distills a representation … where feature-imitation does not” and “proper … uniquely joint-calibrated; post-hoc temperature cannot substitute.”** The transfer evidence compares against one fixed-feature RF, so it cannot identify *why* Laya transfers. E1 shows a result for its tested models and temperature fit, not a general impossibility of temperature scaling. Proper scoring identifies the **teacher** distribution at an unconstrained population optimum; it does not ensure empirical calibration to terminal outcomes or useful confidence discrimination. **Fix:** narrow both claims to the tested RF and calibration protocol, and add stronger matched-input baselines and representation ablations.
+
+6. **MAJOR — Theory statements outrun their conditions or experiments.** [R3](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:162) treats one logit per option as a guarantee of cross-subset score consistency, although option logits can depend on the entire offered-option prompt. [R2](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:123) understates its result: the expected spherical component is also linear in the target, so its population optimum is the target mean, not merely near it. [T2](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:228) needs stronger noise and jointly representable pair-probability assumptions for its BT conclusion. [R4/T5](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:191) describe an unrun closed-loop RL design; dense reward and absence of overconfidence do not follow “for free.” **Fix:** correct the propositions and assumptions, and clearly mark R4/T5 as proposals. R1’s teacher-relative population result and T4’s one-step regret bound can remain with their existing scope limits.
+
+7. **BLOCKER — “engineering problem’s decision states at ~0.89” as journal coverage.** The [GearTrain probe](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_geartrain_transfer_probe.json) is 65 decision records from one problem, with no CI or closed-loop result; BT and RF pairwise accuracies are effectively tied (**0.893 vs 0.890**). The [positioning document](/home/lcy/Documents/projects/opt_agent_v3/docs/ref_papers/journal_positioning.md:65) still calls for broader BBOB/IOH coverage, an HPO task, an engineering or simulation benchmark, and [external optimizer baselines](/home/lcy/Documents/projects/opt_agent_v3/docs/ref_papers/journal_positioning.md:75). **Fix:** keep GearTrain explicitly probe-level and complete those end-to-end benchmark comparisons before submission.
+
+**Three highest-priority actions before submission**
+
+1. Run a locked transfer evaluation on new problem families or tasks, with seed- and family-aware inference, multiplicity control, and stronger matched-input baselines.
+2. Complete the end-to-end benchmark set: broader BBOB/IOH, at least one HPO task, and an engineering or simulation task.
+3. Add external optimizer anchors, including Sobol/Ax or SMAC3/HEBO and LLAMBO, under the same budgets and cost reporting.
+tokens used
+124,768
+VERDICT: REVISE
+
+1. **BLOCKER — “P0 — the transfer positive is now confirmatory.”** The reported BT–RF difference of **+0.140** and record-bootstrap CI **[+0.126, +0.154]** match the [JSON](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_rlcd_loo_confirmatory.json). But the [script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_confirmatory.py:268) resamples records, including multiple records from each problem seed, while averaging over just two training seeds. It also reuses the five families and test records that produced E5’s exploratory positive. The interval describes a fixed-family, fixed-training analysis; it does not establish uncertainty over new families or training runs. **Fix:** label this a confirmatory *analysis rerun* with that limited estimand, then run a locked evaluation on new families or tasks and report seed- and family-aware uncertainty.
+
+2. **MAJOR — “CI excludes zero on 5/5 folds” and “sign p = 0.031.”** The five intervals are unadjusted 95% intervals. The [round-one sign argument](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md:86) and [round-two intervals](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_JOURNAL_ROUND2_REPORT.md:10) use the same five outcomes, so they are not independent confirmations; the folds also share much of their training data. **Fix:** designate one primary pooled contrast, adjust or explicitly label per-family comparisons exploratory, and present 5/5 as a descriptive consistency check rather than additional statistical evidence.
+
+3. **MAJOR — “single-roll labels are noise-dominated — re-roll flip rate 0.74” and “split-half flip to 0.37 (residual label-vs-true ≈19%).”** In the [diagnostic script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_teacher_noise_diagnostic.py:128), a pair counts as flipped when *any* of three re-rolls disagrees; 0.74 is not a per-re-roll flip probability. The named [R=5 diagnostic](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_teacher_noise_diagnostic_r5.json) reports **0.633** for that same above-median measure, and does not report a split-half or truth-error estimate. Re-roll seeds also use process-randomized Python `hash()` ([line 90](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_teacher_noise_diagnostic.py:90)). **Fix:** log a reproducible, paired per-re-roll comparison and an explicitly defined independent 2-versus-2 split-half estimate; remove the inferred 19% truth-error claim unless its assumptions and calculation are validated.
+
+4. **BLOCKER — “alignment exact,” “even noise-free,” and “Gate 4 … unattainable.”** The [aligned Gate 4 results](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_aligned_gates.json) establish a failed gate, but not zero first-action value: behavior-gain CIs include sizeable positive values for Ackley and Hartmann, while Branin’s is negative. The teacher averages five rollouts over four offered actions; [Gate 4](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/validation.py:261) replays the selected action once with a different rule seed and compares it with sampled first actions. **Fix:** use matched candidate and continuation randomness with repeated terminal evaluations, include the full eligible action set, and state the conclusion as “this tested teacher failed Gate 4.” Treat the schedule-value explanation as a hypothesis pending a schedule experiment.
+
+5. **MAJOR — “distills a representation … where feature-imitation does not” and “proper … uniquely joint-calibrated; post-hoc temperature cannot substitute.”** The transfer evidence compares against one fixed-feature RF, so it cannot identify *why* Laya transfers. E1 shows a result for its tested models and temperature fit, not a general impossibility of temperature scaling. Proper scoring identifies the **teacher** distribution at an unconstrained population optimum; it does not ensure empirical calibration to terminal outcomes or useful confidence discrimination. **Fix:** narrow both claims to the tested RF and calibration protocol, and add stronger matched-input baselines and representation ablations.
+
+6. **MAJOR — Theory statements outrun their conditions or experiments.** [R3](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:162) treats one logit per option as a guarantee of cross-subset score consistency, although option logits can depend on the entire offered-option prompt. [R2](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:123) understates its result: the expected spherical component is also linear in the target, so its population optimum is the target mean, not merely near it. [T2](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:228) needs stronger noise and jointly representable pair-probability assumptions for its BT conclusion. [R4/T5](/home/lcy/Documents/projects/opt_agent_v3/docs/RLCD_THEORY.md:191) describe an unrun closed-loop RL design; dense reward and absence of overconfidence do not follow “for free.” **Fix:** correct the propositions and assumptions, and clearly mark R4/T5 as proposals. R1’s teacher-relative population result and T4’s one-step regret bound can remain with their existing scope limits.
+
+7. **BLOCKER — “engineering problem’s decision states at ~0.89” as journal coverage.** The [GearTrain probe](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_geartrain_transfer_probe.json) is 65 decision records from one problem, with no CI or closed-loop result; BT and RF pairwise accuracies are effectively tied (**0.893 vs 0.890**). The [positioning document](/home/lcy/Documents/projects/opt_agent_v3/docs/ref_papers/journal_positioning.md:65) still calls for broader BBOB/IOH coverage, an HPO task, an engineering or simulation benchmark, and [external optimizer baselines](/home/lcy/Documents/projects/opt_agent_v3/docs/ref_papers/journal_positioning.md:75). **Fix:** keep GearTrain explicitly probe-level and complete those end-to-end benchmark comparisons before submission.
+
+**Three highest-priority actions before submission**
+
+1. Run a locked transfer evaluation on new problem families or tasks, with seed- and family-aware inference, multiplicity control, and stronger matched-input baselines.
+2. Complete the end-to-end benchmark set: broader BBOB/IOH, at least one HPO task, and an engineering or simulation task.
+3. Add external optimizer anchors, including Sobol/Ax or SMAC3/HEBO and LLAMBO, under the same budgets and cost reporting.
