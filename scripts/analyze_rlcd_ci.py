@@ -33,10 +33,10 @@ from opt_agent.system1.rlcd import (  # noqa: E402
 from train_rlcd_laya import fit_rf, rf_per_record  # noqa: E402
 
 
-def _per_record_counts(model, tok, records, cfg, device) -> dict[str, tuple[int, int, int]]:
-    """record_id → (correct_pairs, total_pairs, top1_match)."""
+def _per_record_counts(model, tok, records, cfg, device) -> dict[str, tuple[int, int, int, float]]:
+    """record_id → (correct_pairs, total_pairs, top1_match, log_score)."""
     model.eval()
-    out: dict[str, tuple[int, int, int]] = {}
+    out: dict[str, tuple[int, int, int, float]] = {}
     with torch.no_grad():
         for r in records:
             item = build_item(r, tok, max_len=cfg.max_len, head_max_len=cfg.head_max_len)
@@ -49,7 +49,14 @@ def _per_record_counts(model, tok, records, cfg, device) -> dict[str, tuple[int,
             correct = sum(
                 int(logits[i] > logits[j]) for i, j, _ in item["pairs"]
             )
-            out[r.id] = (correct, len(item["pairs"]), int(model_top == gold_top))
+            log_score = float("nan")
+            if item.get("target") is not None:
+                logq = torch.log_softmax(logits, dim=-1).clamp_min(-9.21)
+                t = torch.tensor(item["target"], dtype=logq.dtype,
+                                 device=logq.device)
+                log_score = float((t * logq).sum())
+            out[r.id] = (correct, len(item["pairs"]), int(model_top == gold_top),
+                         log_score)
     return out
 
 
@@ -68,8 +75,8 @@ def _forward_one(model, item, tok, device, cfg):
 
 
 def paired_bootstrap(
-    per_rec_a: dict[str, tuple[int, int, int]],
-    per_rec_b: dict[str, tuple[int, int, int]],
+    per_rec_a: dict[str, tuple[int, int, int, float]],
+    per_rec_b: dict[str, tuple[int, int, int, float]],
     *,
     repetitions: int = 2000,
     seed: int = 0,
@@ -78,15 +85,15 @@ def paired_bootstrap(
     ids = sorted(set(per_rec_a) & set(per_rec_b))
     rng = random.Random(seed)
     n = len(ids)
+    tot_pairs = sum(per_rec_a[i][1] for i in ids)
     diffs = []
     for _ in range(repetitions):
-        ca = cb = ta = tb = 0
+        ca = cb = 0
         for _ in range(n):
             rid = ids[rng.randrange(n)]
-            ca += per_rec_a[rid][0]; ta += per_rec_a[rid][2]
-            cb += per_rec_b[rid][0]; tb += per_rec_b[rid][2]
-        diffs.append(ca / max(1, sum(per_rec_a[i][1] for i in ids)) -
-                     cb / max(1, sum(per_rec_b[i][1] for i in ids)))
+            ca += per_rec_a[rid][0]
+            cb += per_rec_b[rid][0]
+        diffs.append(ca / max(1, tot_pairs) - cb / max(1, tot_pairs))
     diffs.sort()
     return diffs[int(0.025 * repetitions)], diffs[int(0.975 * repetitions)], (
         sum(d > 0 for d in diffs) / repetitions
@@ -106,13 +113,20 @@ def main() -> int:
     zero = _per_record_counts(model, tok, records, eval_cfg, device)
     model.to("cpu"); del model
 
-    ft_agent = None
     import laya
 
-    ft_agent = laya.load("runs/rlcd_laya_v1")
-    ft_agent.model.to(device)
-    ft = _per_record_counts(ft_agent.model, ft_agent.tok, records, eval_cfg, device)
-    ft_agent.model.to("cpu")
+    arms = {}
+    for name, path in (
+        ("proper", "runs/rlcd_laya_proper_v1"),
+        ("bt", "runs/rlcd_laya_bt_v1"),
+    ):
+        if not Path(path).is_dir():
+            print(f"[skip] {name}: {path} not found")
+            continue
+        a = laya.load(path)
+        a.model.to(device)
+        arms[name] = _per_record_counts(a.model, a.tok, records, eval_cfg, device)
+        a.model.to("cpu")
 
     rf_model, rf_scales = fit_rf([asdict(r) for r in train_records])
     rf = rf_per_record(rf_model, rf_scales, [asdict(r) for r in records])
@@ -124,15 +138,27 @@ def main() -> int:
     def _top1(d):
         return (sum(v[2] for v in d.values()) / len(d)) if d else 0.0
 
+    def _logs(d):
+        vals = [v[3] for v in d.values() if v[3] == v[3]]  # NaN filter
+        return sum(vals) / len(vals) if vals else None
+
     result = {
-        "n_records": len(ft),
-        "pairs": sum(v[1] for v in ft.values()),
-        "acc": {"zero": _acc(zero), "ft": _acc(ft), "rf": _acc(rf)},
-        "top1": {"zero": _top1(zero), "ft": _top1(ft), "rf": _top1(rf)},
+        "n_records": len(next(iter(arms.values()), zero)),
+        "pairs": sum(v[1] for v in zero.values()),
+        "acc": {"zero": _acc(zero), "rf": _acc(rf),
+                **{k: _acc(v) for k, v in arms.items()}},
+        "top1": {"zero": _top1(zero), "rf": _top1(rf),
+                 **{k: _top1(v) for k, v in arms.items()}},
+        "mean_log_score": {"zero": _logs(zero),
+                           **{k: _logs(v) for k, v in arms.items()}},
         "ci": {
-            "ft_minus_zero": paired_bootstrap(ft, zero),
-            "ft_minus_rf": paired_bootstrap(ft, rf),
+            **{f"{k}_minus_zero": paired_bootstrap(v, zero)
+               for k, v in arms.items()},
+            **{f"{k}_minus_rf": paired_bootstrap(v, rf)
+               for k, v in arms.items()},
             "rf_minus_zero": paired_bootstrap(rf, zero),
+            **({f"proper_minus_bt": paired_bootstrap(arms["proper"], arms["bt"])}
+               if "proper" in arms and "bt" in arms else {}),
         },
     }
     Path("runs/exp_rlcd_ci.json").write_text(

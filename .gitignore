@@ -57,6 +57,6 @@ runs/**/*.jsonl
 .env
 .env.local
 
-# RLCD fine-tuned Laya checkpoints (1.6 GB weights; regenerate via scripts/train_rlcd_laya.py)
-runs/rlcd_laya_v1/*
-!runs/rlcd_laya_v1/rlcd_train_report.json
+# RLCD fine-tuned Laya checkpoints (1.6 GB weights each; regenerate via scripts/train_rlcd_laya.py)
+runs/rlcd_laya_*/*
+!runs/rlcd_laya_*/rlcd_train_report.json

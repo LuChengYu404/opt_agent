@@ -1,22 +1,13 @@
 {
-  "dataset": "runs/phase8_6d_h3_20seed_5family.jsonl",
-  "method": "RLCD CD stage (Yang et al., ICLR 2024, arXiv:2307.12950) adapted: pairs from counterfactual rollout utilities; Bradley-Terry loss on Laya per-option scorer logits",
-  "rf_baseline": {
+  "bt_pairs_baseline": {
+    "mean_log_score": -3.056692170060199,
     "pairs": 2889,
-    "pairwise_accuracy": 0.816545517480097,
-    "top1_agreement": 0.4,
-    "train_records_used": 548,
-    "val_records": 115,
-    "wall_clock_s": 1.7
-  },
-  "rlcd_finetuned": {
-    "pairs": 2889,
-    "pairwise_accuracy": 0.8788508134302527,
+    "pairwise_accuracy": 0.8726202838352372,
     "records": 115,
     "top1_agreement": 0.3826086956521739
   },
-  "rlcd_train": {
-    "best_val_pairwise_accuracy": 0.8788508134302527,
+  "bt_pairs_train": {
+    "best_val_pairwise_accuracy": 0.8726202838352372,
     "config": {
       "batch_size": 8,
       "beta": 1.0,
@@ -25,44 +16,121 @@
       "max_pairs_per_record": null,
       "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
       "num_epochs": 3,
-      "output_dir": "runs/rlcd_laya_v1"
+      "objective": "bt_pairs",
+      "output_dir": "runs/rlcd_laya_bt_v1"
     },
     "final_val": {
+      "mean_log_score": -3.056692170060199,
       "pairs": 2889,
-      "pairwise_accuracy": 0.8788508134302527,
+      "pairwise_accuracy": 0.8726202838352372,
       "records": 115,
       "top1_agreement": 0.3826086956521739
     },
     "history": [
       {
         "epoch": 0,
-        "train_loss": 0.39844323932260706,
-        "train_pair_acc": 0.8460104168506396,
+        "train_loss": 0.3978831996952278,
+        "train_pair_acc": 0.8454884434161533,
+        "val_mean_log_score": -2.768708374189294,
         "val_pairs": 2889,
         "val_pairwise_accuracy": 0.8598130841121495,
         "val_top1_agreement": 0.24347826086956523
       },
       {
         "epoch": 1,
-        "train_loss": 0.349525682952093,
-        "train_pair_acc": 0.8621562193447212,
+        "train_loss": 0.3575197060902913,
+        "train_pair_acc": 0.8590330297517668,
+        "val_mean_log_score": -2.7090946238973865,
         "val_pairs": 2889,
-        "val_pairwise_accuracy": 0.8688127379716165,
-        "val_top1_agreement": 0.391304347826087
+        "val_pairwise_accuracy": 0.8625822083766009,
+        "val_top1_agreement": 0.2608695652173913
       },
       {
         "epoch": 2,
-        "train_loss": 0.3284065397321314,
-        "train_pair_acc": 0.8720695617240776,
+        "train_loss": 0.3367079086061837,
+        "train_pair_acc": 0.8649881742625791,
+        "val_mean_log_score": -3.056692170060199,
         "val_pairs": 2889,
-        "val_pairwise_accuracy": 0.8788508134302527,
+        "val_pairwise_accuracy": 0.8726202838352372,
         "val_top1_agreement": 0.3826086956521739
       }
     ],
     "train_items": 548,
     "train_pairs": 13618,
     "train_records": 548,
-    "val_records": 115
+    "val_records": 115,
+    "wall_clock_s": 56.5
+  },
+  "dataset": "runs/phase8_6d_h3_20seed_5family.jsonl",
+  "method": "RLCD (Jev/Laya lineage: Reinforcement Learning for Calibrated Decisions) \u2014 strictly proper scoring rule reward (the SDK's own proper_reward: log + 0.5\u00b7spherical) of the reported option distribution vs the counterfactual teacher gold_probs; bt_pairs arm = Bradley-Terry pairwise baseline (DPO-family). NOT Yang et al. ICLR 2024 contrastive distillation.",
+  "rf_baseline": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.816545517480097,
+    "top1_agreement": 0.4,
+    "val_records": 115,
+    "wall_clock_s": 1.6
+  },
+  "rlcd_proper_score": {
+    "mean_log_score": -2.071229878715847,
+    "pairs": 2889,
+    "pairwise_accuracy": 0.8002769124264452,
+    "records": 115,
+    "top1_agreement": 0.25217391304347825
+  },
+  "rlcd_proper_score_train": {
+    "best_val_pairwise_accuracy": 0.8002769124264452,
+    "config": {
+      "batch_size": 8,
+      "beta": 1.0,
+      "learning_rate": 1e-05,
+      "margin": 0.0,
+      "max_pairs_per_record": null,
+      "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
+      "num_epochs": 3,
+      "objective": "proper_score",
+      "output_dir": "runs/rlcd_laya_proper_v1"
+    },
+    "final_val": {
+      "mean_log_score": -2.071229878715847,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8002769124264452,
+      "records": 115,
+      "top1_agreement": 0.25217391304347825
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": 1.9388341471768809,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.070454927112745,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.6933194877120111,
+        "val_top1_agreement": 0.24347826086956523
+      },
+      {
+        "epoch": 1,
+        "train_loss": 1.8889871732048367,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.071229878715847,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.8002769124264452,
+        "val_top1_agreement": 0.25217391304347825
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.8881436361782793,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.0671436392742653,
+        "val_pairs": 2889,
+        "val_pairwise_accuracy": 0.7137417791623399,
+        "val_top1_agreement": 0.24347826086956523
+      }
+    ],
+    "train_items": 548,
+    "train_pairs": 13618,
+    "train_records": 548,
+    "val_records": 115,
+    "wall_clock_s": 53.9
   },
   "split": {
     "train_records": 548,
@@ -70,8 +138,8 @@
     "val_records": 115,
     "val_seed_range": "[16, \u221e)"
   },
-  "train_wall_clock_s": 56.1,
   "zero_shot_laya": {
+    "mean_log_score": -3.3145253710124805,
     "pairs": 2889,
     "pairwise_accuracy": 0.3956386292834891,
     "records": 115,

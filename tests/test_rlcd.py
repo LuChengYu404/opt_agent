@@ -173,6 +173,56 @@ def test_bradley_terry_loss_empty_batch() -> None:
 
 
 # ---------------------------------------------------------------------------
+# proper_score_loss (the RLCD objective proper)
+# ---------------------------------------------------------------------------
+
+
+def test_proper_score_loss_prefers_matching_distribution() -> None:
+    from opt_agent.system1.rlcd import proper_score_loss
+
+    target = [0.7, 0.2, 0.1]
+    logits_match = torch.log(torch.tensor([0.7, 0.2, 0.1]))
+    logits_off = torch.log(torch.tensor([0.1, 0.2, 0.7]))
+    items = [{"target": target, "pairs": [], "option_ids": ["a", "b", "c"]}]
+    loss_match, _ = proper_score_loss(logits_match.unsqueeze(0), items)
+    loss_off, _ = proper_score_loss(logits_off.unsqueeze(0), items)
+    # Strictly proper: the matching distribution must score strictly higher
+    # (lower loss) than any other report.
+    assert float(loss_match) < float(loss_off)
+
+
+def test_proper_score_loss_gradient_flow() -> None:
+    from opt_agent.system1.rlcd import proper_score_loss
+
+    z = torch.zeros(3, requires_grad=True)
+    items = [{"target": [0.6, 0.3, 0.1], "pairs": [], "option_ids": list("abc")}]
+    loss, stats = proper_score_loss(z.unsqueeze(0), items)
+    loss.backward()
+    assert stats["items"] == 1
+    assert z.grad is not None and float(z.grad.abs().sum()) > 0
+
+
+def test_proper_score_loss_empty_targets() -> None:
+    from opt_agent.system1.rlcd import proper_score_loss
+
+    logits = torch.zeros(2, 3)
+    loss, stats = proper_score_loss(
+        logits, [{"target": None, "pairs": []}, {"target": None, "pairs": []}]
+    )
+    assert stats["items"] == 0
+    assert float(loss) == 0.0
+
+
+def test_rlcd_config_objective_validation() -> None:
+    from opt_agent.system1.rlcd import RLCDConfig
+
+    RLCDConfig(objective="proper_score")  # ok
+    RLCDConfig(objective="bt_pairs")      # ok
+    with pytest.raises(ValueError, match="objective"):
+        RLCDConfig(objective="contrastive_distillation")
+
+
+# ---------------------------------------------------------------------------
 # build_item (real tokenizer, synthetic record)
 # ---------------------------------------------------------------------------
 
@@ -204,11 +254,18 @@ class TestBuildItem:
         }
         assert item["qtype"] == 0  # choice
 
-    def test_item_none_when_no_pairs(self, tok) -> None:
+    def test_item_carries_target_and_skips_only_unsupervised(self, tok) -> None:
         from opt_agent.system1.rlcd import build_item
 
-        rec = _record({"local_exploitation": 0.5, "uncertainty_sampling": 0.5})  # tie
-        assert build_item(rec, tok) is None
+        rec = _record({"local_exploitation": 0.5, "uncertainty_sampling": 0.5})
+        item = build_item(rec, tok)  # tie → no pairs, but target remains
+        assert item is not None
+        assert item["pairs"] == []
+        assert item["target"] is not None
+        assert sum(item["target"]) == pytest.approx(1.0)
+        # Target mass only on offered actions with gold mass.
+        idx = {a: i for i, a in enumerate(item["option_ids"])}
+        assert item["target"][idx["stop"]] == 0.0
 
 
 # ---------------------------------------------------------------------------

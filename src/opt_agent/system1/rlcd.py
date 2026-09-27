@@ -1,44 +1,48 @@
-"""RLCD — Reinforcement Learning from Contrastive Distillation for Laya.
+"""RLCD — fine-tuning Laya on the counterfactual rollout teacher.
 
-Branch ``exp/rlcd-laya-finetune`` (2026-09-27). Reference: Yang et al.,
-"RLCD: Reinforcement Learning from Contrastive Distillation", ICLR 2024
-(arXiv:2307.12950; code facebookresearch/RLCD).
+Branch ``exp/rlcd-laya-finetune`` (2026-09-27; objective corrected same day
+after verifying the term's origin).
 
-RLCD replaces human preference labels with *contrastive pairs* and trains a
-preference/scoring model with a Bradley-Terry objective, then aligns the
-policy with RL against that model. The mapping to this project:
+**Name disambiguation (verified 2026-09-27).** In the Jev/Laya line of
+research (typed, non-autoregressive System-1 decision models — the
+"TypeSafe-style" family), **RLCD = "Reinforcement Learning for Calibrated
+Decisions"**: reinforcement learning whose reward is a *strictly proper
+scoring rule*, so the optimum of the expected reward is the true outcome
+distribution — calibration by construction. Laya ships this objective in
+its SDK as ``laya.common.proper_reward`` (log score + 0.5·spherical − RPS
+on ordinal questions) with ``td_lambda_targets`` for multi-turn credit
+assignment; no method paper has been published for it (noted by
+arXiv:2609.24574 and independent third-party tests). This is UNRELATED to
+the identically abbreviated "RLCD: Reinforcement Learning from Contrastive
+Distillation" of Yang et al., ICLR 2024 (arXiv:2307.12950), which trains
+preference models on prompt-induced contrastive pairs.
 
-- **Pair generation** (their positive/negative prompts) → the counterfactual
-  rollout teacher: ``a⁺ ≻ a⁻`` iff ``U(a⁺|s) > U(a⁻|s)``. Our pair labels are
-  strictly stronger than RLCD's prompt-induced ones — they come from a
-  quantitative utility, and the label is the *sign of a measured difference*,
-  which is exactly the statistic a BT likelihood models.
-- **Preference model** → Laya's ``DecisionModel`` per-option scorer logits
-  (one forward pass per decision point scores every option; a contrastive
-  pair is two indices into the same logits row).
-- **RL stage** → closed-loop REINFORCE with a KL anchor to the CD
-  initialization is the faithful stage 2; against the CD model's *own*
-  learned reward the argmax policy is already optimal, so the RL stage only
-  pays off against closed-loop (multi-step) return — see
-  ``docs/RLCD_THEORY.md`` §5.
+This module implements the Laya meaning:
 
-**Quota compatibility (the load-bearing property).** The pairwise objective
-consumes records with partial rollouts (``metadata["partial_rollout"]`` from
-``rollout_action_subsample=k``) unchanged: every observed pair is valid
-supervision no matter how many sibling actions were rolled out, and the BT
-likelihood never renormalizes a subset into a distribution. A softmax-target
-KL objective cannot do this — see RLCD_THEORY T3.
+- **`objective="proper_score"` (RLCD proper)** — maximize Laya's own
+  strictly proper scoring rule (the exact ``proper_reward`` from the SDK)
+  of the reported option distribution against the counterfactual teacher
+  distribution ``gold_probs``. When the target distribution is known, the
+  RL objective reduces to its differentiable form (reward = proper score;
+  no sampling needed); the RL form — scoring the *realized* outcome, with
+  TD(λ) credit assignment — is the closed-loop stage (RLCD_THEORY R4).
+- **`objective="bt_pairs"` (baseline arm)** — Bradley-Terry pairwise loss
+  on utility-ordered action pairs (classic paired-comparison / DPO-family
+  distillation; identifies the teacher *ranking* only). Kept as the
+  comparison arm because it is the estimator that remains unbiased under
+  action-subsampled rollout quotas (RLCD_THEORY T3).
 
 Public API:
     ContrastivePair     — (record_id, pos_action, neg_action, margin)
     mine_pairs          — extract pairs from a DecisionRecord
     bradley_terry_loss  — −log σ(β(z⁺ − z⁻)), batched over record pairs
-    build_item          — record → Laya model input item + pair indices
-    RLCDConfig          — training hyperparameters
+    proper_score_loss   — −proper_reward(softmax(z), gold_probs) (RLCD)
+    build_item          — record → Laya model input item + pairs + target
+    RLCDConfig          — training hyperparameters (incl. objective)
     load_laya_for_training — Agent → (trainable model, tokenizer, cfg)
-    train_rlcd          — CD fine-tune with early stopping on val ranking
+    train_rlcd          — fine-tune with early stopping on val ranking
     save_laya_checkpoint— write a directory loadable by laya.Agent / LayaPolicy
-    evaluate_ranking    — pairwise accuracy + top-1 agreement vs gold
+    evaluate_ranking    — pairwise accuracy, top-1 agreement, mean log score
 """
 
 from __future__ import annotations
@@ -149,10 +153,17 @@ def build_item(
     max_len: int = 512,
     head_max_len: int = 192,
 ) -> dict | None:
-    """Build one Laya training item for a record: ids/markers/qtype + pairs.
+    """Build one Laya training item for a record: ids/markers/qtype + target.
+
+    The item carries both supervision forms:
+      - ``pairs``: option-index pairs for the BT baseline arm (utility order);
+      - ``target``: the teacher distribution ``gold_probs`` aligned to
+        ``option_ids`` order (renormalized over the offered options), for the
+        RLCD proper-score objective.
 
     Returns None when options truncate past `head_max_len` (indices could
-    misalign) or when the record yields no mined pair.
+    misalign) or when the record yields no supervision (no pair AND no
+    nonzero-mass target).
     """
     from laya.common import QTYPES, build_sequence, render_options
 
@@ -167,7 +178,16 @@ def build_item(
         for p in mine_pairs(record)
         if p.pos in index_of and p.neg in index_of
     ]
-    if not pairs:
+    offered = [a for a in option_ids if a in record.gold_probs]
+    mass = sum(record.gold_probs[a] for a in offered)
+    target = (
+        [
+            (record.gold_probs[a] / mass) if a in record.gold_probs else 0.0
+            for a in option_ids
+        ]
+        if offered and mass > 0 else None
+    )
+    if not pairs and target is None:
         return None
     return {
         "ids": ids,
@@ -176,6 +196,7 @@ def build_item(
         "pairs": pairs,
         "record_id": record.id,
         "option_ids": option_ids,
+        "target": target,
     }
 
 
@@ -208,6 +229,52 @@ def bradley_terry_loss(
     }
 
 
+def proper_score_loss(
+    logits: torch.Tensor,
+    items: Sequence[Mapping],
+    *,
+    qtype_ids: torch.Tensor | None = None,
+    w_sph: float = 0.5,
+    w_rps: float = 1.0,
+) -> tuple[torch.Tensor, dict[str, float]]:
+    """RLCD objective: −(strictly proper scoring rule reward).
+
+    Uses the exact ``laya.common.proper_reward`` implementation shipped with
+    the checkpoint's SDK (log score + ``w_sph``·spherical score; the RPS
+    term is masked to ordinal ``score``-type questions and therefore inert
+    for our ``choice`` decisions). The reported distribution is
+    ``softmax(logits)``; the target is the teacher distribution carried by
+    each item (``item["target"]``, gold_probs aligned to option order).
+
+    Strict properness: the expected reward is uniquely maximized when the
+    reported distribution equals the target — so the population optimum
+    recovers the teacher *distribution*, not just its ranking
+    (RLCD_THEORY R1). Loss is the negated reward averaged over the batch.
+    """
+    from laya.common import proper_reward
+
+    rewards: list[torch.Tensor] = []
+    nlls: list[float] = []
+    for row, item in zip(logits, items):
+        if item.get("target") is None:
+            continue
+        q = torch.softmax(row, dim=-1).unsqueeze(0)          # (1, K)
+        t = torch.tensor(item["target"], dtype=q.dtype,
+                         device=q.device).unsqueeze(0)        # (1, K)
+        qt = torch.zeros((), device=q.device)                 # choice qtype id = 0
+        mask = torch.ones_like(q, dtype=q.dtype)
+        r = proper_reward(q, t, qt.unsqueeze(0), mask, w_sph=w_sph, w_rps=w_rps)
+        rewards.append(r.mean())
+        with torch.no_grad():
+            nlls.append(float(-torch.log(
+                q.detach().clamp_min(1e-12)[0, torch.argmax(t, dim=-1).item()]
+            )))
+    if not rewards:
+        return logits.sum() * 0.0, {"items": 0, "mean_nll": 0.0}
+    loss = -torch.stack(rewards).mean()
+    return loss, {"items": len(rewards), "mean_nll": sum(nlls) / len(nlls)}
+
+
 # ---------------------------------------------------------------------------
 # Training
 # ---------------------------------------------------------------------------
@@ -217,6 +284,7 @@ def bradley_terry_loss(
 class RLCDConfig:
     model_dir: str = "/home/lcy/.cache/opt_agent_v3/laya"
     output_dir: str = "runs/rlcd_laya_v1"
+    objective: str = "proper_score"  # "proper_score" (RLCD) | "bt_pairs" (baseline)
     learning_rate: float = 1e-5
     batch_size: int = 8
     num_epochs: int = 3
@@ -232,6 +300,13 @@ class RLCDConfig:
     head_max_len: int = 192
     min_lr_frac: float = 0.1   # cosine floor as a fraction of peak lr
     grad_clip: float = 1.0
+
+    def __post_init__(self) -> None:
+        if self.objective not in ("proper_score", "bt_pairs"):
+            raise ValueError(
+                f"objective must be 'proper_score' or 'bt_pairs'; "
+                f"got {self.objective!r}"
+            )
 
 
 def load_laya_for_training(model_dir: str):
@@ -281,11 +356,15 @@ def _iter_minibatches(items: list[dict], batch_size: int, rng: random.Random):
 
 @torch.no_grad()
 def evaluate_ranking(model, tok, records, cfg: RLCDConfig, device) -> dict:
-    """Pairwise accuracy + top-1 agreement vs the record's gold ordering.
+    """Pairwise accuracy + top-1 agreement + mean log score vs the teacher.
 
     Top-1 agreement compares argmax(model logits) with argmax(gold_probs)
     over the same option vocabulary. For partial-rollout records the
     comparison covers the rolled-out subset (gold_probs' support).
+    ``mean_log_score`` is the distribution-recovery metric: the mean of
+    Σ_a target(a)·log q(a|s) with q = softmax(logits), floored at
+    log(1e-4) exactly like ``laya.common.proper_reward`` so the number is
+    comparable with the RLCD training reward's log-score component.
     """
     was_training = model.training
     model.eval()
@@ -293,6 +372,7 @@ def evaluate_ranking(model, tok, records, cfg: RLCDConfig, device) -> dict:
     n_correct = 0
     n_records = 0
     n_top1 = 0
+    log_scores: list[float] = []
     for start in range(0, len(records), cfg.batch_size):
         chunk = records[start:start + cfg.batch_size]
         kept: list[tuple[dict, DecisionRecord]] = []
@@ -316,6 +396,10 @@ def evaluate_ranking(model, tok, records, cfg: RLCDConfig, device) -> dict:
             )
             n_records += 1
             n_top1 += int(model_top == gold_top)
+            if item.get("target") is not None:
+                logq = torch.log_softmax(row, dim=-1).clamp_min(-9.21)
+                t = torch.tensor(item["target"], dtype=logq.dtype, device=logq.device)
+                log_scores.append(float((t * logq).sum()))
             for i_pos, i_neg, _m in item["pairs"]:
                 n_pairs += 1
                 n_correct += int(row[int(i_pos)] > row[int(i_neg)])
@@ -325,6 +409,9 @@ def evaluate_ranking(model, tok, records, cfg: RLCDConfig, device) -> dict:
         "pairs": n_pairs,
         "pairwise_accuracy": (n_correct / n_pairs) if n_pairs else 0.0,
         "top1_agreement": (n_top1 / n_records) if n_records else 0.0,
+        "mean_log_score": (
+            sum(log_scores) / len(log_scores) if log_scores else None
+        ),
         "records": n_records,
     }
 
@@ -394,35 +481,47 @@ def train_rlcd(
         epoch_loss = 0.0
         epoch_pairs = 0
         epoch_acc_sum = 0.0
+        epoch_acc_batches = 0
         n_batches = 0
         for batch_items in _iter_minibatches(train_items, config.batch_size, rng):
             for g in optim.param_groups:
                 g["lr"] = _lr_at(step)
             optim.zero_grad(set_to_none=True)
             logits = _forward(model, batch_items, tok, device, config)
-            loss, stats = bradley_terry_loss(logits, batch_items, beta=config.beta)
+            if config.objective == "proper_score":
+                loss, stats = proper_score_loss(logits, batch_items)
+            else:
+                loss, stats = bradley_terry_loss(
+                    logits, batch_items, beta=config.beta
+                )
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip)
             optim.step()
             step += 1
             epoch_loss += float(loss.item())
-            epoch_pairs += stats["pairs"]
-            epoch_acc_sum += stats["pair_acc"]
+            epoch_pairs += stats.get("pairs", stats.get("items", 0))
+            if "pair_acc" in stats:
+                epoch_acc_sum += stats["pair_acc"]
+                epoch_acc_batches += 1
             n_batches += 1
         val = evaluate_ranking(model, tok, val_records, config, device)
         history.append({
             "epoch": epoch,
             "train_loss": epoch_loss / max(1, n_batches),
-            "train_pair_acc": epoch_acc_sum / max(1, n_batches),
+            "train_pair_acc": (
+                epoch_acc_sum / epoch_acc_batches if epoch_acc_batches else None
+            ),
             "val_pairwise_accuracy": val["pairwise_accuracy"],
             "val_top1_agreement": val["top1_agreement"],
+            "val_mean_log_score": val["mean_log_score"],
             "val_pairs": val["pairs"],
         })
         print(
-            f"[rlcd] epoch {epoch}: loss={history[-1]['train_loss']:.4f} "
-            f"train_pair_acc={history[-1]['train_pair_acc']:.3f} "
+            f"[rlcd:{config.objective}] epoch {epoch}: "
+            f"loss={history[-1]['train_loss']:.4f} "
             f"val_pair_acc={val['pairwise_accuracy']:.3f} "
-            f"val_top1={val['top1_agreement']:.3f}",
+            f"val_top1={val['top1_agreement']:.3f} "
+            f"val_logscore={val['mean_log_score']:.4f}",
             flush=True,
         )
         if val["pairwise_accuracy"] > best_acc:
@@ -439,6 +538,7 @@ def train_rlcd(
         "config": {
             "model_dir": config.model_dir,
             "output_dir": config.output_dir,
+            "objective": config.objective,
             "learning_rate": config.learning_rate,
             "batch_size": config.batch_size,
             "num_epochs": config.num_epochs,

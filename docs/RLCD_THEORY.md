@@ -1,310 +1,316 @@
-# RLCD theory companion — why contrastive distillation of the rollout teacher is sound
+# RLCD theory companion — fine-tuning Laya on the counterfactual teacher
 
-> Status: 2026-09-27, branch `exp/rlcd-laya-finetune`. This document is the
-> theoretical support for fine-tuning Laya with RLCD (Reinforcement Learning
-> from Contrastive Distillation; Yang et al., ICLR 2024, arXiv:2307.12950,
-> code facebookresearch/RLCD) on the counterfactual rollout supervision. It
-> follows the conventions of `docs/THEORY.md`: formal statements, proofs or
-> proof sketches under explicitly listed scope conditions, and a
+> Status: 2026-09-27, branch `exp/rlcd-laya-finetune`. **Objective
+> reference corrected 2026-09-27 after verifying the term's origin** (see
+> §0.1). This document is the theoretical support for fine-tuning Laya with
+> RLCD — the training method of the Jev/Laya lineage of typed decision
+> models — on the counterfactual rollout supervision. It follows the
+> conventions of `docs/THEORY.md`: formal statements, proofs or proof
+> sketches under explicitly listed scope conditions, and a
 > proposition-to-evidence map. Code anchor: `src/opt_agent/system1/rlcd.py`.
 
-## 0. Setup: RLCD in this project
+## 0. Setup
 
-RLCD's original pipeline (their §3):
+### 0.1 Name disambiguation (verified 2026-09-27)
 
-1. generate **contrastive pairs** (o⁺, o⁻) by prompting a model under a
-   positive vs a negative principle — no human labels;
-2. train a **preference model** on the pairs with a Bradley-Terry (BT)
-   objective: score each response independently, optimize
-   −log σ(β(s(o⁺) − s(o⁻)));
-3. **RL stage**: align the policy with PPO against the learned scores with a
-   KL penalty to the base model.
+**RLCD, in the sense used by Laya and this project: "Reinforcement
+Learning for Calibrated Decisions."** RL whose reward is a *strictly
+proper scoring rule*, so that the expected-reward optimum is the true
+outcome distribution — calibration by construction, unlike preference-based
+RLHF/DPO-family training which identifies only a ranking (a tilted
+distribution). Laya ships the objective in its SDK as
+`laya.common.proper_reward` — log score + 0.5·spherical score, minus a
+ranked-probability term on ordinal `score`-type questions — with
+`td_lambda_targets` for multi-turn credit assignment and `act_costs`
+escalation economics. **No method paper has been published** (noted by
+arXiv:2609.24574 and third-party independent tests); the most complete
+public description is the survey arXiv:2609.28940 ("JEV and Laya as System
+One Decision Layers for LLM", Table II/IX), which also documents Laya
+training against the Brier score — another member of the same strictly
+proper family. Our implementation calls the SDK's `proper_reward` itself.
 
-The project mapping:
+This is **not** the identically abbreviated "RLCD: Reinforcement Learning
+from Contrastive Distillation" (Yang et al., ICLR 2024, arXiv:2307.12950),
+which builds preference pairs by contrastive prompting. That paper's
+pairwise construction is related to our *baseline arm* (§2, T1–T5), which
+is why the confusion was easy to make and worth a paragraph here.
 
-- **Teacher / pair source.** The counterfactual rollout utility
-  `U(a, s)` of `docs/THEORY.md` §0 (executed by
-  `src/opt_agent/rollout/utility.py`). A pair at state `s` is
-  `(a⁺, a⁻) ⟺ U(a⁺, s) > U(a⁻, s)`; its label is the *sign of a measured
-  difference* (`mine_pairs` in `rlcd.py`). This is strictly stronger
-  information than RLCD's prompt-induced pairs: a quantitative teacher, not
-  a binary principle.
-- **Preference model.** Laya's `DecisionModel` per-option scorer: one
-  forward pass at a decision point scores all offered options
-  `f_θ(a | s) = z_θ(a, s)`; the BT loss is
-  `ℓ = −log σ(β(z(a⁺|s) − z(a⁻|s)))` (`bradley_terry_loss`).
-- **Policy.** `argmax_a f_θ(a|s)` — loadable through `LayaPolicy(model_id=
-  <fine-tuned dir>)` with no new glue.
-- **RL stage.** Designed in §5; against the CD model's own reward the argmax
-  policy is already optimal, so the stage only pays off against closed-loop
-  return and is deferred until per-step trajectory logs exist.
+### 0.2 The two objectives implemented on this branch
 
-Notation follows `THEORY.md`: `A` is the 8-action vocabulary, `m = |A|`;
-`R_k ⊆ A` is the rolled-out subset of a *quota-subsampled* record
-(`rollout_action_subsample=k`, main-branch commit 8c70b79);
-`gold_probs(a|s) = softmax(U(·,s)/T)`.
+Let `s` be an optimization state, `A(s)` the offered typed actions
+(`m = |A| = 8` on full-vocabulary records), `U(a, s)` the counterfactual
+rollout utility (`THEORY.md` §0), and
+`gold_probs(·|s) = softmax(U(·, s)/T)` the teacher distribution. Laya's
+forward pass produces per-option logits `z_θ(a|s)`; the reported
+distribution is `q_θ(a|s) = softmax(z_θ)`.
 
----
+- **RLCD (proper-score arm; primary).** Maximize the strictly proper score
+  of the reported distribution against the teacher:
 
-## T1. Pairwise labels inherit affine invariance and cancel per-state teacher shifts
+  ```
+  max_θ  E_s [ S( q_θ(·|s), gold_probs(·|s) ) ],
+  S(q, t) = log-score(q, t) + 0.5 · spherical(q, t)
+          = Σ_a t_a log q_a  +  0.5 · (Σ_a t_a q_a) / ‖q‖₂
+  ```
 
-**Proposition T1.** Consider the contrastive label map
-`(s, a⁺, a⁻) ↦ 1[U(a⁺,s) > U(a⁻,s)]` with margin `Δ = U(a⁺,s) − U(a⁻,s)`.
+  (`proper_score_loss` = −S, using the SDK's `proper_reward` verbatim; the
+  RPS term is masked to ordinal questions and inert for `choice`.)
+  When the target distribution is known the RL objective reduces to this
+  differentiable form — no sampling is needed; the genuinely RL form
+  (score against *realized* outcomes) is §R4.
 
-(i) Under the scope conditions of P1 (affine objective transform with
-recomputed scale), every contrastive label and every margin is unchanged.
-
-(ii) For any perturbation of the teacher of the form
-`Ũ(a, s) = U(a, s) + g(s)` — an arbitrary *state-dependent additive shift*
-(e.g., a mis-set `w_stop · r(s)` term, a per-state utility offset, or any
-utility component that does not vary across actions at the given state) —
-every contrastive label is unchanged.
-
-Consequently the population BT risk, its minimizers up to per-state
-additive constants, the induced argmax policy, and every ranking metric are
-invariant under both transformations.
-
-**Proof.** (i) P1 states `Ũ(a,s) = U(a,s)` for every `(a,s)`; differences
-are then equal term-by-term. (ii)
-`Ũ(a⁺,s) − Ũ(a⁻,s) = U(a⁺,s) − U(a⁻,s)` because `g(s)` cancels. The BT
-probability `σ(βΔ)` is a function of `Δ` alone; a per-state additive
-constant on `f_θ` is likewise cancelled by the loss's difference structure,
-so minimizers are identified exactly up to `s`-measurable offsets, which do
-not affect `argmax_a f_θ(a|s)`. ∎
-
-**Why it matters here.** DISCUSS.md Q-T1/Q-S5 worry that the 4-term utility
-is mis-specified. T1 delimits *which* mis-specifications fine-tuning is
-immune to: anything that shifts all actions equally at a state (STOP-term
-calibration errors, per-state opportunity costs) is invisible to — and
-cannot bias — the contrastive objective. What T1 does *not* cover:
-action-dependent perturbations `h(a)` (e.g., a constant bias *for*
-`boundary_sampling`), which rotate pair labels and must be fixed at the
-utility level, as Phase 8.5 did.
+- **BT pairwise arm (baseline).** Bradley-Terry loss on utility-ordered
+  pairs `a⁺ ≻ a⁻ ⟺ U(a⁺, s) > U(a⁻, s)`:
+  `ℓ = −log σ(β(z_θ(a⁺|s) − z_θ(a⁻|s)))` (`bradley_terry_loss`). Kept
+  because it is the estimator that remains unbiased under
+  action-subsampled rollout quotas (T3).
 
 ---
 
-## T2. Consistency under rollout label noise; margin filtering restores learnability
+## 1. RLCD (proper-score) theory
 
-Rollout utilities are noisy: the continuation policy couples branches to
-future decisions (Q-T2), and GP replay is not bit-reproducible (Q-T8). The
-second scope condition of P1 aside, treat the observed utility as
-`Ũ(a,s) = U*(a,s) + ε(a,s)` with true utility `U*` and noise `ε`.
+### R1. Strict properness ⇒ full-distribution identification and calibration by construction
 
-**Assumptions.** For a pair with true gap `g = U*(a⁺,s) − U*(a⁻,s) > 0`,
-the observed label flips iff `ε(a⁻,s) − ε(a⁺,s) > g`. Assume the noise
-difference is symmetric about 0 with a continuous, strictly decreasing
-one-sided tail; then the flip probability `η(g)` is strictly decreasing in
-`g` with `η(0) = 1/2`, and `η(g) < 1/2 ⟺ g > 0`.
+**Proposition R1.** Let `S(q, t) = Σ_a t_a log q_a + 0.5·(Σ_a t_a q_a)/‖q‖₂`
+(the SDK's composite on the simplex). Then:
 
-**Proposition T2.**
-(i) *(Noisy-BT shrinkage, ranking preserved.)* The population BT risk with
-flip-noise labels is minimized by scores whose differences satisfy
+(i) `S` is **strictly proper**: for every target `t` and every report
+`q ≠ t` on the support of `t`, `S(t, t) > S(q, t)`.
 
-```
-β( f*(a⁺|s) − f*(a⁻|s) ) = log( (1 − η(g)) / η(g) )
-```
+(ii) Consequently the population RLCD objective
+`E_s[S(q_θ(·|s), gold_probs(·|s))]` is uniquely maximized (over an
+unconstrained conditional-distribution family) by
+`q*(a|s) = gold_probs(a|s)` — the fine-tune target is the teacher
+*distribution*, not merely its ranking, and the model's reported
+confidence is calibrated against the teacher in the properness sense:
+argmax, all pairwise orderings, and every moment of the reported
+distribution match the teacher's.
 
-for each pair. Since `g ↦ log((1−η(g))/η(g))` is strictly increasing with
-value 0 at `g = 0`, `f*` is a strictly increasing reparametrization of
-`U*` within each state: the *ranking* — and hence `argmax_a f*` — equals
-`argmax_a U*` whenever the true utilities are distinct. Noise shrinks the
-score scale but does not reorder it.
+(iii) Identification hierarchy: proper-score training identifies the
+teacher up to equality; BT training (§2) identifies it only up to a
+strictly increasing per-state transform (ranking alone). Properness buys
+calibration; the price is exact sensitivity to target *magnitudes* (R2).
 
-(ii) *(Margin filtering.)* Dropping pairs with observed margin
-`|Δ̃| < δ` bounds the flip rate of retained pairs by
-`η(g_δ)` where `g_δ` solves `g_δ + (noise support condition)` — under a
-noise scale `σ_ε` (e.g., sub-Gaussian), retained true gaps satisfy
-`g ≥ δ − |ε⁺ − ε⁻|` w.h.p., so the retained flip rate is bounded strictly
-below 1/2 for `δ` above the noise scale. Pairs with flip rate < 1/2 are
-PAC-learnable by the classical classification-noise result (Angluin &
-Laird 1988), and the excess BT risk scales with the flip rate rather than
-saturating.
+**Proof.** (i) The log score `Σ t_a log q_a` is strictly proper (Gibbs/
+information inequality: `KL(t‖q) > 0` for `q ≠ t` on supp(t)). The
+spherical score `(Σ t_a q_a)/‖q‖₂` is strictly proper (Shuford–Albert–
+Massengill 1966). A positive-weighted sum of strictly proper scoring rules
+is strictly proper: if each term is uniquely maximized at `q = t`, so is
+the sum. (ii) Pointwise maximization; take expectation. (iii) is the
+statement that BT's likelihood depends only on score *differences* (T1)
+while `S` depends on `q` itself. ∎
 
-**Proof sketch.** (i) For a Bernoulli outcome with correct probability
-`p = 1 − η(g)`, the minimizer of the expected log-loss
-`−p log σ(x) − (1−p) log σ(−x)` is `x = log(p/(1−p))` (logistic MLE;
-strict convexity in `x`). Substitute `p = 1 − η(g)` and use that
-`η` strictly decreases through 1/2 at `g = 0`. (ii) is a tail bound plus
-the noise-robust classification theorem; the homoscedastic special case
-`ε ∼ N(0, σ²)` gives `η(g) = Φ(−g/(σ√2))` and retained flip rate
-`≤ Φ(−(δ/(σ√2) − 1))`. ∎
+**Why it matters here.** MASTER_PLAN §13 makes calibration the System-1
+requirement ("does it know when it is unreliable?"), and the EXP-RQ3
+router failure traced to the RF softmax never exceeding 0.25 — a
+distribution-level pathology a ranking-only objective cannot even express.
+RLCD is the objective whose optimum is a *calibrated* copy of the
+counterfactual teacher, which is what the Router (Phase 12) needs as its
+input signal. (Post-hoc temperature scaling — as Laya's checkpoint already
+ships — is the cheap partial substitute; R1 makes it a no-op at the
+optimum.)
 
-**Empirical tie.** `RLCDConfig.margin` implements `δ`. The zero-shot vs
-fine-tuned comparison of `scripts/train_rlcd_laya.py` measures the realized
-ranking recovery; T2 predicts improvement whenever the teacher's within-state
-gaps exceed the rollout noise scale — exactly the regime the long-horizon
-quota fix buys (deeper horizon ⇒ larger separated gaps, per the Phase 8.6C
-horizon diagnosis).
+### R2. Behavior under noisy rollout targets
 
-**Contrast with magnitude-matching objectives.** A regression/KL objective
-that matches *utility values* or softmax *masses* is not sign-stable: its
-optimum tracks the noisy magnitude `Ũ`, and under heteroscedastic noise the
-argmax of the fitted surface can differ from `argmax U*` even in
-expectation. The BT objective deliberately discards magnitude and keeps the
-sign — the only part of the noisy teacher T1+T2 jointly certify.
+Rollout utilities are noisy (GP refit nondeterminism Q-T8, continuation
+coupling Q-T2), so the teacher distribution
+`t̃ = softmax((U + ε)/T)` is a noisy instance of a clean `t*`.
 
----
+**Proposition R2.** For the log-score component, the population optimum
+over the simplex satisfies
+`q*(a|s) = E_t̃[ t̃(a|s) ]` for every `a`: maximizing
+`E[ Σ_a t̃_a log q_a ]` over `q` yields the **mean of the noisy targets**,
+because the objective is linear in `t̃`. The spherical component's optimum
+is a monotone function of the same mean near interior points; the composite
+therefore anchors `q*` to the noise-averaged teacher — a T-tempered,
+noise-smoothed version of `softmax(U*/T)`.
 
-## T3. Quota compatibility: pairwise supervision survives action subsampling; renormalized subset softmax does not
+**Contrast (deliberate).** BT under the same noise recovers only the
+ranking of `U*` (T2) and is *sign-stable*; proper-score training tracks
+the smoothed *distribution*, absorbing noise into a flatter target rather
+than discarding magnitude. Neither is uniformly better: the proper-score
+optimum is the right target when the noise is i.i.d.-across-actions
+(averaging is the correct aggregator); the BT objective is the right one
+when only ordering is trusted (asymmetric/action-correlated noise —
+T1's exception clause). The branch's 4-arm comparison measures which
+assumption the rollout noise actually satisfies.
 
-This is the theorem that binds the main-branch quota fix to the fine-tune
-choice of objective. Let records roll out a random `k`-of-`m` subset
-`R_k` per state (`rollout_action_subsample=k`), selected independently of
-the utilities and their noise.
+**Proof.** `∇_q E[Σ_a t̃_a log q_a] = E[t̃]/q + λ` under the simplex
+constraint ⇒ stationary at `q ∝ E[t̃]` (Gibbs). Linearity in `t̃` is the
+whole argument. ∎
 
-**Proposition T3.**
-(i) *(Completeness of subsampled pairs.)* The pairs mined from `R_k` are
-exactly the full pair set restricted to `R_k`. Any scorer whose induced
-ranking is correct on every subset in the support of the subsampling design
-has the correct ranking on `A`: for any ordered pair `(a, b)`, the
-probability that both appear in one state's subset is
-`p₂ = k(k−1)/(m(m−1)) > 0`, so over `n` states the pair's expected
-observation count is `n·p₂` and the probability of never observing it is
-`(1−p₂)ⁿ → 0`. Pairwise identification requires pair *co-observation*, not
-full-vocabulary coverage per record.
+### R3. Subset conditioning changes the quota calculus (refining T3)
 
-(ii) *(Bias of renormalized subset softmax.)* Training a distribution-matching
-objective (KL/cross-entropy) on `q_k = softmax(U|_{R_k})` — the subset
-renormalization a naive loader would produce — is biased for the full-vocab
-target `p = softmax(U)` and the bias does not vanish as records accumulate
-at fixed `k`. Concrete instance: `A = {a, b, c}`, `U = (0, −1, −1)`, `T = 1`.
-Full target `p_a = 1/(1 + 2e⁻¹) ≈ 0.576`. On subset `{a, b}`:
-`q_a = 1/(1+e⁻¹) ≈ 0.731`; on subset `{b, c}`: the target assigns `a` mass
-**0** although `a` is the global best. Every convex combination of subset
-targets misplaces mass — the top action's expected target mass is neither
-`p_a` nor monotone in the right direction — and the mass assigned when the
-top action is *absent* is exactly the wrong supervision. The pairwise
-objective on the same subsets uses only
-`1[U(a|s) > U(b|s)]` and is untouched by all of this.
+Deployment offers the model a *state-filtered* option subset
+(`candidate_actions_for_state`), and Laya's architecture is
+option-conditioned: the options are in the prompt and the softmax is over
+the offered set only. Under quota subsampling (k-of-m rolled out per
+record), training items carry the teacher renormalized **on the offered
+subset**.
 
-**Proof.** (i) counting + union bound as stated. (ii) direct computation in
-the 3-action instance; the general statement follows because absent actions
-receive renormalized-zero targets while present top actions receive
-renormalized-inflated targets, and both distortions persist in expectation.
-∎
+**Proposition R3.** For an option-conditioned model trained per subset
+`R` with target `t^R = softmax(U|_{R})/Z_R`:
 
-**Consequence.** Under a subsampled rollout quota, RLCD's pairwise
-objective is the *correct* estimator family for fine-tuning, and
-softmax-target KL is structurally mismatched. This is why the quota fix
-(main 8c70b79) records `partial_rollout` metadata warning against
-renormalization, and why `mine_pairs` treats partial records as first-class
-supervision (unit-tested in `tests/test_rlcd.py::
-test_mine_pairs_partial_records_are_first_class`).
+(i) On each subset, proper-score training identifies `t^R` exactly (R1
+applies conditionally); no forced-zero supervision is emitted for absent
+actions because absent actions receive no logit in that forward pass.
 
----
+(ii) The composite full-vocabulary distribution the model would report if
+offered all of `A` is *not* constrained to equal `softmax(U/T)` by
+subset-only training: cross-subset consistency
+(`t^R = softmax(U/T)|_R / Z_R` for all `R`) is implied only if the model
+represents a single underlying utility score per (s, a). Laya does — one
+scalar `z_θ(a|s)` per option — so subset training is consistent with a
+shared-score representation; models with subset-specific heads would not
+have this guarantee.
 
-## T4. What fine-tuning can buy: the one-step regret ceiling and its decision-level readout
+(iii) The pairwise objective remains the weakest-assumption estimator: it
+uses only co-observed ordering and requires no renormalization or
+shared-score assumption at all.
 
-**Proposition T4.** Let `π̂(s) = argmax_a f̂(a|s)` be any policy trained on
-`U`-supervision, and let the per-state utility range be
-`range(s) = max_a U(a,s) − min_a U(a,s)`.
+**Empirical tie.** `metadata["partial_rollout"]` (main 8c70b79) exists
+precisely because *non*-option-conditioned consumers (e.g. an RF over a
+fixed 8-wide head) cannot consume subset targets without bias — T3's
+original statement, which remains valid for fixed-head models. R3
+delimits it: Laya-style option conditioning is the architecture under
+which quota-subsampled records are consumable by proper-score training.
 
-(i) *(Inherited ceiling.)* `E_s[U(π̂(s), s)] − max_a E_s[U(a, s)] ≤ D`
-with `D = E_s[max_a U(a,s)] − max_a E_s[U(a,s)]` — P2 verbatim; no
-fine-tuning method, RLCD included, escapes this bound on one-step value.
+### R4. Where the "RL" lives: realized-outcome scoring and TD(λ)
 
-(ii) *(Decision-level readout.)*
-`E_s[U(a*(s),s) − U(π̂(s),s)] ≤ E_s[ range(s) · 1{π̂(s) ≠ a*(s)} ]`
-where `a*(s) ∈ argmax_a U(a,s)`. If the top-1 disagreement rate is
-`τ = P(π̂(s) ≠ a*(s))` and `range(s) ≤ R̄` on the panel, the one-step regret
-against the per-state oracle is at most `R̄ · τ`.
+The teacher-distribution form above is the differentiable reduction of
+RLCD; the reinforcement-learning form matters when the target is not a
+distribution but a **realized outcome** `o ∈ A(s)` (which action proved
+right), because a strictly proper scoring rule `S(q, o)` scores a report
+against a realized event using the same properness machinery
+(`S(q, o) = Σ_a 1[a = o] s_a` for scoring functions `s`; the Brier and
+log scores the Laya lineage documents are exactly this form —
+arXiv:2609.28940 quotes Brier explicitly).
 
-**Proof.** (i) is P2. (ii) on the event `{π̂(s) = a*(s)}` the loss is 0;
-otherwise it is at most `range(s)`; take expectations. ∎
+**Consequences for this project.**
 
-**Empirical tie.** This is why the branch's headline metrics are
-*decision-level* (pairwise accuracy, top-1 agreement) and why they are
-meaningful: by T4(ii) they bound the deployable one-step value of the
-fine-tuned model, and by T4(i) that value is capped by `D` — Hartmann-class
-families (large `D`) are where a better System-1 can matter at all;
-SixHumpCamel-class families cannot reward any fine-tuning beyond the best
-constant action (the RF probe already found no signal there, consistent
-with `D ≈ 0.015`).
-
----
-
-## 5. The RL stage: optimal by construction against its own reward, valuable only against closed-loop return
-
-**Proposition T5.** Let `f̂` be the CD-trained scorer and consider the
-learned-reward objective `J(π) = E_s[ f̂(π(s) | s) ]`. The greedy policy
-`π̂(s) = argmax_a f̂(a|s)` maximizes `J` over all (possibly randomized)
-policies. Hence an RL stage (PPO/REINFORCE) optimizing `J` cannot improve
-it; its function in RLCD-for-LLMs is to trade `J` off against the KL
-constraint and to average out reward-model errors under *generation-level*
-actions. In this project's typed setting (m = 8 fixed actions, one network
-producing the distribution and the scores), the only distinct quantity an
-RL stage can optimize is the **closed-loop return**
-`G(π) = terminal Δbest under full-budget execution`, which differs from
-one-step `U` by the continuation coupling diagnosed in Phase 8.6C/F
-(horizon flips ~50 % of top actions; continuation effects dominate first
-effects on Ackley/Rastrigin). The faithful stage-2 design is REINFORCE
-with a baseline and a KL anchor `κ·KL(π ‖ π_CD)`:
-
-```
-max_π  E[G(π)] − κ · KL(π ‖ π_CD)
-```
-
-which is a different functional from the CD risk and, per P2's caveat, is
-not bounded by `D`. It is deferred until per-step trajectories are logged
-(the existing `DecisionLoop` trajectory records suffice as the rollout
-buffer); running it earlier would train on the same one-step signal the CD
-stage already consumes provably optimally.
-
-**Proof.** Pointwise `f̂(π(s)|s) ≤ max_a f̂(a|s)`; expectation preserves the
-inequality; equality at `π̂`. ∎
-
-**Secondary role (variance).** RLCD motivates contrastive pairs by
-signal-to-noise: paired supervision differences out everything the two
-responses share (their §2, citing contrastive RL losses, Tian et al.
-2022). The same structure appears on both sides of our objective — teacher
-differences (T1) and student score differences (the BT gradient per pair is
-a function of `z⁺ − z⁻` only, so any state-level offset the encoder emits
-across all options is invisible to training). The learned object is exactly
-the ranking; nothing else is fitted.
+- **Stage 2 (closed loop) gets a dense, per-decision reward for free.**
+  Scoring `q_θ(·|s_t)` against the realized outcome at `s_t` (e.g. the
+  action whose branch actually improved `best_value`, or a graded
+  outcome) is a proper-score reward available at *every* decision, unlike
+  sparse terminal-Δbest REINFORCE. Combined with the SDK's TD(λ)
+  bootstrap (`td_lambda_targets`) over decision-loop trajectories, this
+  is the faithful Laya-lineage recipe for the closed-loop stage T5
+  designs — and it optimizes the *reported distribution*, so calibration
+  pressure persists during RL (RLHF's overconfidence failure mode is
+  structurally absent, per the Table II contrast in 2609.28940).
+- **Escalation economics.** `act_costs`/`cost_wrong_act` in the shipped
+  config make the reward cost-aware — the same term structure as our
+  utility's evaluation/fit costs (`w_eval`, `w_fit`), so the teacher `U`
+  and the RLCD reward can be composed without double-counting if stage 2
+  adopts the SDK's convention.
 
 ---
 
-## Relation to the existing theory (P1–P3, L1)
+## 2. The BT pairwise baseline arm (T1–T5, references corrected)
 
-| New | Builds on | Statement in one line | Code anchor | Evidence |
-|---|---|---|---|---|
-| T1 | P1 | Pairwise labels are affine-invariant and cancel per-state teacher shifts | `mine_pairs` | affine Gate 5 Spearman = 1.0 (existing); shift-cancellation unit tests |
-| T2 | — (new) | Rollout noise shrinks BT scores but preserves ranking; margin filtering restores learnability | `RLCDConfig.margin` | zero-shot vs fine-tuned pairwise accuracy (`scripts/train_rlcd_laya.py`) |
-| T3 | quota fix (main 8c70b79) | Pairwise supervision is unbiased under k-of-m subsampling; renormalized subset softmax is biased and stays biased | `partial_rollout` metadata + `mine_pairs` | partial-record unit tests; long-horizon partial datasets |
-| T4 | P2 | Top-1 disagreement × range bounds one-step regret; `D` still caps everything | `evaluate_ranking` | decision-level metrics are the readout of deployable value |
-| T5 | P3 (spirit) | RL against the CD reward is a no-op for argmax; stage 2 only pays against closed-loop return | design only | deferred (needs trajectory logs) |
-| — | L1 | The RF baseline imitates threshold rules exactly — its wins and losses are the teacher's | `_shared_rq_features` + RF | RQ2.2 `+0.0000` imitation (existing) |
+The propositions below analyze the pairwise objective kept as the
+comparison arm. They are the theory of *paired-comparison distillation of
+the rollout teacher* (Bradley-Terry 1952; the DPO literature analyzes the
+same likelihood) — **not** of Laya's RLCD; the identically-named Yang
+et al. 2024 paper is related work only.
+
+**T1 (invariance/sufficiency).** Pairwise labels inherit P1's affine
+invariance exactly and cancel any per-state additive teacher shift
+`g(s)`: `Ũ(a,s) = U(a,s) + g(s)` leaves every pair label unchanged, and
+the BT loss's difference structure makes minimizers identified only up to
+`s`-measurable offsets, which do not affect argmax. *Delimits the
+misspecification immunity of the pairwise arm:* STOP-term calibration
+errors and per-state opportunity costs are invisible to it;
+action-dependent perturbations `h(a)` are not. ∎ (differences cancel
+`g(s)`; P1 term-by-term.)
+
+**T2 (noise consistency).** With symmetric zero-mean utility noise, the
+flip rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
+through `η(0) = 1/2`; the noisy-BT population optimum satisfies
+`βΔf* = log((1−η(g))/η(g))` — a strictly increasing reparametrization of
+`U*`, so the ranking (and argmax) is preserved while score magnitudes
+shrink. Margin filtering (`margin=δ`) bounds the retained flip rate
+strictly below 1/2, restoring learnability (Angluin–Laird). *Contrast
+with R2:* BT discards magnitude by design and is sign-stable; proper-score
+training keeps magnitude and averages noise instead.
+
+**T3 (quota compatibility, for fixed-head consumers).** Pairs mined from
+a k-of-m subsample are the full pair set restricted to the subset; any
+scorer correct on all covered subsets ranks `A` correctly (pair
+co-observation probability `k(k−1)/(m(m−1))`, misses vanish as records
+accumulate). Renormalized subset softmax targets are biased for a *fixed
+full-vocabulary* distribution and stay biased at fixed k (3-action
+counterexample: `U = (0,−1,−1)`, subset targets give the global best mass
+0 whenever absent, 0.73 vs 0.58 when present). See R3 for the
+option-conditioned refinement under which proper-score training escapes
+this objection.
+
+**T4 (ceiling + decision-level readout).** Any U-supervised policy
+inherits P2's `D` ceiling on one-step value; one-step regret vs the
+per-state oracle is at most `E[range(s) · 1{top-1 wrong}]`, so the
+branch's decision-level metrics bound deployable value. Applies to both
+arms — and to the RF baseline.
+
+**T5 (RL stage).** Against the BT model's own reward the argmax policy is
+already optimal, so pairwise stage-2 RL is vacuous; the RL that pays is
+against closed-loop return — now sharpened by R4: use proper-score
+rewards on realized outcomes with TD(λ), not sparse terminal REINFORCE.
+
+---
+
+## Proposition-to-evidence map
+
+| Statement | Type | Code anchor | Evidence |
+|---|---|---|---|
+| R1 strict properness ⇒ calibrated teacher recovery | identification (Gibbs + Shuford et al.) | `proper_score_loss` (SDK `proper_reward`) | proper-score arm vs zero-shot vs BT: pairwise acc **and** mean log score (`runs/EXP_RLCD_REPORT.md`) |
+| R2 noise → mean-target tracking | population optimum (linearity) | idem | arm comparison under rollout noise; which arm wins separates R2 vs T2 noise models |
+| R3 subset conditioning consumes quota records | architectural lemma | `build_item` target on offered options; `partial_rollout` metadata | partial-record tests; long-horizon partial datasets (main 8c70b79) |
+| R4 realized-outcome RL + TD(λ) design | design proposition | deferred; uses SDK `td_lambda_targets` | stage-2 once trajectories logged |
+| T1–T5 pairwise-arm theory | as above | `mine_pairs`, `bradley_terry_loss` | BT arm rows in the same report; unit tests |
 
 ## What is deliberately *not* claimed
 
-- T2's noise model is symmetric one-sided-tail; adversarial or
-  action-correlated noise (e.g., a buggy action executor that biases one
-  action's branch) violates it and rotates labels — T1's exception clause.
-- T3(i) is an identification statement (n → ∞); finite-n pair coverage is
-  `n·k(k−1)/(m(m−1))`, which the experiment reports should quote.
-- T4 bounds **one-step** value only; closed-loop value is a different
-  functional (Phase 8.6F), which is precisely why §5 exists.
-- The CD stage measures teacher-ranking recovery, not optimization
-  performance. Any closed-loop claim needs the paired-trajectory protocol
-  of EXP-RQ3 (and, per P3, a panel where `A(s) > 0` regions exist).
-- RLCD's own Appendix N theory (unpublished in fetched HTML; paper-only)
-  analyzes gradient behaviour of their BT variant; the propositions here
-  are self-contained and do not depend on reading theirs.
+- RLCD has **no published method paper**; R1–R4 analyze the objective as
+  shipped in the SDK (and as described second-hand in arXiv:2609.28940 /
+  2609.24574). If the lineage publishes the method and it differs (e.g.
+  the Brier-score-only variant the survey reports), R1 still holds for
+  the composite we run, and the Brier variant satisfies the same
+  properness statements.
+- R1's "calibration by construction" is calibration **against the
+  counterfactual teacher**, not against ground-truth closed-loop
+  outcomes; the teacher itself is horizon- and continuation-dependent
+  (Phase 8.6C/F). Calibrating to a mis-specified teacher is precise
+  error — the closed-loop stage (R4) is where that is addressed.
+- T4's ceiling applies to both arms; decision-level wins do not
+  establish closed-loop optimization gains.
+- T2/R2's noise models are symmetric; action-correlated noise violates
+  both.
 
 ## References
 
-- Yang, K. et al. *RLCD: Reinforcement Learning from Contrastive
-  Distillation.* ICLR 2024. arXiv:2307.12950.
+- Laya SDK (`pip install laya`, v0.3.7): `laya.common.proper_reward`,
+  `td_lambda_targets`; checkpoint `convaiinnovations/laya`.
+- *JEV and Laya as System One Decision Layers for LLM.* arXiv:2609.28940
+  — closest public description of RLCD (Table II: calibration by
+  construction; Table IX: Laya fine-tuning "RL with proper scoring
+  rules"; Brier score quoted).
+- *Evaluating Decision Models for Text Annotation.* arXiv:2609.24574 —
+  notes RLCD has no published method paper.
+- Gneiting, T., Raftery, A. E. *Strictly Proper Scoring Rules,
+  Prediction, and Estimation.* JASA 102(477), 2007.
+- Brier, G. W. *Verification of Forecasts Expressed in Terms of
+  Probability.* Monthly Weather Review 78(1), 1950.
+- Shuford, E. H., Albert, A., Massengill, H. E. *Admissible Probability
+  Measurement Procedures.* Psychometrika 31(2), 1966 (spherical rule).
+- Bernardo, J. M. *Expected Information as Expected Utility.* Ann.
+  Statist. 7(3), 1979 (log score propriety).
 - Bradley, R. A., Terry, M. E. *Rank Analysis of Incomplete Block
-  Designs: The Method of Paired Comparisons.* Biometrika 39(3–4), 1952.
-- Angluin, D., Laird, P. *Learning from Noisy Examples.* Machine
-  Learning 2, 1988 (noise rate < 1/2 ⇒ learnability).
-- Yue, Y., Joachims, T. *Interactively Optimizing Information Retrieval
-  Systems as a Dueling Bandits Problem.* ICML 2009 (pairwise-only
-  identification).
-- Rafailov, L. et al. *Direct Preference Optimization (DPO).* NeurIPS
-  2023 — the RL-free bound of the same BT objective; the natural
-  stage-2 alternative if KL-anchored REINFORCE proves unnecessary.
-- Tian, Y. et al. *Contrastive Representation Learning for RL.* 2022
-  (contrastive-difference objectives as variance reduction), as cited in
-  RLCD §2.
+  Designs.* Biometrika 39(3–4), 1952 (BT arm).
+- Rafailov, L. et al. *Direct Preference Optimization.* NeurIPS 2023
+  (same likelihood family as the BT arm).
+- Angluin, D., Laird, P. *Learning from Noisy Examples.* ML 2, 1988
+  (T2). Yue, Y., Joachims, T. ICML 2009 (dueling-bandit identification,
+  T3).
+- Yang, K. et al. *RLCD: Reinforcement Learning from Contrastive
+  Distillation.* ICLR 2024, arXiv:2307.12950 — **the other RLCD**;
+  cited here only to anchor the disambiguation in §0.1.

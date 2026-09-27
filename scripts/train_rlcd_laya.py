@@ -1,23 +1,24 @@
-"""EXP-RLCD — fine-tune Laya on counterfactual rollout pairs (branch
-exp/rlcd-laya-finetune, 2026-09-27).
+"""EXP-RLCD — fine-tune Laya on the counterfactual rollout teacher (branch
+exp/rlcd-laya-finetune, 2026-09-27; objective reference corrected same day).
 
-Reference method: Yang et al., "RLCD: Reinforcement Learning from
-Contrastive Distillation", ICLR 2024 (arXiv:2307.12950). This driver runs
-the CD (contrastive-distillation) stage of RLCD adapted to the optimization
-decision task: contrastive pairs come from the counterfactual rollout
-teacher U(a|s); Laya's per-option scorer is fine-tuned with a Bradley-Terry
-objective; the closed-loop RL stage is designed in docs/RLCD_THEORY.md §5.
+**RLCD here means the Jev/Laya-lineage method**: "Reinforcement Learning
+for Calibrated Decisions" — RL whose reward is a strictly proper scoring
+rule, shipped in the laya SDK as `laya.common.proper_reward` (log score +
+0.5·spherical; RPS on ordinal questions). No method paper exists (per
+arXiv:2609.24574 and independent tests); this driver uses the SDK's exact
+implementation. It is NOT the identically-named contrastive-distillation
+paper of Yang et al. (ICLR 2024).
 
-Decision-level comparison on held-out seeds (default: train problem-seeds
-0–15, validate 16–19 of the canonical 20-seed 5-family dataset):
+This driver trains both fine-tuning arms and compares four models on
+held-out seeds (default: train problem-seeds 0–15, validate 16–19 of the
+canonical 20-seed 5-family dataset):
 
-    zero-shot Laya  vs  RLCD fine-tuned Laya  vs  RandomForest baseline
+    zero-shot Laya | RLCD proper-score | BT pairwise (baseline arm) | RF
 
-Metrics: pairwise ranking accuracy against the teacher's utility ordering,
-and top-1 agreement with the record's gold argmax. The RF baseline mirrors
-the workshop outline's multi-output RandomForestRegressor trained on the
-same records' utilities (family-median rescaled, features from
-`_shared_rq_features`).
+Metrics: pairwise ranking accuracy, top-1 agreement with gold argmax, and
+mean log score (distribution recovery). The RF baseline mirrors the
+workshop outline's multi-output RandomForestRegressor (family-median
+rescaled utilities, `_shared_rq_features`).
 
 Usage:
     .venv/bin/python scripts/train_rlcd_laya.py \
@@ -135,7 +136,12 @@ def main() -> int:
     parser.add_argument("--dataset", type=Path,
                         default=Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
     parser.add_argument("--model-dir", default="/home/lcy/.cache/opt_agent_v3/laya")
-    parser.add_argument("--output-dir", default="runs/rlcd_laya_v1")
+    parser.add_argument("--output-dir", default="runs/rlcd_laya_proper_v1",
+                        help="Checkpoint dir for the RLCD proper-score arm")
+    parser.add_argument("--bt-output-dir", default="runs/rlcd_laya_bt_v1",
+                        help="Checkpoint dir for the BT pairwise baseline arm")
+    parser.add_argument("--skip-bt", action="store_true",
+                        help="Skip the BT baseline arm (proper-score only)")
     parser.add_argument("--train-seed-max", type=int, default=16,
                         help="Train on problem seeds [0, N)")
     parser.add_argument("--val-seed-min", type=int, default=16,
@@ -175,28 +181,37 @@ def main() -> int:
     zero = evaluate_ranking(model, tok, val_records, eval_cfg, device)
     print(f"[zero-shot] {json.dumps(zero)} ({time.time()-t0:.0f}s)", flush=True)
 
-    # --- RLCD contrastive-distillation stage --------------------------------
-    config = RLCDConfig(
-        model_dir=args.model_dir,
-        output_dir=args.output_dir,
-        num_epochs=args.epochs,
-        batch_size=args.batch_size,
-        learning_rate=args.lr,
-        beta=args.beta,
-        max_pairs_per_record=args.max_pairs,
-        device=str(device),
-    )
-    t1 = time.time()
-    train_report = train_rlcd(train_records, val_records, config)
-    train_wall = time.time() - t1
+    # --- Fine-tune arms ------------------------------------------------------
+    def _train_arm(objective: str, output_dir: str) -> tuple[dict, dict]:
+        config = RLCDConfig(
+            model_dir=args.model_dir,
+            output_dir=output_dir,
+            objective=objective,
+            num_epochs=args.epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.lr,
+            beta=args.beta,
+            max_pairs_per_record=args.max_pairs,
+            device=str(device),
+        )
+        t = time.time()
+        rep = train_rlcd(train_records, val_records, config)
+        rep["wall_clock_s"] = round(time.time() - t, 1)
+        import laya
 
-    # --- Fine-tuned eval through the SAVED checkpoint (proves loadability) --
-    import laya
+        arm_agent = laya.load(output_dir)
+        arm_agent.model.to(device)
+        metrics = evaluate_ranking(
+            arm_agent.model, arm_agent.tok, val_records, eval_cfg, device
+        )
+        arm_agent.model.to("cpu")
+        return rep, metrics
 
-    ft_agent = laya.load(args.output_dir)
-    ft_agent.model.to(device)
-    ft = evaluate_ranking(ft_agent.model, ft_agent.tok, val_records, eval_cfg, device)
-    ft_agent.model.to("cpu")
+    proper_report, proper_metrics = _train_arm("proper_score", args.output_dir)
+    if args.skip_bt:
+        bt_report = bt_metrics = None
+    else:
+        bt_report, bt_metrics = _train_arm("bt_pairs", args.bt_output_dir)
 
     # --- RF baseline ---------------------------------------------------------
     rf = None
@@ -225,53 +240,82 @@ def main() -> int:
             "val_records": len(val_records),
         },
         "zero_shot_laya": zero,
-        "rlcd_finetuned": ft,
-        "rlcd_train": train_report,
+        "rlcd_proper_score": proper_metrics,
+        "rlcd_proper_score_train": proper_report,
+        "bt_pairs_baseline": bt_metrics,
+        "bt_pairs_train": bt_report,
         "rf_baseline": rf,
-        "train_wall_clock_s": round(train_wall, 1),
         "method": (
-            "RLCD CD stage (Yang et al., ICLR 2024, arXiv:2307.12950) adapted: "
-            "pairs from counterfactual rollout utilities; Bradley-Terry loss on "
-            "Laya per-option scorer logits"
+            "RLCD (Jev/Laya lineage: Reinforcement Learning for Calibrated "
+            "Decisions) — strictly proper scoring rule reward (the SDK's own "
+            "proper_reward: log + 0.5·spherical) of the reported option "
+            "distribution vs the counterfactual teacher gold_probs; "
+            "bt_pairs arm = Bradley-Terry pairwise baseline (DPO-family). "
+            "NOT Yang et al. ICLR 2024 contrastive distillation."
         ),
     }
     args.json_out.write_text(json.dumps(result, indent=2, sort_keys=True),
                              encoding="utf-8")
 
+    def _ls(x):
+        return "—" if x is None or x.get("mean_log_score") is None else (
+            f"{x['mean_log_score']:.4f}"
+        )
+
     lines = [
-        "# EXP-RLCD — RLCD fine-tuning of Laya on counterfactual pairs",
+        "# EXP-RLCD — RLCD fine-tuning of Laya on the counterfactual teacher",
         "",
-        f"Date: 2026-09-27 · branch `exp/rlcd-laya-finetune`",
+        "Date: 2026-09-27 (objective reference corrected same day) · "
+        "branch `exp/rlcd-laya-finetune`",
         f"Dataset: `{args.dataset}` ({len(records)} records; "
         f"{len(train_records)} train / {len(val_records)} val by problem seed)",
         "",
-        "Method: contrastive pairs (a⁺ ≻ a⁻ ⟺ U(a⁺|s) > U(a⁻|s)) from the",
-        "counterfactual rollout teacher; Bradley-Terry loss −log σ(β(z⁺−z⁻))",
-        "on Laya's per-option scorer. Theory: `docs/RLCD_THEORY.md`.",
+        "**RLCD = the Jev/Laya-lineage method** (\"Reinforcement Learning for",
+        "Calibrated Decisions\"): reward = strictly proper scoring rule (SDK's",
+        "`proper_reward`: log score + 0.5·spherical). No method paper exists;",
+        "the implementation is the one shipped with the checkpoint. NOT the",
+        "identically-named Yang et al. ICLR 2024 paper. Theory:",
+        "`docs/RLCD_THEORY.md`.",
         "",
-        "| Model | Pairwise acc | Top-1 agreement | Pairs | Records |",
-        "|---|---:|---:|---:|---:|",
+        "| Model | Pairwise acc | Top-1 agreement | Mean log score | Pairs | Records |",
+        "|---|---:|---:|---:|---:|---:|",
         f"| Laya zero-shot | {zero['pairwise_accuracy']:.3f} | "
-        f"{zero['top1_agreement']:.3f} | {zero['pairs']} | {zero['records']} |",
-        f"| Laya + RLCD (CD) | {ft['pairwise_accuracy']:.3f} | "
-        f"{ft['top1_agreement']:.3f} | {ft['pairs']} | {ft['records']} |",
+        f"{zero['top1_agreement']:.3f} | {_ls(zero)} | {zero['pairs']} | "
+        f"{zero['records']} |",
     ]
+    if proper_metrics:
+        lines.append(
+            f"| **Laya + RLCD (proper score)** | "
+            f"{proper_metrics['pairwise_accuracy']:.3f} | "
+            f"{proper_metrics['top1_agreement']:.3f} | {_ls(proper_metrics)} | "
+            f"{proper_metrics['pairs']} | {proper_metrics['records']} |"
+        )
+    if bt_metrics:
+        lines.append(
+            f"| Laya + BT pairs (baseline arm) | "
+            f"{bt_metrics['pairwise_accuracy']:.3f} | "
+            f"{bt_metrics['top1_agreement']:.3f} | {_ls(bt_metrics)} | "
+            f"{bt_metrics['pairs']} | {bt_metrics['records']} |"
+        )
     if rf:
         lines.append(
             f"| RandomForest (utilities) | {rf['pairwise_accuracy']:.3f} | "
-            f"{rf['top1_agreement']:.3f} | {rf['pairs']} | {rf['val_records']} |"
+            f"{rf['top1_agreement']:.3f} | — | {rf['pairs']} | "
+            f"{rf['val_records']} |"
         )
     lines += [
         "",
-        f"Training: {train_report['train_pairs']} pairs over "
-        f"{train_report['train_items']} usable records; "
-        f"{train_wall:.0f}s on {device}.",
-        "Saved checkpoint: `" + args.output_dir + "` "
-        "(loadable via `LayaPolicy(model_id=...)`).",
+        f"RLCD arm: {proper_report['train_pairs']} pairs / "
+        f"{proper_report['train_items']} records seen; "
+        f"{proper_report['wall_clock_s']}s on {device}.",
+        f"Saved checkpoints: `{args.output_dir}` (proper-score arm)"
+        + (f", `{args.bt_output_dir}` (BT arm)" if bt_metrics else "")
+        + " (loadable via `LayaPolicy(model_id=...)`).",
         "",
-        "Caveats: decision-level metrics only (teacher-ranking recovery),",
-        "not closed-loop optimization performance; same-family split by seed",
-        "(cross-family transfer is RQ2 and not claimed here).",
+        "Caveats: decision-level metrics only (teacher recovery), not",
+        "closed-loop optimization performance; same-family split by seed",
+        "(cross-family transfer is RQ2 and not claimed here); value capped",
+        "by the adaptive-value ceiling D (RLCD_THEORY T4).",
         "",
     ]
     args.report_out.write_text("\n".join(lines), encoding="utf-8")
