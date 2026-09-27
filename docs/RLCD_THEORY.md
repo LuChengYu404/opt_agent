@@ -235,10 +235,12 @@ action-dependent perturbations `h(a)` are not. ∎ (differences cancel
 `g(s)`; P1 term-by-term.)
 
 **T2 (noise consistency).** ASSUMPTIONS (strengthened per codex reviews
-2026-09-28): (a) the pairwise noise DIFFERENCE has a symmetric,
-unimodal (e.g. log-concave) distribution, so its one-sided tail
-`P(ε > g)` is strictly decreasing in `g` — needed for the *strictly*
-decreasing flip rate (plain symmetry alone gives only `η(0) = 1/2`);
+2026-09-28): (a) the pairwise noise DIFFERENCE has a symmetric
+distribution whose one-sided tail `P(ε > g)` is STRICTLY decreasing in
+`g` for `g > 0` (assumed directly — e.g. satisfied by continuous
+densities positive on their support such as Gaussians; symmetry alone
+gives only `η(0) = 1/2`, and unimodality alone does not rule out tail
+plateaus);
 (b) the pair preference probabilities are jointly representable by a
 single per-state score vector (BT transitivity) — noise correlated
 across pairs within a state can violate this. Under these, the flip

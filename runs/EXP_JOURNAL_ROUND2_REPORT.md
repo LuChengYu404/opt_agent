@@ -23,10 +23,11 @@ engineering problem (P3).
 
 2. **P1 — the teacher diagnosis chain is complete and decisive.**
    - P1a (metrics corrected per codex issue 3): single-roll labels are
-     noise-dominated — PER-RE-ROLL pair flip probability 0.36 (vs stored
-     labels) on pairs above the median gap; conservative any-of-3 flip
-     0.73; inter-roll gap spread (0.084) exceeds the median stored gap
-     (0.05); argmax stable across re-rolls for only 25% of records.
+     noise-dominated — PER-RE-ROLL pair flip probability 0.40 (vs stored
+     labels) on pairs above the median gap (0.36 overall); conservative
+     any-of-3 flip 0.73; inter-roll gap spread (0.084) exceeds the median
+     stored gap (0.05); argmax stable across re-rolls for only 25% of
+     records.
      Re-roll seeds are now deterministic (no hash()).
    - P1b/denoising: R=5 replicate-averaging (generator gained
      `rollout_replicates`; 661-record dataset in 141 s). Independent 2v2
