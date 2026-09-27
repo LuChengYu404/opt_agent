@@ -1,6 +1,52 @@
 # Current research status
 
-## Closed-loop and external-transfer audit (2026-09-27, latest)
+## EXP-RQ3 — Real-LLM cost frontier (2026-09-27, latest)
+
+`runs/exp_rq3_router_sweep.json` runs 135 paired trajectories (5 BOCoDe
+families × seeds {100, 101, 102} × 9 policies) on a real `deepseek-chat`
+System-2 backend, with frozen RF System-1 trained on rollout seeds 0–15
+and temperature-calibrated on 16–19. Pre-specified acceptance criteria
+(declared before unblinding): ≥ 50 % call/token reduction vs always-LLM,
+regret margin ≤ 0.10 σ_family.
+
+**Headline.** The frozen System-1 alone — **0 LLM calls — is competitive
+with or beats the always-LLM policy on 4/5 families**, with statistically
+detectable positive mean gains on Rastrigin (+16.95 terminal best, 2/1/0
+W/T/L) and SixHumpCamel (+0.43, 2/1/0). Hartmann is the only family
+where LLM calls produced a detectable gain (+0.91, 3/0/0); Ackley is
+ambiguous inside the CI. Full report:
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
+
+**Confidence-routing diagnostic.** The RF softmax maximum rarely exceeds
+0.25, so every confidence threshold (0.5, 0.75, 0.9) routes almost
+every step to System-2. The random-rate baselines (rate ∈ {0.25, 0.5})
+*beat* the confidence-based router on most families, evidencing that
+the current `ConfidenceRouter.tau_conf` is not yet a useful routing
+heuristic.
+
+**Per-family recommendation.**
+- Rastrigin, SixHumpCamel, Branin → `rf` (System-1 only).
+- Hartmann → `llm` or `confidence_0.75` (≈ 12–14 calls/trajectory).
+- Ackley → inconclusive at 3 seeds; expand before claiming LLM gain.
+
+## EXP-RQ2.2 — Within-function dimension transfer (2026-09-27)
+
+`scripts/exp_rq2_2_ioh_within_function_dim_transfer.py` trains a
+multi-output RF on the action labels of `RuleFullBudget` at IOH
+functions f6, f8, f15 × dims {2, 10} × instances {0, 1} × seeds {100, 101,
+102} (36 trajectories), then deploys the RF on the held-out test dim 5
+× instance 2 (untouched). Full report:
+`runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md`.
+
+**Result.** The RF perfectly mimics `RuleFullBudget` on the test dim
+(`rf − rule_full = +0.000`, 0/3/0 W/T/L on every function), as expected
+for imitation learning. Both lose to Surrogate and Local on every
+function: `rf − surrogate` mean +0.27 (f6), +0.39 (f8), +0.24 (f15) with
+CI lower bound > 0 on f8 and f15. **Within-function dimension transfer
+is a clean negative result**: the cross-family transfer signal in
+EXP-RQ2.1 was at least partly a *family* signal, not a dimension signal.
+
+## Closed-loop and external-transfer audit (2026-09-27)
 
 The complete results and methods are in
 `runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`. Independent trajectory workers
