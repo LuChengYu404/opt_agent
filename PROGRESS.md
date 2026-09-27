@@ -1,5 +1,44 @@
 # Current research status
 
+## Long-horizon rollout quota control (2026-09-27)
+
+True full-horizon labels (horizon = `remaining_budget`, the decisive semantics
+from the Phase 8.6C horizon diagnosis) were previously out of scope: a
+226-record 3-family hfull dataset cost ≈ 90 minutes because every decision
+point rolls out 8 candidates × H GP-bound branch steps. The quota is now
+controllable on two orthogonal axes plus operational ones:
+
+- **`DatasetConfig.rollout_action_subsample=k`** — roll out only a
+  deterministic k-of-8 candidate subset per decision point
+  (`subsample_candidates`, seeded by `(run_seed, step, salt)` so partial
+  records stay replayable and affine-transform record pairs stay aligned).
+  Quota scales ≈ k/8 (measured on Branin × 2 seeds, horizon=remaining:
+  51.6 vs 93.8 backend cost units/record at k=4 vs k=8). Records carry
+  `metadata["partial_rollout"]`; `candidate_actions` still lists the full
+  vocabulary; `gold_probs`/`rollout_results` cover only the rolled-out
+  subset. Pairwise (contrastive) supervision is unaffected by construction;
+  softmax-target consumers must check `partial_rollout` before
+  renormalizing (a subset softmax inflates the top gap — see
+  `docs/RLCD_THEORY.md` T3 on the branch).
+- **`DatasetConfig.horizon_mode="remaining"`** — per-decision-point horizon
+  = remaining budget (true hfull). `metadata["horizon"]` records the actual
+  per-record value; `"horizon_mode"` records the mode. Fixed mode is the
+  historical default and is unchanged.
+- **`scripts/generate_dataset_longhorizon.py`** — process-parallel over
+  (problem, seed) with `--workers`, append-only `--resume` (skips
+  trajectories already on disk), and per-record cost accounting
+  (Σ n_new_samples + n_model_fits across rolled branches).
+
+Oracle replay compatibility: `oracle_test_from_record` picks
+`gold_id = argmax(gold_probs)`, which on a partial record evaluates the best
+*rolled-out* action — the correct semantics under a subsampled quota.
+
+Smoke evidence: `runs/longhorizon_quota_smoke.jsonl` (14 partial records,
+Branin × 2 seeds, horizon=remaining, k=4, 7.4 s wall-clock with 2 workers)
+and `runs/longhorizon_quota_k8.jsonl` (same spec at k=8 for the cost
+comparison). Tests: 11 new in `tests/test_longhorizon_quota.py`; full suite
+399/399.
+
 ## Schedule mechanism check + RQ2.2 10-seed + theory formalization (2026-09-27, latest)
 
 Three additions close the remaining stated gaps:

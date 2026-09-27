@@ -11,6 +11,7 @@ from opt_agent.dataset.generator import (
     DatasetGenerator,
     derive_run_seed,
     full_candidates,
+    subsample_candidates,
 )
 from opt_agent.dataset.splits import (
     Split,
@@ -62,6 +63,7 @@ __all__ = [
     "phase_of_ratio",
     "physical_state_hash",
     "split_records",
+    "subsample_candidates",
     "validate_record",
     "write_jsonl",
 ]

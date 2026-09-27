@@ -73,6 +73,34 @@ def derive_seed(*parts: int) -> int:
     return int.from_bytes(h.digest()[:4], "little") & 0x7FFFFFFF
 
 
+# Domain-separation salt for the long-horizon quota subsample (2026-09-27).
+# Keeps the k-subset choice independent from the candidate-param seed stream.
+_SUBSAMPLE_SALT = 918273645
+
+
+def subsample_candidates(
+    candidates: list[Candidate],
+    k: int,
+    seed: int,
+) -> list[Candidate]:
+    """Deterministically keep k of `candidates` (order-preserving).
+
+    The subset is drawn with `random.Random(seed)` so the same
+    (run_seed, step, salt) triple always yields the same subset — this keeps
+    partial records replayable and keeps affine-transform pairs aligned
+    (Gate 5 compares records by id with the same run_seed/step).
+    """
+    if not 1 <= k <= len(candidates):
+        raise ValueError(
+            f"subsample size must be in [1, {len(candidates)}]; got k={k}"
+        )
+    if k == len(candidates):
+        return list(candidates)
+    rng = random.Random(seed)
+    chosen = set(rng.sample(range(len(candidates)), k))
+    return [c for i, c in enumerate(candidates) if i in chosen]
+
+
 def derive_run_seed(problem: str, problem_seed: int, trajectory_id: int) -> int:
     """Process-stable seed combining (problem_name, problem_seed, trajectory_id).
 
@@ -112,6 +140,22 @@ class DatasetConfig:
     # transformed scale consistently. Default (1.0, 0.0) is the identity.
     objective_scale: float = 1.0
     objective_shift: float = 0.0
+    # Long-horizon quota control (2026-09-27): when set to k < |vocab|, each
+    # decision point rolls out only a deterministic k-subset of the candidate
+    # vocabulary at the configured horizon. Rollout cost scales as k/|vocab|.
+    # `candidate_actions` still lists the full vocabulary; the record's
+    # `gold_probs`/`rollout_results` cover only the rolled-out subset and
+    # metadata["partial_rollout"] records which ids were rolled out. Pairwise
+    # consumers (contrastive distillation) are unaffected by construction;
+    # softmax-target consumers must read `partial_rollout` first (renormalizing
+    # a subset softmax to the full vocabulary would inflate the top gap).
+    rollout_action_subsample: int | None = None
+    # "fixed": use `horizon` for every decision point (historical default).
+    # "remaining": per decision point, roll out until the budget is exhausted
+    # (horizon = remaining_budget) — the true long-horizon semantics from the
+    # Phase 8.6C horizon diagnosis. metadata["horizon"] records the actual
+    # per-record value; metadata["horizon_mode"] records the mode.
+    horizon_mode: str = "fixed"
     # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
     # `CounterfactualRollout` for follow-up steps and recorded in metadata
     # so records can be replayed with a different continuation. Default:
@@ -142,6 +186,19 @@ class DatasetConfig:
             raise ValueError(
                 f"DatasetConfig.objective_shift must be finite; got {shift!r}"
             )
+        k = self.rollout_action_subsample
+        if k is not None and not 1 <= k <= len(ALL_CANDIDATE_SPECS):
+            raise ValueError(
+                f"rollout_action_subsample must be None or in "
+                f"[1, {len(ALL_CANDIDATE_SPECS)}]; got {k!r}"
+            )
+        if self.horizon_mode not in ("fixed", "remaining"):
+            raise ValueError(
+                f"horizon_mode must be 'fixed' or 'remaining'; "
+                f"got {self.horizon_mode!r}"
+            )
+        if self.horizon_mode == "fixed" and self.horizon < 1:
+            raise ValueError(f"horizon must be >= 1 in fixed mode; got {self.horizon}")
 
 
 BackendFactory = Callable[[], UnifiedBackend]
@@ -241,26 +298,53 @@ class DatasetGenerator:
 
             # Decision point?
             if step % self.config.decision_every_k_actions == 0:
+                remaining = int(state.resource.remaining_budget)
+                h_step = (
+                    max(1, remaining)
+                    if self.config.horizon_mode == "remaining"
+                    else self.config.horizon
+                )
+                if self.config.horizon_mode == "remaining" and remaining <= 0:
+                    break  # nothing left to decide; budget exhausted
                 cands = full_candidates(seed=derive_seed(run_seed, step))
-                # Sprint 0 fix: scale the rollout cap to candidates × horizon so
-                # long-horizon runs (e.g. horizon=total_budget) don't hit the
-                # default cap of 200.
-                rollout_cap = max(200, 8 * self.config.horizon + 32)
+                k = self.config.rollout_action_subsample
+                if k is not None and k < len(cands):
+                    rolled = subsample_candidates(
+                        cands, k, derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                    )
+                else:
+                    rolled = cands
+                # Sprint 0 fix: scale the rollout cap to rolled candidates ×
+                # horizon so long-horizon runs (e.g. horizon=total_budget)
+                # don't hit the default cap of 200.
+                rollout_cap = max(200, len(rolled) * h_step + 32)
                 output = CounterfactualRollout(
                     backend,
-                    horizon=self.config.horizon,
+                    horizon=h_step,
                     utility_weights=self.config.utility_weights,
                     continuation_spec=self.config.continuation_spec,
                     max_rollout_steps=rollout_cap,
                     optimization_scale=optimization_scale,
                     evaluation_scale=evaluation_scale,
                     fit_scale=fit_scale,
-                ).rollout(state, cands)
+                ).rollout(state, rolled)
                 probs = to_gold_probs(
                     output.results,
                     temperature=self.config.temperature,
                     include_invalid_as_zero=True,
                 )
+                partial_meta: dict | None = None
+                if rolled is not cands:
+                    partial_meta = {
+                        "k": int(k),
+                        "action_ids": [c.action_id for c in rolled],
+                        "note": (
+                            "gold_probs and rollout_results cover only these "
+                            "action_ids; do not renormalize to the full "
+                            "vocabulary. Pairwise (contrastive) consumers are "
+                            "unaffected by construction."
+                        ),
+                    }
                 # Preserve the complete decision point, including a fitted GP
                 # and RNG state. History alone cannot faithfully replay it.
                 replay_checkpoint = backend.checkpoint()
@@ -278,6 +362,8 @@ class DatasetGenerator:
                     evaluation_scale=evaluation_scale,
                     fit_scale=fit_scale,
                     replay_checkpoint=replay_checkpoint,
+                    partial_rollout=partial_meta,
+                    horizon=h_step,
                 )
 
             # Behavior policy — NEVER samples from gold_probs.
@@ -307,6 +393,8 @@ class DatasetGenerator:
         evaluation_scale: float,
         fit_scale: float,
         replay_checkpoint: Checkpoint | None = None,
+        partial_rollout: dict | None = None,
+        horizon: int | None = None,
     ) -> DecisionRecord:
         # Phase 8.6B: serialize enough backend state for exact replay.
         replay_meta: dict = {}
@@ -368,7 +456,10 @@ class DatasetGenerator:
                 "optimization_scale": float(optimization_scale),
                 "evaluation_scale": float(evaluation_scale),
                 "fit_scale": float(fit_scale),
-                "horizon": int(self.config.horizon),
+                "horizon": int(
+                    self.config.horizon if horizon is None else horizon
+                ),
+                "horizon_mode": str(self.config.horizon_mode),
                 # Phase 9 Gate 5 — affine objective transform (so replay
                 # infrastructure can reconstruct the same transformed backend).
                 "objective_scale": float(self.config.objective_scale),
@@ -388,6 +479,9 @@ class DatasetGenerator:
                 # Keep w_stop_opportunity for backward compatibility with
                 # Phase 8.6B readers. New code should use utility_weights.
                 "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+                # Long-horizon quota (2026-09-27): present only for records
+                # generated with rollout_action_subsample < |vocab|.
+                **({"partial_rollout": partial_rollout} if partial_rollout else {}),
                 **replay_meta,
             },
         )
