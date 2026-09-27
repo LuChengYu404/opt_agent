@@ -121,6 +121,36 @@ Rastrigin 12.418); definition fixed in the merged-analysis script. The
    longer horizons, stochastic objectives, or genuinely OOD states — or
    accepting the degenerate cost frontier: System-1 only.
 
+## Deterministic schedule control (mechanism check, added later the same day)
+
+`scripts/exp_rq3_schedule_baseline.py` runs the predeclared
+`GlobalThenLocal` control (10 `global_exploration` decisions, then
+`local_exploitation`) on the exact sweep panel — same five families, seeds
+100–109, budget 30, n_init 5 — with each trajectory's initial Sobol values
+asserted equal to the recorded sweep rows before saving. Zero LLM calls.
+Artifacts: `runs/exp_rq3_schedule_baseline.json`.
+
+| Family | schedule − `llm` (CI) | W/T/L | schedule − `rf` (CI) | W/T/L |
+|---|---:|:-:|---:|:-:|
+| Branin | +0.278 [-0.185, +0.819] | 5/4/1 | -0.237 [-0.885, +0.356] | 5/0/5 |
+| Hartmann | **+0.334 [+0.128, +0.567]** | 7/2/1 | -0.242 [-0.677, +0.230] | 4/0/6 |
+| Ackley | +0.165 [-0.038, +0.370] | 4/5/1 | **-0.853 [-1.577, -0.167]** | 2/1/7 |
+| SixHumpCamel | **+0.674 [+0.246, +1.140]** | 9/0/1 | **-0.341 [-0.622, -0.104]** | 2/0/8 |
+| Rastrigin | **+9.628 [+4.846, +14.600]** | 8/2/0 | -0.481 [-9.661, +8.446] | 5/0/5 |
+
+(W/T/L is schedule vs the named arm.) **The two-line deterministic
+schedule beats the real LLM with CI excluding zero on Hartmann,
+SixHumpCamel, and Rastrigin, and never loses to it on any family.** It
+ties the frozen RF on Branin, Hartmann, and Rastrigin; RF keeps Ackley and
+SixHumpCamel. The LLM's closed-loop decision content on this panel is
+*dominated* by the fixed global-to-local schedule that the per-step
+distribution analysis identified — the schedule alone reproduces and
+exceeds the LLM's value (on Rastrigin the ordering is schedule ≈ rf >
+llm, subsuming the earlier "LLM > AlwaysSurrogate on Rastrigin" finding).
+Under `docs/THEORY.md` Proposition 3 this also explains why no router
+could have rescued the LLM arm: its per-state advantage over the frozen
+System-1 is nonpositive.
+
 ---
 
 ## Original 3-seed run (seeds 100–102)

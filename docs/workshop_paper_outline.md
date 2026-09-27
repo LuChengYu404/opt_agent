@@ -43,13 +43,15 @@ state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
    deployed through full BO trajectories, the always-LLM policy never beats
    System-1-only with a CI excluding zero and is detectably worse on Ackley,
    Hartmann, and SixHumpCamel; no confidence-threshold or random-rate routing
-   arm earns its cost. The measured frontier on this panel is degenerate:
-   System-1 only (0 LLM calls) dominates.
+   arm earns its cost. A deterministic two-phase schedule dominates the LLM
+   itself on 3/5 families — the frontier's degeneracy is a property of the
+   System-2 decisions, formalized by a routing-dominance proposition.
 
 Our contribution is a 7-component framework (backend/state/action/utility/
-rollout/dataset/system-1+router) with **385 unit tests** and five replicable
-experiments. We do not yet demonstrate cross-problem transfer of the
-meta-policy, and within-function dimension transfer is a clean negative.
+rollout/dataset/system-1+router) with **385 unit tests**, four formal
+propositions verified against the data (`docs/THEORY.md`), and six
+replicable experiments. We do not yet demonstrate cross-problem transfer of
+the meta-policy, and within-function dimension transfer is a clean negative.
 
 ---
 
@@ -144,6 +146,38 @@ validation.
 `LayaPolicy` (typed-decision adapter) and `LLMSystem1Policy` (DeepSeek-chat
 API or mock). `HybridPolicy` wraps a System-1 + confidence-based router that
 falls back to `System2LLMDeepSeek`.
+
+### §3.8 Theoretical results (full statements + proofs: `docs/THEORY.md`)
+
+Four short results formalize claims the experiments measure:
+
+- **P1 (affine invariance, exact).** Under `y → αy + β` (α > 0) with the
+  scale `σ_opt = std(y_init)` recomputed, every utility label is unchanged
+  (β cancels in the Δopt difference; α cancels against the scale), so
+  gold_probs and all rank statistics are invariant by construction. This
+  makes Gate 5's Spearman = 1.0 *necessary*, and localizes the 2/17 JS
+  breaches to GP-fit numerics rather than the supervision signal. Verified
+  through the actual `compute_utility` code path on 5,304 rollout branches
+  (max relative error 1.4e-12; `scripts/verify_theory_propositions.py`).
+- **P2 (`adaptive-value` = tight value of state-conditionality).**
+  `D = E[max_a U] − max_a E[U] ≥ 0` equals the one-step regret of the best
+  constant action against per-state oracle selection and tightly bounds the
+  gain of *any* state-conditional policy over the best constant action.
+  The Flat families (SixHumpCamel D = 0.012 at 20 seeds) admit no
+  state-conditional gain by bound, which is why the RF probe finds no
+  signal there. Recomputed at 20 seeds: Hartmann 0.710 > Ackley 0.332 >
+  Rastrigin 0.262 > Branin 0.040 > SixHumpCamel 0.012.
+- **P3 (routing degeneracy).** If the System-2's per-state advantage
+  `A(s) = Q(s, a₂(s)) − Q(s, a₁(s)) ≤ 0` a.s., *every* router — oracle or
+  learned — has non-positive value over never routing. The 10-seed sweep
+  (0/40 arms beat `rf` with CI excluding zero) is the empirical signature
+  of `A ≤ 0`, so the routing failure is a property of the LLM's decisions,
+  not of the routing heuristic.
+- **L1 (exact imitation of axis-aligned rules).** A random forest whose
+  features contain an axis-aligned threshold rule's inputs reproduces the
+  rule exactly under noiseless labels with no feature aliasing — explaining
+  RQ2.2's `rf − rule_full = +0.0000` and the inherited losses to
+  Surrogate/Local.
 
 ## §4 RQ2 — Cross-Family Transfer (Leave-One-Family-Out CV)
 
@@ -265,17 +299,21 @@ f6 (AttractiveSector), f8 (Rosenbrock), f15 (RotatedRastrigin) × source
 dims {2, 10} × instances {0, 1} × seeds {100–102}, then deployed on the
 untouched target dim 5 × instance 2 (72 trajectories total).
 
-| Cell (test d5/i2, n=3 seeds) | `rf − rule_full` | `rf − surrogate` | `rf − local` |
+| Cell (test d5/i2, n=10 seeds) | `rf − rule_full` | `rf − surrogate` | `rf − local` |
 |---|---:|---:|---:|
-| f6 | **+0.000** [+0.000, +0.000] | +0.274 [+0.003, +0.751] | +0.347 [−0.002, +0.530] |
-| f8 | **+0.000** [+0.000, +0.000] | **+0.392** [+0.162, +0.801] | **+0.515** [+0.208, +0.875] |
-| f15 | **+0.000** [+0.000, +0.000] | +0.241 [+0.005, +0.554] | +0.070 [−0.194, +0.296] |
+| f6 | **+0.000** [+0.000, +0.000] | **+0.128** [+0.009, +0.282] | **+0.153** [+0.006, +0.303] |
+| f8 | **+0.000** [+0.000, +0.000] | **+0.244** [+0.059, +0.453] | **+0.321** [+0.141, +0.526] |
+| f15 | **+0.000** [+0.000, +0.000] | **+0.225** [+0.088, +0.378] | +0.105 [−0.033, +0.265] |
 
-The RF imitates the rule perfectly on the held-out dimension (expected for
-imitation learning), and both lose to the fixed Surrogate/Local baselines on
-every function. **Within-function dimension transfer is a clean negative**;
+(10-seed confirmation of the original 3-seed run; W/T/L and the 3-seed
+numbers in `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md`.)
+
+The RF imitates the rule perfectly on the held-out dimension (THEORY.md
+Lemma 1 makes this exact, not expected), and both lose to the fixed
+Surrogate baseline on every function — with CI excluding zero on all three
+at 10 seeds. **Within-function dimension transfer is a clean negative**;
 the RQ2.1 cross-family signal is at least partly a *family* signal, not a
-dimension signal. Report: `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md`.
+dimension signal.
 
 ## §5 RQ1 — Decision Landscape
 
@@ -374,13 +412,21 @@ picks `surrogate_acquisition` 100% of all 25 steps.
   67%, Ackley 66%, SixHumpCamel 68%) — *families where LLM does NOT beat
   Surrogate*. The pooled distribution alone does not explain the Rastrigin-
   specific advantage; only the *temporal pattern* is unique.
-- **Causal validation not established**: a deterministic global-then-local
-  baseline (e.g., always pick `global_exploration` for 10 steps then
-  `local_exploitation` thereafter) has not been implemented or compared.
-- **Recommended paper wording**: *"On Rastrigin, the LLM exhibited a
-  global-to-local temporal action pattern associated with its terminal
-  advantage. This analysis does not establish that the schedule caused the
-  advantage."*
+- **Deterministic schedule control now run (NEW)**: the predeclared
+  `GlobalThenLocal` baseline (10 global decisions, then local) was run on
+  the exact RQ3 panel (seeds 100–109, paired starts verified). It **beats
+  the real LLM with CI excluding zero on Hartmann (+0.334), SixHumpCamel
+  (+0.674), and Rastrigin (+9.628)** and never loses to it; it ties the
+  frozen RF on three families (RF keeps Ackley and SixHumpCamel).
+  On Rastrigin the ordering is schedule ≈ rf > llm, which **subsumes** the
+  earlier "LLM > AlwaysSurrogate on Rastrigin" pilot: the schedule alone
+  reproduces and exceeds the LLM's value. See §5.5.
+- **Recommended paper wording (updated)**: *"On Rastrigin, the LLM
+  exhibited a global-to-local temporal action pattern associated with its
+  advantage over AlwaysSurrogate. A deterministic two-phase schedule
+  realizing that pattern matches the LLM's value and exceeds it on three
+  of five families, so the schedule — not LLM-specific per-step reasoning
+  — accounts for the LLM's measurable decision value on this panel."*
 
 ### §5.3 FrozenRouter: BOCoDe advantage does NOT transfer
 
@@ -440,6 +486,18 @@ CI-detectably worse. The RF softmax maximum rarely exceeds 0.25, so
 confidence thresholds route nearly every step to System-2;
 `ConfidenceRouter.tau_conf` is not a useful routing signal on this panel.
 
+**Schedule control (mechanism).** A predeclared deterministic
+`GlobalThenLocal` control (10 global decisions, then local) run on this
+exact panel (paired starts verified) **beats the LLM arm with CI excluding
+zero on Hartmann (+0.334), SixHumpCamel (+0.674), and Rastrigin (+9.628)**
+and never loses to it; it ties `rf` on Branin/Hartmann/Rastrigin while RF
+keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
+decision content is dominated by the fixed two-phase schedule its own
+per-step distribution exhibits — and by THEORY.md P3, no router could have
+rescued an arm with nonpositive per-state advantage. Artifacts:
+`runs/exp_rq3_schedule_baseline.json`,
+`scripts/exp_rq3_schedule_baseline.py`.
+
 ## §7 Limitations
 
 (per codex round-1 review 2026-09-27; ordered roughly by importance)
@@ -480,10 +538,13 @@ confidence thresholds route nearly every step to System-2;
    DeepSeek API. Other LLMs (GPT-4, Claude, Gemini) may exhibit different
    decision patterns; we have no evidence the Rastrigin finding transfers,
    and the §5.5 cost-frontier result is provider-specific.
-9. **Mechanism is correlational, not causal** — the LLM's Rastrigin
-   advantage is associated with a global-to-local temporal pattern, but we
-   have not run a deterministic global-then-local baseline to test whether
-   the *schedule* causes the advantage.
+9. **Mechanism: schedule-sufficiency shown, full causal decomposition not** —
+   the deterministic global-then-local control now exists and dominates the
+   LLM (3/5 families, CI excluding zero; never loses), which establishes
+   that the schedule *suffices* for — and exceeds — the LLM's closed-loop
+   value on this panel. This is stronger than the earlier correlational
+   statement but still not a step-level causal decomposition of the LLM's
+   individual decisions.
 10. **Per-step trajectory attrition** — by step 15, only 1 LLM trajectory
     has not yet terminated; later-step means are computed on small subsamples.
     The +45.7 advantage at step 15 is illustrative, not inferential.
@@ -532,14 +593,18 @@ confidence thresholds route nearly every step to System-2;
 ## §9 Conclusion
 
 - Three contributions: (1) a 7-component decision-centric BO framework
-  with **385 unit tests** (was 364 pre-Gate 5; +21 in `test_objective_transform.py`);
-  (2) a counterfactual oracle dataset validation methodology that closes
+  with **385 unit tests** (was 364 pre-Gate 5; +21 in `test_objective_transform.py`)
+  and four formal propositions tied to the experiments (`docs/THEORY.md`:
+  affine label invariance, adaptive-value bound, routing degeneracy,
+  exact imitation of axis-aligned rules); (2) a counterfactual oracle
+  dataset validation methodology that closes
   Gate 3 (PASS at 20 seeds, adjusted_lift CI [0.848, 1.954]) and Gate 4
   stop-gain (5/5), with **Gate 2 still failing** (5/15 buckets pass at
-  top_action_share ≥ 0.6) and **Gate 5 partial** (median Spearman = 1.0;
-  predeclared joint fails on 2/17 buckets); (3) a global-to-local temporal
-  action pattern associated with (not causally established as causing)
-  LLM-as-System-1's Rastrigin advantage.
+  top_action_share ≥ 0.6) and **Gate 5 partial** (median Spearman = 1.0
+  necessarily by P1; predeclared joint fails on 2/17 buckets); (3) a
+  global-to-local temporal action pattern whose *sufficiency* is now
+  demonstrated: a deterministic two-phase schedule reproduces and exceeds
+  the LLM's closed-loop value on this panel.
 - **RQ2 (NEW)**: cross-family transfer **wins vs the real state-conditional
   RulePolicy on 3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
   95% CI upper < 0). It also wins vs AlwaysSurrogate on 2/5 (Ackley,
@@ -557,9 +622,10 @@ confidence thresholds route nearly every step to System-2;
   help Hartmann or SixHumpCamel vs AlwaysSurrogate; (d) cross-family RF
   loses to a constant `local_exploitation` policy (AlwaysLocal) on
   aggregate because that policy ignores budget awareness; (e) within-
-  function dimension transfer fails (RQ2.2 — the RQ2.1 signal is a family
-  signal, not a dimension signal); (f) in closed loop, always-LLM is
-  dominated by the frozen System-1 (§5.5).
+  function dimension transfer fails (RQ2.2 at 10 seeds — the RQ2.1 signal
+  is a family signal, not a dimension signal); (f) in closed loop,
+  always-LLM is dominated by both the frozen System-1 and a deterministic
+  two-phase schedule (§5.5) — and by P3 no router could have fixed this.
 - Future work: regimes where an LLM System-2 repays its cost (longer
   horizons, stochastic objectives, OOD states), external lenz/PlugBO
   baseline, fine-tuning a small decision model from LLM trajectories,
@@ -579,6 +645,15 @@ confidence thresholds route nearly every step to System-2;
 
 ## File references (one-line per claim)
 
+- `docs/THEORY.md` — P1/P2/P3/L1 with proofs, scope conditions, and the
+  proposition-to-evidence map
+- `scripts/verify_theory_propositions.py` → `runs/verify_theory_propositions.json`
+  — P1 checked through `compute_utility` on 5,304 branches (max rel err
+  1.4e-12); P2 recomputed at 20 seeds
+- `runs/exp_rq3_schedule_baseline.json` + `scripts/exp_rq3_schedule_baseline.py`
+  — deterministic schedule control on the RQ3 panel (paired starts verified)
+- `runs/exp_rq2_2_ioh_within_function_dim_transfer_10seed.json` — RQ2.2
+  10-seed confirmation
 - `runs/phase8_6d_h3_20seed_5family.jsonl` — Track A dataset
 - `runs/exp_rq1_2_h3_20seed_report.json` — Track A gate results
 - `runs/EXP_RQ0_5_REPORT.md` — Track C source (joint 10-seed)

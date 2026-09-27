@@ -1,6 +1,54 @@
 # Current research status
 
-## EXP-RQ3 — Real-LLM cost frontier, 10-seed confirmation + sign correction (2026-09-27, latest)
+## Schedule mechanism check + RQ2.2 10-seed + theory formalization (2026-09-27, latest)
+
+Three additions close the remaining stated gaps:
+
+1. **Deterministic schedule control on the RQ3 panel**
+   (`scripts/exp_rq3_schedule_baseline.py` →
+   `runs/exp_rq3_schedule_baseline.json`). The predeclared `GlobalThenLocal`
+   policy (10 `global_exploration` decisions, then `local_exploitation`)
+   ran on the exact cost-frontier panel (5 families × seeds 100–109,
+   budget 30, paired Sobol starts asserted equal to the sweep rows; zero
+   LLM calls). **It beats the real LLM with CI excluding zero on Hartmann
+   (+0.334), SixHumpCamel (+0.674), and Rastrigin (+9.628) and never loses
+   to it**; it ties the frozen RF on Branin/Hartmann/Rastrigin while RF
+   keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
+   decision content on this panel is dominated by its own global-to-local
+   schedule — the schedule alone reproduces and exceeds the LLM's value
+   (Rastrigin ordering: schedule ≈ rf > llm, subsuming the RQ0.5
+   "LLM > AlwaysSurrogate on Rastrigin" pilot). This closes the workshop
+   outline's "deterministic baseline not implemented" caveat.
+2. **RQ2.2 10-seed confirmation**
+   (`runs/exp_rq2_2_ioh_within_function_dim_transfer_10seed.json`; 120
+   train + 120 test trajectories). Perfect imitation persists
+   (`rf − rule_full = +0.0000`, 10/10 ties on every function) and the
+   loss to Surrogate now has CI excluding zero on **all three** functions
+   (f6 +0.128, f8 +0.244, f15 +0.225); losses to Local are CI-positive on
+   f6/f8. The within-function dimension-transfer negative is strengthened.
+3. **Theory formalization** (`docs/THEORY.md`, verified by
+   `scripts/verify_theory_propositions.py` →
+   `runs/verify_theory_propositions.json`):
+   - **P1 affine invariance (exact)**: under `y → αy+β` with recomputed
+     scale, every utility label is unchanged; verified through the real
+     `compute_utility` on 5,304 rollout branches (max rel err 1.4e-12).
+     Makes Gate 5's Spearman = 1.0 necessary; JS breaches are GP numerics.
+   - **P2 adaptive-value bound**: `D = E[max U] − max E[U]` tightly bounds
+     any state-conditional policy's one-step gain over the best constant
+     action. Recomputed at 20 seeds: Hartmann 0.710 > Ackley 0.332 >
+     Rastrigin 0.262 > Branin 0.040 > SixHumpCamel 0.012 (same regime
+     ordering as the 10-seed landscape; best constant action is
+     `local_exploitation` on the three opportunity-rich families).
+   - **P3 routing degeneracy**: if System-2's per-state advantage
+     `A(s) ≤ 0`, *no* router (oracle or learned) beats System-1-only.
+     The 10-seed sweep (0/40 arms beat `rf`) is the empirical signature;
+     the routing failure is a property of the LLM decisions, not the
+     heuristic. Schedule control reinforces `A ≤ 0`.
+   - **L1 exact imitation**: RF with the rule's axis-aligned features in
+     its feature set reproduces a threshold rule exactly under noiseless
+     labels — explaining RQ2.2's `+0.0000` and the inherited losses.
+
+## EXP-RQ3 — Real-LLM cost frontier, 10-seed confirmation + sign correction (2026-09-27)
 
 `runs/exp_rq3_router_sweep.json` (seeds 100–102, 135 trajectories) plus
 `runs/exp_rq3_router_sweep_seeds103_109.json` (seeds 103–109, 315

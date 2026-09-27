@@ -1,0 +1,50 @@
+{
+  "dataset": "runs/phase8_6d_h3_20seed_5family.jsonl",
+  "n_records": 663,
+  "p1_affine_invariance": {
+    "n_branches_checked": 5304,
+    "max_relative_error": 1.359253273954324e-12
+  },
+  "p2_adaptive_value": {
+    "branin": {
+      "n_records": 146,
+      "adaptive_value_D": 0.039503561868885595,
+      "nonnegative": true,
+      "oracle_mean_utility": -0.021306623793170016,
+      "best_constant_action": "retrain_surrogate",
+      "best_constant_mean_utility": -0.060810185662055614
+    },
+    "hartmann": {
+      "n_records": 135,
+      "adaptive_value_D": 0.7095031254099011,
+      "nonnegative": true,
+      "oracle_mean_utility": 1.1435230502782447,
+      "best_constant_action": "local_exploitation",
+      "best_constant_mean_utility": 0.4340199248683436
+    },
+    "ackley": {
+      "n_records": 130,
+      "adaptive_value_D": 0.3323503921542488,
+      "nonnegative": true,
+      "oracle_mean_utility": 0.7037436932472072,
+      "best_constant_action": "local_exploitation",
+      "best_constant_mean_utility": 0.3713933010929584
+    },
+    "sixhumpcamel": {
+      "n_records": 123,
+      "adaptive_value_D": 0.012102878344546736,
+      "nonnegative": true,
+      "oracle_mean_utility": -0.065077366063969,
+      "best_constant_action": "retrain_surrogate",
+      "best_constant_mean_utility": -0.07718024440851573
+    },
+    "rastrigin": {
+      "n_records": 129,
+      "adaptive_value_D": 0.2618051902742941,
+      "nonnegative": true,
+      "oracle_mean_utility": 0.411933584082922,
+      "best_constant_action": "local_exploitation",
+      "best_constant_mean_utility": 0.1501283938086279
+    }
+  }
+}

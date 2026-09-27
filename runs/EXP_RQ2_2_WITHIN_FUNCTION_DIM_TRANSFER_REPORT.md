@@ -1,6 +1,27 @@
 # EXP-RQ2.2 — Within-function dimension transfer (2026-09-27)
 
 **Date:** 2026-09-27
+
+## 10-seed confirmation (seeds 100–109, added later the same day)
+
+The stated limitation below ("three test seeds per cell") is closed: the
+protocol rerun with seeds 100–109 (120 train rollouts + 120 test
+trajectories, 8 parallel workers), same untouched test dim 5 / instance 2.
+Artifacts: `runs/exp_rq2_2_ioh_within_function_dim_transfer_10seed.json`.
+
+| Cell (test d5/i2, n=10 seeds) | `rf − rule_full` | `rf − surrogate` | `rf − local` |
+|---|---:|---:|---:|
+| f6 | **+0.0000** [+0.0000, +0.0000] (0/10/0) | **+0.1281 [+0.0088, +0.2820]** (1/0/9) | **+0.1529 [+0.0058, +0.3030]** (3/0/7) |
+| f8 | **+0.0000** [+0.0000, +0.0000] (0/10/0) | **+0.2443 [+0.0590, +0.4528]** (1/0/9) | **+0.3214 [+0.1408, +0.5264]** (1/0/9) |
+| f15 | **+0.0000** [+0.0000, +0.0000] (0/10/0) | **+0.2252 [+0.0883, +0.3775]** (1/1/8) | +0.1050 [−0.0329, +0.2653] (4/0/6) |
+
+(W/T/L is rf vs baseline.) Perfect imitation persists at 10 seeds on all
+three functions, and the RF's loss to **Surrogate now has CI excluding
+zero on all three functions** (at 3 seeds only f8/f15 cleared zero). The
+negative result is strengthened with tighter intervals.
+`docs/THEORY.md` Lemma 1 explains the exact-zero imitation column: the RF
+feature set contains the rule's axis-aligned thresholds, so with noiseless
+rule labels the forest reproduces the rule exactly — including its losses.
 **Goal:** Cleanly isolate dimension transfer from family transfer. EXP-RQ2.1
 trained an RF on four BOCoDe families and tested on a fifth; each family
 has a fixed dimension, so the cross-family result was confounded with
