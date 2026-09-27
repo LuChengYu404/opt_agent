@@ -115,9 +115,6 @@ class JevStyleSystem1(nn.Module):
             f"stagnation_steps={opt.get('stagnation_steps', '?')}"
         )
 
-    def _candidate_text(self, candidate_id: str) -> str:
-        return f"action: {candidate_id}"
-
     def encode_state(self, state) -> torch.Tensor:
         """Return the [CLS] pooled state vector, shape (hidden_dim,)."""
         text = self._state_text(state)

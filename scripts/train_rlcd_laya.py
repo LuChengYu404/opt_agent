@@ -40,6 +40,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from _rlcd_common import rf_pairwise_and_top1 as _rf_pairwise_and_top1  # noqa: E402,F401
+
 from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
@@ -52,25 +54,6 @@ from _shared_rq_features import (  # noqa: E402
     extract_utilities,
     compute_family_scales,
 )
-
-
-def _rf_pairwise_and_top1(pred: dict[str, float], gold: dict[str, float]) -> tuple[int, int, int]:
-    """(correct, total, top1_match) for one record's predicted utilities."""
-    actions = sorted(set(pred) & set(gold))
-    correct = 0
-    total = 0
-    for i, a in enumerate(actions):
-        for b in actions[i + 1:]:
-            g = gold[a] - gold[b]
-            if abs(g) <= 1e-12:
-                continue
-            total += 1
-            p = pred[a] - pred[b]
-            correct += int((p > 0) == (g > 0))
-    top = int(
-        max(actions, key=lambda a: pred[a]) == max(actions, key=lambda a: gold[a])
-    )
-    return correct, total, top
 
 
 def fit_rf(train_dicts: list[dict]):

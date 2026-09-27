@@ -35,7 +35,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -44,6 +43,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from _rlcd_common import bootstrap_ci as _bootstrap_ci  # noqa: E402
+from _rlcd_common import make_always_surrogate  # noqa: E402
 
 CHECKPOINTS = {
     "proper": "runs/rlcd_laya_proper_v1",
@@ -51,17 +54,6 @@ CHECKPOINTS = {
 }
 QUANTILES = (0.20, 0.40, 0.60)
 PROBLEMS = ("Branin", "Ackley", "Hartmann", "SixHumpCamel", "Rastrigin")
-
-
-def _bootstrap_ci(values: list[float], repetitions: int = 2000,
-                  seed: int = 0) -> tuple[float, float]:
-    rng = random.Random(seed)
-    n = len(values)
-    means = sorted(
-        statistics.fmean(values[rng.randrange(n)] for _ in range(n))
-        for _ in range(repetitions)
-    )
-    return means[int(0.025 * repetitions)], means[int(0.975 * repetitions)]
 
 
 def _confidence_percentiles() -> dict[str, dict[float, float]]:
@@ -120,32 +112,20 @@ def _run_one(task: dict) -> dict:
     import torch
 
     torch.set_num_threads(1)
-    from opt_agent.actions import candidate_actions_for_state
     from opt_agent.backend.bocode_botorch import (
         BackendConfig,
         BocodeBotorchBackend,
     )
     from opt_agent.loop import DecisionLoop
     from opt_agent.router.confidence import ConfidenceRouter
-    from opt_agent.state import OptimizationState
     from opt_agent.system1 import HybridPolicy, LayaPolicy
     from opt_agent.system2.fallback import FallbackSystem2
-
-    class AlwaysSurrogatePolicy:
-        def __init__(self, seed: int = 0) -> None:
-            self.seed = seed
-
-        def select_action(self, state: OptimizationState, backend=None):
-            choices = candidate_actions_for_state(state, seed=self.seed)
-            if "surrogate_acquisition" in choices:
-                return choices["surrogate_acquisition"]
-            return next(iter(choices.values()))
 
     problem, seed, budget, arm = (
         task["problem"], task["seed"], task["budget"], task["arm"]
     )
     if arm == "surrogate":
-        policy = AlwaysSurrogatePolicy(seed=seed)
+        policy = make_always_surrogate(seed=seed)
         route_counts = None
     else:
         if arm.endswith("_only"):
@@ -159,7 +139,7 @@ def _run_one(task: dict) -> dict:
                 system1=system1,
                 router=ConfidenceRouter(tau_conf=tau),
                 system2=FallbackSystem2(
-                    baseline=AlwaysSurrogatePolicy(seed=seed)  # type: ignore[arg-type]
+                    baseline=make_always_surrogate(seed=seed)  # type: ignore[arg-type]
                 ),
             )
         else:
@@ -167,7 +147,7 @@ def _run_one(task: dict) -> dict:
                 system1=system1,
                 router=ConfidenceRouter(tau_conf=0.0),  # forced System-1
                 system2=FallbackSystem2(
-                    baseline=AlwaysSurrogatePolicy(seed=seed)  # type: ignore[arg-type]
+                    baseline=make_always_surrogate(seed=seed)  # type: ignore[arg-type]
                 ),
             )
         route_counts = None  # filled after the run from policy.history

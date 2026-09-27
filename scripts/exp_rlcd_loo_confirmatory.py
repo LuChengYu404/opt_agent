@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import statistics
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -28,70 +27,20 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from _rlcd_common import (  # noqa: E402
+    ACTIONS_T,
+    bootstrap_ci as _bootstrap_ci,
+    paired_accuracy_diffs as _paired_diffs,
+    per_record_laya as _per_record_laya,
+    raw_gold as _raw_gold,
+    rf_pairwise_and_top1,
+)
+
 from opt_agent.dataset import iter_jsonl  # noqa: E402
 
-ACTIONS_T = ("global_exploration", "local_exploitation", "uncertainty_sampling",
-             "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
-             "retrain_surrogate", "stop")
-
-
-def _raw_gold(record) -> dict[str, float] | None:
-    gold = {}
-    for a, cell in record.rollout_results.items():
-        if cell.get("status") != "valid":
-            continue
-        u = cell.get("utility")
-        if isinstance(u, (int, float)) and u == u:
-            gold[a] = float(u)
-    return gold if len(gold) >= 2 else None
-
-
-def _per_record_laya(model, tok, records, device_str: str) -> dict[str, list]:
-    """record_id → [(correct, total, top1, log_score)] (one per record)."""
-    import torch
-
-    from opt_agent.system1.rlcd import (  # noqa: F401
-        RLCDConfig,
-        _collate,
-        build_item,
-    )
-
-    device = torch.device(device_str)
-    model.to(device).eval()
-    out: dict[str, list] = {}
-    with torch.no_grad():
-        for r in records:
-            item = build_item(r, tok, max_len=512, head_max_len=192)
-            if item is None or _raw_gold(r) is None:
-                continue
-            batch = _collate([item], tok.pad_token_id)
-            tensors = {k: v.to(device) for k, v in batch.items()
-                       if torch.is_tensor(v)}
-            with torch.autocast(device_type=device.type,
-                                dtype=torch.bfloat16,
-                                enabled=device.type == "cuda"):
-                logits, _ = model(
-                    tensors["input_ids"], tensors["attention_mask"],
-                    tensors["marker_pos"], tensors["marker_mask"],
-                    tensors["qtype"],
-                )
-            row = logits[0].float().cpu()
-            index_of = {a: i for i, a in enumerate(item["option_ids"])}
-            gold = _raw_gold(r)
-            gold_top = max(gold, key=lambda a: gold[a])
-            model_top = max((a for a in gold if a in index_of),
-                            key=lambda a: float(row[index_of[a]]))
-            # item["pairs"] carries option indices already.
-            correct = sum(int(row[i] > row[j]) for i, j, _ in item["pairs"])
-            log_score = None
-            if item.get("target") is not None:
-                logq = torch.log_softmax(row, -1).clamp_min(-9.21)
-                t = torch.tensor(item["target"], dtype=logq.dtype)
-                log_score = float((t * logq).sum())
-            out[r.id] = (correct, len(item["pairs"]),
-                         int(model_top == gold_top), log_score)
-    model.to("cpu")
-    return out
+def _per_record_laya_compat(model, tok, records, device_str):
+    from _rlcd_common import per_record_laya
+    return per_record_laya(model, tok, records, device_str)
 
 
 def _rf_per_record(train_records, test_records) -> dict[str, tuple]:
@@ -125,44 +74,8 @@ def _rf_per_record(train_records, test_records) -> dict[str, tuple]:
         if gold is None:
             continue
         pred = dict(zip(ACTIONS_T, rf.predict([feats(r)])[0]))
-        actions = sorted(gold)
-        correct = total = 0
-        for i, a in enumerate(actions):
-            for b in actions[i + 1:]:
-                g = gold[a] - gold[b]
-                if abs(g) <= 1e-12:
-                    continue
-                total += 1
-                correct += int((pred[a] - pred[b] > 0) == (g > 0))
-        top1 = int(max(actions, key=lambda a: pred[a])
-                   == max(actions, key=lambda a: gold[a]))
+        correct, total, top1 = rf_pairwise_and_top1(pred, gold)
         out[r.id] = (correct, total, top1, None)
-    return out
-
-
-def _bootstrap_ci(diffs: list[float], repetitions: int = 2000,
-                  seed: int = 0) -> tuple[float, float]:
-    rng = random.Random(seed)
-    n = len(diffs)
-    if n == 0:
-        return (0.0, 0.0)
-    means = sorted(
-        statistics.fmean(diffs[rng.randrange(n)] for _ in range(n))
-        for _ in range(repetitions)
-    )
-    return means[int(0.025 * repetitions)], means[int(0.975 * repetitions)]
-
-
-def _paired_diffs(a: dict[str, tuple], b: dict[str, tuple]) -> list[float]:
-    """Record-clustered accuracy diffs: per-record correct-rate difference."""
-    ids = sorted(set(a) & set(b))
-    out = []
-    for i in ids:
-        ca, ta = a[i][0], a[i][1]
-        cb, tb = b[i][0], b[i][1]
-        if ta == 0 or tb == 0:
-            continue
-        out.append(ca / ta - cb / tb)
     return out
 
 
@@ -196,7 +109,7 @@ def _run_fold(task: dict) -> dict:
             import laya
 
             agent = laya.load(str(tmp))
-            per_rec = _per_record_laya(agent.model, agent.tok, test, device)
+            per_rec = _per_record_laya_compat(agent.model, agent.tok, test, device)
             seed_rows.append(per_rec)
             del agent
             torch.cuda.empty_cache()

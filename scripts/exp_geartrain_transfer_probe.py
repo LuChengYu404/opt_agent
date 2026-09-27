@@ -27,6 +27,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from _rlcd_common import (  # noqa: E402
+    ACTIONS_T,
+    per_record_laya,
+    raw_gold as _raw_gold,
+    rf_pairwise_and_top1,
+)
+
 from opt_agent.dataset import iter_jsonl  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
@@ -35,55 +42,14 @@ from opt_agent.system1.rlcd import (  # noqa: E402
     load_laya_for_training,
 )
 
-ACTIONS_T = ("global_exploration", "local_exploitation", "uncertainty_sampling",
-             "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
-             "retrain_surrogate", "stop")
-
-
-def _raw_gold(record) -> dict[str, float] | None:
-    gold = {}
-    for a, cell in record.rollout_results.items():
-        if cell.get("status") != "valid":
-            continue
-        u = cell.get("utility")
-        if isinstance(u, (int, float)) and u == u:
-            gold[a] = float(u)
-    return gold if len(gold) >= 2 else None
-
-
 def _laya_arm(model, tok, records, device) -> dict:
-    model.to(device).eval()
-    n_pairs = n_correct = n_top1 = n = 0
-    with torch.no_grad():
-        for r in records:
-            item = build_item(r, tok, max_len=512, head_max_len=192)
-            gold = _raw_gold(r)
-            if item is None or gold is None:
-                continue
-            batch = _collate([item], tok.pad_token_id)
-            tensors = {k: v.to(device) for k, v in batch.items()
-                       if torch.is_tensor(v)}
-            with torch.autocast(device_type=device.type, dtype=torch.bfloat16,
-                                enabled=device.type == "cuda"):
-                logits, _ = model(
-                    tensors["input_ids"], tensors["attention_mask"],
-                    tensors["marker_pos"], tensors["marker_mask"],
-                    tensors["qtype"],
-                )
-            row = logits[0].float().cpu()
-            index_of = {a: i for i, a in enumerate(item["option_ids"])}
-            n += 1
-            n_top1 += int(
-                max(gold, key=lambda a: float(row[index_of[a]]))
-                == max(gold, key=lambda a: gold[a])
-            )
-            for i, j, _ in item["pairs"]:
-                n_pairs += 1
-                n_correct += int(row[i] > row[j])
-    model.to("cpu")
-    return {"records": n, "pairs": n_pairs,
-            "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
-            "top1_agreement": n_top1 / n if n else 0.0}
+    per_rec = per_record_laya(model, tok, records, str(device))
+    n_pairs = sum(v[1] for v in per_rec.values())
+    return {"records": len(per_rec), "pairs": n_pairs,
+            "pairwise_accuracy": (sum(v[0] for v in per_rec.values()) / n_pairs)
+                                 if n_pairs else 0.0,
+            "top1_agreement": (sum(v[2] for v in per_rec.values()) / len(per_rec))
+                              if per_rec else 0.0}
 
 
 def _rf_arm(train_records, test_records) -> dict:
@@ -117,17 +83,11 @@ def _rf_arm(train_records, test_records) -> dict:
         if gold is None:
             continue
         pred = dict(zip(ACTIONS_T, rf.predict([feats(r)])[0]))
-        actions = sorted(gold)
+        c, tt, m = rf_pairwise_and_top1(pred, gold)
         n += 1
-        n_top1 += int(max(actions, key=lambda a: pred[a])
-                      == max(actions, key=lambda a: gold[a]))
-        for i, a in enumerate(actions):
-            for b in actions[i + 1:]:
-                g = gold[a] - gold[b]
-                if abs(g) <= 1e-12:
-                    continue
-                n_pairs += 1
-                n_correct += int((pred[a] - pred[b] > 0) == (g > 0))
+        n_top1 += m
+        n_pairs += tt
+        n_correct += c
     return {"records": n, "pairs": n_pairs,
             "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
             "top1_agreement": n_top1 / n if n else 0.0}

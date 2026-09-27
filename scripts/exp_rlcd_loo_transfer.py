@@ -30,33 +30,31 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from _rlcd_common import (  # noqa: E402
+    per_record_laya,
+    raw_gold as _raw_gold,
+    rf_pairwise_and_top1 as _rf_pairwise_and_top1,
+)
+
 from opt_agent.dataset import iter_jsonl  # noqa: E402
 
 
 def _eval_arm(model, tok, records) -> dict:
-    import torch
-
-    from opt_agent.system1.rlcd import RLCDConfig, evaluate_ranking
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-    out = evaluate_ranking(
-        model, tok, records,
-        RLCDConfig(device=str(device), batch_size=8), device,
-    )
-    model.to("cpu")
-    return out
-
-
-def _raw_gold(record) -> dict[str, float] | None:
-    gold = {}
-    for a, cell in record.rollout_results.items():
-        if cell.get("status") != "valid":
-            continue
-        u = cell.get("utility")
-        if isinstance(u, (int, float)) and u == u:  # finite check (no NaN)
-            gold[a] = float(u)
-    return gold if len(gold) >= 2 else None
+    per_rec = per_record_laya(model, tok, records,
+                              "cuda" if torch.cuda.is_available() else "cpu")
+    n_pairs = sum(v[1] for v in per_rec.values())
+    return {
+        "pairs": n_pairs,
+        "pairwise_accuracy": (sum(v[0] for v in per_rec.values()) / n_pairs)
+                             if n_pairs else 0.0,
+        "top1_agreement": (sum(v[2] for v in per_rec.values()) / len(per_rec))
+                          if per_rec else 0.0,
+        "mean_log_score": (
+            sum(v[3] for v in per_rec.values() if v[3] is not None)
+            / max(1, sum(1 for v in per_rec.values() if v[3] is not None))
+        ) if any(v[3] is not None for v in per_rec.values()) else None,
+        "records": len(per_rec),
+    }
 
 
 def _rf_fold(train_records, test_records) -> dict:
@@ -64,7 +62,6 @@ def _rf_fold(train_records, test_records) -> dict:
 
     from _shared_rq_features import ACTIONS, extract_features
     from opt_agent.dataset import phase_of_ratio
-    from train_rlcd_laya import _rf_pairwise_and_top1
 
     def feats(r):
         return extract_features(

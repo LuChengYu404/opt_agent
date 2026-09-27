@@ -24,6 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from _rlcd_common import per_record_laya  # noqa: E402
+
 from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
@@ -31,47 +33,6 @@ from opt_agent.system1.rlcd import (  # noqa: E402
     load_laya_for_training,
 )
 from train_rlcd_laya import fit_rf, rf_per_record  # noqa: E402
-
-
-def _per_record_counts(model, tok, records, cfg, device) -> dict[str, tuple[int, int, int, float]]:
-    """record_id → (correct_pairs, total_pairs, top1_match, log_score)."""
-    model.eval()
-    out: dict[str, tuple[int, int, int, float]] = {}
-    with torch.no_grad():
-        for r in records:
-            item = build_item(r, tok, max_len=cfg.max_len, head_max_len=cfg.head_max_len)
-            if item is None:
-                continue
-            logits = _forward_one(model, item, tok, device, cfg)
-            index_of = {a: i for i, a in enumerate(item["option_ids"])}
-            gold_top = max(r.gold_probs, key=lambda a: r.gold_probs[a])
-            model_top = max(index_of, key=lambda a: float(logits[index_of[a]]))
-            correct = sum(
-                int(logits[i] > logits[j]) for i, j, _ in item["pairs"]
-            )
-            log_score = float("nan")
-            if item.get("target") is not None:
-                logq = torch.log_softmax(logits, dim=-1).clamp_min(-9.21)
-                t = torch.tensor(item["target"], dtype=logq.dtype,
-                                 device=logq.device)
-                log_score = float((t * logq).sum())
-            out[r.id] = (correct, len(item["pairs"]), int(model_top == gold_top),
-                         log_score)
-    return out
-
-
-def _forward_one(model, item, tok, device, cfg):
-    from opt_agent.system1.rlcd import _collate
-
-    batch = _collate([item], tok.pad_token_id)
-    tensors = {k: v.to(device) for k, v in batch.items() if torch.is_tensor(v)}
-    with torch.autocast(device_type=device.type, dtype=torch.bfloat16,
-                        enabled=device.type == "cuda"):
-        logits, _ = model(
-            tensors["input_ids"], tensors["attention_mask"],
-            tensors["marker_pos"], tensors["marker_mask"], tensors["qtype"],
-        )
-    return logits[0].float()
 
 
 def paired_bootstrap(
@@ -110,7 +71,7 @@ def main() -> int:
 
     model, tok, _cfg, _ = load_laya_for_training("/home/lcy/.cache/opt_agent_v3/laya")
     model.to(device)
-    zero = _per_record_counts(model, tok, records, eval_cfg, device)
+    zero = per_record_laya(model, tok, records, str(device))
     model.to("cpu"); del model
 
     import laya
@@ -125,7 +86,7 @@ def main() -> int:
             continue
         a = laya.load(path)
         a.model.to(device)
-        arms[name] = _per_record_counts(a.model, a.tok, records, eval_cfg, device)
+        arms[name] = per_record_laya(a.model, a.tok, records, str(device))
         a.model.to("cpu")
 
     rf_model, rf_scales = fit_rf([asdict(r) for r in train_records])

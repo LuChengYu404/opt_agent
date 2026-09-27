@@ -98,13 +98,3 @@ class OptimizationState:
             "total_budget": self.resource.total_budget,
             "last_action": self.history.last_action,
         }
-
-    def to_narrative(self) -> str:
-        """Plain-English narrative of the same observable state for
-        narrative-format LLM prompts. The narrative text lives in
-        ``system1._prompt`` to keep all prompt-shape choices together;
-        this method is a thin wrapper so callers can request narrative
-        directly from the state.
-        """
-        from opt_agent.system1._prompt import _state_narrative
-        return _state_narrative(self)

@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -34,17 +33,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
-
-def _bootstrap_ci(values: list[float], repetitions: int = 2000,
-                  seed: int = 0) -> tuple[float, float]:
-    rng = random.Random(seed)
-    n = len(values)
-    means = sorted(
-        statistics.fmean(values[rng.randrange(n)] for _ in range(n))
-        for _ in range(repetitions)
-    )
-    return means[int(0.025 * repetitions)], means[int(0.975 * repetitions)]
+from _rlcd_common import bootstrap_ci as _bootstrap_ci  # noqa: E402
 
 
 def _run_one(task: dict) -> dict:
@@ -52,35 +43,20 @@ def _run_one(task: dict) -> dict:
     import torch
 
     torch.set_num_threads(1)
-    from opt_agent.actions import candidate_actions_for_state
+    from _rlcd_common import make_always_surrogate, make_rule_full_budget
     from opt_agent.backend.bocode_botorch import (
         BackendConfig,
         BocodeBotorchBackend,
     )
     from opt_agent.loop import DecisionLoop
-    from opt_agent.loop.policies import RulePolicy
-    from opt_agent.state import OptimizationState
-
-    class RuleFullBudget(RulePolicy):
-        LOW_BUDGET_THRESHOLD = 0
-
-    class AlwaysSurrogatePolicy:
-        def __init__(self, seed: int = 0) -> None:
-            self.seed = seed
-
-        def select_action(self, state, backend=None):
-            choices = candidate_actions_for_state(state, seed=self.seed)
-            if "surrogate_acquisition" in choices:
-                return choices["surrogate_acquisition"]
-            return next(iter(choices.values()))
 
     problem, seed, budget, arm = (
         task["problem"], task["seed"], task["budget"], task["arm"]
     )
     if arm == "rule_full_budget":
-        policy = RuleFullBudget(seed=seed)
+        policy = make_rule_full_budget(seed=seed)
     elif arm == "surrogate":
-        policy = AlwaysSurrogatePolicy(seed=seed)
+        policy = make_always_surrogate(seed=seed)
     else:
         from opt_agent.system1 import LayaPolicy
 

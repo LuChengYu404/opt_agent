@@ -159,8 +159,3 @@ class TemperatureCalibrator:
         ).reshape(1, -1)
         scaled = _softmax(L / self.temperature)[0]
         return {c: float(v) for c, v in zip(candidates, scaled)}
-
-    def transform_batch(
-        self, probs_list: Sequence[Mapping[str, float]],
-    ) -> list[dict[str, float]]:
-        return [self.transform(p) for p in probs_list]
