@@ -1,0 +1,2440 @@
+{
+  "closed_loop_best_first_action": {
+    "Ackley": "local_exploitation",
+    "Branin": "surrogate_acquisition",
+    "Hartmann": "local_exploitation",
+    "Rastrigin": "local_exploitation",
+    "SixHumpCamel": "surrogate_acquisition"
+  },
+  "families": [
+    "Branin",
+    "Hartmann",
+    "Ackley",
+    "SixHumpCamel",
+    "Rastrigin"
+  ],
+  "per_policy_family_counts": {
+    "AlwaysSurrogate/Ackley": {
+      "surrogate_acquisition": 250
+    },
+    "AlwaysSurrogate/Branin": {
+      "surrogate_acquisition": 250
+    },
+    "AlwaysSurrogate/Hartmann": {
+      "surrogate_acquisition": 250
+    },
+    "AlwaysSurrogate/Rastrigin": {
+      "surrogate_acquisition": 250
+    },
+    "AlwaysSurrogate/SixHumpCamel": {
+      "surrogate_acquisition": 250
+    },
+    "Jev/Ackley": {
+      "surrogate_acquisition": 250
+    },
+    "Jev/Branin": {
+      "surrogate_acquisition": 250
+    },
+    "Jev/Hartmann": {
+      "surrogate_acquisition": 250
+    },
+    "Jev/Rastrigin": {
+      "surrogate_acquisition": 250
+    },
+    "Jev/SixHumpCamel": {
+      "surrogate_acquisition": 250
+    },
+    "LLMDeepSeek/Ackley": {
+      "global_exploration": 99,
+      "local_exploitation": 43,
+      "surrogate_acquisition": 9
+    },
+    "LLMDeepSeek/Branin": {
+      "global_exploration": 108,
+      "local_exploitation": 34
+    },
+    "LLMDeepSeek/Hartmann": {
+      "global_exploration": 100,
+      "local_exploitation": 48,
+      "surrogate_acquisition": 2
+    },
+    "LLMDeepSeek/Rastrigin": {
+      "global_exploration": 103,
+      "local_exploitation": 43,
+      "surrogate_acquisition": 1
+    },
+    "LLMDeepSeek/SixHumpCamel": {
+      "global_exploration": 101,
+      "local_exploitation": 45,
+      "surrogate_acquisition": 3
+    },
+    "RoutingAware/Ackley": {
+      "global_exploration": 98,
+      "local_exploitation": 43,
+      "surrogate_acquisition": 11
+    },
+    "RoutingAware/Branin": {
+      "surrogate_acquisition": 250
+    },
+    "RoutingAware/Hartmann": {
+      "global_exploration": 103,
+      "local_exploitation": 43,
+      "surrogate_acquisition": 1
+    },
+    "RoutingAware/Rastrigin": {
+      "global_exploration": 102,
+      "local_exploitation": 44,
+      "surrogate_acquisition": 2
+    },
+    "RoutingAware/SixHumpCamel": {
+      "surrogate_acquisition": 250
+    },
+    "RulePolicy/Ackley": {
+      "global_exploration": 83,
+      "stop": 10,
+      "surrogate_acquisition": 49
+    },
+    "RulePolicy/Branin": {
+      "global_exploration": 80,
+      "stop": 10,
+      "surrogate_acquisition": 59
+    },
+    "RulePolicy/Hartmann": {
+      "global_exploration": 84,
+      "stop": 10,
+      "surrogate_acquisition": 47
+    },
+    "RulePolicy/Rastrigin": {
+      "global_exploration": 75,
+      "stop": 10,
+      "surrogate_acquisition": 65
+    },
+    "RulePolicy/SixHumpCamel": {
+      "global_exploration": 83,
+      "stop": 10,
+      "surrogate_acquisition": 48
+    }
+  },
+  "per_step_actions": {
+    "AlwaysSurrogate/Ackley": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "AlwaysSurrogate/Branin": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "AlwaysSurrogate/Hartmann": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "AlwaysSurrogate/Rastrigin": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "AlwaysSurrogate/SixHumpCamel": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "Jev/Ackley": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "Jev/Branin": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "Jev/Hartmann": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "Jev/Rastrigin": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "Jev/SixHumpCamel": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "LLMDeepSeek/Ackley": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 2,
+        "local_exploitation": 7,
+        "surrogate_acquisition": 1
+      },
+      "11": {
+        "global_exploration": 3,
+        "local_exploitation": 6,
+        "surrogate_acquisition": 1
+      },
+      "12": {
+        "global_exploration": 2,
+        "local_exploitation": 8
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 6
+      },
+      "15": {
+        "local_exploitation": 2
+      },
+      "16": {
+        "local_exploitation": 2
+      },
+      "17": {
+        "local_exploitation": 1
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "7": {
+        "global_exploration": 8,
+        "local_exploitation": 1,
+        "surrogate_acquisition": 1
+      },
+      "8": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "9": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      }
+    },
+    "LLMDeepSeek/Branin": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 5,
+        "local_exploitation": 5
+      },
+      "11": {
+        "global_exploration": 4,
+        "local_exploitation": 6
+      },
+      "12": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 2
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "6": {
+        "global_exploration": 10
+      },
+      "7": {
+        "global_exploration": 10
+      },
+      "8": {
+        "global_exploration": 10
+      },
+      "9": {
+        "global_exploration": 10
+      }
+    },
+    "LLMDeepSeek/Hartmann": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 2,
+        "local_exploitation": 8
+      },
+      "11": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "12": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 8
+      },
+      "15": {
+        "local_exploitation": 1
+      },
+      "16": {
+        "local_exploitation": 1
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 10
+      },
+      "4": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 10
+      },
+      "7": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "8": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "9": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      }
+    },
+    "LLMDeepSeek/Rastrigin": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 3,
+        "local_exploitation": 6,
+        "surrogate_acquisition": 1
+      },
+      "11": {
+        "global_exploration": 4,
+        "local_exploitation": 6
+      },
+      "12": {
+        "global_exploration": 2,
+        "local_exploitation": 8
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 6
+      },
+      "15": {
+        "local_exploitation": 1
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "7": {
+        "global_exploration": 8,
+        "local_exploitation": 2
+      },
+      "8": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "9": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      }
+    },
+    "LLMDeepSeek/SixHumpCamel": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 3,
+        "local_exploitation": 7
+      },
+      "11": {
+        "global_exploration": 5,
+        "local_exploitation": 5
+      },
+      "12": {
+        "global_exploration": 2,
+        "local_exploitation": 8
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 7
+      },
+      "15": {
+        "local_exploitation": 2
+      },
+      "2": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "3": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "4": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "5": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "6": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "7": {
+        "global_exploration": 10
+      },
+      "8": {
+        "global_exploration": 8,
+        "local_exploitation": 2
+      },
+      "9": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      }
+    },
+    "RoutingAware/Ackley": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 2,
+        "local_exploitation": 7,
+        "surrogate_acquisition": 1
+      },
+      "11": {
+        "global_exploration": 3,
+        "local_exploitation": 6,
+        "surrogate_acquisition": 1
+      },
+      "12": {
+        "global_exploration": 1,
+        "local_exploitation": 8,
+        "surrogate_acquisition": 1
+      },
+      "13": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "14": {
+        "local_exploitation": 7
+      },
+      "15": {
+        "local_exploitation": 2
+      },
+      "16": {
+        "local_exploitation": 2
+      },
+      "17": {
+        "local_exploitation": 1
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "7": {
+        "global_exploration": 7,
+        "local_exploitation": 1,
+        "surrogate_acquisition": 2
+      },
+      "8": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "9": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      }
+    },
+    "RoutingAware/Branin": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "RoutingAware/Hartmann": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "11": {
+        "global_exploration": 2,
+        "local_exploitation": 8
+      },
+      "12": {
+        "global_exploration": 1,
+        "local_exploitation": 9
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 7
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 10
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 10
+      },
+      "7": {
+        "global_exploration": 9,
+        "surrogate_acquisition": 1
+      },
+      "8": {
+        "global_exploration": 10
+      },
+      "9": {
+        "global_exploration": 10
+      }
+    },
+    "RoutingAware/Rastrigin": {
+      "0": {
+        "global_exploration": 10
+      },
+      "1": {
+        "global_exploration": 10
+      },
+      "10": {
+        "global_exploration": 3,
+        "local_exploitation": 6,
+        "surrogate_acquisition": 1
+      },
+      "11": {
+        "global_exploration": 5,
+        "local_exploitation": 5
+      },
+      "12": {
+        "local_exploitation": 10
+      },
+      "13": {
+        "local_exploitation": 10
+      },
+      "14": {
+        "local_exploitation": 7
+      },
+      "15": {
+        "local_exploitation": 1
+      },
+      "2": {
+        "global_exploration": 10
+      },
+      "3": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "4": {
+        "global_exploration": 10
+      },
+      "5": {
+        "global_exploration": 10
+      },
+      "6": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "7": {
+        "global_exploration": 7,
+        "local_exploitation": 2,
+        "surrogate_acquisition": 1
+      },
+      "8": {
+        "global_exploration": 9,
+        "local_exploitation": 1
+      },
+      "9": {
+        "global_exploration": 10
+      }
+    },
+    "RoutingAware/SixHumpCamel": {
+      "0": {
+        "surrogate_acquisition": 10
+      },
+      "1": {
+        "surrogate_acquisition": 10
+      },
+      "10": {
+        "surrogate_acquisition": 10
+      },
+      "11": {
+        "surrogate_acquisition": 10
+      },
+      "12": {
+        "surrogate_acquisition": 10
+      },
+      "13": {
+        "surrogate_acquisition": 10
+      },
+      "14": {
+        "surrogate_acquisition": 10
+      },
+      "15": {
+        "surrogate_acquisition": 10
+      },
+      "16": {
+        "surrogate_acquisition": 10
+      },
+      "17": {
+        "surrogate_acquisition": 10
+      },
+      "18": {
+        "surrogate_acquisition": 10
+      },
+      "19": {
+        "surrogate_acquisition": 10
+      },
+      "2": {
+        "surrogate_acquisition": 10
+      },
+      "20": {
+        "surrogate_acquisition": 10
+      },
+      "21": {
+        "surrogate_acquisition": 10
+      },
+      "22": {
+        "surrogate_acquisition": 10
+      },
+      "23": {
+        "surrogate_acquisition": 10
+      },
+      "24": {
+        "surrogate_acquisition": 10
+      },
+      "3": {
+        "surrogate_acquisition": 10
+      },
+      "4": {
+        "surrogate_acquisition": 10
+      },
+      "5": {
+        "surrogate_acquisition": 10
+      },
+      "6": {
+        "surrogate_acquisition": 10
+      },
+      "7": {
+        "surrogate_acquisition": 10
+      },
+      "8": {
+        "surrogate_acquisition": 10
+      },
+      "9": {
+        "surrogate_acquisition": 10
+      }
+    },
+    "RulePolicy/Ackley": {
+      "0": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "1": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "10": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "11": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "12": {
+        "global_exploration": 7,
+        "stop": 2,
+        "surrogate_acquisition": 1
+      },
+      "13": {
+        "global_exploration": 4,
+        "stop": 4
+      },
+      "14": {
+        "stop": 4
+      },
+      "2": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "3": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "4": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "5": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "6": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "7": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "8": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "9": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      }
+    },
+    "RulePolicy/Branin": {
+      "0": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "1": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "10": {
+        "global_exploration": 10
+      },
+      "11": {
+        "global_exploration": 9,
+        "stop": 1
+      },
+      "12": {
+        "global_exploration": 8,
+        "stop": 1
+      },
+      "13": {
+        "global_exploration": 6,
+        "stop": 2
+      },
+      "14": {
+        "global_exploration": 3,
+        "stop": 3
+      },
+      "15": {
+        "global_exploration": 3
+      },
+      "16": {
+        "stop": 3
+      },
+      "2": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "3": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "4": {
+        "global_exploration": 2,
+        "surrogate_acquisition": 8
+      },
+      "5": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "6": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "7": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "8": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "9": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      }
+    },
+    "RulePolicy/Hartmann": {
+      "0": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "1": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "10": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "11": {
+        "global_exploration": 5,
+        "stop": 2,
+        "surrogate_acquisition": 3
+      },
+      "12": {
+        "global_exploration": 2,
+        "stop": 4,
+        "surrogate_acquisition": 2
+      },
+      "13": {
+        "global_exploration": 2,
+        "stop": 1,
+        "surrogate_acquisition": 1
+      },
+      "14": {
+        "global_exploration": 1,
+        "stop": 1,
+        "surrogate_acquisition": 1
+      },
+      "15": {
+        "global_exploration": 1,
+        "surrogate_acquisition": 1
+      },
+      "16": {
+        "stop": 1,
+        "surrogate_acquisition": 1
+      },
+      "17": {
+        "global_exploration": 1
+      },
+      "18": {
+        "stop": 1
+      },
+      "2": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "3": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "4": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "5": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "6": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "7": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "8": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "9": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      }
+    },
+    "RulePolicy/Rastrigin": {
+      "0": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "1": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "10": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "11": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "12": {
+        "global_exploration": 6,
+        "stop": 2,
+        "surrogate_acquisition": 2
+      },
+      "13": {
+        "global_exploration": 4,
+        "stop": 2,
+        "surrogate_acquisition": 2
+      },
+      "14": {
+        "global_exploration": 1,
+        "stop": 3,
+        "surrogate_acquisition": 2
+      },
+      "15": {
+        "global_exploration": 3
+      },
+      "16": {
+        "stop": 3
+      },
+      "2": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "3": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "4": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "5": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "6": {
+        "global_exploration": 3,
+        "surrogate_acquisition": 7
+      },
+      "7": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "8": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "9": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      }
+    },
+    "RulePolicy/SixHumpCamel": {
+      "0": {
+        "global_exploration": 5,
+        "surrogate_acquisition": 5
+      },
+      "1": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "10": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "11": {
+        "global_exploration": 10
+      },
+      "12": {
+        "global_exploration": 4,
+        "stop": 5,
+        "surrogate_acquisition": 1
+      },
+      "13": {
+        "global_exploration": 3,
+        "stop": 2
+      },
+      "14": {
+        "global_exploration": 3
+      },
+      "15": {
+        "stop": 3
+      },
+      "2": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "3": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "4": {
+        "global_exploration": 4,
+        "surrogate_acquisition": 6
+      },
+      "5": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "6": {
+        "global_exploration": 8,
+        "surrogate_acquisition": 2
+      },
+      "7": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      },
+      "8": {
+        "global_exploration": 6,
+        "surrogate_acquisition": 4
+      },
+      "9": {
+        "global_exploration": 7,
+        "surrogate_acquisition": 3
+      }
+    }
+  },
+  "per_step_best_y_means": {
+    "AlwaysSurrogate/Ackley": {
+      "0": -20.637023927046418,
+      "1": -20.613892787256045,
+      "10": -20.28681313402504,
+      "11": -20.215837337535117,
+      "12": -20.211125144254698,
+      "13": -20.211125144254698,
+      "14": -20.211125144254698,
+      "15": -20.211125144254698,
+      "16": -20.19366767601599,
+      "17": -20.19366767601599,
+      "18": -20.19366767601599,
+      "19": -20.19366767601599,
+      "2": -20.47644964313235,
+      "20": -20.19366767601599,
+      "21": -20.19366767601599,
+      "22": -20.190968980759212,
+      "23": -20.190968980759212,
+      "24": -20.176081354997848,
+      "3": -20.44436157092713,
+      "4": -20.442787627027435,
+      "5": -20.370761095446923,
+      "6": -20.370761095446923,
+      "7": -20.370761095446923,
+      "8": -20.28681313402504,
+      "9": -20.28681313402504
+    },
+    "AlwaysSurrogate/Branin": {
+      "0": -8.654644371041503,
+      "1": -8.478801415748842,
+      "10": -1.3028826670744726,
+      "11": -1.3028826670744726,
+      "12": -1.2377066356680553,
+      "13": -1.159523228487235,
+      "14": -0.8643976862050857,
+      "15": -0.7794816640479068,
+      "16": -0.7195310753501565,
+      "17": -0.6499600455992033,
+      "18": -0.622712039109212,
+      "19": -0.6093457314798986,
+      "2": -7.336712526272757,
+      "20": -0.5925489211419009,
+      "21": -0.5854636237621913,
+      "22": -0.5849397881034871,
+      "23": -0.44877177570127014,
+      "24": -0.4298812234673564,
+      "3": -5.008375383136728,
+      "4": -4.187224972922146,
+      "5": -2.9637557143560067,
+      "6": -2.185933567750185,
+      "7": -2.185933567750185,
+      "8": -1.3028826670744726,
+      "9": -1.3028826670744726
+    },
+    "AlwaysSurrogate/Hartmann": {
+      "0": 0.989510154444543,
+      "1": 1.1791671432481028,
+      "10": 2.1077299138997816,
+      "11": 2.161781784966993,
+      "12": 2.1793813620103504,
+      "13": 2.306950372910932,
+      "14": 2.4084999696988696,
+      "15": 2.549632654285636,
+      "16": 2.595323653601986,
+      "17": 2.638984040396945,
+      "18": 2.727631369965367,
+      "19": 2.7538388767010478,
+      "2": 1.2150518712360134,
+      "20": 2.769969401285733,
+      "21": 2.808677130428343,
+      "22": 2.8191362506235857,
+      "23": 2.9158891950451102,
+      "24": 2.929690722379514,
+      "3": 1.4247839108698759,
+      "4": 1.5453872692838253,
+      "5": 1.6681439312992308,
+      "6": 1.7699376165187728,
+      "7": 1.8437304920275572,
+      "8": 1.9736651796331819,
+      "9": 2.0612248010256793
+    },
+    "AlwaysSurrogate/Rastrigin": {
+      "0": -153.02861664532253,
+      "1": -148.11300458899746,
+      "10": -137.6545508322717,
+      "11": -137.6545508322717,
+      "12": -136.039707942471,
+      "13": -134.53401079355228,
+      "14": -134.3224950510357,
+      "15": -134.3224950510357,
+      "16": -134.3224950510357,
+      "17": -133.86453686987136,
+      "18": -133.86453686987136,
+      "19": -133.73672188434756,
+      "2": -148.11300458899746,
+      "20": -133.73672188434756,
+      "21": -133.73672188434756,
+      "22": -131.22850401393268,
+      "23": -129.97756503238696,
+      "24": -127.30372661449266,
+      "3": -142.40285754359965,
+      "4": -142.40285754359965,
+      "5": -142.40285754359965,
+      "6": -142.40285754359965,
+      "7": -139.74051077780635,
+      "8": -138.14567529482824,
+      "9": -137.71661123538513
+    },
+    "AlwaysSurrogate/SixHumpCamel": {
+      "0": -0.33075872579066506,
+      "1": -0.07861132340392993,
+      "10": 0.6091926079423992,
+      "11": 0.671071838575735,
+      "12": 0.7053619806262802,
+      "13": 0.7137728609894254,
+      "14": 0.720040293169451,
+      "15": 0.7259240251113045,
+      "16": 0.7259240251113045,
+      "17": 0.7259240251113045,
+      "18": 0.7322291645224115,
+      "19": 0.7565705641086752,
+      "2": 0.21806574468499004,
+      "20": 0.7565705641086752,
+      "21": 0.803302093129216,
+      "22": 0.8624153439506606,
+      "23": 0.8939963098050103,
+      "24": 0.8939963098050103,
+      "3": 0.3669974698381609,
+      "4": 0.3669974698381609,
+      "5": 0.4470382389649479,
+      "6": 0.4470382389649479,
+      "7": 0.4470382389649479,
+      "8": 0.4470382389649479,
+      "9": 0.6091926079423992
+    },
+    "Jev/Ackley": {
+      "0": -20.637023927046418,
+      "1": -20.613892787256045,
+      "10": -20.28681313402504,
+      "11": -20.215837337535117,
+      "12": -20.211125144254698,
+      "13": -20.211125144254698,
+      "14": -20.211125144254698,
+      "15": -20.211125144254698,
+      "16": -20.19366767601599,
+      "17": -20.19366767601599,
+      "18": -20.19366767601599,
+      "19": -20.19366767601599,
+      "2": -20.47644964313235,
+      "20": -20.19366767601599,
+      "21": -20.19366767601599,
+      "22": -20.190968980759212,
+      "23": -20.190968980759212,
+      "24": -20.176081354997848,
+      "3": -20.44436157092713,
+      "4": -20.442787627027435,
+      "5": -20.370761095446923,
+      "6": -20.370761095446923,
+      "7": -20.370761095446923,
+      "8": -20.28681313402504,
+      "9": -20.28681313402504
+    },
+    "Jev/Branin": {
+      "0": -8.654644371041503,
+      "1": -8.478801415748842,
+      "10": -1.3028826670744726,
+      "11": -1.3028826670744726,
+      "12": -1.2377066356680553,
+      "13": -1.159523228487235,
+      "14": -0.8643976862050857,
+      "15": -0.7794816640479068,
+      "16": -0.7195310753501565,
+      "17": -0.6499600455992033,
+      "18": -0.622712039109212,
+      "19": -0.6093457314798986,
+      "2": -7.336712526272757,
+      "20": -0.5925489211419009,
+      "21": -0.5854636237621913,
+      "22": -0.5849397881034871,
+      "23": -0.44877177570127014,
+      "24": -0.4298812234673564,
+      "3": -5.008375383136728,
+      "4": -4.187224972922146,
+      "5": -2.9637557143560067,
+      "6": -2.185933567750185,
+      "7": -2.185933567750185,
+      "8": -1.3028826670744726,
+      "9": -1.3028826670744726
+    },
+    "Jev/Hartmann": {
+      "0": 0.989510154444543,
+      "1": 1.1791671432481028,
+      "10": 2.1077299138997816,
+      "11": 2.161781784966993,
+      "12": 2.1793813620103504,
+      "13": 2.306950372910932,
+      "14": 2.4084999696988696,
+      "15": 2.549632654285636,
+      "16": 2.595323653601986,
+      "17": 2.638984040396945,
+      "18": 2.727631369965367,
+      "19": 2.7538388767010478,
+      "2": 1.2150518712360134,
+      "20": 2.769969401285733,
+      "21": 2.808677130428343,
+      "22": 2.8191362506235857,
+      "23": 2.9158891950451102,
+      "24": 2.929690722379514,
+      "3": 1.4247839108698759,
+      "4": 1.5453872692838253,
+      "5": 1.6681439312992308,
+      "6": 1.7699376165187728,
+      "7": 1.8437304920275572,
+      "8": 1.9736651796331819,
+      "9": 2.0612248010256793
+    },
+    "Jev/Rastrigin": {
+      "0": -153.02861664532253,
+      "1": -148.11300458899746,
+      "10": -137.6545508322717,
+      "11": -137.6545508322717,
+      "12": -136.039707942471,
+      "13": -134.53401079355228,
+      "14": -134.3224950510357,
+      "15": -134.3224950510357,
+      "16": -134.3224950510357,
+      "17": -133.86453686987136,
+      "18": -133.86453686987136,
+      "19": -133.73672188434756,
+      "2": -148.11300458899746,
+      "20": -133.73672188434756,
+      "21": -133.73672188434756,
+      "22": -131.22850401393268,
+      "23": -129.97756503238696,
+      "24": -127.30372661449266,
+      "3": -142.40285754359965,
+      "4": -142.40285754359965,
+      "5": -142.40285754359965,
+      "6": -142.40285754359965,
+      "7": -139.74051077780635,
+      "8": -138.14567529482824,
+      "9": -137.71661123538513
+    },
+    "Jev/SixHumpCamel": {
+      "0": -0.33075872579066506,
+      "1": -0.07861132340392993,
+      "10": 0.6091926079423992,
+      "11": 0.671071838575735,
+      "12": 0.7053619806262802,
+      "13": 0.7137728609894254,
+      "14": 0.720040293169451,
+      "15": 0.7259240251113045,
+      "16": 0.7259240251113045,
+      "17": 0.7259240251113045,
+      "18": 0.7322291645224115,
+      "19": 0.7565705641086752,
+      "2": 0.21806574468499004,
+      "20": 0.7565705641086752,
+      "21": 0.803302093129216,
+      "22": 0.8624153439506606,
+      "23": 0.8939963098050103,
+      "24": 0.8939963098050103,
+      "3": 0.3669974698381609,
+      "4": 0.3669974698381609,
+      "5": 0.4470382389649479,
+      "6": 0.4470382389649479,
+      "7": 0.4470382389649479,
+      "8": 0.4470382389649479,
+      "9": 0.6091926079423992
+    },
+    "LLMDeepSeek/Ackley": {
+      "0": -20.638832531532543,
+      "1": -20.59057538287491,
+      "10": -20.312272327563875,
+      "11": -20.22881783677203,
+      "12": -20.101229008307946,
+      "13": -19.875543870615616,
+      "14": -19.640791329815976,
+      "15": -18.641823974919703,
+      "16": -18.641823974919703,
+      "17": -20.327031935609003,
+      "2": -20.56522723347745,
+      "3": -20.56522723347745,
+      "4": -20.558220563143568,
+      "5": -20.51850009653523,
+      "6": -20.47599174202491,
+      "7": -20.452688523190513,
+      "8": -20.452688523190513,
+      "9": -20.435708652477093
+    },
+    "LLMDeepSeek/Branin": {
+      "0": -8.08959231090617,
+      "1": -7.317357849354241,
+      "10": -2.870951022887609,
+      "11": -2.870951022887609,
+      "12": -2.7623953860333175,
+      "13": -2.6966098660264675,
+      "14": -2.019080107397397,
+      "2": -5.479204377470959,
+      "3": -5.218296489836528,
+      "4": -3.8669406334302496,
+      "5": -3.1785873791495147,
+      "6": -3.1785873791495147,
+      "7": -3.1785873791495147,
+      "8": -3.1785873791495147,
+      "9": -3.1785873791495147
+    },
+    "LLMDeepSeek/Hartmann": {
+      "0": 1.1459520212258134,
+      "1": 1.2166147150507807,
+      "10": 1.6637975245032417,
+      "11": 1.759660336042254,
+      "12": 1.8136011081691177,
+      "13": 1.9191105626847134,
+      "14": 2.004281443775745,
+      "15": 1.263431894423971,
+      "16": 1.3398894625133944,
+      "2": 1.2752487363166334,
+      "3": 1.3237275002526536,
+      "4": 1.3237275002526536,
+      "5": 1.3237275002526536,
+      "6": 1.3857862234009861,
+      "7": 1.3857862234009861,
+      "8": 1.4995054462231137,
+      "9": 1.527453004203378
+    },
+    "LLMDeepSeek/Rastrigin": {
+      "0": -151.86147825953998,
+      "1": -148.36541635286034,
+      "10": -118.60614007034002,
+      "11": -118.18402965597079,
+      "12": -113.94360264927772,
+      "13": -109.76401028076978,
+      "14": -110.33792822577183,
+      "15": -88.61058302444181,
+      "2": -144.52134417281803,
+      "3": -138.914197943884,
+      "4": -134.78408946867427,
+      "5": -130.3743022003753,
+      "6": -123.66464292268144,
+      "7": -122.6029412126188,
+      "8": -122.15709483514847,
+      "9": -120.15075968399321
+    },
+    "LLMDeepSeek/SixHumpCamel": {
+      "0": -0.24799123556347946,
+      "1": -0.021045731821959117,
+      "10": 0.5896600861654799,
+      "11": 0.5896600861654799,
+      "12": 0.5896600861654799,
+      "13": 0.6469843194838939,
+      "14": 0.7683379328525038,
+      "15": 0.9930007891141641,
+      "2": 0.1282131370743254,
+      "3": 0.25415945090003367,
+      "4": 0.4873041945670059,
+      "5": 0.5426115071291323,
+      "6": 0.5426115071291323,
+      "7": 0.5426115071291323,
+      "8": 0.5426115071291323,
+      "9": 0.5812226902775481
+    },
+    "RoutingAware/Ackley": {
+      "0": -20.638832531532543,
+      "1": -20.59057538287491,
+      "10": -20.312272327563875,
+      "11": -20.22881783677203,
+      "12": -20.131667167040895,
+      "13": -19.897345137220753,
+      "14": -19.602700467470953,
+      "15": -18.68356736889639,
+      "16": -18.68356736889639,
+      "17": -20.410518723562376,
+      "2": -20.56522723347745,
+      "3": -20.56522723347745,
+      "4": -20.558220563143568,
+      "5": -20.51850009653523,
+      "6": -20.47599174202491,
+      "7": -20.452688523190513,
+      "8": -20.452688523190513,
+      "9": -20.435708652477093
+    },
+    "RoutingAware/Branin": {
+      "0": -8.654644371041503,
+      "1": -8.478801415748842,
+      "10": -1.3028826670744726,
+      "11": -1.3028826670744726,
+      "12": -1.2377066356680553,
+      "13": -1.159523228487235,
+      "14": -0.8643976862050857,
+      "15": -0.7794816640479068,
+      "16": -0.7195310753501565,
+      "17": -0.6499600455992033,
+      "18": -0.622712039109212,
+      "19": -0.6093457314798986,
+      "2": -7.336712526272757,
+      "20": -0.5925489211419009,
+      "21": -0.5854636237621913,
+      "22": -0.5849397881034871,
+      "23": -0.44877177570127014,
+      "24": -0.4298812234673564,
+      "3": -5.008375383136728,
+      "4": -4.187224972922146,
+      "5": -2.9637557143560067,
+      "6": -2.185933567750185,
+      "7": -2.185933567750185,
+      "8": -1.3028826670744726,
+      "9": -1.3028826670744726
+    },
+    "RoutingAware/Hartmann": {
+      "0": 1.1459520212258134,
+      "1": 1.2166147150507807,
+      "10": 1.7388719201661955,
+      "11": 1.8335236053715502,
+      "12": 1.887464377498414,
+      "13": 1.98326968731292,
+      "14": 2.1101170936831415,
+      "2": 1.2752487363166334,
+      "3": 1.3237275002526536,
+      "4": 1.3237275002526536,
+      "5": 1.3237275002526536,
+      "6": 1.3857862234009861,
+      "7": 1.4778540469488983,
+      "8": 1.5745798418860675,
+      "9": 1.6025273998663319
+    },
+    "RoutingAware/Rastrigin": {
+      "0": -151.86147825953998,
+      "1": -148.36541635286034,
+      "10": -119.04602958402252,
+      "11": -117.49281766994335,
+      "12": -113.64849749323753,
+      "13": -113.12370455968397,
+      "14": -110.01960384980634,
+      "15": -88.61058302444181,
+      "2": -144.52134417281803,
+      "3": -138.914197943884,
+      "4": -134.78408946867427,
+      "5": -130.3743022003753,
+      "6": -123.66464292268144,
+      "7": -122.6029412126188,
+      "8": -122.15709483514847,
+      "9": -120.59064919767572
+    },
+    "RoutingAware/SixHumpCamel": {
+      "0": -0.33075872579066506,
+      "1": -0.07861132340392993,
+      "10": 0.6091926079423992,
+      "11": 0.671071838575735,
+      "12": 0.7053619806262802,
+      "13": 0.7137728609894254,
+      "14": 0.720040293169451,
+      "15": 0.7259240251113045,
+      "16": 0.7259240251113045,
+      "17": 0.7259240251113045,
+      "18": 0.7322291645224115,
+      "19": 0.7565705641086752,
+      "2": 0.21806574468499004,
+      "20": 0.7565705641086752,
+      "21": 0.803302093129216,
+      "22": 0.8624153439506606,
+      "23": 0.8939963098050103,
+      "24": 0.8939963098050103,
+      "3": 0.3669974698381609,
+      "4": 0.3669974698381609,
+      "5": 0.4470382389649479,
+      "6": 0.4470382389649479,
+      "7": 0.4470382389649479,
+      "8": 0.4470382389649479,
+      "9": 0.6091926079423992
+    },
+    "RulePolicy/Ackley": {
+      "0": -20.63518067613191,
+      "1": -20.586923527474273,
+      "10": -20.301224251004868,
+      "11": -20.301224251004868,
+      "12": -20.301224251004868,
+      "13": -20.288041230826604,
+      "14": -20.132773123129198,
+      "2": -20.540287489200953,
+      "3": -20.495005893405768,
+      "4": -20.471941505979704,
+      "5": -20.467585069294465,
+      "6": -20.326637900638605,
+      "7": -20.310532779550556,
+      "8": -20.30296666505893,
+      "9": -20.30296666505893
+    },
+    "RulePolicy/Branin": {
+      "0": -8.757656965664934,
+      "1": -8.581814010372273,
+      "10": -2.007938151196723,
+      "11": -2.007938151196723,
+      "12": -2.0436673619112904,
+      "13": -2.0883288753044993,
+      "14": -1.82177747026978,
+      "15": -1.4176774465143105,
+      "16": -1.4176774465143105,
+      "2": -7.253843079218533,
+      "3": -4.856723977765014,
+      "4": -4.454438180907696,
+      "5": -2.645823124183758,
+      "6": -2.007938151196723,
+      "7": -2.007938151196723,
+      "8": -2.007938151196723,
+      "9": -2.007938151196723
+    },
+    "RulePolicy/Hartmann": {
+      "0": 0.989510154444543,
+      "1": 1.166768709675979,
+      "10": 1.8988414182250941,
+      "11": 1.8988414182250941,
+      "12": 1.9656360052300987,
+      "13": 2.2653109535988807,
+      "14": 2.3975705881094522,
+      "15": 2.652871630947844,
+      "16": 2.652871630947844,
+      "17": 2.6202066077848007,
+      "18": 2.6202066077848007,
+      "2": 1.2268432373619516,
+      "3": 1.2268432373619516,
+      "4": 1.3744747141765015,
+      "5": 1.4034742916014267,
+      "6": 1.548894579909196,
+      "7": 1.5856947579624647,
+      "8": 1.7639275438864097,
+      "9": 1.8988414182250941
+    },
+    "RulePolicy/Rastrigin": {
+      "0": -152.4863808172368,
+      "1": -152.4863808172368,
+      "10": -118.9309372970785,
+      "11": -118.77750736330873,
+      "12": -118.1556951669286,
+      "13": -119.54079983557178,
+      "14": -119.1297014618127,
+      "15": -123.21567017078712,
+      "16": -123.21567017078712,
+      "2": -144.87397669455103,
+      "3": -138.09599779553244,
+      "4": -134.64460676766322,
+      "5": -124.53319470311095,
+      "6": -124.19594156892722,
+      "7": -124.19594156892722,
+      "8": -123.66537505535628,
+      "9": -119.65538587295742
+    },
+    "RulePolicy/SixHumpCamel": {
+      "0": -0.2982540262831015,
+      "1": 0.012943940550813798,
+      "10": 0.657605349678975,
+      "11": 0.6655394411701685,
+      "12": 0.6655394411701685,
+      "13": 0.6615979985719761,
+      "14": 0.9930007891141641,
+      "15": 0.9930007891141641,
+      "2": 0.37881568186463066,
+      "3": 0.39642600918042364,
+      "4": 0.46770168822016683,
+      "5": 0.5230090007822932,
+      "6": 0.5585255326953877,
+      "7": 0.657605349678975,
+      "8": 0.657605349678975,
+      "9": 0.657605349678975
+    }
+  },
+  "policies": [
+    "RulePolicy",
+    "AlwaysSurrogate",
+    "LLMDeepSeek",
+    "Jev",
+    "RoutingAware"
+  ],
+  "sanity_issues": 0,
+  "source": "/home/lcy/Documents/projects/opt_agent_v3/runs/exp_rq0_5_joint_10seed.json"
+}
