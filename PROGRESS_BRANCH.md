@@ -213,3 +213,23 @@ Consolidated report: `runs/EXP_JOURNAL_ROUND2_REPORT.md`.
 - **P3**: GearTrain added (only gate-passing engineering problem; 4 tests);
   numerical→engineering probe: bt 0.893 / rf 0.890 / zero-shot 0.423.
   Constraint-semantics problems + external baselines documented as remainder.
+
+## 10. Codex review loop (2026-09-28): REVISE → REVISE → REVISE → APPROVE
+
+4 rounds via `codex exec` (proxy per user instruction). Round 1: 7 issues
+(3 BLOCKER / 4 MAJOR) — all substantive; logs `runs/codex_review_round2.log`,
+`codex_rereview_round2.log`, `codex_rereview3.log`, `codex_rereview4.log`.
+Revisions (commits 34f55cf, e0d0502, 159a050): P0 relabeled analysis-rerun
+(fixed-family/fixed-training estimand; locked new-family eval required);
+pooled CI = single primary contrast, 5/5 = descriptive; noise metrics
+redefined and recomputed (per-re-roll 0.40 above-median; 2v2 split-half
+persisted, 0.36/0.33/0.33); Gate-4 claim scoped to the tested teacher with
+wide-CI acknowledgment (upper bounds +0.78/+1.92 on Ackley/Hartmann);
+claim narrowing (RF singularity, temperature, teacher-relative calibration);
+theory fixes (R2 exact-linear spherical, R3 set-independence as hypothesis,
+T2 direct tail assumption, R4/T5 marked proposals). Round 4: both remaining
+nits ADDRESSED — **VERDICT: APPROVE**.
+
+Pre-submission remainder (unchanged, from review): locked transfer
+evaluation on untouched families/tasks; benchmark breadth (BBOB/IOH, HPO,
+end-to-end engineering); external optimizer anchors (SMAC3/HEBO/LLAMBO).
