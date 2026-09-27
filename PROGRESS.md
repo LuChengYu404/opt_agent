@@ -1,33 +1,51 @@
 # Current research status
 
-## EXP-RQ3 — Real-LLM cost frontier (2026-09-27, latest)
+## EXP-RQ3 — Real-LLM cost frontier, 10-seed confirmation + sign correction (2026-09-27, latest)
 
-`runs/exp_rq3_router_sweep.json` runs 135 paired trajectories (5 BOCoDe
-families × seeds {100, 101, 102} × 9 policies) on a real `deepseek-chat`
-System-2 backend, with frozen RF System-1 trained on rollout seeds 0–15
-and temperature-calibrated on 16–19. Pre-specified acceptance criteria
-(declared before unblinding): ≥ 50 % call/token reduction vs always-LLM,
-regret margin ≤ 0.10 σ_family.
+`runs/exp_rq3_router_sweep.json` (seeds 100–102, 135 trajectories) plus
+`runs/exp_rq3_router_sweep_seeds103_109.json` (seeds 103–109, 315
+trajectories, 8 parallel workers) = **450 paired trajectories** (5 BOCoDe
+families × 10 seeds × 9 policies) on a real `deepseek-chat` System-2
+backend, frozen RF System-1 (rollout seeds 0–15, calibrated 16–19;
+identical dataset/training hash across both files), 0 paired-start
+violations, 0 LLM fallbacks. Merged analysis:
+`scripts/analyze_rq3_cost_frontier.py` →
+`runs/exp_rq3_cost_frontier_10seed.json` (reproduces the 3-seed numbers
+exactly on the original file).
 
-**Headline.** The frozen System-1 alone — **0 LLM calls — is competitive
-with or beats the always-LLM policy on 4/5 families**, with statistically
-detectable positive mean gains on Rastrigin (+16.95 terminal best, 2/1/0
-W/T/L) and SixHumpCamel (+0.43, 2/1/0). Hartmann is the only family
-where LLM calls produced a detectable gain (+0.91, 3/0/0); Ackley is
-ambiguous inside the CI. Full report:
-`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
+**Sign correction.** The earlier 3-seed report's prose inverted the sign
+of its own Hartmann numbers: `rf` beat `llm` 3/0/0 at seeds 100–102
+(+0.910); the claim "Hartmann is the one family where the LLM is
+genuinely useful" and the recommendation "Hartmann → llm" were wrong and
+are withdrawn. The independent EXP-RQ0.5 joint run (LLM −0.985 on
+Hartmann, p = 0.0007) had the correct direction all along.
 
-**Confidence-routing diagnostic.** The RF softmax maximum rarely exceeds
-0.25, so every confidence threshold (0.5, 0.75, 0.9) routes almost
-every step to System-2. The random-rate baselines (rate ∈ {0.25, 0.5})
-*beat* the confidence-based router on most families, evidencing that
-the current `ConfidenceRouter.tau_conf` is not yet a useful routing
-heuristic.
+**10-seed headline.** The frozen System-1 alone — **0 LLM calls — beats
+or ties every LLM-calling arm on all five families.** `rf − llm`:
+Branin +0.515, Hartmann **+0.576 (CI excludes 0)**, Ackley **+1.017 (CI
+excludes 0; flips the 3-seed "LLM may benefit" read)**, SixHumpCamel
+**+1.015 (CI excludes 0)**, Rastrigin +10.109 (CI crosses 0; the 3-seed
+borderline significance weakens). **No arm on the whole 40-cell grid
+beats `rf` with CI excluding zero**; the only positive point estimates
+anywhere are Hartmann/confidence_0.25 (+0.018) and Hartmann/random_0.25
+(+0.149), both CI-crossing. Pre-specified criteria now PASS 5/5 (100 %
+call/token reduction; regret margin never violated) — but the frontier
+is degenerate: always-LLM is dominated, and no confidence threshold or
+random rate earns its cost. Full report (correction + confirmation
+sections at top): `runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
 
-**Per-family recommendation.**
-- Rastrigin, SixHumpCamel, Branin → `rf` (System-1 only).
-- Hartmann → `llm` or `confidence_0.75` (≈ 12–14 calls/trajectory).
-- Ackley → inconclusive at 3 seeds; expand before claiming LLM gain.
+**Confidence-routing diagnostic (updated at 10 seeds).** The 3-seed
+"random-rate beats the confidence router" observation does not
+generalize: at 10 seeds neither scheme produces a CI-detectable gain
+over `rf`, and Branin random_0.5/0.75 are CI-detectably worse. The RF
+softmax maximum still rarely exceeds 0.25, so confidence thresholds
+route almost everything to System-2.
+
+**Per-family recommendation (10 seeds).** All five families → `rf`
+(System-1 only). No LLM-favourable family exists on this panel at
+budget 30; the open problem is finding any regime (longer horizons,
+stochastic objectives, OOD states) where the LLM System-2 repays its
+cost.
 
 ## EXP-RQ2.2 — Within-function dimension transfer (2026-09-27)
 

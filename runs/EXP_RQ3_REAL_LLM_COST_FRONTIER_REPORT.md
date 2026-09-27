@@ -1,5 +1,135 @@
 # EXP-RQ3 — Real-LLM cost frontier (RQ3 closed-loop, 2026-09-27)
 
+> ## CORRECTION + 10-seed confirmation (2026-09-27, later the same day)
+>
+> **The original 3-seed prose below contains a sign inversion.** Its own
+> recorded numbers show the `rf` arm (frozen System-1, 0 LLM calls) beat
+> `llm` on Hartmann at seeds 100–102 by +0.910 (3/0/0; the W/T/L column
+> was RF's wins, misread as the LLM's). The passages below that claim
+> "Hartmann is the one family where the LLM is genuinely useful", the
+> headline sentence "competitive on 4/5, indistinguishable on Ackley",
+> the verdict row "FAIL on Ackley", and the per-family recommendation
+> "Hartmann → llm or confidence_0.75" all inverted the sign of Δ and are
+> **superseded**. The independent EXP-RQ0.5 joint run had already
+> reported "Hartmann: LLM worse, −0.985, p = 0.0007" (workshop outline
+> §5) — the corrected reading agrees with it; the 3-seed prose was the
+> outlier.
+>
+> The 10-seed confirmation below (seeds 100–109, 450 paired trajectories)
+> settles the direction: **no LLM-calling arm beats `rf` with a CI
+> excluding zero on any family, while `llm` itself is CI-detectably worse
+> than `rf` on Ackley, Hartmann, and SixHumpCamel.** See the next section.
+
+## 10-seed confirmation (seeds 100–109)
+
+**Setup.** Added seeds 103–109 to the original seeds 100–102 (315 new +
+135 original = 450 paired trajectories; 5 families × 10 seeds × 9
+policies). Same frozen RF System-1 (trained on rollout seeds 0–15,
+temperature-calibrated on 16–19; identical `dataset_sha256` and training
+block verified across both files), same `deepseek-chat` backend, budget
+30, paired Sobol starts (0 paired-start violations across all 450), and
+**zero LLM fallbacks** in the new run. Merged analysis:
+`scripts/analyze_rq3_cost_frontier.py` →
+`runs/exp_rq3_cost_frontier_10seed.json` (it reproduces the original
+3-seed meanΔ/CI/W-T-L numbers exactly on the old file, which is how the
+sign error was found).
+
+**Headline (10 paired seeds; terminal best, higher is better).**
+
+| Family | `rf` mean best | `llm` mean best | `rf − llm` | `llm` calls | `rf` calls |
+|---|---:|---:|---:|---:|---:|
+| Branin | -0.924 | -1.439 | +0.515 | 16.9 | **0** |
+| Hartmann | +2.387 | +1.811 | **+0.576** | 14.6 | **0** |
+| Ackley | -19.182 | -20.199 | **+1.017** | 15.6 | **0** |
+| SixHumpCamel | +0.787 | -0.228 | **+1.015** | 12.4 | **0** |
+| Rastrigin | -121.330 | -131.439 | +10.109 | 13.7 | **0** |
+
+Bold = paired seed-bootstrap 95% CI of `llm − rf` entirely below zero
+(RF detectably better): Hartmann [-1.032, -0.103], Ackley [-1.658,
+-0.436], SixHumpCamel [-1.512, -0.587]. Branin [-1.224, +0.152] and
+Rastrigin [-22.356, +0.404] are RF-better in mean with CI crossing zero.
+
+**Cost-frontier table (10 seeds).** Paired mean Δ = `arm − rf` per seed
+(negative = RF better); W/T/L is RF vs the arm; 10k-resample seed
+bootstrap 95% CI.
+
+| Family | Arm | mean Δ | CI 95 % | W/T/L | Calls Δ |
+|---|---|---:|---|:-:|---:|
+| Branin | llm | -0.515 | [-1.224, +0.152] | 5/0/5 | +16.9 |
+| Branin | confidence_0.75 | **-0.725** | **[-1.454, -0.013]** | 6/0/4 | +17.0 |
+| Branin | random_0.5 | **-0.959** | **[-1.908, -0.065]** | 7/0/3 | +11.2 |
+| Hartmann | llm | **-0.576** | **[-1.032, -0.103]** | 7/0/3 | +14.6 |
+| Hartmann | confidence_0.25 | +0.018 | [-0.492, +0.480] | 4/0/6 | +8.9 |
+| Hartmann | random_0.25 | +0.149 | [-0.264, +0.690] | 5/2/3 | +6.0 |
+| Ackley | llm | **-1.017** | **[-1.658, -0.436]** | 7/1/2 | +15.6 |
+| Ackley | confidence_0.25 | **-0.588** | **[-1.213, -0.109]** | 5/3/2 | +9.1 |
+| Ackley | random_0.25 | -0.278 | [-1.065, +0.739] | 6/2/2 | +5.8 |
+| SixHumpCamel | llm | **-1.015** | **[-1.512, -0.587]** | 9/1/0 | +12.4 |
+| SixHumpCamel | confidence_0.25 | **-1.015** | **[-1.512, -0.587]** | 9/1/0 | +12.9 |
+| SixHumpCamel | random_0.25 | -0.236 | [-0.591, +0.084] | 6/1/3 | +7.2 |
+| Rastrigin | llm | -10.109 | [-22.356, +0.404] | 6/1/3 | +13.7 |
+| Rastrigin | confidence_0.25 | -5.186 | [-18.102, +6.706] | 5/1/4 | +12.9 |
+| Rastrigin | random_0.25 | -5.447 | [-14.117, +1.388] | 5/4/1 | +5.5 |
+
+Full grid (all 8 arms × 5 families) in `runs/exp_rq3_cost_frontier_10seed.json`.
+
+**What changed vs the 3-seed run.**
+
+1. **Ackley flips against the LLM.** The 3-seed read ("LLM may benefit
+   Ackley, CI crosses zero") does not survive: at 10 seeds `llm` is
+   CI-detectably *worse* than `rf` (-1.017, 7/1/2). The pre-specified
+   regret-margin criterion no longer fails on Ackley.
+2. **Hartmann corrects to an RF win** (sign error documented above):
+   +0.576 with CI excluding zero. The "route LLM only to Hartmann"
+   recommendation is withdrawn.
+3. **Rastrigin's borderline 3-seed significance weakens**: +16.95
+   (CI lo = 0) becomes +10.11 (CI [-22.4, +0.4]). RF remains better in
+   mean; the effect is no longer near-significant.
+4. **The random-rate-beats-confidence observation does not generalize.**
+   At 10 seeds no random rate and no confidence threshold produces a
+   CI-detectable gain over `rf` anywhere; the only positive point
+   estimates on the whole grid are Hartmann/confidence_0.25 (+0.018,
+   8.9 calls) and Hartmann/random_0.25 (+0.149, 6.0 calls), both
+   CI-crossing. Meanwhile Branin random_0.5/0.75 are now CI-detectably
+   *worse* than `rf`.
+
+**Pre-specified acceptance verdict (10 seeds).**
+
+| Criterion | Required | Observed | Verdict |
+|---|---|---|---|
+| Call reduction vs `llm` | ≥ 50 % | 100 % (`rf` = 0 calls) | **PASS** |
+| Token reduction vs `llm` | ≥ 50 % | 100 % | **PASS** |
+| Regret margin vs `llm` ≤ 0.10 σ_family | per family | `rf` ≥ `llm` in mean on 5/5 families (CI-detectably better on 3) | **PASS 5/5** |
+
+σ_family = sample std of `terminal_best` pooled over arms and seeds per
+family (Branin 1.408, Hartmann 0.599, Ackley 0.872, SixHumpCamel 0.692,
+Rastrigin 12.418); definition fixed in the merged-analysis script. The
+3-seed report's σ_Ackley ≈ 0.74 had no recorded definition.
+
+**Decision for the paper (supersedes the 3-seed decision).**
+
+1. **The frozen RF System-1 (0 LLM calls) is the recommended default on
+   all five families.** The always-LLM policy is *dominated* — it never
+   beats `rf` with CI excluding zero and loses detectably on three
+   families at ~12–17 calls (~4.7–6.5k tokens) per trajectory.
+2. **No selective-routing scheme earns its cost on this panel.** Neither
+   confidence thresholds nor random rates produce any CI-detectable gain
+   over `rf`; several are CI-detectably worse.
+3. **The open problem changes.** It is no longer "per-family calibration
+   of a router" (the LLM-favourable family does not exist here); it is
+   *finding any regime where this LLM System-2 repays its cost* — e.g.
+   longer horizons, stochastic objectives, or genuinely OOD states — or
+   accepting the degenerate cost frontier: System-1 only.
+
+---
+
+## Original 3-seed run (seeds 100–102)
+
+**Read the sections below with the sign correction above: the Hartmann
+per-family paragraph, the headline sentence, the verdict table, and the
+"Decision for the paper" contain the inverted reading. The tables and
+recorded numbers are correct.**
+
 **Date:** 2026-09-27
 **Setup:** five BOCoDe families × seeds {100, 101, 102} × budget 30, paired starting Sobol evaluations.
 **Policies:** `rf` (always System-1, 0 LLM calls); `llm` (always System-2);
