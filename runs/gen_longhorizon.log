@@ -1,0 +1,120 @@
+[1/100] Branin seed=16 → 7 records
+[2/100] Branin seed=9 → 8 records
+[3/100] Branin seed=17 → 4 records
+[4/100] Branin seed=0 → 7 records
+[5/100] Branin seed=19 → 6 records
+[6/100] Branin seed=12 → 4 records
+[7/100] Branin seed=11 → 8 records
+[8/100] Branin seed=10 → 8 records
+[9/100] Branin seed=14 → 10 records
+[10/100] Branin seed=1 → 7 records
+[11/100] Branin seed=13 → 4 records
+[12/100] Branin seed=18 → 7 records
+[13/100] Branin seed=8 → 8 records
+[14/100] Hartmann seed=2 → 7 records
+[15/100] Branin seed=4 → 8 records
+[16/100] Branin seed=15 → 7 records
+[17/100] Branin seed=5 → 7 records
+[18/100] Branin seed=6 → 10 records
+[19/100] Branin seed=2 → 8 records
+[20/100] Ackley seed=1 → 8 records
+[21/100] Ackley seed=0 → 8 records
+[22/100] Hartmann seed=5 → 6 records
+[23/100] Ackley seed=2 → 7 records
+[24/100] Hartmann seed=19 → 1 records
+[25/100] Ackley seed=5 → 2 records
+[26/100] Hartmann seed=9 → 6 records
+[27/100] Branin seed=3 → 8 records
+[28/100] Ackley seed=3 → 5 records
+[29/100] Ackley seed=7 → 8 records
+[30/100] Ackley seed=4 → 10 records
+[31/100] Ackley seed=8 → 7 records
+[32/100] Ackley seed=6 → 8 records
+[33/100] Ackley seed=14 → 2 records
+[34/100] Ackley seed=11 → 7 records
+[35/100] Ackley seed=9 → 7 records
+[36/100] Ackley seed=12 → 2 records
+[38/100] Ackley seed=10 → 7 records
+[38/100] Ackley seed=17 → 6 records
+[39/100] Ackley seed=18 → 4 records
+[40/100] Ackley seed=15 → 8 records
+[41/100] Branin seed=7 → 9 records
+[42/100] Ackley seed=13 → 7 records
+[43/100] Ackley seed=16 → 9 records
+[44/100] Hartmann seed=8 → 7 records
+[45/100] Hartmann seed=7 → 6 records
+[46/100] Hartmann seed=11 → 6 records
+[47/100] Ackley seed=19 → 8 records
+[48/100] SixHumpCamel seed=0 → 2 records
+[49/100] Hartmann seed=12 → 5 records
+[50/100] Hartmann seed=6 → 7 records
+[51/100] SixHumpCamel seed=2 → 2 records
+[52/100] SixHumpCamel seed=3 → 2 records
+[53/100] Hartmann seed=16 → 7 records
+[54/100] Hartmann seed=18 → 5 records
+[55/100] Hartmann seed=1 → 7 records
+[56/100] SixHumpCamel seed=15 → 7 records
+[57/100] Hartmann seed=13 → 9 records
+[58/100] SixHumpCamel seed=8 → 8 records
+[59/100] SixHumpCamel seed=17 → 2 records
+[60/100] Hartmann seed=17 → 7 records
+[61/100] SixHumpCamel seed=12 → 4 records
+[62/100] SixHumpCamel seed=13 → 6 records
+[63/100] SixHumpCamel seed=6 → 7 records
+[64/100] Rastrigin seed=0 → 7 records
+[65/100] SixHumpCamel seed=7 → 7 records
+[66/100] SixHumpCamel seed=4 → 9 records
+[67/100] SixHumpCamel seed=5 → 7 records
+[68/100] Hartmann seed=15 → 9 records
+[69/100] SixHumpCamel seed=9 → 7 records
+[70/100] Rastrigin seed=12 → 1 records
+[71/100] Rastrigin seed=7 → 7 records
+[72/100] SixHumpCamel seed=1 → 9 records
+[73/100] Rastrigin seed=10 → 7 records
+[74/100] Rastrigin seed=5 → 9 records
+[75/100] Rastrigin seed=13 → 7 records
+[76/100] Rastrigin seed=9 → 5 records
+[77/100] Hartmann seed=0 → 8 records
+[78/100] SixHumpCamel seed=14 → 8 records
+[79/100] Rastrigin seed=8 → 7 records
+[80/100] Rastrigin seed=4 → 6 records
+[81/100] Rastrigin seed=17 → 6 records
+[82/100] SixHumpCamel seed=19 → 7 records
+[83/100] Rastrigin seed=11 → 4 records
+[84/100] Rastrigin seed=3 → 7 records
+[85/100] Rastrigin seed=6 → 9 records
+[86/100] Rastrigin seed=14 → 5 records
+[87/100] Rastrigin seed=19 → 3 records
+[88/100] SixHumpCamel seed=18 → 7 records
+[89/100] Rastrigin seed=16 → 7 records
+[90/100] SixHumpCamel seed=10 → 8 records
+[91/100] Rastrigin seed=18 → 7 records
+[92/100] SixHumpCamel seed=16 → 5 records
+[93/100] Rastrigin seed=1 → 8 records
+[94/100] SixHumpCamel seed=11 → 9 records
+[95/100] Hartmann seed=10 → 8 records
+[96/100] Rastrigin seed=2 → 8 records
+[97/100] Rastrigin seed=15 → 8 records
+[98/100] Hartmann seed=14 → 9 records
+[99/100] Hartmann seed=4 → 7 records
+[100/100] Hartmann seed=3 → 8 records
+{
+  "cost_units_new": 36688,
+  "cost_units_per_record": 55.5,
+  "horizon_mode": "remaining",
+  "output": "runs/longhorizon_k4_20seed_5family.jsonl",
+  "problems": [
+    "Branin",
+    "Hartmann",
+    "Ackley",
+    "SixHumpCamel",
+    "Rastrigin"
+  ],
+  "quot_note": "quota per decision point \u2248 4 \u00d7 remaining_budget backend steps (vs 8 \u00d7 remaining_budget at full rollout)",
+  "records_new": 661,
+  "records_partial": 661,
+  "seeds": 20,
+  "subsample_k": 4,
+  "trajectories_skipped_resume": 0,
+  "wall_clock_s": 46.8
+}

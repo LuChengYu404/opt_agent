@@ -1,0 +1,54 @@
+{
+  "best_val_pairwise_accuracy": 0.5760517799352751,
+  "config": {
+    "batch_size": 8,
+    "beta": 1.0,
+    "learning_rate": 1e-05,
+    "margin": 0.0,
+    "max_pairs_per_record": null,
+    "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
+    "num_epochs": 3,
+    "objective": "proper_score",
+    "output_dir": "runs/rlcd_laya_proper_lh"
+  },
+  "final_val": {
+    "mean_log_score": -2.0715378118597942,
+    "pairs": 618,
+    "pairwise_accuracy": 0.5760517799352751,
+    "records": 115,
+    "top1_agreement": 0.34782608695652173
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 1.9688298149385315,
+      "train_pair_acc": null,
+      "val_mean_log_score": -2.0749703967052957,
+      "val_pairs": 618,
+      "val_pairwise_accuracy": 0.4935275080906149,
+      "val_top1_agreement": 0.17391304347826086
+    },
+    {
+      "epoch": 1,
+      "train_loss": 1.9019705903702888,
+      "train_pair_acc": null,
+      "val_mean_log_score": -2.0715378118597942,
+      "val_pairs": 618,
+      "val_pairwise_accuracy": 0.5760517799352751,
+      "val_top1_agreement": 0.34782608695652173
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.8989008164060288,
+      "train_pair_acc": null,
+      "val_mean_log_score": -2.07131637904955,
+      "val_pairs": 618,
+      "val_pairwise_accuracy": 0.5469255663430421,
+      "val_top1_agreement": 0.40869565217391307
+    }
+  ],
+  "train_items": 546,
+  "train_pairs": 2843,
+  "train_records": 546,
+  "val_records": 115
+}

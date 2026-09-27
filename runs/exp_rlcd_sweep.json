@@ -1,0 +1,257 @@
+[
+  {
+    "best_val_pairwise_accuracy": 0.8788508134302527,
+    "final_val": {
+      "mean_log_score": -3.0371908094571984,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8788508134302527,
+      "records": 115,
+      "top1_agreement": 0.41739130434782606
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 1.0,
+      "margin": 0.0
+    },
+    "tag": "bt_beta1_margin0",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.8757355486327449,
+    "final_val": {
+      "mean_log_score": -4.464835926242497,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8757355486327449,
+      "records": 115,
+      "top1_agreement": 0.41739130434782606
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 0.5,
+      "margin": 0.05
+    },
+    "tag": "bt_beta0.5_margin0.05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.8736587054344064,
+    "final_val": {
+      "mean_log_score": -3.1244511573211007,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8736587054344064,
+      "records": 115,
+      "top1_agreement": 0.34782608695652173
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 1.0,
+      "margin": 0.05
+    },
+    "tag": "bt_beta1_margin0.05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.8733125649013499,
+    "final_val": {
+      "mean_log_score": -2.3676809808482293,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8733125649013499,
+      "records": 115,
+      "top1_agreement": 0.3391304347826087
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 2.0,
+      "margin": 0.0
+    },
+    "tag": "bt_beta2_margin0",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.8729664243682935,
+    "final_val": {
+      "mean_log_score": -2.3919914577318275,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8729664243682935,
+      "records": 115,
+      "top1_agreement": 0.3739130434782609
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 2.0,
+      "margin": 0.05
+    },
+    "tag": "bt_beta2_margin0.05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.8629283489096573,
+    "final_val": {
+      "mean_log_score": -4.066979398416437,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.8629283489096573,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "bt_pairs",
+    "overrides": {
+      "beta": 0.5,
+      "margin": 0.0
+    },
+    "tag": "bt_beta0.5_margin0",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7912772585669782,
+    "final_val": {
+      "mean_log_score": -2.068820858001709,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7912772585669782,
+      "records": 115,
+      "top1_agreement": 0.23478260869565218
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 5e-06,
+      "w_sph": 0.5
+    },
+    "tag": "proper_wsph0.5_lr5e-06",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7871235721703012,
+    "final_val": {
+      "mean_log_score": -2.069114323284315,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7871235721703012,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 5e-06,
+      "w_sph": 0.25
+    },
+    "tag": "proper_wsph0.25_lr5e-06",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.77466251298027,
+    "final_val": {
+      "mean_log_score": -2.0692864739376566,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.77466251298027,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 1e-05,
+      "w_sph": 1.0
+    },
+    "tag": "proper_wsph1.0_lr1e-05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7715472481827622,
+    "final_val": {
+      "mean_log_score": -2.070118598316027,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7715472481827622,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 5e-06,
+      "w_sph": 1.0
+    },
+    "tag": "proper_wsph1.0_lr5e-06",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7410868812737972,
+    "final_val": {
+      "mean_log_score": -2.0684265820876413,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7410868812737972,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 2e-05,
+      "w_sph": 0.25
+    },
+    "tag": "proper_wsph0.25_lr2e-05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.731048805815161,
+    "final_val": {
+      "mean_log_score": -2.0675380115923674,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.731048805815161,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 1e-05,
+      "w_sph": 0.5
+    },
+    "tag": "proper_wsph0.5_lr1e-05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7293181031498789,
+    "final_val": {
+      "mean_log_score": -2.068872022628784,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7293181031498789,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 2e-05,
+      "w_sph": 1.0
+    },
+    "tag": "proper_wsph1.0_lr2e-05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7223952924887505,
+    "final_val": {
+      "mean_log_score": -2.0688009013300355,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7223952924887505,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 1e-05,
+      "w_sph": 0.25
+    },
+    "tag": "proper_wsph0.25_lr1e-05",
+    "train_wall_s": null
+  },
+  {
+    "best_val_pairwise_accuracy": 0.7217030114226376,
+    "final_val": {
+      "mean_log_score": -2.068607551118602,
+      "pairs": 2889,
+      "pairwise_accuracy": 0.7217030114226376,
+      "records": 115,
+      "top1_agreement": 0.24347826086956523
+    },
+    "objective": "proper_score",
+    "overrides": {
+      "lr": 2e-05,
+      "w_sph": 0.5
+    },
+    "tag": "proper_wsph0.5_lr2e-05",
+    "train_wall_s": null
+  }
+]

@@ -1,0 +1,148 @@
+{
+  "bt_pairs_baseline": {
+    "mean_log_score": -2.2199032317037166,
+    "pairs": 618,
+    "pairwise_accuracy": 0.6601941747572816,
+    "records": 115,
+    "top1_agreement": 0.48695652173913045
+  },
+  "bt_pairs_train": {
+    "best_val_pairwise_accuracy": 0.6601941747572816,
+    "config": {
+      "batch_size": 8,
+      "beta": 1.0,
+      "learning_rate": 1e-05,
+      "margin": 0.0,
+      "max_pairs_per_record": null,
+      "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
+      "num_epochs": 3,
+      "objective": "bt_pairs",
+      "output_dir": "runs/rlcd_laya_bt_lh"
+    },
+    "final_val": {
+      "mean_log_score": -2.2199032317037166,
+      "pairs": 618,
+      "pairwise_accuracy": 0.6601941747572816,
+      "records": 115,
+      "top1_agreement": 0.48695652173913045
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": 0.6886311233907506,
+        "train_pair_acc": 0.5965521629433286,
+        "val_mean_log_score": -2.082275270379108,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.6537216828478964,
+        "val_top1_agreement": 0.4260869565217391
+      },
+      {
+        "epoch": 1,
+        "train_loss": 0.6511186171269071,
+        "train_pair_acc": 0.6254096983797889,
+        "val_mean_log_score": -2.1810223289158035,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.656957928802589,
+        "val_top1_agreement": 0.4260869565217391
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.6099919426268425,
+        "train_pair_acc": 0.6671348117213093,
+        "val_mean_log_score": -2.2199032317037166,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.6601941747572816,
+        "val_top1_agreement": 0.48695652173913045
+      }
+    ],
+    "train_items": 546,
+    "train_pairs": 2843,
+    "train_records": 546,
+    "val_records": 115,
+    "wall_clock_s": 55.0
+  },
+  "dataset": "runs/longhorizon_k4_20seed_5family.jsonl",
+  "method": "RLCD (Jev/Laya lineage: Reinforcement Learning for Calibrated Decisions) \u2014 strictly proper scoring rule reward (the SDK's own proper_reward: log + 0.5\u00b7spherical) of the reported option distribution vs the counterfactual teacher gold_probs; bt_pairs arm = Bradley-Terry pairwise baseline (DPO-family). NOT Yang et al. ICLR 2024 contrastive distillation.",
+  "rf_baseline": {
+    "pairs": 618,
+    "pairwise_accuracy": 0.5453074433656958,
+    "top1_agreement": 0.3826086956521739,
+    "val_records": 115,
+    "wall_clock_s": 1.7
+  },
+  "rlcd_proper_score": {
+    "mean_log_score": -2.0715378118597942,
+    "pairs": 618,
+    "pairwise_accuracy": 0.5760517799352751,
+    "records": 115,
+    "top1_agreement": 0.34782608695652173
+  },
+  "rlcd_proper_score_train": {
+    "best_val_pairwise_accuracy": 0.5760517799352751,
+    "config": {
+      "batch_size": 8,
+      "beta": 1.0,
+      "learning_rate": 1e-05,
+      "margin": 0.0,
+      "max_pairs_per_record": null,
+      "model_dir": "/home/lcy/.cache/opt_agent_v3/laya",
+      "num_epochs": 3,
+      "objective": "proper_score",
+      "output_dir": "runs/rlcd_laya_proper_lh"
+    },
+    "final_val": {
+      "mean_log_score": -2.0715378118597942,
+      "pairs": 618,
+      "pairwise_accuracy": 0.5760517799352751,
+      "records": 115,
+      "top1_agreement": 0.34782608695652173
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": 1.9688298149385315,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.0749703967052957,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.4935275080906149,
+        "val_top1_agreement": 0.17391304347826086
+      },
+      {
+        "epoch": 1,
+        "train_loss": 1.9019705903702888,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.0715378118597942,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.5760517799352751,
+        "val_top1_agreement": 0.34782608695652173
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.8989008164060288,
+        "train_pair_acc": null,
+        "val_mean_log_score": -2.07131637904955,
+        "val_pairs": 618,
+        "val_pairwise_accuracy": 0.5469255663430421,
+        "val_top1_agreement": 0.40869565217391307
+      }
+    ],
+    "train_items": 546,
+    "train_pairs": 2843,
+    "train_records": 546,
+    "val_records": 115,
+    "wall_clock_s": 54.5
+  },
+  "split": {
+    "train_records": 546,
+    "train_seed_range": "[0, 16)",
+    "val_records": 115,
+    "val_seed_range": "[16, \u221e)"
+  },
+  "zero_shot_laya": {
+    "mean_log_score": -3.3690854383551554,
+    "pairs": 618,
+    "pairwise_accuracy": 0.4854368932038835,
+    "records": 115,
+    "top1_agreement": 0.17391304347826086
+  }
+}

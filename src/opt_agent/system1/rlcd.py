@@ -290,6 +290,7 @@ class RLCDConfig:
     num_epochs: int = 3
     beta: float = 1.0          # BT inverse-temperature on logit differences
     margin: float = 0.0        # drop pairs with utility gap below this
+    w_sph: float = 0.5         # spherical-score weight in proper_score (SDK default)
     max_pairs_per_record: int | None = None
     weight_decay: float = 0.01
     warmup_frac: float = 0.1   # fraction of total steps for linear warmup
@@ -300,6 +301,7 @@ class RLCDConfig:
     head_max_len: int = 192
     min_lr_frac: float = 0.1   # cosine floor as a fraction of peak lr
     grad_clip: float = 1.0
+    save: bool = True          # False for sweep runs (skip 1.6 GB writes)
 
     def __post_init__(self) -> None:
         if self.objective not in ("proper_score", "bt_pairs"):
@@ -489,7 +491,9 @@ def train_rlcd(
             optim.zero_grad(set_to_none=True)
             logits = _forward(model, batch_items, tok, device, config)
             if config.objective == "proper_score":
-                loss, stats = proper_score_loss(logits, batch_items)
+                loss, stats = proper_score_loss(
+                    logits, batch_items, w_sph=config.w_sph
+                )
             else:
                 loss, stats = bradley_terry_loss(
                     logits, batch_items, beta=config.beta
@@ -532,7 +536,8 @@ def train_rlcd(
 
     model.load_state_dict(best_state)
     final = evaluate_ranking(model, tok, val_records, config, device)
-    save_laya_checkpoint(config.model_dir, config.output_dir, best_state, cfg)
+    if config.save:
+        save_laya_checkpoint(config.model_dir, config.output_dir, best_state, cfg)
 
     report = {
         "config": {
@@ -555,6 +560,7 @@ def train_rlcd(
         "history": history,
     }
     out = Path(config.output_dir)
+    out.mkdir(parents=True, exist_ok=True)
     (out / "rlcd_train_report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
     )

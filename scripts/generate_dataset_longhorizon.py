@@ -92,7 +92,14 @@ def _config_from_task(cfg: dict) -> "DatasetConfig":
 
 
 def _run_trajectory(task: dict) -> list:
-    """Worker: generate all records for one (problem, seed, trajectory_id)."""
+    """Worker: generate all records for one (problem, seed, trajectory_id).
+
+    Pin torch to a single thread: GP fitting is the bottleneck, and with
+    many process workers the default (all cores) oversubscribes the machine.
+    """
+    import torch
+
+    torch.set_num_threads(1)
     from dataclasses import replace as _replace
 
     base = _config_from_task(task["config"])
@@ -180,12 +187,17 @@ def main() -> int:
     t0 = time.time()
     n_tasks = len(tasks)
     if tasks:
+        import multiprocessing
+
+        # spawn: workers import cleanly (no fork-safety issues with torch
+        # state); each worker pins itself to 1 torch thread.
+        ctx = multiprocessing.get_context("spawn")
         # Serialise the already-present records into tmp first when resuming.
         if args.resume and args.output.exists():
             tmp.write_text(args.output.read_text(), encoding="utf-8")
         else:
             tmp.write_text("", encoding="utf-8")
-        with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx) as pool:
             futures = {pool.submit(_run_trajectory, t): t for t in tasks}
             for fut in as_completed(futures):
                 task = futures[fut]
