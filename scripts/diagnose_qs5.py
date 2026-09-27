@@ -167,7 +167,13 @@ def _oracle_for_changed_top(
         return {"error": "missing replay metadata"}
 
     problem_id = str(meta["backend_problem_id"])
-    backend = BocodeBotorchBackend()
+    # Phase 9 Gate 5 — thread affine transform from metadata so that any
+    # evaluate() calls after restore() append transformed values to the
+    # (already-transformed) history. Without this, oracle_test would mix
+    # raw and transformed objectives — silent corruption.
+    from opt_agent.dataset.validation import _affine_kwargs_from_metadata
+    affine_kwargs = _affine_kwargs_from_metadata(meta)
+    backend = BocodeBotorchBackend(**affine_kwargs)
     try:
         backend.initialize(BackendConfig(
             problem_id=problem_id,

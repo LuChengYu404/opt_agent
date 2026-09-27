@@ -23,6 +23,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 
+import math
+
 import torch
 
 if TYPE_CHECKING:
@@ -153,7 +155,12 @@ class BocodeBotorchBackend(UnifiedBackend):
         "Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin"
     )
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        objective_scale: float = 1.0,
+        objective_shift: float = 0.0,
+    ) -> None:
         self.config: Optional[BackendConfig] = None
         self._problem = None
         self._history_X: Optional[torch.Tensor] = None
@@ -162,8 +169,29 @@ class BocodeBotorchBackend(UnifiedBackend):
         self._model = None
         self._mll = None
         self._fitted: bool = False
+        # Phase 9 Gate 5 — affine rescaling of the objective. Transform is
+        # applied at write-time in initialize() and evaluate() so that the
+        # GP fits, state extractor, optimizer, and counterfactual rollouts
+        # all see a consistent transformed scale.
+        # math.isfinite + > 0 (for scale) required; shift can be any finite.
+        if not math.isfinite(float(objective_scale)) or float(objective_scale) <= 0:
+            raise ValueError(
+                f"objective_scale must be finite and > 0; got {objective_scale!r}"
+            )
+        if not math.isfinite(float(objective_shift)):
+            raise ValueError(
+                f"objective_shift must be finite; got {objective_shift!r}"
+            )
+        self._objective_scale: float = float(objective_scale)
+        self._objective_shift: float = float(objective_shift)
 
     # -- helpers ------------------------------------------------------------
+
+    def _apply_objective_transform(self, obj: torch.Tensor) -> torch.Tensor:
+        """Apply y → scale * y + shift. Identity when scale=1, shift=0."""
+        if self._objective_scale == 1.0 and self._objective_shift == 0.0:
+            return obj
+        return self._objective_scale * obj + self._objective_shift
 
     @staticmethod
     def _bounds_to_tensor(bounds) -> torch.Tensor:
@@ -225,7 +253,7 @@ class BocodeBotorchBackend(UnifiedBackend):
             obj0, cons0 = prob.evaluate(X0)
 
         self._history_X = X0.detach().clone()
-        self._history_obj = obj0.detach().clone()
+        self._history_obj = self._apply_objective_transform(obj0).detach().clone()
         self._history_cons = cons0.detach().clone()
         self._fitted = False
         return self.get_history()
@@ -244,10 +272,16 @@ class BocodeBotorchBackend(UnifiedBackend):
         with torch.no_grad():
             obj, cons = self._problem.evaluate(X)
         self._history_X = torch.cat([self._history_X, X.detach()], dim=0)
-        self._history_obj = torch.cat([self._history_obj, obj.detach()], dim=0)
+        self._history_obj = torch.cat(
+            [self._history_obj, self._apply_objective_transform(obj).detach()],
+            dim=0,
+        )
         self._history_cons = torch.cat([self._history_cons, cons.detach()], dim=0)
         self._fitted = False  # invalidate fitted surrogate
-        return self._slice_batch(X.detach(), obj.detach(), cons.detach())
+        # Returned slice uses the transformed values so callers see the
+        # consistent scale (matches _history_obj).
+        obj_ret = self._apply_objective_transform(obj).detach()
+        return self._slice_batch(X.detach(), obj_ret, cons.detach())
 
     def fit(self) -> None:
         """Fit a SingleTaskGP over current history using BoTorch."""

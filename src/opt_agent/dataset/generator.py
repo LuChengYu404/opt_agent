@@ -106,6 +106,12 @@ class DatasetConfig:
     optimization_scale: float | None = None
     evaluation_scale: float | None = None
     fit_scale: float | None = None
+    # Phase 9 Gate 5 — affine rescaling of the objective (codex §27).
+    # Applied at write-time inside BocodeBotorchBackend so GP fits, state
+    # extractor, optimizer, and counterfactual rollouts all see the
+    # transformed scale consistently. Default (1.0, 0.0) is the identity.
+    objective_scale: float = 1.0
+    objective_shift: float = 0.0
     # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
     # `CounterfactualRollout` for follow-up steps and recorded in metadata
     # so records can be replayed with a different continuation. Default:
@@ -118,6 +124,25 @@ class DatasetConfig:
         )
     )
 
+    def __post_init__(self) -> None:
+        """Validate Phase 9 Gate 5 affine params eagerly.
+
+        `objective_scale` must be finite and strictly positive; `objective_shift`
+        must be finite. Rejecting at config construction time (rather than
+        deep inside generate()) gives a clearer error and avoids a partially-
+        constructed DatasetGenerator if downstream code re-uses the factory.
+        """
+        scale = float(self.objective_scale)
+        shift = float(self.objective_shift)
+        if not math.isfinite(scale) or scale <= 0:
+            raise ValueError(
+                f"DatasetConfig.objective_scale must be finite and > 0; got {scale!r}"
+            )
+        if not math.isfinite(shift):
+            raise ValueError(
+                f"DatasetConfig.objective_shift must be finite; got {shift!r}"
+            )
+
 
 BackendFactory = Callable[[], UnifiedBackend]
 
@@ -129,12 +154,37 @@ class DatasetGenerator:
         backend_factory: BackendFactory | None = None,
     ) -> None:
         self.config = config
-        # Default factory: real BocodeBotorchBackend.
-        self.backend_factory: BackendFactory = backend_factory or self._default_factory
+        # Default factory: real BocodeBotorchBackend configured with the
+        # affine objective transform from DatasetConfig. Validates scale/shift
+        # eagerly so misuse raises at __init__ time, not deep inside generate().
+        if backend_factory is None:
+            scale = float(config.objective_scale)
+            shift = float(config.objective_shift)
+            if not math.isfinite(scale) or scale <= 0:
+                raise ValueError(
+                    f"DatasetConfig.objective_scale must be finite and > 0; got {scale!r}"
+                )
+            if not math.isfinite(shift):
+                raise ValueError(
+                    f"DatasetConfig.objective_shift must be finite; got {shift!r}"
+                )
+
+            def _factory() -> UnifiedBackend:
+                from opt_agent.backend.bocode_botorch import BocodeBotorchBackend
+                return BocodeBotorchBackend(
+                    objective_scale=scale, objective_shift=shift
+                )
+
+            self.backend_factory = _factory
+        else:
+            self.backend_factory = backend_factory
 
     @staticmethod
     def _default_factory() -> UnifiedBackend:
         from opt_agent.backend.bocode_botorch import BocodeBotorchBackend
+        # Threaded from DatasetConfig in __init__ via closure set in
+        # `_make_default_factory`; bare default below for tests/CLI that
+        # use the static API directly without going through __init__.
         return BocodeBotorchBackend()
 
     def generate(self) -> Iterator[DecisionRecord]:
@@ -319,6 +369,10 @@ class DatasetGenerator:
                 "evaluation_scale": float(evaluation_scale),
                 "fit_scale": float(fit_scale),
                 "horizon": int(self.config.horizon),
+                # Phase 9 Gate 5 — affine objective transform (so replay
+                # infrastructure can reconstruct the same transformed backend).
+                "objective_scale": float(self.config.objective_scale),
+                "objective_shift": float(self.config.objective_shift),
                 # Sprint 0: full utility_weights (not just w_stop_opportunity)
                 # and continuation_policy spec, so any record is replayable
                 # with different config (per codex Q-T2 2026-09-25).

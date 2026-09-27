@@ -92,7 +92,10 @@ def _rank(record, weights: UtilityWeights) -> str:
 
 
 def _terminal_for_actions(record, action_ids: set[str]) -> dict[str, dict]:
-    backend = BocodeBotorchBackend()
+    # Phase 9 Gate 5 — thread affine transform from metadata.
+    from opt_agent.dataset.validation import _affine_kwargs_from_metadata
+    affine_kwargs = _affine_kwargs_from_metadata(record.metadata)
+    backend = BocodeBotorchBackend(**affine_kwargs)
     backend.initialize(BackendConfig(
         problem_id=record.metadata["backend_problem_id"],
         seed=int(record.problem["seed"]),
