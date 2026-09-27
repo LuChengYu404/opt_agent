@@ -1,14 +1,17 @@
 # EXP-RQ1.2 — Counterfactual Oracle Replay Report (5-family version, post-codex-revision)
 
-**Date**: 2026-09-26
-**Status**: Code revisions per `gpt-5.6-sol` review (2026-09-26) applied
+**Date**: 2026-09-26 (initial 10-seed); 2026-09-27 (seed extension to n=20)
+**Status**: 10-seed → 20-seed run completed. Gate 3 / Gate 4 stop-gain results **strengthened or held** at 20 seeds. The 20-seed dataset reuses seeds 0–9 (this is a **seed extension**, not an independent replication).
 **Datasets**:
 - 3-family baseline (kept for history, NOT cited as independent evidence): `phase8_6b_h1_10seed.jsonl`, `phase8_6b_h3_10seed.jsonl`, `phase8_6d_hfull_10seed.jsonl` (226 records each; Branin/Hartmann/Ackley)
-- **5-family canonical**: `phase8_6d_h3_10seed_5family.jsonl` (354 records; Branin/Hartmann/Ackley/SixHumpCamel/Rastrigin × 10 seeds; **horizon=3**, not horizon=30 — naming corrected post-review)
+- **5-family canonical 10-seed (exploratory)**: `phase8_6d_h3_10seed_5family.jsonl` (354 records; Branin/Hartmann/Ackley/SixHumpCamel/Rastrigin × 10 seeds; **horizon=3**, not horizon=30 — naming corrected post-review)
+- **5-family canonical 20-seed (seed extension, this update)**: `phase8_6d_h3_20seed_5family.jsonl` (663 records; same families × seeds 0-19 — note seeds 0-9 are reused; report at `runs/exp_rq1_2_h3_20seed_report.json`)
 
 > **Naming correction (per codex review 2026-09-26)**: The previous file `phase8_6d_hfull_10seed_5family.jsonl` was generated with `horizon=3`, not the `horizon=30` implied by `hfull`. Renamed to `phase8_6d_h3_10seed_5family.jsonl`. A true `hfull` (horizon=30) dataset would require ~30× generation cost (~90 minutes) and is **out of scope** for RQ1.
 
-## 1. Headline result (5-family canonical, post-revision)
+## 1. Headline result (5-family canonical)
+
+### 10-seed exploratory (n_seeds=50, 2026-09-26)
 
 | Gate | Result |
 |---|---|
@@ -17,6 +20,49 @@
 | 4a: stop-gain CI lo > 0 | **PASS 5/5 families** |
 | 4b: uniform-gain CI lo > 0 | PASS 3/5 (hartmann, rastrigin, sixhumpcamel) |
 | 4c: behavior-gain CI lo > 0 | PASS 1/5 (rastrigin only) |
+
+### 20-seed seed-extension (n_seeds=100, 2026-09-27) — **canonical for citation**
+
+| Gate | 10-seed | 20-seed (seed extension) |
+|---|---|---|
+| 3: aggregate_mass adjusted_lift | 1.124 (CI [0.695, 1.722]) | **1.294 (CI [0.848, 1.954])** |
+| 4a: stop-gain CI lo > 0 | 5/5 | **5/5** (unchanged) |
+| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Hartmann now passes) |
+| 4c: behavior-gain CI lo > 0 | 1/5 | **1/5** (Rastrigin only, unchanged) |
+
+**Seed-expansion note (per codex priority #1, 2026-09-27)**: The 20-seed
+run was generated with the same `DatasetGenerator` config and same
+`validate_phase8_6b.py` runner as the 10-seed exploratory run. **Seeds 0–9
+are reused** — this is a **10-seed extension to n=20**, not an independent
+replication. The 20-seed numbers demonstrate that the Gate 3 signal is robust
+to seed expansion; a true independent replication would require a different
+RNG seed stream (e.g., seeds 100–119), which is deferred.
+
+**20-seed is the citation-quality number** for the Gate 3 adjusted_lift CI
+because it has n_seeds=100 (vs 10-seed's n_seeds=50). 10-seed numbers are
+retained for transparency on the seed expansion.
+
+### Per-family Gate 4 — 20-seed (n_seeds=20 per family, exploratory per codex)
+
+Per-family normalized terminal gain: mean and 95% CI (paired bootstrap).
+**Bold** = CI lower bound > 0.
+
+| Family | stop mean (CI lo, hi) | uniform mean (CI lo, hi) | behavior mean (CI lo, hi) |
+|---|---|---|---|
+| ackley | **+2.284** (**+1.43**, +3.28) | +0.426 (-0.18, +1.10) | +0.161 (-0.32, +0.65) |
+| branin | **+0.241** (**+0.15**, +0.36) | **+0.033** (**+0.006**, +0.067) | -0.002 (-0.007, +0.004) |
+| hartmann | **+6.290** (**+2.44**, +11.65) | **+1.883** (**+0.022**, +4.67) | -0.665 (-2.50, +0.65) |
+| rastrigin | **+1.436** (**+0.91**, +2.07) | **+0.329** (**+0.15**, +0.51) | **+0.154** (**+0.015**, +0.31) |
+| sixhumpcamel | **+0.058** (**+0.04**, +0.08) | **+0.014** (**+0.008**, +0.021) | +0.002 (-0.001, +0.006) |
+
+**Stop-gain CI lo > 0 on all 5/5 families** (exploratory claim, no multiplicity
+adjustment; 95% CIs are unadjusted). **Uniform-gain CI lo > 0 on 4/5 families**
+(Branin, Hartmann, Rastrigin, SixHumpCamel). **Behavior-gain CI lo > 0 on
+1/5 family** (Rastrigin only) — Rastrigin is the unique family where
+oracle-labeled first actions beat the behavior policy. The CI lower bounds
+for Rastrigin behavior (0.015) and Branin uniform (0.006) are barely above
+zero and should be interpreted as "positive mean under the unadjusted bootstrap,"
+not "robustly beats behavior."
 
 ## 2. Three findings (per `gpt-5.6-sol` review 2026-09-26, exploratory)
 
@@ -102,7 +148,7 @@ What changed (and why):
    - New helper `_bootstrap_ci_mean()`: pure-Python bootstrap 95% CI for the mean.
 2. `scripts/validate_phase8_6b.py`: report now includes `gate3.seed_clustered_ci95`.
 3. Tests: `tests/test_phase8_5_gates.py` + `tests/test_phase8_6b_gates.py` — **16/16 pass** (no breakage from the API change).
-4. Full suite: `tests/` — **364/364 pass** (no regressions).
+4. Full suite: `tests/` — **385/385 pass** (no regressions from Gate 5 work; +21 tests in `tests/test_objective_transform.py`).
 
 ## 9. Files
 
