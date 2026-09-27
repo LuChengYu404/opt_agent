@@ -1,0 +1,361 @@
+{
+  "config": {
+    "dataset_sha256": "b08125550482d9d743ebf846d6b64eb5bc7dcf7ec4249577669de0bcea225425",
+    "training_families": [
+      "ackley",
+      "branin",
+      "hartmann",
+      "rastrigin",
+      "sixhumpcamel"
+    ],
+    "n_train": 661,
+    "fids": [
+      6,
+      8,
+      15
+    ],
+    "dims": [
+      2,
+      5,
+      10
+    ],
+    "instances": [
+      2,
+      3,
+      4
+    ],
+    "seeds": [
+      100,
+      101,
+      102,
+      103,
+      104
+    ],
+    "budget": 30,
+    "policies": [
+      "rf_all",
+      "surrogate",
+      "local"
+    ],
+    "model": "RF 200 trees, depth 8, leaf 5; EXP-RQ2.1 frozen features/targets"
+  },
+  "n_runs": 405,
+  "cells": {
+    "f6/d2": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.43330886084006015,
+        "surrogate": 0.320669377344962,
+        "local": 0.097642512514657
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": 0.11263948349509816,
+          "ci95_instance_then_seed_bootstrap": [
+            0.03239884475358188,
+            0.22650343459676722
+          ],
+          "wins_ties_losses": [
+            2,
+            2,
+            11
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.3356663483254031,
+          "ci95_instance_then_seed_bootstrap": [
+            0.10170071338993131,
+            0.637508259186725
+          ],
+          "wins_ties_losses": [
+            3,
+            0,
+            12
+          ]
+        }
+      }
+    },
+    "f6/d5": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.1428870355314994,
+        "surrogate": 0.09038751810481957,
+        "local": 0.14008198080285336
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": 0.0524995174266798,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.007617874743559647,
+            0.19881060579166668
+          ],
+          "wins_ties_losses": [
+            6,
+            0,
+            9
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.002805054728646029,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.19005549011378575,
+            0.19448074866619264
+          ],
+          "wins_ties_losses": [
+            10,
+            0,
+            5
+          ]
+        }
+      }
+    },
+    "f6/d10": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.19924518513693384,
+        "surrogate": 0.4659458345550988,
+        "local": 0.1642227386218408
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": -0.266700649418165,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.4412090694317598,
+            -0.0800094238207359
+          ],
+          "wins_ties_losses": [
+            13,
+            1,
+            1
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.035022446515093016,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.12478067606373687,
+            0.26040781287155074
+          ],
+          "wins_ties_losses": [
+            11,
+            0,
+            4
+          ]
+        }
+      }
+    },
+    "f8/d2": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.4189304559509108,
+        "surrogate": 0.13308124102313632,
+        "local": 0.10757329081039191
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": 0.28584921492777454,
+          "ci95_instance_then_seed_bootstrap": [
+            0.0658733343319629,
+            0.587488197962562
+          ],
+          "wins_ties_losses": [
+            1,
+            0,
+            14
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.3113571651405189,
+          "ci95_instance_then_seed_bootstrap": [
+            0.07727328328988763,
+            0.5812724337554387
+          ],
+          "wins_ties_losses": [
+            2,
+            1,
+            12
+          ]
+        }
+      }
+    },
+    "f8/d5": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.0963625148315795,
+        "surrogate": 0.09741085264552868,
+        "local": 0.06758087199455375
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": -0.0010483378139491911,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.07631350457252993,
+            0.08014354747825457
+          ],
+          "wins_ties_losses": [
+            9,
+            1,
+            5
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.028781642837025737,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.03553905015848645,
+            0.1238203341226693
+          ],
+          "wins_ties_losses": [
+            7,
+            0,
+            8
+          ]
+        }
+      }
+    },
+    "f8/d10": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.2958900206061214,
+        "surrogate": 0.4746492998875977,
+        "local": 0.2448244943069003
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": -0.17875927928147625,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.36286294056951596,
+            0.03756717242285991
+          ],
+          "wins_ties_losses": [
+            12,
+            0,
+            3
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.05106552629922112,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.1383056554175611,
+            0.31998844332356885
+          ],
+          "wins_ties_losses": [
+            9,
+            0,
+            6
+          ]
+        }
+      }
+    },
+    "f15/d2": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.4745730628022715,
+        "surrogate": 0.3506980145897193,
+        "local": 0.27227243982965565
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": 0.12387504821255228,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.014023956735987435,
+            0.2346556040438883
+          ],
+          "wins_ties_losses": [
+            3,
+            2,
+            10
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": 0.2023006229726159,
+          "ci95_instance_then_seed_bootstrap": [
+            0.04546774083799458,
+            0.35427335586066117
+          ],
+          "wins_ties_losses": [
+            3,
+            1,
+            11
+          ]
+        }
+      }
+    },
+    "f15/d5": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.4282437743163538,
+        "surrogate": 0.30661937287155794,
+        "local": 0.45375957837256187
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": 0.12162440144479587,
+          "ci95_instance_then_seed_bootstrap": [
+            0.04649961623681351,
+            0.2169370714182433
+          ],
+          "wins_ties_losses": [
+            3,
+            0,
+            12
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": -0.02551580405620799,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.11998673018535065,
+            0.06073648783938808
+          ],
+          "wins_ties_losses": [
+            6,
+            0,
+            9
+          ]
+        }
+      }
+    },
+    "f15/d10": {
+      "n_instances": 3,
+      "n_seeds_per_instance": 5,
+      "policies": {
+        "rf_all": 0.5408402404182054,
+        "surrogate": 0.6571190323657914,
+        "local": 0.5434606541931117
+      },
+      "paired": {
+        "surrogate": {
+          "mean_rf_minus_baseline_regret": -0.11627879194758593,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.23183293204589137,
+            -0.006081098318399874
+          ],
+          "wins_ties_losses": [
+            8,
+            0,
+            7
+          ]
+        },
+        "local": {
+          "mean_rf_minus_baseline_regret": -0.0026204137749063178,
+          "ci95_instance_then_seed_bootstrap": [
+            -0.1383671355955012,
+            0.15852257689424204
+          ],
+          "wins_ties_losses": [
+            8,
+            0,
+            7
+          ]
+        }
+      }
+    }
+  },
+  "interpretation": "Exploratory external-transfer stress test. Lower regret is better. Within-cell intervals resample instances then seeds; only three instances per function/dimension and no multiple-comparison correction."
+}

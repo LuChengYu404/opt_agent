@@ -1,0 +1,33 @@
+{
+  "source": "runs/exp_rq0_5_joint_10seed.json",
+  "panel": "BOCoDe development panel, 5 families x 10 seeds, budget 30",
+  "full_llm_calls": 739,
+  "dimension_router_llm_calls": 447,
+  "llm_call_reduction": 0.3951285520974289,
+  "full_llm_tokens": 537456,
+  "dimension_router_tokens": 324702,
+  "token_reduction": 0.39585380012503346,
+  "per_family": {
+    "Ackley": {
+      "n_paired_seeds": 10,
+      "mean_router_minus_llm_best_y": 0.07200778508480817
+    },
+    "Branin": {
+      "n_paired_seeds": 10,
+      "mean_router_minus_llm_best_y": 2.2667286425591113
+    },
+    "Hartmann": {
+      "n_paired_seeds": 10,
+      "mean_router_minus_llm_best_y": 0.05269218169220606
+    },
+    "Rastrigin": {
+      "n_paired_seeds": 10,
+      "mean_router_minus_llm_best_y": -1.4545661945399728
+    },
+    "SixHumpCamel": {
+      "n_paired_seeds": 10,
+      "mean_router_minus_llm_best_y": 0.24701199032111648
+    }
+  },
+  "limitation": "The dimension router failed to show a gain over AlwaysSurrogate on the held-out IOH panel; this cost saving is development-panel only."
+}

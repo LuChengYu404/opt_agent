@@ -1,0 +1,202 @@
+{
+  "config": {
+    "dataset_sha256": "b08125550482d9d743ebf846d6b64eb5bc7dcf7ec4249577669de0bcea225425",
+    "training": {
+      "n_training_records": 546,
+      "n_calibration_records": 115,
+      "temperature": 0.4731512589614807,
+      "nll_before": 1.9713058957368816,
+      "nll_after": 1.932800630653133,
+      "calibration_target": "argmax short-horizon rollout utility, not terminal success"
+    },
+    "families": [
+      "branin"
+    ],
+    "seeds": [
+      300
+    ],
+    "budget": 10,
+    "policies": [
+      "rf",
+      "llm",
+      "confidence_0.5",
+      "random_0.5"
+    ],
+    "system2_mode": "mock",
+    "system2_model": "rule-fallback-mock"
+  },
+  "runs": [
+    {
+      "family": "branin",
+      "seed": 300,
+      "budget": 10,
+      "policy": "rf",
+      "system2_mode": "mock",
+      "initial_values": [
+        -4.866652041139551,
+        -11.82875347485459,
+        -18.944908918817802,
+        -148.8891343051583,
+        -26.180270975080965
+      ],
+      "terminal_best": -1.1255920810231625,
+      "n_evaluations": 10,
+      "n_steps": 10,
+      "termination": "budget_exhausted",
+      "actions": [
+        "retrain_surrogate",
+        "local_exploitation",
+        "retrain_surrogate",
+        "local_exploitation",
+        "retrain_surrogate",
+        "local_exploitation",
+        "retrain_surrogate",
+        "local_exploitation",
+        "retrain_surrogate",
+        "local_exploitation"
+      ],
+      "routes": [
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1",
+        "system1"
+      ],
+      "llm_calls": 0,
+      "llm_tokens": 0,
+      "llm_fallbacks": 0,
+      "elapsed_s": 0.6493124200496823
+    },
+    {
+      "family": "branin",
+      "seed": 300,
+      "budget": 10,
+      "policy": "llm",
+      "system2_mode": "mock",
+      "initial_values": [
+        -4.866652041139551,
+        -11.82875347485459,
+        -18.944908918817802,
+        -148.8891343051583,
+        -26.180270975080965
+      ],
+      "terminal_best": -4.866652041139551,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination": "stop",
+      "actions": [
+        "global_exploration",
+        "stop"
+      ],
+      "routes": [
+        "system2",
+        "system2"
+      ],
+      "llm_calls": 2,
+      "llm_tokens": 0,
+      "llm_fallbacks": 0,
+      "elapsed_s": 0.0006986239459365606
+    },
+    {
+      "family": "branin",
+      "seed": 300,
+      "budget": 10,
+      "policy": "confidence_0.5",
+      "system2_mode": "mock",
+      "initial_values": [
+        -4.866652041139551,
+        -11.82875347485459,
+        -18.944908918817802,
+        -148.8891343051583,
+        -26.180270975080965
+      ],
+      "terminal_best": -4.866652041139551,
+      "n_evaluations": 7,
+      "n_steps": 2,
+      "termination": "stop",
+      "actions": [
+        "global_exploration",
+        "stop"
+      ],
+      "routes": [
+        "system2",
+        "system2"
+      ],
+      "llm_calls": 2,
+      "llm_tokens": 0,
+      "llm_fallbacks": 0,
+      "elapsed_s": 0.0793677190085873
+    },
+    {
+      "family": "branin",
+      "seed": 300,
+      "budget": 10,
+      "policy": "random_0.5",
+      "system2_mode": "mock",
+      "initial_values": [
+        -4.866652041139551,
+        -11.82875347485459,
+        -18.944908918817802,
+        -148.8891343051583,
+        -26.180270975080965
+      ],
+      "terminal_best": -4.866652041139551,
+      "n_evaluations": 7,
+      "n_steps": 3,
+      "termination": "stop",
+      "actions": [
+        "retrain_surrogate",
+        "global_exploration",
+        "stop"
+      ],
+      "routes": [
+        "system1",
+        "system2",
+        "system2"
+      ],
+      "llm_calls": 2,
+      "llm_tokens": 0,
+      "llm_fallbacks": 0,
+      "elapsed_s": 0.27878700697328895
+    }
+  ],
+  "summary": {
+    "branin/confidence_0.5": {
+      "n_seeds": 1,
+      "mean_terminal_best": -4.866652041139551,
+      "mean_llm_calls": 2.0,
+      "mean_llm_tokens": 0.0,
+      "mean_elapsed_s": 0.0793677190085873,
+      "total_fallbacks": 0
+    },
+    "branin/llm": {
+      "n_seeds": 1,
+      "mean_terminal_best": -4.866652041139551,
+      "mean_llm_calls": 2.0,
+      "mean_llm_tokens": 0.0,
+      "mean_elapsed_s": 0.0006986239459365606,
+      "total_fallbacks": 0
+    },
+    "branin/random_0.5": {
+      "n_seeds": 1,
+      "mean_terminal_best": -4.866652041139551,
+      "mean_llm_calls": 2.0,
+      "mean_llm_tokens": 0.0,
+      "mean_elapsed_s": 0.27878700697328895,
+      "total_fallbacks": 0
+    },
+    "branin/rf": {
+      "n_seeds": 1,
+      "mean_terminal_best": -1.1255920810231625,
+      "mean_llm_calls": 0.0,
+      "mean_llm_tokens": 0.0,
+      "mean_elapsed_s": 0.6493124200496823,
+      "total_fallbacks": 0
+    }
+  }
+}

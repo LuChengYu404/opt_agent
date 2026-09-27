@@ -1,5 +1,46 @@
 # Current research status
 
+## Closed-loop and external-transfer audit (2026-09-27, latest)
+
+The complete results and methods are in
+`runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`. Independent trajectory workers
+now run in parallel (four by default); serial/parallel checks reproduced
+identical actions and terminal values on 16 BOCoDe and four IOH smoke runs,
+plus two full-budget BOCoDe runs with GP fitting.
+
+- **RQ1 remains open:** a frozen RF trained on the 20-seed rollout corpus was
+  evaluated in full budget-30 loops on five BOCoDe families. On fresh seeds
+  200–219 it beat AlwaysSurrogate on Ackley (+0.662 raw terminal best, paired
+  unadjusted 95% CI [+0.111, +1.321]), but the fixed Local policy was at
+  least as strong. The RF lost to Surrogate on Branin (−1.221), Hartmann
+  (−0.695), and SixHumpCamel (−0.441); Rastrigin was inconclusive. No general
+  learned-policy gain is established. A `no_retrain` mask removed repeated GP
+  refits but did not overturn this result on the fresh seeds.
+- **RQ2 remains partial:** leave-one-family-out RF deployed in complete loops
+  did not beat the stronger fixed controls consistently. A separate external
+  IOH/BBOB stress test completed 405 trajectories on three new functions ×
+  dimensions {2,5,10} × three instances × five seeds × three policies. RF
+  tended to improve over Surrogate at 10D and regress at 2D, with Local often
+  competitive; this combines domain and dimension shift and is exploratory.
+- **RQ3 remains open:** an audit of the existing real-LLM BOCoDe joint run
+  found 447 calls / 324,702 tokens for the frozen dimension router versus
+  739 calls / 537,456 tokens for LLM everywhere (about 39.5% fewer calls and
+  tokens). This development-panel saving does not establish a transferable
+  router; the held-out IOH performance test was negative. A parallel,
+  resumable confidence-threshold and random-rate sweep is implemented;
+  four mock-System-2 trajectories matched serial execution, but no real LLM
+  sweep has run without a configured credential.
+- **Mechanism check:** a post-hoc fixed global-then-local schedule beat the
+  recorded LLM on mean Rastrigin terminal best for development seeds 0–9,
+  but lost to fixed Surrogate and Local on separate seeds 100–119. The observed
+  LLM schedule is not a validated causal explanation of its advantage.
+
+The real confidence/OOD System-1/System-2 cost frontier and engineering
+transfer remain unrun because no usable LLM credential or engineering
+simulator was found in the current environment. The new local results should
+be treated as evidence for revising the method claim rather than proof of
+the original final goal.
+
 ## Workshop paper evidence gap closure (2026-09-27)
 
 Three experiments closed the gaps that block a defensible workshop paper:

@@ -57,14 +57,17 @@ from _shared_rq_features import (  # noqa: E402
 )
 
 
-def build_dataset(records: list[dict]) -> tuple[list, list, list, list, list]:
+def build_dataset(
+    records: list[dict], *, family_scales: dict | None = None,
+) -> tuple[list, list, list, list, list]:
     """Build (X, Y, family_idx, seed_idx, states) from raw record dicts.
 
     Skips terminal-phase records (no decision left to make) and zero-feature
     rows. `states` is the raw state dict per record (used by
     `real_rulepolicy_action` for state-conditional baseline).
     """
-    family_scales = compute_family_scales(records)
+    if family_scales is None:
+        family_scales = compute_family_scales(records)
     X, Y, fam_idx, seed_idx, states = [], [], [], [], []
     for r in records:
         phase = phase_of_ratio(float(

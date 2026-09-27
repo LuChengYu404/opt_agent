@@ -1,7 +1,7 @@
 # EXP-RQ2.1 — Cross-Family Transfer (Leave-One-Family-Out CV)
 
 **Date**: 2026-09-27
-**Dataset**: `runs/phase8_6d_h3_20seed_5family.jsonl` (661 records, 5 families × 20 seeds × horizon=3)
+**Dataset**: `runs/phase8_6d_h3_20seed_5family.jsonl` (663 records before filtering; 661 nonterminal records in this analysis, 5 families × 20 seeds × horizon=3)
 **Model**: multi-output RandomForestRegressor (one regressor per action)
 **CV**: 5-fold leave-one-family-out
 **Baselines**: AlwaysSurrogate, In-family RF (reference, NOT upper bound), **RulePolicy (real, state-conditional)**, AlwaysLocal (constant local_exploitation, informational)
