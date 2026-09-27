@@ -1,0 +1,26 @@
+[1/10] GearTrain seed=7 → 4 records
+[2/10] GearTrain seed=3 → 7 records
+[3/10] GearTrain seed=1 → 8 records
+[4/10] GearTrain seed=2 → 7 records
+[5/10] GearTrain seed=4 → 8 records
+[6/10] GearTrain seed=6 → 7 records
+[7/10] GearTrain seed=0 → 4 records
+[8/10] GearTrain seed=9 → 6 records
+[9/10] GearTrain seed=5 → 7 records
+[10/10] GearTrain seed=8 → 7 records
+{
+  "cost_units_new": 1914,
+  "cost_units_per_record": 29.45,
+  "horizon_mode": "fixed",
+  "output": "runs/geartrain_h3_10seed.jsonl",
+  "problems": [
+    "GearTrain"
+  ],
+  "quot_note": "quota per decision point \u2248 8 \u00d7 remaining_budget backend steps (vs 8 \u00d7 remaining_budget at full rollout)",
+  "records_new": 65,
+  "records_partial": 0,
+  "seeds": 10,
+  "subsample_k": 8,
+  "trajectories_skipped_resume": 0,
+  "wall_clock_s": 7.1
+}

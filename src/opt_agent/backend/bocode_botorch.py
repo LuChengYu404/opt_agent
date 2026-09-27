@@ -152,8 +152,13 @@ class BocodeBotorchBackend(UnifiedBackend):
     """
 
     _ALLOWED_PROBLEMS = (
-        "Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin"
-    )
+            "Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin",
+            # P3 engineering transfer (2026-09-27): single-objective,
+            # unconstrained, d=4 — the only BOCoDe engineering problem
+            # passing the Phase-1 structural gates without constraint
+            # semantics. Verified by tests/test_engineering_geartrain.py.
+            "GearTrain",
+        )
 
     def __init__(
         self,

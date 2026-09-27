@@ -134,6 +134,12 @@ def main() -> int:
                         help="'remaining' (to budget exhaustion) or a fixed int")
     parser.add_argument("--subsample-k", type=int, default=4,
                         help="Candidates rolled out per decision point (1-8)")
+    parser.add_argument("--replicates", type=int, default=1,
+                        help="Rollout replicates per decision point; utilities averaged (P1b denoising)")
+    parser.add_argument("--continuation", default="on_policy", choices=["on_policy", "rule"],
+                        help="Rollout continuation policy (P1b alignment: rule matches Gate 4)")
+    parser.add_argument("--terminal-utility", action="store_true",
+                        help="Pure terminal-delta-best utility (w_opt=1, cost/stop terms zeroed)")
     parser.add_argument("--problems", nargs="+", default=list(PROBLEMS_5FAMILY))
     parser.add_argument("--seeds", type=int, default=5,
                         help="Number of problem seeds (0..N-1)")
@@ -160,9 +166,24 @@ def main() -> int:
         print(f"error: {args.output} exists; pass --force or --resume", file=sys.stderr)
         return 1
 
+    from opt_agent.rollout.specs import ContinuationPolicySpec
+    from opt_agent.rollout.utility import UtilityWeights
+
+    weights = UtilityWeights()
+    if args.terminal_utility:
+        weights = UtilityWeights(
+            w_optimization=1.0, w_surrogate=0.0, w_coverage=0.0,
+            w_evaluation=0.0, w_fit=0.0, w_stop_opportunity=0.0,
+        )
+    cont = ContinuationPolicySpec(
+        name=args.continuation, seed=0,
+        extras={"rule_weight": 0.8} if args.continuation == "on_policy" else {},
+    )
     spec = replace(
         DatasetConfig(),
         problems=tuple(args.problems),
+        continuation_spec=cont,
+        utility_weights=weights,
         seeds=tuple(range(args.seeds)),
         total_budget=args.budget,
         max_actions=args.max_actions,
@@ -170,6 +191,7 @@ def main() -> int:
         horizon=horizon,
         horizon_mode=horizon_mode,
         rollout_action_subsample=args.subsample_k,
+        rollout_replicates=args.replicates,
     )
 
     done_keys = _existing_trajectory_keys(args.output) if args.resume else set()

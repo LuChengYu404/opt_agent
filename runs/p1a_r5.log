@@ -1,0 +1,21 @@
+80 records × 3 re-rolls
+[10/80] flip_rate=0.5
+[20/80] flip_rate=0.4
+[30/80] flip_rate=0.6666666666666666
+[40/80] flip_rate=0.8
+[50/80] flip_rate=0.5
+[60/80] flip_rate=0.6666666666666666
+[70/80] flip_rate=0.8333333333333334
+[80/80] flip_rate=0.8333333333333334
+{
+  "argmax_stable_share": 0.25,
+  "flip_rate_above_median_gap": 0.6327433628318584,
+  "flip_rate_below_median_gap": 0.7168141592920354,
+  "mean_flip_rate": 0.6747787610619469,
+  "median_interroll_gap_spread": 0.09877918779492739,
+  "median_stored_gap": 0.05036136547245408,
+  "n_records": 80,
+  "repeats": 3,
+  "verdict": "NOISE_DOMINATED",
+  "verdict_rule": "flip rate on pairs above the median stored gap: >=0.25 NOISE; <=0.10 MISSPEC; else MIXED"
+}

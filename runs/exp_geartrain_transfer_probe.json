@@ -1,0 +1,26 @@
+{
+  "bt_h3": {
+    "pairs": 1595,
+    "pairwise_accuracy": 0.8927899686520376,
+    "records": 65,
+    "top1_agreement": 0.5538461538461539
+  },
+  "proper_h3": {
+    "pairs": 1595,
+    "pairwise_accuracy": 0.8006269592476489,
+    "records": 65,
+    "top1_agreement": 0.2923076923076923
+  },
+  "rf_synthetic": {
+    "pairs": 1595,
+    "pairwise_accuracy": 0.890282131661442,
+    "records": 65,
+    "top1_agreement": 0.49230769230769234
+  },
+  "zero_shot": {
+    "pairs": 1595,
+    "pairwise_accuracy": 0.4225705329153605,
+    "records": 65,
+    "top1_agreement": 0.03076923076923077
+  }
+}

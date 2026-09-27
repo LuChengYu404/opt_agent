@@ -195,3 +195,21 @@ Consolidated report: `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`.
 New scripts: `exp_rlcd_calibration_ablation.py`, `exp_rlcd_router_panel.py`,
 `exp_rlcd_loo_transfer.py`. Gate-2 partial-record fix in
 `src/opt_agent/dataset/validation.py`.
+
+## 9. Journal round 2 — P0–P3 (2026-09-27/28)
+
+Consolidated report: `runs/EXP_JOURNAL_ROUND2_REPORT.md`.
+
+- **P0 confirmatory**: bt−RF pooled **+0.140 [+0.126, +0.154]**, CI excludes
+  0 on 5/5 folds, dual training seeds, 663 records.
+- **P1 teacher chain**: single-roll labels noise-dominated (flip 0.74);
+  R=5 replicate averaging (new `rollout_replicates`) cuts split-half flip
+  to 0.37; Gate-4-ALIGNED teacher (rule continuation + terminal-Δbest
+  utility) removes label/evaluation mismatch — **Gate 4 still fails:
+  first-action true terminal advantage ≈ 0**. Value lives in
+  schedules/continuations (8.6F reproduced on clean labels).
+- **P2**: aligned-teacher models still collapse to per-objective constants;
+  discrimination still zero — the thin-signal ceiling propagates.
+- **P3**: GearTrain added (only gate-passing engineering problem; 4 tests);
+  numerical→engineering probe: bt 0.893 / rf 0.890 / zero-shot 0.423.
+  Constraint-semantics problems + external baselines documented as remainder.

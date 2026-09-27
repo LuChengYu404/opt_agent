@@ -101,6 +101,59 @@ def subsample_candidates(
     return [c for i, c in enumerate(candidates) if i in chosen]
 
 
+def _average_rollouts(outputs: list) -> "RolloutOutput":
+    """Merge replicate rollouts of the SAME candidate subset (P1b denoising).
+
+    Per action: utility/deltas/counts are means over the replicas where the
+    action was valid; the per-replica utilities and their std are stashed in
+    ``metrics['utility_replicas']`` / ``metrics['utility_std']``. An action
+    valid in no replica is emitted as-is from the first output (invalid).
+    T2: averaging leaves the expected ranking unchanged and shrinks utility
+    noise as 1/sqrt(R).
+    """
+    import statistics as _stats
+
+    from opt_agent.rollout import CounterfactualResult, RolloutOutput
+
+    base = outputs[0]
+    merged: list[CounterfactualResult] = []
+    for first in base.results:
+        replicas = [
+            r for out in outputs
+            for r in out.results
+            if r.action_id == first.action_id and r.status == "valid"
+        ]
+        if not replicas:
+            merged.append(first)
+            continue
+
+        def _mean(attr: str) -> float:
+            vals = [getattr(r, attr) for r in replicas]
+            return float(_stats.fmean(vals))
+
+        utilities = [r.utility for r in replicas]
+        metrics = dict(first.metrics)
+        metrics["utility_replicas"] = utilities
+        metrics["utility_std"] = (
+            float(_stats.pstdev(utilities)) if len(utilities) > 1 else 0.0
+        )
+        merged.append(CounterfactualResult(
+            action_id=first.action_id,
+            action=first.action,
+            status="valid",
+            n_new_samples=_mean("n_new_samples"),
+            n_model_fits=_mean("n_model_fits"),
+            delta_optimization=_mean("delta_optimization"),
+            delta_surrogate=_mean("delta_surrogate"),
+            delta_coverage=_mean("delta_coverage"),
+            utility=float(_stats.fmean(utilities)),
+            metrics=metrics,
+            trajectory_tail=first.trajectory_tail,
+            error=None,
+        ))
+    return RolloutOutput(s_t=base.s_t, results=tuple(merged))
+
+
 def derive_run_seed(problem: str, problem_seed: int, trajectory_id: int) -> int:
     """Process-stable seed combining (problem_name, problem_seed, trajectory_id).
 
@@ -156,6 +209,16 @@ class DatasetConfig:
     # Phase 8.6C horizon diagnosis. metadata["horizon"] records the actual
     # per-record value; metadata["horizon_mode"] records the mode.
     horizon_mode: str = "fixed"
+    # P1b denoising (2026-09-27, per the noise-vs-misspecification diagnostic
+    # `exp_teacher_noise_diagnostic.py`: single-rollout labels are
+    # NOISE-dominated — inter-roll gap spread 0.084 > median stored gap 0.05,
+    # above-median-gap flip rate 0.74). When R > 1, each decision point's
+    # rollout is repeated R times with fresh candidate/continuation seeds and
+    # the per-action utilities are AVERAGED (T2: noise shrinks as 1/sqrt(R);
+    # the expected ranking is unchanged). rollout_results carry the mean
+    # utility plus `utility_replicas` and `utility_std` for downstream
+    # uncertainty accounting.
+    rollout_replicates: int = 1
     # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
     # `CounterfactualRollout` for follow-up steps and recorded in metadata
     # so records can be replayed with a different continuation. Default:
@@ -199,6 +262,11 @@ class DatasetConfig:
             )
         if self.horizon_mode == "fixed" and self.horizon < 1:
             raise ValueError(f"horizon must be >= 1 in fixed mode; got {self.horizon}")
+        if not 1 <= self.rollout_replicates <= 8:
+            raise ValueError(
+                f"rollout_replicates must be in [1, 8]; "
+                f"got {self.rollout_replicates}"
+            )
 
 
 BackendFactory = Callable[[], UnifiedBackend]
@@ -318,16 +386,39 @@ class DatasetGenerator:
                 # horizon so long-horizon runs (e.g. horizon=total_budget)
                 # don't hit the default cap of 200.
                 rollout_cap = max(200, len(rolled) * h_step + 32)
-                output = CounterfactualRollout(
-                    backend,
-                    horizon=h_step,
-                    utility_weights=self.config.utility_weights,
-                    continuation_spec=self.config.continuation_spec,
-                    max_rollout_steps=rollout_cap,
-                    optimization_scale=optimization_scale,
-                    evaluation_scale=evaluation_scale,
-                    fit_scale=fit_scale,
-                ).rollout(state, rolled)
+                R = self.config.rollout_replicates
+                subset_seed = derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                outputs = []
+                for rep in range(R):
+                    # Same rolled subset every replicate (deterministic salt);
+                    # fresh action seeds and continuation seed per replicate.
+                    rep_cands = (
+                        cands if R == 1
+                        else full_candidates(seed=derive_seed(run_seed, step, rep))
+                    )
+                    rep_rolled = rolled if R == 1 else subsample_candidates(
+                        rep_cands, len(rolled), subset_seed
+                    )
+                    outputs.append(CounterfactualRollout(
+                        backend,
+                        horizon=h_step,
+                        utility_weights=self.config.utility_weights,
+                        continuation_spec=(
+                            self.config.continuation_spec if R == 1 else
+                            replace(
+                                self.config.continuation_spec,
+                                seed=derive_seed(
+                                    int(self.config.continuation_spec.seed),
+                                    rep, 424242,
+                                ),
+                            )
+                        ),
+                        max_rollout_steps=rollout_cap,
+                        optimization_scale=optimization_scale,
+                        evaluation_scale=evaluation_scale,
+                        fit_scale=fit_scale,
+                    ).rollout(state, rep_rolled))
+                output = outputs[0] if R == 1 else _average_rollouts(outputs)
                 probs = to_gold_probs(
                     output.results,
                     temperature=self.config.temperature,
@@ -444,6 +535,11 @@ class DatasetGenerator:
                     "n_new_samples": r.n_new_samples,
                     "n_model_fits": r.n_model_fits,
                     "error": r.error,
+                    **(
+                        {"utility_replicas": r.metrics["utility_replicas"],
+                         "utility_std": r.metrics["utility_std"]}
+                        if "utility_replicas" in r.metrics else {}
+                    ),
                 }
                 for r in output.results
             },

@@ -183,3 +183,39 @@ def test_remaining_mode_with_subsample_combines_quotas() -> None:
         assert meta["k"] == 2
         assert len(meta["action_ids"]) == 2
         assert set(rec.rollout_results) == set(meta["action_ids"])
+
+
+# ---------------------------------------------------------------------------
+# rollout_replicates (P1b denoising)
+# ---------------------------------------------------------------------------
+
+
+def test_replicate_averaging_and_metadata() -> None:
+    one = _records(_quick_spec(horizon=1))
+    rep = _records(_quick_spec(horizon=1, rollout_replicates=2))
+    assert len(rep) == len(one)
+    for r in rep:
+        for cell in r.rollout_results.values():
+            replicas = cell.get("utility_replicas")
+            assert replicas is not None and len(replicas) == 2
+            assert cell["utility"] == pytest.approx(
+                sum(replicas) / len(replicas), abs=1e-9
+            )
+            assert cell["utility_std"] >= 0.0
+
+
+def test_replicate_single_is_identity() -> None:
+    a = _records(_quick_spec(horizon=1))
+    b = _records(_quick_spec(horizon=1, rollout_replicates=1))
+    assert [r.id for r in a] == [r.id for r in b]
+    for x, y in zip(a, b):
+        for k in x.rollout_results:
+            assert "utility_replicas" not in y.rollout_results[k]
+            assert x.rollout_results[k]["utility"] == y.rollout_results[k]["utility"]
+
+
+def test_replicate_validation() -> None:
+    with pytest.raises(ValueError, match="rollout_replicates"):
+        _quick_spec(rollout_replicates=0)
+    with pytest.raises(ValueError, match="rollout_replicates"):
+        _quick_spec(rollout_replicates=9)
