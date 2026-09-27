@@ -194,11 +194,13 @@ arXiv:2609.28940 quotes Brier explicitly).
 
 **Consequences for this project.**
 
-- **Stage 2 (closed loop) gets a dense, per-decision reward for free.**
-  Scoring `q_θ(·|s_t)` against the realized outcome at `s_t` (e.g. the
-  action whose branch actually improved `best_value`, or a graded
-  outcome) is a proper-score reward available at *every* decision, unlike
-  sparse terminal-Δbest REINFORCE. Combined with the SDK's TD(λ)
+- **Stage 2 (closed loop): a candidate dense per-decision reward.**
+  Scoring `q_θ(·|s_t)` against a realized outcome at `s_t` defines a
+  proper-score reward computable at *every* decision — a candidate
+  alternative to sparse terminal-Δbest REINFORCE. Whether a suitable
+  realized outcome signal exists at decision granularity (the rollout
+  branch outcome is available only counterfactually) is an open design
+  question, not a given. Combined with the SDK's TD(λ)
   bootstrap (`td_lambda_targets`) over decision-loop trajectories, this
   is a PROPOSED design (unrun; marked per codex review 2026-09-28) for
   the closed-loop stage T5 sketches. That it optimizes the *reported
@@ -232,12 +234,15 @@ errors and per-state opportunity costs are invisible to it;
 action-dependent perturbations `h(a)` are not. ∎ (differences cancel
 `g(s)`; P1 term-by-term.)
 
-**T2 (noise consistency).** ASSUMPTIONS (strengthened per codex review
-2026-09-28): (a) symmetric zero-mean utility noise; (b) the pair
-preference probabilities are jointly representable by a single per-state
-score vector (BT transitivity) — noise that is correlated across pairs
-within a state can violate this. Under these, the
-flip rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
+**T2 (noise consistency).** ASSUMPTIONS (strengthened per codex reviews
+2026-09-28): (a) the pairwise noise DIFFERENCE has a symmetric,
+unimodal (e.g. log-concave) distribution, so its one-sided tail
+`P(ε > g)` is strictly decreasing in `g` — needed for the *strictly*
+decreasing flip rate (plain symmetry alone gives only `η(0) = 1/2`);
+(b) the pair preference probabilities are jointly representable by a
+single per-state score vector (BT transitivity) — noise correlated
+across pairs within a state can violate this. Under these, the flip
+rate `η(g)` of a pair with true gap `g > 0` is strictly decreasing
 through `η(0) = 1/2`; the noisy-BT population optimum satisfies
 `βΔf* = log((1−η(g))/η(g))` — a strictly increasing reparametrization of
 `U*`, so the ranking (and argmax) is preserved while score magnitudes

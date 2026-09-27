@@ -30,24 +30,26 @@ engineering problem (P3).
      Re-roll seeds are now deterministic (no hash()).
    - P1b/denoising: R=5 replicate-averaging (generator gained
      `rollout_replicates`; 661-record dataset in 141 s). Independent 2v2
-     split-half reliability of the averaged teacher: pair flip 0.33-0.36
-     even at top-quartile stored gaps — averaging helps but does not make
-     the teacher stable at these gap scales. Gate 3 holds (13.3). Gate 4
-     fails.
+     split-half reliability of the averaged teacher (definition and
+     numbers logged in `exp_teacher_noise_diagnostic_r5.json:
+     summary.split_half_2v2`): pair flip 0.36 overall / 0.33
+     above-median / 0.33 top-quartile (n=3,562 pairs) — averaging helps
+     but does not make the teacher stable at these gap scales. Gate 3
+     holds (13.3). Gate 4 fails.
    - P1b/alignment: a Gate-4-ALIGNED teacher (rule continuation + pure
      terminal-Δbest utility, R=5) removes the label-side protocol
      mismatch. Gate 4 STILL fails — behavior-gain seed-bootstrap CIs:
      ackley +0.25 [−0.18, +0.78], hartmann −0.24 [−2.63, +1.92],
      rastrigin +0.04 [−0.10, +0.17], sixhump +0.00 [−0.01, +0.01],
-     branin −0.02 [−0.04, −0.00]. **No family is CI-positive; the gate's
-     own replay is a single evaluation with unmatched randomness and the
-     teacher covers only the k=4 rolled subset**, so the honest statement
-     is: THIS TESTED TEACHER fails Gate 4, with first-action terminal
-     advantage bounded to at most small on this panel (CIs consistent
-     with anything from ≈−0.2 to +0.8 on Ackley/Hartmann). The
-     schedule/continuation explanation remains a HYPOTHESIS pending a
-     direct schedule-label experiment (Phase 8.6F is prior evidence, not
-     proof).
+     branin −0.02 [−0.04, −0.00]. **No family is CI-positive** (Branin
+     CI-negative; Ackley/Hartmann CIs are wide, reaching +0.78/+1.92, so
+     sizeable positive first-action value is NOT excluded on those two);
+     the gate's own replay is a single evaluation with unmatched
+     randomness and the teacher covers only the k=4 rolled subset. The
+     supported statement is exactly: THIS TESTED TEACHER fails Gate 4
+     under this protocol. The schedule/continuation explanation remains
+     a HYPOTHESIS pending a direct schedule-label experiment (Phase
+     8.6F is prior evidence, not proof).
 
 3. **P2 — the thin-signal ceiling propagates through every stage.**
    Models trained on the aligned teacher: decision-level ranking 0.67
@@ -77,23 +79,28 @@ engineering problem (P3).
 
 ## What the paper can now claim (updated claim set)
 
-- **Positive (confirmatory)**: counterfactual-rollout distillation of a
+- **Positive (analysis-rerun confirmatory on the design families; a
+  locked new-family evaluation is still required for a strong
+  confirmatory claim)**: counterfactual-rollout distillation of a
   typed-decision foundation model transfers across optimization families
-  at near in-family accuracy and beats feature-imitation (RF) with CI
-  excluding zero on 5/5 held-out families; it also transfers to an
-  engineering problem's decision states at ~0.89 (probe-level).
+  at near in-family accuracy and beats feature-imitation (RF) with the
+  single pre-designated primary contrast (pooled record-clustered CI
+  [+0.126, +0.154]) — direction consistent on 5/5 folds, reported as a
+  descriptive consistency check only. It also ranks at 0.89 on an
+  engineering problem's decision states (single-problem probe, tied
+  with RF).
 - **Method**: objective choice trades ranking vs calibration shape for
   the TESTED models/protocol (proper jointly calibrated in our E1 setup;
   the tested BT+post-hoc-temperature fit recovered one metric at the
   cost of the other — not a general impossibility claim);
   pairwise supervision is the quota-correct estimator (T3/R3); rollout
   replicate-averaging is necessary hygiene (P1a) and cheap (T2).
-- **Mechanism chain (each link measured; strengths as stated above)**:
-  single-roll labels noise-dominated (per-re-roll flip 0.36) → the tested
-  denoised+aligned teacher still fails Gate 4 (no CI-positive
-  behavior-gain) → distilled policies collapse to per-objective constants
-  → confidence carries no discrimination → routing degenerates to
-  family-level switching.
+- **Mechanism chain (each link measured; per-link scope as above)**:
+  single-roll labels noise-dominated (per-re-roll flip 0.40
+  above-median) → the tested denoised+aligned teacher still fails Gate 4
+  (no CI-positive behavior-gain; wide CIs on two families) → distilled
+  policies collapse to per-objective constants → confidence carries no
+  discrimination → routing degenerates to family-level switching.
 - **Consequent redirection**: the learnable-and-transferable object at
   this action granularity is the RANKING (which transfers); the
   value-bearing object is the SCHEDULE/continuation — the next
