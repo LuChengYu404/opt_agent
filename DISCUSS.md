@@ -7,6 +7,19 @@
 > - 第 2 节（科学问题）与第 3 节（技术问题）都明确写出**为什么现在卡住 + 候选方向 + 评审要回答什么**，避免空泛问题。
 > - 项目核心研究方向不变（见 `MASTER_PLAN.md` §2 与 `project-opt-agent-v3` 记忆）：Decision-Centric Adaptive Optimization Agent，3 个 RQ（Learnability / Generalization / Selective Reasoning）。
 
+## 0. 2026-09-27 更新（评审前必读）
+
+本清单起草于 Phase 9.0 前后（2026-09-23 左右）。此后的实验已实证回答了其中若干问题；评审时请以下列更新为准，原始问题保留在下方作为上下文：
+
+- **Q-S1 / Q-S5 / Q-T1 / Q-T2（utility 与 Gate 4）— 部分回答**：Phase 8.6C 诊断出 horizon 是主导因素（h3 → h10 翻转约 50% 的 top action）；8.6D/8.6E/8.6F 完成长程标签、闭环学生模型与首动作/延续解耦诊断。20-seed 复现（EXP-RQ1.2）后 Gate 3 PASS（adjusted_lift 1.294，CI [0.848, 1.954]）、Gate 4 stop-gain 5/5、uniform-gain 4/5、behavior-gain 1/5；Gate 2 仍 FAIL。
+- **Q-S3（RQ3 收益如何量化）— 已回答（阴性）**：真 deepseek-chat 成本前沿已跑完（450 条配对轨迹，5 家族 × 10 seeds × 9 策略，零 fallback）。冻结 RF System-1（0 LLM 调用）在 5/5 家族上持平或优于 always-LLM；无任何置信度阈值或随机率路由 arm 的 CI 显著优于 System-1-only。前沿是退化的。见 `runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`（注意顶部符号修正声明：初版 3-seed 报告的 Hartmann 结论是符号反转错误）。
+- **Q-S4（可发表性）— 已定位**：论文大纲成形（`docs/workshop_paper_outline.md`，codex 5 轮评审 APPROVE），定位 workshop paper：框架 + RQ1 Gate 3/5 + RQ2 部分阳性 + RQ3 阴性成本前沿（含 RQ2.2 维度迁移阴性）。
+- **Q-T4（Router 信号）— 置信度信号已证伪**：RF softmax 最大值几乎不超过 0.25，所有置信度阈值几乎把全部步骤路由给 System-2；随机率基线不优于 System-1-only。entropy / OOD 联动仍未测。
+- **Q-T5（hard routing；真 LLM 是否入常规路径）— 是**：EXP-RQ3 的全部 LLM arm 均为真 deepseek-chat 后端闭环运行，零 fallback。
+- **Q-S2 / Q-T6（工程迁移 suspension）— 仍未跑**：环境中无工程仿真器，Phase 14 仍是占位符。
+- **Q-T3（Laya 评估）— 部分回答**：Phase 9.5 完成真实 Laya zero-shot 5×5 基准（action collapse：600/625 选 error_guided_sampling）。
+- §1.3 gate 表与 §1.4 项目位置为起草时快照；当前口径见 `PROGRESS.md` 顶部。
+
 ---
 
 ## 1. 背景与已完成事项

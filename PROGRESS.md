@@ -92,8 +92,9 @@ plus two full-budget BOCoDe runs with GP fitting.
   tokens). This development-panel saving does not establish a transferable
   router; the held-out IOH performance test was negative. A parallel,
   resumable confidence-threshold and random-rate sweep is implemented;
-  four mock-System-2 trajectories matched serial execution, but no real LLM
-  sweep has run without a configured credential.
+  the real-LLM version of that sweep has since run to 10 seeds — see the
+  EXP-RQ3 10-seed cost-frontier section above (450 paired trajectories;
+  System-1-only dominates every LLM-calling arm).
 - **Mechanism check:** a post-hoc fixed global-then-local schedule beat the
   recorded LLM on mean Rastrigin terminal best for development seeds 0–9,
   but lost to fixed Surrogate and Local on separate seeds 100–119. The observed

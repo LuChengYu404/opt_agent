@@ -1,7 +1,8 @@
 # Workshop Paper Outline — Decision-Centric BO
 
-> **Status**: draft outline, 2026-09-27. Numeric claims will be replaced with
-> final numbers after Tracks A/B/D complete (next ~30 min).
+> **Status**: draft outline, 2026-09-27 (updated same day: Tracks A/B/D complete;
+> RQ3 real-LLM cost frontier added at 10 seeds; RQ2.2 dimension-transfer
+> negative added; RQ3 router-sweep sign error corrected).
 > **Target venue**: ICLR / NeurIPS workshop on Meta-Learning for Optimization
 > or AutoML/BO workshop; NOT a main-track submission.
 > **Length**: 8 pages + appendix.
@@ -31,17 +32,24 @@ state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
    JS ≤ 0.02) **fails on 2/17 Hartmann buckets** due to GP-fit numerical
    fragility in the rollout's surrogate acquisition proposal. Per-record
    rank invariance is not established.
-3. **LLM as System-1** — a DeepSeek-flash LLM used at every decision beats
+3. **LLM as System-1** — a deepseek-chat LLM used at every decision beats
    AlwaysSurrogate by **+17.54 best_y** on Rastrigin (paired-t **p=0.0058**,
    Student-t df=n-1, n=10) and exhibits a **global-to-local temporal action
    pattern** *associated with* its terminal advantage (no causal claim — a
    deterministic global-then-local baseline has not been run). A simple
    `dim≥5` router beats Surrogate on the BOCoDe panel (p=0.0120) but does
    NOT transfer to IOH/BBOB (p=0.1376, negative result).
+4. **Cost frontier (10 seeds, closed loop)** — with a frozen RF System-1
+   deployed through full BO trajectories, the always-LLM policy never beats
+   System-1-only with a CI excluding zero and is detectably worse on Ackley,
+   Hartmann, and SixHumpCamel; no confidence-threshold or random-rate routing
+   arm earns its cost. The measured frontier on this panel is degenerate:
+   System-1 only (0 LLM calls) dominates.
 
 Our contribution is a 7-component framework (backend/state/action/utility/
-rollout/dataset/system-1+router) with **385 unit tests** and four replicable
-experiments. We do not yet demonstrate cross-problem transfer of the meta-policy.
+rollout/dataset/system-1+router) with **385 unit tests** and five replicable
+experiments. We do not yet demonstrate cross-problem transfer of the
+meta-policy, and within-function dimension transfer is a clean negative.
 
 ---
 
@@ -58,8 +66,12 @@ experiments. We do not yet demonstrate cross-problem transfer of the meta-policy
   RulePolicy on **3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
   95% CI upper < 0); aggregate Cross − Rule = -0.065; loses to a constant
   `local_exploitation` policy (AlwaysLocal) on aggregate); RQ3 has one strong
-  pilot (LLM > Surrogate on Rastrigin, p=0.0058) and one negative pilot
-  (router does not transfer to IOH, p=0.1376).
+  pilot (LLM > Surrogate on Rastrigin, p=0.0058), one negative pilot
+  (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
+  cost frontier (450 paired trajectories) in which a frozen RF System-1 with
+  zero LLM calls beats or ties every LLM-calling arm on all five families.
+  Within-function dimension transfer (RQ2.2) is a clean negative: the RQ2.1
+  signal is a family signal, not a dimension signal.
 - This paper presents the framework + RQ1 + RQ2 partial pilot + RQ3 pilots;
   full RQ2 transfer with engineering families and a crossed (family × dimension)
   design is deferred.
@@ -237,10 +249,33 @@ this single 5-family panel.
   the effect of deploying the RF through a full BO trajectory.
 - **Single model class (RF)** — MLP / GBM / Transformer may behave differently.
 - **Family × dimension confounded** — disentangling requires a crossed design
-  (same family at multiple dimensions).
+  (same family at multiple dimensions). EXP-RQ2.2 below addresses the
+  dimension axis within a fixed function.
 - **No multiplicity adjustment** on the 5 per-family CIs.
 - **Aggregate records-weighted mean is arithmetic**, not inferential for
   an average effect across new families.
+
+### §4.6 Within-function dimension transfer (EXP-RQ2.2) — clean negative
+
+**Why.** Every BOCoDe family has a fixed dimension, so RQ2.1's cross-family
+result confounds family with dimension. EXP-RQ2.2 fixes the function and
+varies only the dimension: a multi-output RF (same hyperparameters as
+RQ2.1) trained on the action labels of `RuleFullBudget` at IOH functions
+f6 (AttractiveSector), f8 (Rosenbrock), f15 (RotatedRastrigin) × source
+dims {2, 10} × instances {0, 1} × seeds {100–102}, then deployed on the
+untouched target dim 5 × instance 2 (72 trajectories total).
+
+| Cell (test d5/i2, n=3 seeds) | `rf − rule_full` | `rf − surrogate` | `rf − local` |
+|---|---:|---:|---:|
+| f6 | **+0.000** [+0.000, +0.000] | +0.274 [+0.003, +0.751] | +0.347 [−0.002, +0.530] |
+| f8 | **+0.000** [+0.000, +0.000] | **+0.392** [+0.162, +0.801] | **+0.515** [+0.208, +0.875] |
+| f15 | **+0.000** [+0.000, +0.000] | +0.241 [+0.005, +0.554] | +0.070 [−0.194, +0.296] |
+
+The RF imitates the rule perfectly on the held-out dimension (expected for
+imitation learning), and both lose to the fixed Surrogate/Local baselines on
+every function. **Within-function dimension transfer is a clean negative**;
+the RQ2.1 cross-family signal is at least partly a *family* signal, not a
+dimension signal. Report: `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md`.
 
 ## §5 RQ1 — Decision Landscape
 
@@ -365,6 +400,46 @@ better than LLM-everywhere on this benchmark. **The Pareto frontier
 deferral**: more elaborate routing needs RQ2 transfer experiments to
 become a defensible claim.
 
+### §5.5 Real-LLM cost frontier, closed loop, 10 seeds (EXP-RQ3)
+
+Frozen RF System-1 (trained on rollout seeds 0–15, temperature-calibrated on
+16–19) deployed through full budget-30 BO trajectories against the same
+`deepseek-chat` System-2, with confidence-threshold routers (τ ∈ {0.25,
+0.5, 0.75, 0.9}) and random-rate baselines (rate ∈ {0.25, 0.5, 0.75}).
+**450 paired trajectories** (5 families × seeds 100–109 × 9 policies),
+identical Sobol starts per (family, seed), zero LLM fallbacks, identical
+frozen-model hash across both sweep files.
+
+| Family | `rf − llm` (mean) | `llm − rf` 95 % CI | verdict |
+|---|---:|---|---|
+| Branin | +0.515 | [-1.224, +0.152] | rf better in mean, CI crosses 0 |
+| Hartmann | +0.576 | **[-1.032, -0.103]** | rf detectably better |
+| Ackley | +1.017 | **[-1.658, -0.436]** | rf detectably better |
+| SixHumpCamel | +1.015 | **[-1.512, -0.587]** | rf detectably better |
+| Rastrigin | +10.109 | [-22.356, +0.404] | rf better in mean, CI crosses 0 |
+
+**No arm on the whole grid (8 LLM-calling arms × 5 families) beats `rf`
+with a CI excluding zero**; the only positive point estimates anywhere are
+Hartmann/confidence_0.25 (+0.018) and Hartmann/random_0.25 (+0.149), both
+CI-crossing. Always-LLM spends ~12–17 calls (~4.7–6.5k tokens) per
+trajectory and is dominated. The pre-specified acceptance criteria (≥ 50 %
+call/token reduction at ≤ 0.10 σ_family regret margin) pass trivially via
+the System-1-only arm — the measured frontier is degenerate.
+
+**Sign correction (documentation integrity).** The first 3-seed version of
+this experiment inverted the sign of its own Hartmann numbers in prose
+("the one family where the LLM is genuinely useful"); the recorded data had
+`rf` winning 3/0/0. The corrected reading agrees with §5.1 above (LLM
+−0.985 on Hartmann, p=0.0007). See the correction block at the top of
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
+
+**Routing diagnostic.** The 3-seed "random rate beats the confidence
+router" observation does not generalize: at 10 seeds neither scheme
+produces a CI-detectable gain over `rf`, and Branin random_0.5/0.75 are
+CI-detectably worse. The RF softmax maximum rarely exceeds 0.25, so
+confidence thresholds route nearly every step to System-2;
+`ConfidenceRouter.tau_conf` is not a useful routing signal on this panel.
+
 ## §7 Limitations
 
 (per codex round-1 review 2026-09-27; ordered roughly by importance)
@@ -392,15 +467,19 @@ become a defensible claim.
 5. **20-seed is not an independent replication** — seeds 0–9 are reused
    from the 10-seed exploratory run. True replication would require an
    independent seed stream (e.g., 100–119).
-6. **No Pareto frontier** — LLM cost (token spend) is recorded but not yet
-   in a quality × cost plot. The "routing reduces LLM cost" claim requires
-   a Pareto frontier sweep, which is deferred.
+6. **Pareto frontier measured but degenerate** — the closed-loop cost
+   frontier (§5.5) is measured at budget 30 on the five-family panel with
+   one provider (deepseek-chat): System-1-only dominates, so there is no
+   interesting quality-cost tradeoff on this panel. Whether any regime
+   (longer horizons, stochastic objectives, genuinely OOD states) gives
+   the LLM System-2 positive marginal value is open.
 7. **No external baseline** — lenz / PlugBO / TuRBO not yet compared. The
    internal baselines (Rule, AlwaysSurrogate, Jev) are sufficient for RQ3
    pilot framing but not for state-of-the-art comparison.
-8. **Single LLM provider / prompt configuration** — only DeepSeek-flash via
+8. **Single LLM provider / prompt configuration** — only deepseek-chat via
    DeepSeek API. Other LLMs (GPT-4, Claude, Gemini) may exhibit different
-   decision patterns; we have no evidence the Rastrigin finding transfers.
+   decision patterns; we have no evidence the Rastrigin finding transfers,
+   and the §5.5 cost-frontier result is provider-specific.
 9. **Mechanism is correlational, not causal** — the LLM's Rastrigin
    advantage is associated with a global-to-local temporal pattern, but we
    have not run a deterministic global-then-local baseline to test whether
@@ -416,12 +495,13 @@ become a defensible claim.
     multiple comparisons; some borderline-pass CIs (Branin uniform CI lo
     +0.006; Rastrigin behavior CI lo +0.015) would not survive a
     Bonferroni-type correction.
-13. **Learned System-1 (multi-output RF) tested on cross-family transfer only** —
-    the "RoutingAware" rule is still hand-coded (dim ≥ 5). We have not trained a
-    System-1 from counterfactual oracle labels and tested it on closed-loop
-    trajectory evaluation; the EXP-RQ2.1 result is **one-step decision regret**,
-    not full BO trajectory. Whether the cross-family RF transfers usefully to
-    a deployed System-1 loop is left for future work.
+13. **Learned System-1 closed-loop evidence is negative-to-heterogeneous** —
+    EXP-RQ2.1 is one-step decision regret; the closed-loop audit
+    (`runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`) and §5.5 deploy frozen RFs
+    through full trajectories. The RF beats AlwaysSurrogate on Ackley but
+    not the stronger AlwaysLocal control, and dominates every LLM arm at
+    zero cost on this panel; a general learned-policy gain is not
+    established. The "RoutingAware" rule remains hand-coded (dim ≥ 5).
 14. **Summing raw best_y across families is not principled** — different
     problems have different objective scales. The TOTAL comparison is
     informative but not on a common scale; per-family + ratio-of-advantages
@@ -435,10 +515,16 @@ become a defensible claim.
   Cross-family has lower regret vs real RulePolicy on 3/5 (Branin, Ackley,
   Rastrigin) and vs AlwaysSurrogate on 2/5 (Ackley, Rastrigin); higher regret
   vs AlwaysSurrogate on Hartmann + SixHumpCamel; inconclusive on Branin.
-- "Is LLM-as-System-1 worth it?" — only on hard multimodal problems;
-  on smoother problems, AlwaysSurrogate is competitive.
-- "Is routing a Pareto win?" — not yet demonstrated. Honest framing:
-  "trained router does not yet transfer; this is the open question."
+- "Is LLM-as-System-1 worth it?" — against AlwaysSurrogate, only on hard
+  multimodal problems (Rastrigin +17.54, p=0.0058). But in closed loop
+  against a frozen RF System-1 (§5.5), the always-LLM policy never wins
+  with a CI excluding zero and loses detectably on 3/5 families at ~12–17
+  calls per trajectory. The LLM's positive value on this panel is confined
+  to the one-step comparison against weaker baselines.
+- "Is routing a Pareto win?" — measured (§5.5): no. No confidence threshold
+  or random rate earns its cost over System-1-only; the frontier is
+  degenerate on this panel. Whether any regime gives routing positive
+  value is the open question.
 - "Does the trained System-1 transfer across problems?" — see §4 RQ2 below
   (wins vs real RulePolicy on 3/5; wins vs AlwaysSurrogate on 2/5; loses to a
   constant local policy on aggregate).
@@ -460,17 +546,25 @@ become a defensible claim.
   Rastrigin). Aggregate Cross − Rule = -0.065 (cross is better). The cross
   signal is heterogeneous (loses on Hartmann, SixHumpCamel vs Surrogate);
   family × dimension confounded.
-- Four negative results that sharpen the claim: (a) trained router does
+- **RQ3 (cost frontier, NEW)**: in closed loop at 10 paired seeds the
+  frozen RF System-1 (0 LLM calls) beats or ties every LLM-calling arm on
+  all five families; always-LLM is CI-detectably worse on Ackley, Hartmann,
+  and SixHumpCamel. No confidence-threshold or random-rate router earns
+  its cost. The measured frontier is degenerate: System-1 only.
+- Six negative results that sharpen the claim: (a) trained router does
   not transfer from BOCoDe to IOH; (b) RoutingAware does not beat
   LLM-everywhere on the same panel; (c) cross-family transfer does not
   help Hartmann or SixHumpCamel vs AlwaysSurrogate; (d) cross-family RF
   loses to a constant `local_exploitation` policy (AlwaysLocal) on
-  aggregate because that policy ignores budget awareness.
-- Future work: Pareto frontier, external lenz/PlugBO baseline,
-  fine-tuning a small decision model from LLM trajectories, dimension-
-  crossed design to disentangle dimension vs family effects, engineering
-  families (vehicle suspension), closed-loop trajectory evaluation of
-  trained System-1.
+  aggregate because that policy ignores budget awareness; (e) within-
+  function dimension transfer fails (RQ2.2 — the RQ2.1 signal is a family
+  signal, not a dimension signal); (f) in closed loop, always-LLM is
+  dominated by the frozen System-1 (§5.5).
+- Future work: regimes where an LLM System-2 repays its cost (longer
+  horizons, stochastic objectives, OOD states), external lenz/PlugBO
+  baseline, fine-tuning a small decision model from LLM trajectories,
+  dimension-crossed design to disentangle dimension vs family effects,
+  engineering families (vehicle suspension).
 
 ---
 
@@ -490,6 +584,14 @@ become a defensible claim.
 - `runs/EXP_RQ0_5_REPORT.md` — Track C source (joint 10-seed)
 - `runs/exp_rq0_5_action_distribution.md` — Track D mechanism analysis
 - `runs/EXP_AFFINE_REPORT.md` — Track B Gate 5 result
+- `runs/exp_rq3_router_sweep.json` + `runs/exp_rq3_router_sweep_seeds103_109.json`
+  + `runs/exp_rq3_cost_frontier_10seed.json` — RQ3 cost frontier
+  (450 paired trajectories; merged paired bootstrap analysis)
+- `scripts/analyze_rq3_cost_frontier.py` — merged analysis; reproduces the
+  3-seed numbers exactly on the original file (how the sign error was found)
+- `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md` — RQ2.2 clean negative
+- `runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md` — closed-loop audit
+  (`rf_all` / `rf_transfer` vs fixed controls, seeds 100–119 / 200–219)
 - `src/opt_agent/backend/bocode_botorch.py` — affine transform (Gate 5)
 - `src/opt_agent/dataset/generator.py` — DatasetConfig affine fields
 - `tests/test_objective_transform.py` — 16 new tests for Gate 5

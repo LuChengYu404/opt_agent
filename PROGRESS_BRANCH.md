@@ -5,6 +5,11 @@
 **Authors**: opt-agent-dev, Claude Code
 **Purpose**: Snapshot of the research direction, current evidence, and open questions following a one-day discussion + experiment cycle.
 
+> **SUPERSEDED (2026-09-27)**: this is a point-in-time snapshot. The RQ
+> status table below ("RQ2 0%", "RQ3 ~20%") is out of date — RQ2.1/RQ2.2
+> and the RQ3 real-LLM cost frontier have since run. Current status:
+> `PROGRESS.md` (top section) and `docs/workshop_paper_outline.md`.
+
 ---
 
 ## 1. Executive summary
