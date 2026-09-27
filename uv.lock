@@ -616,6 +616,23 @@ wheels = [
 ]
 
 [[package]]
+name = "ioh"
+version = "0.3.22"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/36/fd/001e327e4d1eb36227c7a84bc819f9c760b616592f0da38a81c259fe0937/ioh-0.3.22.tar.gz", hash = "sha256:b482d1c26e358d5ff1127b69dbbf8b53b2284362359f8c66b997a4390fb6b9d3", size = 8057908, upload-time = "2025-09-26T10:18:44.633Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/67/16a124984a141a40edaa1f9776f5fe2021e40e51214751fafa7140e6f465/ioh-0.3.22-cp312-cp312-macosx_10_15_x86_64.whl", hash = "sha256:6810fb39661a9d3ed8f77771de68acbf778305e2e9b92949017472f9ac2aabdc", size = 8350034, upload-time = "2025-09-26T10:18:17.44Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/d0/fc8011418c00b50f7bd85cc63e289387e46d5fa01077d3749e64feee10d1/ioh-0.3.22-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:4e03145f319af32c4ab3552524f751fe1ccc71a369cbc1552ae88c64215dee15", size = 8251815, upload-time = "2025-09-26T10:18:20.387Z" },
+    { url = "https://files.pythonhosted.org/packages/58/e1/4ec2e70d456be99a819e7544a5a5ac954b6918d289a7656663d7cc8e4486/ioh-0.3.22-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:88273fab9126a4d1299fd145319f701658dc786a8253fba6ae4c13fb5e8f4fc7", size = 8670467, upload-time = "2025-09-26T10:18:22.196Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/35/949fc370594e9bb9c937888c92ea53e9e04dbcf1fa80c7e6a60a00ad0e78/ioh-0.3.22-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2b56d033d2efe0501cb76851eb4bf6f7031bf01512350006cf25026e3f036add", size = 8605274, upload-time = "2025-09-26T10:18:24.169Z" },
+    { url = "https://files.pythonhosted.org/packages/84/87/3fa26e99673244d811d10b45b0e1d48209ec8c8e2721fc1ca29186226002/ioh-0.3.22-cp312-cp312-win32.whl", hash = "sha256:31e16a60044a7473433ce64439e1388691b3f701ca39d89cfe939ede11ba260f", size = 8095039, upload-time = "2025-09-26T10:18:26.34Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/05/c1983f506511d45e950f5212d37a57ec8587f54b2d11abd8acd7a3a83e4f/ioh-0.3.22-cp312-cp312-win_amd64.whl", hash = "sha256:4a1da06186428cbb3ed0afb9db6dbb3bf771a3e0f4e90c4a5d564dc5158cec14", size = 8206836, upload-time = "2025-09-26T10:18:28.298Z" },
+]
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -751,7 +768,7 @@ wheels = [
 
 [[package]]
 name = "laya"
-version = "0.3.7"
+version = "0.3.20"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
@@ -760,9 +777,9 @@ dependencies = [
     { name = "torch" },
     { name = "transformers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b5/fd/dd60f49451ef43af50c3fcd5d5d9b12aea590f5bcb9afb3e5ec5171b6fa6/laya-0.3.7.tar.gz", hash = "sha256:cca6e999f18f8a5c5efb51d7f6870aebbfa95477855634d4ba933063c38d0c3f", size = 128270, upload-time = "2026-09-23T07:25:35.657Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/82/0964e13e1a67ae4ac2824c3115470d31cd149a065d971a5dec6e4049ca23/laya-0.3.20.tar.gz", hash = "sha256:692de1346cf0239bb7bbcffdf0cfbd538c24834f8bc61e9b60f4106465c033c9", size = 275028, upload-time = "2026-09-24T05:41:07.653Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/df/e31a236052b5597fa0082468f3a7a14fb9f632100fb72816cd08090de247/laya-0.3.7-py3-none-any.whl", hash = "sha256:370beee36a6962f0daed3f086146b7dc6cc825fee0a1941ec05ea7207989ea8a", size = 58928, upload-time = "2026-09-23T07:25:34.377Z" },
+    { url = "https://files.pythonhosted.org/packages/34/0c/80982f9ad6f52ca9cb146cfc00fac79e7b7f4388f00f4197575a3170be48/laya-0.3.20-py3-none-any.whl", hash = "sha256:6039e802fa5effb8dd492061cd7ad39a43087beadc4a4fa4a649614e77eb83d4", size = 118520, upload-time = "2026-09-24T05:41:06.273Z" },
 ]
 
 [[package]]
@@ -1248,6 +1265,7 @@ dependencies = [
     { name = "botorch" },
     { name = "gpytorch" },
     { name = "httpx" },
+    { name = "ioh" },
     { name = "numpy" },
     { name = "python-dotenv" },
 ]
@@ -1270,6 +1288,7 @@ requires-dist = [
     { name = "gpytorch", specifier = ">=1.15.2" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "httpx", extras = ["socks"], marker = "extra == 'laya'", specifier = ">=0.27" },
+    { name = "ioh", specifier = ">=0.3.22" },
     { name = "laya", marker = "extra == 'laya'", specifier = ">=0.3.6" },
     { name = "numpy", specifier = ">=2.5.3" },
     { name = "python-dotenv", specifier = ">=1.0.0" },

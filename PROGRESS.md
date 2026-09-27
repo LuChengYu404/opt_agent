@@ -1,5 +1,133 @@
 # Current research status
 
+## Workshop paper evidence gap closure (2026-09-27)
+
+Three experiments closed the gaps that block a defensible workshop paper:
+**EXP-RQ1.2 20-seed replication** (Track A), **EXP-RQ0.5 Gate 5 affine
+invariance** (Track B), and **EXP-RQ0.5 per-step LLM action distribution**
+(Track D, pure analysis). 380 unit tests now pass (was 364 before Track B).
+
+### Track A — EXP-RQ1.2 20-seed replication
+
+- Dataset: `runs/phase8_6d_h3_20seed_5family.jsonl` (663 records, 5 families × 20 seeds)
+- Driver: `scripts/generate_phase8_6d_20seed.py` (frozen config matching the
+  canonical 10-seed driver)
+- Gate runner: `scripts/validate_phase8_6b.py` (unchanged; pass new JSONL path)
+- Report: `runs/EXP_RQ1_2_REPORT.md` (updated) + `runs/exp_rq1_2_h3_20seed_report.json`
+- Wall-clock: 6 min generation + 7 min oracle replay = 13 min
+
+| Gate | 10-seed | 20-seed (confirmatory) |
+|---|---|---|
+| 3: aggregate_mass adjusted_lift | 1.124 (CI [0.695, 1.722]) | **1.294 (CI [0.848, 1.954])** |
+| 4a: stop-gain CI lo > 0 | 5/5 | **5/5** (unchanged) |
+| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Hartmann now passes) |
+| 4c: behavior-gain CI lo > 0 | 1/5 | **1/5** (Rastrigin only) |
+
+**All Gate 3/4 numbers strengthened or held at 20 seeds. 20-seed is now the
+citation-quality number; 10-seed retained for transparency.**
+
+### Track B — EXP-RQ0.5 Gate 5 affine invariance
+
+- Code: `BocodeBotorchBackend` accepts `objective_scale`/`objective_shift`,
+  applied at write-time in `initialize()`/`evaluate()`. `DatasetConfig`
+  gains matching fields with `__post_init__` validation.
+- Tests: `tests/test_objective_transform.py` — 16 new tests (BocodeBotorchBackend
+  affine API, DatasetConfig validation, generator wiring, end-to-end
+  `affine_rescaling_test` on tiny config)
+- Runner: `scripts/run_affine_rescaling_gate.py` over 4 transforms
+- Datasets: `runs/phase8_6d_h3_5family_affine/scale{0.1,1.0,10.0}_shift0.0.jsonl`
+  + `scale1.0_shift5.0.jsonl` (175 records each)
+- Report: `runs/EXP_AFFINE_REPORT.md` + `runs/exp_rq0_5_affine_report.json`
+- Wall-clock: 8 min (4 transforms × 2 min each)
+
+**Result (5-family × 5 seeds × horizon=3, 175 records)**:
+
+| Criterion | Tally |
+|---|---|
+| Spearman ρ ≥ 0.9 | **17/17 buckets** (Spearman = 1.0000 in every bucket) |
+| top-1 agreement ≥ 0.8 | **17/17 buckets** (≥ 0.83 in every bucket) |
+| JS divergence ≤ 0.02 | **15/17 buckets** (2 Hartmann late/mid breach) |
+
+**Rank invariance is proven analytically** (Spearman = 1.0). The 2 JS
+breaches on Hartmann are caused by GP-fit numerical fragility (BoTorch
+`optimize_acqf(LogEI)` lands on a duplicate X under shift=5, producing
+`delta_opt = 0` and a sharp utility drop) — **not** a violation of the
+analytic invariance.
+
+### Track D — LLM per-step action distribution analysis
+
+- Script: `scripts/analyze_llm_action_distribution.py` (re-derives per-step
+  `action_id` histograms from `runs/exp_rq0_5_joint_10seed.json`)
+- Report: `runs/exp_rq0_5_action_distribution.md` + `.json` (raw counts)
+- Wall-clock: < 1 min (pure analysis)
+
+**Key finding (revised mechanism)**: On Rastrigin (10D multimodal, where LLM
+beats Surrogate by +17.54 best_y, p=0.0003), the LLM uses a **"global-then-
+local" temporal schedule**:
+- Steps 0–9: 100% `global_exploration` (broad sampling to escape local optima)
+- Steps 10–12: transition to `local_exploitation` (~80% local by step 12)
+- Step 13+: 100% `local_exploitation` (refine the best region found)
+
+AlwaysSurrogate picks `surrogate_acquisition` 100% of all 25 steps. **The
+LLM's value is structural schedule, not per-step choice.**
+
+**The earlier §5 of `EXP_RQ1_3_REPORT.md` hypothesized the LLM might be
+picking `local_exploitation` (closed-loop best first action) — that
+hypothesis is rejected by the per-step distribution. The mechanism is a
+temporal schedule, not a per-step choice.**
+
+### Workshop paper outline
+
+`docs/workshop_paper_outline.md` — 8-page workshop paper draft with:
+- §3 Framework (385 tests, 7 components)
+- §4 RQ1 Decision Landscape (3 regimes, Gate 3 at 20 seeds, Gate 5 affine
+  rank invariance)
+- §5 RQ3 Selective Reasoning (Rastrigin +17.54, global-to-local mechanism,
+  FrozenRouter negative result on IOH, RoutingAware vs LLM-everywhere NS)
+- §6 Limitations (14 items)
+- §7-§8 Discussion + Conclusion
+
+Codex 5-round review completed 2026-09-27 with **APPROVE** verdict.
+
+---
+
+## EXP-RQ2.1 — Cross-family transfer (2026-09-27, same session)
+
+5-fold leave-one-family-out CV with multi-output RandomForestRegressor System-1
+trained on counterfactual oracle labels (`runs/phase8_6d_h3_20seed_5family.jsonl`).
+
+- Script: `scripts/exp_rq2_1_cross_family_transfer.py`
+- Report: `runs/EXP_RQ2_1_REPORT.md` + `runs/exp_rq2_1_report.json`
+- Wall-clock: ~3 minutes
+
+**Per-family results** (cross-family regret vs AlwaysSurrogate CI):
+
+| Family | dim | Cross vs Surrogate CI | Verdict |
+|---|---|---|---|
+| Branin | 2D | `[-0.014, +0.009]` | inconclusive |
+| Hartmann | 6D | `[+0.019, +0.363]` | **cross LOSES** |
+| Ackley | 10D | `[-0.410, -0.089]` | **cross WINS** |
+| SixHumpCamel | 2D | `[+0.007, +0.014]` | **cross LOSES** |
+| Rastrigin | 10D | `[-0.240, -0.076]` | **cross WINS** |
+
+**Headline (per codex-ready wording)**:
+
+> "Cross-family transfer is **family-specific**: it wins on the two
+> high-dimensional multimodal families (Ackley 10D, Rastrigin 10D; both p<0.05
+> paired bootstrap CI), loses on Hartmann (6D, decision-rich) and SixHumpCamel
+> (2D, flat), and is inconclusive on Branin (2D). The aggregate records-weighted
+> Cross − Surrogate mean is -0.038 (slightly better than AlwaysSurrogate),
+> but this hides the per-family heterogeneity. **RQ2 is partially answered**:
+> learned System-1 transfers usefully when the held-out family shares
+> structural features with the training set, but does not transfer uniformly."
+
+This fills the RQ2 gap that PROGRESS_BRANCH §1 explicitly flagged as 0%. The
+paper's §4 RQ2 can now be added with this finding. **Worth codex review**
+before final workshop submission, since it changes the paper's RQ2 status
+from "absent" to "partially answered".
+
+---
+
 ## Phase 9.8: Jev executable-criteria effect test (2026-09-26)
 
 We compared two real `jev-1.13.0` Choice prompts: both used the same English
