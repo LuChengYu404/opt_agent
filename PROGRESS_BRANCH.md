@@ -410,3 +410,30 @@ state/action change exists. Six claim-wording fixes applied to the outline
 (P2 scope, P3 conditionality, schedule sufficiency — title now "…Whose
 Value a Two-Phase Schedule Subsumes", menu closure scoped, Gate-2
 granularity, Gate-4 "not established" not "unattainable").
+
+## 15. Design A/B executed: rich state shows no decision value (2026-09-28)
+
+The KEEP_FROZEN_QUALIFY adjudication (§14) was theory-only at the time.
+Branch `exp/lenz-state-jev-presentation` (commits 06deec4, bf7eccf)
+implemented the lenz-style rich state (full trial log D_t + config c_t +
+decision history H_t, with the frozen 15-scalar summary carried as a
+projection) with Jev-style narrative + executable-criteria presentation,
+then ran BOTH follow-up experiments on the untouched s100–119 stream
+(`runs/EXP_LENZ_JEV_REPORT.md`):
+
+- **E1 learnability probe** (`runs/exp_lenz_gate2_probe.json`): per-family
+  LOSO RF, frozen15 vs frozen+trajectory-features vs traj-only — trajectory
+  features do NOT beat frozen15 on 5/5 families (traj-only clearly worse
+  where signal exists: branin 0.50→0.24, sixhump 0.66→0.57).
+- **E2 LLM A/B** (`runs/exp_lenz_vs_frozen_llm.json`): deepseek-chat at
+  temperature 0, same frozen 8-action menu, 30 stratified records — rich
+  state changes 6/30 decisions (5 of 6 global_exploration →
+  surrogate_acquisition in mid/late phases) but gold-argmax agreement is
+  IDENTICAL (0.133 both) at 2.1× token cost (766 → 1,599 per call).
+
+Reading: the compression is not the bottleneck on this panel — the thin
+signal lives in the problems (P2 ceiling), not in the 15-scalar state.
+Empirical closure for §14; cited from outline limitation 3. Caveats
+(handcrafted features only, n=30 single-model A/B, H_t truncated to
+last_action in dataset records) in the report. Scripts are
+dataset-agnostic — rerun first on any journal-version panel.

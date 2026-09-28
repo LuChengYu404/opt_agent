@@ -704,11 +704,17 @@ independently establish, that premise). Artifacts:
 3. **Gate 2 fails — at this state granularity** — stable state-to-action
    learnability is **not demonstrated** (5/15 buckets pass at
    top_action_share ≥ 0.6 threshold) *from the compressed 15-scalar process
-   state*. Related agentic-BO designs condition on the full trajectory or
-   posterior context (`docs/ref_papers/state_action_design_survey.md`);
-   whether a richer state representation would support learnability is open
-   — but the adaptive-value ceiling (P2, representation-independent) caps
-   any such gain at D on four of five families.
+   state*. Whether a richer state would help is **empirically probed,
+   negative** (branch `exp/lenz-state-jev-presentation`, untouched
+   s100–119 stream): (i) a trajectory-feature RF probe does not beat the
+   15 scalars on 5/5 families; (ii) a rich-state LLM A/B (deepseek-chat,
+   temperature 0, same frozen menu, 30 stratified records) changes 6/30
+   decisions (5 of 6 global_exploration → surrogate_acquisition) without
+   moving gold-argmax agreement (0.133 both) at 2.1× token cost. A learned
+   sequence encoder over trials remains untested, and the adaptive-value
+   ceiling (P2, representation-independent) caps any such gain at D on
+   four of five families. Design spectrum:
+   `docs/ref_papers/state_action_design_survey.md`.
 4. **Gate 5 fails on 2/17 buckets** — predeclared joint test (`pass_: false`)
    because JS divergence exceeds 0.02 on Hartmann (late, mid) buckets. Median
    Spearman = 1.0 in all (problem, phase) buckets (consistent with the
@@ -911,6 +917,9 @@ independently establish, that premise). Artifacts:
 - `runs/exp_rlcd_loo_confirmatory_replication_s100_119.json` — LOO transfer
   replication on the independent stream (§4.7)
 - `runs/exp_gate4_multiplicity_sensitivity.json` — Bonferroni sensitivity (limitation 12)
+- branch `exp/lenz-state-jev-presentation`: `runs/exp_lenz_gate2_probe.json` +
+  `runs/exp_lenz_vs_frozen_llm.json` + `runs/EXP_LENZ_JEV_REPORT.md` —
+  rich-state A/B (both negative; limitation 3)
 - `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.7)
 - `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
   `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,
