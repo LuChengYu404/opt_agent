@@ -41,24 +41,24 @@
 
 ## Abstract (≤ 200 words)
 
-Bayesian Optimization (BO) reduces sequential control decisions (refit,
-switch acquisition, expand, stop) to one fixed acquisition function. We
-re-frame them as a meta-decision: at each state choose one of eight typed
-strategy actions. On a 5-family BOCoDe panel × 20 paired seeds
-(independently seed-stream replicated) we measure: (1) a decision
-landscape — three regimes via an adaptive-value bound on counterfactual
-oracle labels; (2) label affine invariance — median Spearman ρ = 1.0 in
-all 17 buckets; the predeclared joint gate fails on 2/17; (3) an
-LLM System-1 — beats AlwaysSurrogate on Rastrigin (+17.54, p=0.0058) yet
-is detectably worse on 3/5 families, and a deterministic two-phase
-schedule subsumes its closed-loop value; a dim≥5 router does not transfer
-to IOH; (4) a closed-loop cost frontier (450 paired trajectories) — a
-frozen RF System-1 with zero LLM calls dominates every LLM-calling arm;
-(5) distillation — RLCD fine-tuning lifts decision-level ranking 0.40 →
-0.87 and transfers cross-family (BT arm +0.140/+0.188 on two seed streams), but collapses to a constant policy in closed loop.
-Contributions: a 7-component framework (423 tests), four formal
-results tied to the experiments, and honest negatives — on this panel no
-learned policy beats a constant local baseline in closed loop.
+Bayesian Optimization (BO) reduces sequential control decisions to one
+fixed acquisition function. We re-frame them as a meta-decision: at each
+state choose one of eight typed strategy actions. On a 5-family BOCoDe
+panel × 20 paired seeds (independently seed-stream replicated) we
+measure: (1) a decision landscape — three regimes via an adaptive-value
+bound on counterfactual oracle labels; (2) label affine invariance —
+median Spearman ρ = 1.0 in all 17 buckets; the predeclared joint gate
+fails on 2/17; (3) an LLM System-1 — beats AlwaysSurrogate on Rastrigin
+(+17.54, p=0.0058) yet is detectably worse on 3/5 families, and a
+deterministic two-phase schedule subsumes its closed-loop value; a dim≥5
+router does not transfer to IOH; (4) a closed-loop cost frontier (450
+paired trajectories) — a frozen RF System-1 with zero LLM calls
+dominates every LLM-calling arm; (5) distillation — RLCD fine-tuning
+lifts decision-level ranking 0.40 → 0.87 and transfers cross-family
+(BT arm +0.140/+0.188 on two seed streams), but collapses to a constant
+policy. Contributions: a 7-component framework (423 tests), four formal
+results, and honest negatives: no learned policy beats a constant local
+baseline in closed loop on this panel.
 
 ---
 

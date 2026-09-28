@@ -456,3 +456,24 @@ dataset-agnostic — rerun first on any journal-version panel.
   LMABO citation/scoping, codex re-review; P1 locked-eval/external
   baselines; P2 journal-version panel swaps with branch A/B scripts as
   first diagnostic).
+
+## 17. Paper-package codex review loop (2026-09-28): REVISE → REVISE → APPROVE
+
+Three rounds on the post-integration package (outline + THEORY classical
+section + exploration rounds):
+- Round 5 (`runs/codex_paper_review_round5.log`): REVISE — 10 MAJOR +
+  5 MINOR. Substantive catches: proper-arm per-family direction obscured
+  by "5/5" (branin/hartmann NEGATIVE both streams); A/B transition counts
+  4/6 not 5/6; +0.052 rounding; P2≠entropy unit conversion (ES/PES
+  location vs MES value); GP-Hedge reward is posterior-mean
+  full-information, not realized gains; L1 restated as representability;
+  abstract 496→≤200 words; 4.x renumbering; LMABO scoping ("reports but
+  does not optimize a quality-cost frontier"); GP-Hedge baseline
+  re-scoped (spec-first Exp3-style alternative, not a direct port).
+- Round 6 (`runs/codex_paper_rereview6.log`): 12 ADDRESSED / 3 PARTIAL
+  (abstract 210 words; two residual unit-conversion/GP-Hedge lines).
+- Round 7 (`runs/codex_paper_rereview7.log`): all three ADDRESSED —
+  **VERDICT: APPROVE**.
+
+Commits: 555981a (round-5 revisions), 69764be (round-6 residuals), plus
+the lenz-branch report fix (A/B counts).
