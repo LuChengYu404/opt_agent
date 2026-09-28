@@ -103,3 +103,37 @@
   (CoRL 2023)、经典 AIA 三篇、Sara/lenz。
 - ⚠️ 条目（2026 preprint 居多：HiL-Bench、Agentic Abstention、C3PO、
   System-1.x、adaptive retrieval 各篇）：引用前必须核对 PDF 与 venue。
+
+## 线 0（补）：经典 BO 对"状态/信息/规则"的既有答案（LLM 之前）
+
+> 用户问题：早期自适应采样怎么处理信息、判断规则是什么。
+> 答案：经典 BO 有一套完整数学化方案，且与本项目框架逐项对应。
+
+| 问题 | 经典 BO 的答案 | 代表论文 | 本项目对应 |
+|---|---|---|---|
+| 状态/信息怎么定义 | **GP 后验分布**——所有观测 (x,y) 的充分统计量 | Rasmussen & Williams | 15 维摘要（后验的粗投影；E1 阴性即"投影没丢信号"的实证） |
+| 怎么知道下一步采哪/探还是用 | **acquisition function**——从后验解析算分、argmax 即决策；EI 内含探索-利用折中，UCB 显式折中 | Mockus EI；Srinivas GP-UCB | 效用函数 + 8 动作菜单（把规则从 x 层抬到策略层） |
+| 策略切换/组合怎么做 | **GP-Hedge**：PI/EI/UCB 组成 portfolio，在线多臂老虎机（指数权重）按历史收益分配——无监督、在线自适应 | Hoffman, Brochu, Freitas, UAI 2011 (arXiv:1009.5419) ✅ | RulePolicy/路由器；**缺失的基线**（见下） |
+| 信息价值怎么度量 | **信息论采集**：采样价值 = 后验熵的减少（关于最优位置/最优值） | ES (Hennig & Schuler)✅；PES (Hernández-Lobato 2014)✅；MES (Wang & Jegelka 2017)✅ | P2 的 D（决策论的信息价值）——D≈0 ⟺ 熵降换不来效用；两视角可互引 |
+| 组合线后续 | Entropy Search Portfolio（Shahriari et al.）⚠️；Self-tuning Portfolio BO（Vasconcelos 2022）⚠️ | — | related work 串联 2011→2026 |
+
+**⚠️ 关键最近邻（必须引用并划界）：LMABO（Ngo et al., ICLR 2026）**
+"Adaptive Acquisition Selection for Bayesian Optimization"
+（OpenReview EPKmSgXvRe / arXiv:2602.07904 / ICLR 2026 proceedings）：
+零样本 LLM 在每个 BO 迭代按结构化状态表示从 acquisition portfolio 中
+选下一个 acquisition——"LLM 当 BO 路由器"的直接实现。
+与本项目的差异（related work 划界要点）：LMABO 选 **acquisition 层**、
+零样本、无成本治理、无学习；本项目是**策略层 typed 动作 + 反事实监督 +
+成本前沿（阴性）**——RQ3（何时值得让 LLM 参与）恰是 LMABO 未问的问题。
+注意：该文为 ICLR 2026 正式发表，审稿人大概率知道它。
+
+## 借鉴清单（按优先级）
+
+1. **GP-Hedge 作为缺失基线**（P0，审稿风险）：8 动作菜单 ≈ 离散化
+   portfolio；GP-Hedge 是"无 oracle 标签、在线自适应"的对照。要么实现
+   GP-Hedge-over-8-actions（在线 Hedge 权重按 terminal gain 更新，
+   工作量中等），要么 related work 明确讨论差异。
+2. **LMABO 引用与划界**（P0，最近邻）：见上。
+3. **信息论视角补强 E2/P2**（P1）：决策价值 (D) vs 信息价值 (熵降) 的
+   对照讨论，引 PES/MES。
+4. 组合线 2011→2026 一条 related work 脉络（P2）。
