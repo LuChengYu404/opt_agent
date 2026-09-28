@@ -19,3 +19,4 @@
 2. 部分条目（标注 ⚠️ 的）只经过搜索摘要确认，尚未读全文；
    其表述（如"附录 E"细节）基于摘要/评论转述，引用前需核实。
 3. 状态标记：✅ = 已读摘要/全文核实；⚠️ = 仅搜索结果确认，待核实。
+| [state_action_design_survey.md](state_action_design_survey.md) | 状态/动作设计谱系调研（Sara/lenz、LLAMBO、GPTOpt、Volpp、TempoRL、FunBO vs 本项目），供 related work 与设计调整决策使用 |

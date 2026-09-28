@@ -127,9 +127,21 @@ and within-function dimension transfer is a clean negative.
 ## §2 Background & Related Work
 
 - BO and BoTorch (briefly).
+- **Agentic BO (Sara/lenz, Brunzema et al. 2026)** — nearest neighbor: open
+  command action space (probe/reconfigure/propose/evaluate/stop) over a
+  BoTorch backend, full (trials, config, instructions, deliberation-history)
+  state, no learned policy, token cost reported but not optimized. Our
+  closed 8-action space over a compressed 15-scalar process state is the
+  opposite trade: expressiveness for measurability — it is what makes
+  per-decision counterfactual supervision, predeclared gates, and a
+  noninferiority cost frontier possible. Full state/action design spectrum:
+  `docs/ref_papers/state_action_design_survey.md`.
 - Meta-learning for algorithm selection (Biedenkapp et al. on algorithm
-  configuration; our analogue is per-trajectory action selection).
-- LLM-as-decision-maker literature (recent; e.g., AutoML-Agent, Voyager).
+  configuration; TempoRL's skip-actions are the anchor for our zero-cost
+  actions and when-to-route; our analogue is per-trajectory action selection).
+- LLM-as-decision-maker literature (LLAMBO ICLR 2024 — prompt-state with the
+  full evaluation history, action = next x; GPTOpt 2025 — fine-tuned
+  LLM-as-optimizer; both act in x-space, we act at the strategy layer).
 - Decision-theoretic foundations: counterfactual decision-making, instrument
   of decision theory (no need to be exhaustive).
 
@@ -676,8 +688,14 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
    Family, dimension, smoothness, and multimodality are **confounded**;
    "Hartmann beats Branin" could be a dimensionality effect, a smoothness
    effect, or a multimodality effect.
-3. **Gate 2 fails** — stable state-to-action learnability is **not demonstrated**
-   (5/15 buckets pass at top_action_share ≥ 0.6 threshold).
+3. **Gate 2 fails — at this state granularity** — stable state-to-action
+   learnability is **not demonstrated** (5/15 buckets pass at
+   top_action_share ≥ 0.6 threshold) *from the compressed 15-scalar process
+   state*. Related agentic-BO designs condition on the full trajectory or
+   posterior context (`docs/ref_papers/state_action_design_survey.md`);
+   whether a richer state representation would support learnability is open
+   — but the adaptive-value ceiling (P2, representation-independent) caps
+   any such gain at D on four of five families.
 4. **Gate 5 fails on 2/17 buckets** — predeclared joint test (`pass_: false`)
    because JS divergence exceeds 0.02 on Hartmann (late, mid) buckets. Median
    Spearman = 1.0 in all (problem, phase) buckets (consistent with the
