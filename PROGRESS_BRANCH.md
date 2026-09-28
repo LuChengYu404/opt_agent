@@ -477,3 +477,23 @@ section + exploration rounds):
 
 Commits: 555981a (round-5 revisions), 69764be (round-6 residuals), plus
 the lenz-branch report fix (A/B counts).
+
+## 17. Codex paper-package review loop rounds 5-7 (2026-09-28): REVISE → REVISE → APPROVE
+
+Round 5 (`runs/codex_paper_review_round5.log`): 10 MAJOR + 5 MINOR across
+internal consistency / new-number spot checks / classical-theory accuracy /
+positioning fairness / priorities sanity. Substantive catches: P2-vs-entropy
+is a decision-theoretic counterpart NOT a unit conversion (ES/PES target the
+optimum's location, MES its value); GP-Hedge's reward is the updated
+posterior mean at each nominated arm, not realized terminal gain; L1 is
+representability, exact imitation stays empirical; LMABO reports but does
+not optimize a quality-cost frontier; proper-score arm loses to RF on
+branin/hartmann in both streams (directions now stated); A/B transitions
+4/6 not 5/6; +0.052 not +0.053; §4 renumbered 4.1/4.2; test history
+385→421→423 complete. Fixes: commits 555981a, 69764be, 9d47f61 (also
+brought the lenz A/B artifacts onto the mainline so citations resolve).
+Round 6 (`codex_paper_rereview6.log`): 12/15 ADDRESSED, 3 PARTIALLY
+(abstract word count; a leftover unit-conversion phrase; deferred bandit
+spec). Round 7 (`codex_paper_rereview7.log`): all three ADDRESSED —
+**VERDICT: APPROVE**. Current outline/THEORY/survey package is the
+reviewed submission baseline.
