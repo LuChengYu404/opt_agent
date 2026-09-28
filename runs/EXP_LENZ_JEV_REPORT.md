@@ -36,9 +36,11 @@ Branch `exp/lenz-state-jev-presentation`。问题（survey §四）：**全量�
 | tokens/次 | 766 | **1,599（2.1×）** |
 | 延迟 | 0.8s | 0.8s |
 
-改变方向的细节：6 处改变中 5 处是 `global_exploration → surrogate_acquisition`
-（集中在 mid/late phase——看到完整 trial log 后 LLM 略转保守/利用），1 处
-`→ local_exploitation`（hartmann late，恰好命中 gold）。
+改变方向的细节：6 处改变中 4 处是 `global_exploration → surrogate_acquisition`、
+1 处 `local_exploitation → surrogate_acquisition`（即 6 处中 5 处转向
+surrogate_acquisition）、1 处 `global_exploration → local_exploitation`
+（hartmann late，恰好命中 gold）；集中在 mid/late phase——看到完整
+trial log 后 LLM 略转保守/利用。
 
 **读法：富状态确实改变 LLM 行为（20% 的决策、方向系统性偏 exploit），
 但不改变其与教师 argmax 的一致率，且 token 成本翻倍。** 结合 E1：
