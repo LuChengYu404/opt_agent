@@ -30,13 +30,16 @@
 ## 后续优化方向（按优先级）
 
 ### P0 —— 投稿前必须
-1. **组合线基线（修订 per codex round 5）**：GP-Hedge 不能直接
+1. **组合线基线（修订 per codex round 5/6）**：GP-Hedge 不能直接
    搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对
    被选轨迹可见；GP-Hedge 奖励是后验均值型全信息奖励）。正确的 P0：
    (a) related work 里准确界定 GP-Hedge（THEORY.md 已修）；(b) 若要
    实验基线，二者选一：acquisition-only 的 GP-Hedge 对照，或单独
-   设计并命名的策略级 bandit（如 Exp3-over-8-actions、以 terminal
-   gain 为奖励），后者需先写清楚规格再实现。
+   设计并命名的策略级 bandit。后者的规格（已定，不再延后）：
+   **StrategyBandit-8**——臂 = 8 个 typed 动作；每决策点按 Exp3
+   权重采臂并执行；奖励 r_t = 执行后轨迹的增量 Δbest（在线可观测，
+   不用反事实标签）；γ=0.05 均匀混合保证探索；按 (family, seed)
+   分轨独立更新；命名与 GP-Hedge（后验均值全信息奖励）明确区分。
 2. **引用并划界 LMABO（ICLR 2026）**：最近邻。划界点：acquisition 层
    vs 更广的过程动作层（stop/refit/采样策略，非暗示 LMABO 无策略级
    控制）；零样本 vs 反事实监督；LMABO 报告但**不优化**质量-成本路由

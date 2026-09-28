@@ -134,8 +134,10 @@
    搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对被选
    轨迹可见；其奖励是后验均值型全信息奖励而非实现收益）。P0 =
    related work 准确界定（THEORY.md 已修）；实验基线若做，二选一：
-   acquisition-only 的 GP-Hedge 对照，或单独命名+完整规格的策略级
-   bandit（如 Exp3-over-8-actions、terminal-gain 奖励）——规格先行。
+   acquisition-only 的 GP-Hedge 对照，或 **StrategyBandit-8**（Exp3
+   over 8 typed 动作、奖励 = 执行后增量 Δbest、γ=0.05、按 (family,
+   seed) 分轨——完整规格见 exploration_rounds.md P0-1，机制与
+   GP-Hedge 明确区分）。
 2. **LMABO 引用与划界**（P0，最近邻）：见上。
 3. **信息论视角补强 E2/P2**（P1）：决策价值 (D) vs 信息价值 (熵降) 的
    对照讨论，引 PES/MES。
