@@ -161,25 +161,31 @@ same outcome for any untested router on this panel.
 
 ---
 
-## L1. Random forests exactly imitate axis-aligned threshold rules
+## L1. Random forests can represent axis-aligned threshold rules; exact imitation is then an empirical observation
 
-**Lemma 1.** Let the target rule `r(s)` be a function of a subset of
-axis-aligned features (e.g., `stagnation_steps`, remaining-budget ratio).
-Suppose training pairs `(features(sᵢ), r(sᵢ))` are noiseless and cover the
-rule's decision cells, and there is **no aliasing**: equal feature vectors
-imply equal rule actions. Then a random forest whose trees can realize the
-rule's threshold rectangles (depth ≥ number of thresholds), with one
-regressor per action trained on indicator targets, reproduces `r` exactly:
+**Lemma 1 (representability).** Let the target rule `r(s)` be a function of
+a subset of axis-aligned features (e.g., `stagnation_steps`,
+remaining-budget ratio). Suppose training pairs `(features(sᵢ), r(sᵢ))`
+are noiseless and cover the rule's decision cells, and there is **no
+aliasing**: equal feature vectors imply equal rule actions. Then there
+EXIST CART trees (depth ≥ number of thresholds, one regressor per action
+on indicator targets) whose ensemble reproduces `r` exactly:
 `argmax_a f̂_a(features(s)) = r(s)` on covered states.
+
+**Scope caveat (added per codex round 5).** This is a representability
+statement, not a guarantee about the TRAINED forest: CART fitting with
+random subsetting may grow trees that split elsewhere, and coverage plus
+no-aliasing do not by themselves ensure the correct partitions dominate
+the ensemble average. The claim that a fitted forest DOES recover the
+rule exactly is an empirical observation (below), for which the lemma
+supplies the explanation of possibility.
 
 **Proof sketch.** Each CART tree partitions the feature space into
 axis-aligned rectangles; the rule's cells are a partition of this kind, so
 some tree realizations isolate them. With noiseless indicator targets and
-sufficient leaf samples, each per-action regressor converges to the
-indicator of the rule picking that action on every covered cell, and the
-argmax is unique. Randomization only affects which realizations appear;
-coverage ensures at least one correct partition dominates the ensemble
-average. ∎
+sufficient leaf samples, per-action regressors CAN converge to the
+indicator of the rule picking that action on every covered cell, making
+the argmax unique for those realizations. ∎
 
 **Empirical tie.** `RuleFullBudget` decides on
 (`stagnation_steps ≥ 3` with budget, low-budget threshold 0) — both
@@ -225,49 +231,67 @@ The propositions are not built from scratch; each is a strategy-level
 counterpart of a classical result. Making the lineage explicit (also the
 related-work framing in the outline §2):
 
-- **P2 (adaptive-value) is the utility-unit form of the classical Value of
-  Information.** Decision theory has long measured "what is knowing more
-  worth": expected value of information (Howard, 1966, *Information Value
-  Theory*; Raiffa & Schlaifer, 1961) and expected information gain in
-  Bayesian experimental design (Lindley, 1956). Entropy-based BO
-  acquisitions operationalize the nats version — Entropy Search (Hennig &
-  Schuler, 2012), Predictive Entropy Search (Hernández-Lobato et al.,
-  2014), Max-Value Entropy Search (Wang & Jegelka, 2017) value a candidate
-  point by the posterior entropy reduction about the optimum. Our `D` is
-  the same quantity expressed in utility units *about the state's oracle
-  label* rather than in nats *about the optimum's location*: `D` is the
-  most any policy could gain from perfectly knowing which state it is in.
-  The two views compose: `D ≈ 0` means no entropy reduction about the
-  state can pay for itself in utility — which is why richer state
-  observation (branch `exp/lenz-state-jev-presentation`, E1/E2) buys
-  nothing on the flat families.
+- **P2 (adaptive-value) is the decision-theoretic counterpart of the
+  classical Value of Information.** Decision theory has long measured
+  "what is knowing more worth": expected value of information (Howard,
+  1966, *Information Value Theory*; Raiffa & Schlaifer, 1961) and expected
+  information gain in Bayesian experimental design (Lindley, 1956).
+  Information-theoretic BO acquisitions are a related but DIFFERENT
+  functional, not a unit conversion: Entropy Search (Hennig & Schuler,
+  2012) and Predictive Entropy Search (Hernández-Lobato et al., 2014)
+  value a candidate point by posterior entropy reduction about the
+  optimum's LOCATION, while Max-Value Entropy Search (Wang & Jegelka,
+  2017) targets its VALUE. Our `D` is instead a perfect-information
+  value measured in utility units about the STATE's oracle label:
+  `E_s[max_a U(a,s)] − max_a E_s[U(a,s)]` is the most any policy could
+  gain from perfectly knowing which state it is in (the
+  Howard-style expected value of revealing the state identity). The
+  analogy, not an identity: both ask what knowing more is worth, in
+  different currencies about different unknowns. They compose
+  empirically: `D ≈ 0` on the flat families means no state-revealing
+  information can pay for itself in utility — consistent with richer
+  state observation (branch `exp/lenz-state-jev-presentation`, E1/E2)
+  buying nothing there.
 - **The compressed state is a projection of the classical sufficient
-  statistic.** Under the GP model the posterior `p(f | D_t)` is a
-  sufficient summary of the full trial log; our 15-scalar state is a
+  statistic — with the sufficiency model-conditional and the claim
+  task-scoped.** Under the GP model the posterior `p(f | D_t)` is a
+  sufficient summary of the trial log; process decisions additionally
+  read budget, configuration, and execution state, which are not
+  functions of the posterior. Our 15-scalar state is a
   fixed-dimensional projection of `(D_t, c_t)`. The E1 negative result
   (trajectory features add nothing over the projection on 5/5 families)
-  is consistent with near-lossless projection *for predicting the action
-  label*.
+  shows the projection is near-lossless FOR PREDICTING THE ACTION LABEL
+  under the tested feature families — it does not establish losslessness
+  in general.
 - **The utility-plus-menu design lifts acquisition functions to the
   strategy level.** EI (Mockus, 1978) and GP-UCB (Srinivas et al., 2010)
   are closed-form one-step decision rules derived from the posterior; our
   8-action menu plus hand-specified utility is the same one-step-greedy
   structure at the level of *which optimizer action*, where no closed-form
   rule exists — which is precisely why supervision is needed.
-- **P3 is the negative complement of the portfolio/bandit line.**
+- **P3 stands in an analogy relation to the portfolio/bandit line.**
   GP-Hedge (Hoffman, Brochu & Freitas, UAI 2011) allocates among
-  acquisition functions by online exponential weights from realized gains;
+  acquisition functions by exponential weights, rewarding EVERY arm each
+  round with the updated GP posterior mean at that arm's nominated point
+  (a full-information reward, not the realized gain of the chosen arm);
   Shahriari et al.'s Entropy Search Portfolio and Vasconcelos et al.
   (2022) continue the line; LMABO (ICLR 2026) delegates the portfolio
   choice to a zero-shot LLM. That line assumes the portfolio contains an
-  arm worth switching to; P3 states the complementary degenerate case —
-  when the expensive arm's per-state advantage is ≤ 0, no allocation
-  (online bandit, learned router, or LLM) can extract positive value.
-  Our RQ3 cost frontier is the empirical measurement of exactly that
-  condition, which the portfolio line does not ask.
-- **L1 is standard tree representational behavior** (axis-aligned splits
-  reproduce axis-aligned threshold rules), used here as an explanation
-  device for the RQ2.2 exact-imitation negative.
+  arm worth switching to. P3 is the analogous degenerate condition in our
+  two-arm routing model — when the expensive arm's per-state advantage is
+  ≤ 0, no allocation can extract positive value. The analogy is not an
+  equivalence: our sweep measures routing outcomes, not the per-state
+  premise itself (limitation 9 of the outline), and our menu (stop, refit,
+  sampling strategies) has no per-arm nominated point, so GP-Hedge's
+  reward is not directly defined over it.
+- **L1 is a representability statement plus an empirical observation.**
+  Axis-aligned regression trees CAN represent an axis-aligned threshold
+  rule exactly; under noiseless labels, no feature aliasing, and
+  sufficient per-leaf samples, a fitted forest can recover the partition
+  — but coverage and no-aliasing alone do not GUARANTEE that the trained
+  ensemble learns it or that correct trees dominate the average. The
+  RQ2.2 observation (`rf − rule_full = +0.0000` on all functions) is the
+  empirical realization; the proposition is the representability part.
 
 Canon attribution note: the citations above are textbook-level; per repo
 convention, double-check page-precise references at camera-ready

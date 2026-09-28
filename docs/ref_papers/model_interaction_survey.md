@@ -123,7 +123,8 @@
 零样本 LLM 在每个 BO 迭代按结构化状态表示从 acquisition portfolio 中
 选下一个 acquisition——"LLM 当 BO 路由器"的直接实现。
 与本项目的差异（related work 划界要点）：LMABO 选 **acquisition 层**、
-零样本、无成本治理、无学习；本项目是**策略层 typed 动作 + 反事实监督 +
+零样本、报告但不优化成本（~6k tokens/~$0.01/迭代）、无学习；本项目
+是**更广的过程动作层（stop/refit/采样策略）+ 反事实监督 +
 成本前沿（阴性）**——RQ3（何时值得让 LLM 参与）恰是 LMABO 未问的问题。
 注意：该文为 ICLR 2026 正式发表，审稿人大概率知道它。
 

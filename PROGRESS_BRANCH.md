@@ -330,7 +330,7 @@ Two commits on `docs/workshop_paper_outline.md`:
    test count 385→423 (x4); title aligned with the schedule-sufficiency
    finding (old title kept as noted alternative).
 2. **RLCD line integrated** (content update, numbers re-verified against
-   `runs/*.json` in the same session): new §4.7 (fine-tuned-model
+   `runs/*.json` in the same session): new §4.2 (fine-tuned-model
    cross-family transfer +0.140 5/5 folds analysis-rerun; GearTrain
    probe), new §5.6 (teacher-noise chain; 4-arm distillation table; sweep
    re-run numbers; long-horizon; closed-loop collapse + router panel),
@@ -339,7 +339,7 @@ Two commits on `docs/workshop_paper_outline.md`:
    prior APPROVE predates this integration.
 
 Verification this pass (all personally re-pulled): §5.1 D values
-(verify_theory_propositions.json), §4.7 LOO confirmatory + per-family +
+(verify_theory_propositions.json), §4.2 LOO confirmatory + per-family +
 E5 recompute (gap +0.146 = 0.8657−0.7200 ✓, 5/5 ✓, one-sided p=0.031 ✓),
 GearTrain, split-half 2v2, aligned Gate-4 upper bounds (+0.78/+1.92),
 4-arm + CIs, sweep re-run, long-horizon, closed-loop regrets recomputed
@@ -372,7 +372,7 @@ Three additions closing the two cheapest outline gaps + one bug found:
    bound is itself bootstrap-fragile at ±0.05 around 0** — official +0.022
    vs recompute −0.044); **behavior 1/5 → 0/5**.
 
-3. **RLCD LOO transfer replication on the independent stream** (§4.7
+3. **RLCD LOO transfer replication on the independent stream** (§4.2
    seed-reuse half of the analysis-rerun caveat).
    `exp_rlcd_loo_confirmatory.py --dataset …_s100_119.jsonl` (train AND
    eval both on the new stream):
@@ -427,8 +427,10 @@ then ran BOTH follow-up experiments on the untouched s100–119 stream
   where signal exists: branin 0.50→0.24, sixhump 0.66→0.57).
 - **E2 LLM A/B** (`runs/exp_lenz_vs_frozen_llm.json`): deepseek-chat at
   temperature 0, same frozen 8-action menu, 30 stratified records — rich
-  state changes 6/30 decisions (5 of 6 global_exploration →
-  surrogate_acquisition in mid/late phases) but gold-argmax agreement is
+  state changes 6/30 decisions — 4 of 6 global_exploration →
+  surrogate_acquisition, one local_exploitation → surrogate_acquisition,
+  one global_exploration → local_exploitation; concentrated in mid/late
+  phases — but gold-argmax agreement is
   IDENTICAL (0.133 both) at 2.1× token cost (766 → 1,599 per call).
 
 Reading: the compression is not the bottleneck on this panel — the thin

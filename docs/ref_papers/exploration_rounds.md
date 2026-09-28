@@ -9,7 +9,7 @@
 |---|---|---|---|
 | 1 | 全库有没有前后不一致/矛盾 | 20 项发现（15 确认/5 部分），全部修复 | `runs/AUDIT_INCONSISTENCY_FINDINGS.md`、`runs/codex_audit_review.log`、PROGRESS_BRANCH §11 |
 | 2 | 实验结果能否支撑论文 | workshop 定位可支撑；"learned policy 有效"不可主张 | 会话分析（outline 修订落地） |
-| 3 | 补充实验 | 独立流复现 G3 1.296、LOO +0.188、Bonferroni 分级 | PROGRESS_BRANCH §13、outline §5.2/§4.7/limitation 5/12 |
+| 3 | 补充实验 | 独立流复现 G3 1.296、LOO +0.188、Bonferroni 分级 | PROGRESS_BRANCH §13、outline §5.2/§4.2/limitation 5/12 |
 | 4 | 状态/动作设计要不要改 | 文献谱系定位 + codex 裁决 KEEP_FROZEN_QUALIFY | `state_action_design_survey.md`、`runs/codex_design_review.log`、§14 |
 | 5 | 富状态到底有没有用 | 实现后 A/B：E1 探针 5/5 阴性、E2 LLM 对齐无差 2.1× token | 分支 `exp/lenz-state-jev-presentation`、`runs/EXP_LENZ_JEV_REPORT.md`、§15 |
 | 6 | 大小模型交互 + 信息充分性的前沿；经典 BO 的既有答案 | 四线谱系 + 经典三件套（后验/acquisition/GP-Hedge/熵价值）+ **最近邻 LMABO (ICLR 2026)** | `model_interaction_survey.md`（含线 0 补充） |
@@ -30,11 +30,18 @@
 ## 后续优化方向（按优先级）
 
 ### P0 —— 投稿前必须
-1. **GP-Hedge 基线**：8 动作菜单 ≈ 离散化 portfolio；BO 审稿人必问
-   "为什么不用在线自适应组合"。实现 GP-Hedge-over-8-actions（在线
-   Hedge 权重按 terminal gain 更新）或 related work 明确论证差异。
+1. **组合线基线（修订 per codex round 5）**：GP-Hedge 不能直接
+   搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对
+   被选轨迹可见；GP-Hedge 奖励是后验均值型全信息奖励）。正确的 P0：
+   (a) related work 里准确界定 GP-Hedge（THEORY.md 已修）；(b) 若要
+   实验基线，二者选一：acquisition-only 的 GP-Hedge 对照，或单独
+   设计并命名的策略级 bandit（如 Exp3-over-8-actions、以 terminal
+   gain 为奖励），后者需先写清楚规格再实现。
 2. **引用并划界 LMABO（ICLR 2026）**：最近邻。划界点：acquisition 层
-   vs 策略层；零样本 vs 反事实监督；无成本治理 vs 成本前沿（阴性）。
+   vs 更广的过程动作层（stop/refit/采样策略，非暗示 LMABO 无策略级
+   控制）；零样本 vs 反事实监督；LMABO 报告但**不优化**质量-成本路由
+   前沿（其报告 ~6k tokens / ~$0.01 / 迭代）vs 本项目的非劣效成本
+   前沿（阴性）。
 3. **codex 复审 outline**：三次大改（RLCD 整合、复现实验、措辞修正/
    经典对接）之后的版本未再过评审。
 
@@ -42,7 +49,7 @@
 4. 信息论视角加固 E2/P2 的讨论（THEORY.md 已对接一半；正文写作时
    展开 D 与熵降的关系）。
 5. **locked family eval**：需扩 backend allowlist（冻结决策，单独评审），
-   解除 §4.7 analysis-rerun 的家族复用半边。
+   解除 §4.2 analysis-rerun 的家族复用半边。
 6. **外部 baseline**（SMAC3 / HEBO / Sobol 锚点；期刊版 P0）。
 
 ### P2 —— 期刊版（换面板后）

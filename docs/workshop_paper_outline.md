@@ -11,7 +11,7 @@
 > (§4.1–4.5 under §5 and §5.1–5.5 under §6 renumbered to match their
 > parents); test count 385→423; title aligned with the schedule-sufficiency
 > finding (previous title kept below as an alternative).
-> **2026-09-28 content update**: the branch RLCD line is integrated (§4.7
+> **2026-09-28 content update**: the branch RLCD line is integrated (§4.2
 > fine-tuned-model cross-family transfer + GearTrain probe; §5.6 teacher
 > noise + decision-level distillation + closed-loop collapse; limitations
 > 15–16; discussion/conclusion/abstract updated). All quoted numbers were
@@ -41,60 +41,25 @@
 
 ## Abstract (≤ 200 words)
 
-Bayesian Optimization (BO) practice reduces many sequential decision points
-(refit surrogate, switch acquisition, expand region, or stop) to a single fixed
-acquisition function. We re-frame these as an explicit meta-decision: at every
-state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
-5-family BOCoDe panel × 20 paired seeds we measure five things:
-
-1. **Decision landscape** — we identify three regimes (Flat, Heavy-tailed,
-   Frequent-opportunity) using an `adaptive-value` metric on counterfactual
-   oracle labels.
-2. **Affine invariance (partial)** — gold_probs **median rank correlation is
-   Spearman ρ = 1.0000 across all 17 (problem, phase) buckets** under
-   y → scale * y + shift. The predeclared joint Gate 5 (which also requires
-   JS ≤ 0.02) **fails on 2/17 Hartmann buckets** due to GP-fit numerical
-   fragility in the rollout's surrogate acquisition proposal. Per-record
-   rank invariance is not established.
-3. **LLM as System-1** — a deepseek-chat LLM used at every decision beats
-   AlwaysSurrogate by **+17.54 best_y** on Rastrigin (paired-t **p=0.0058**,
-   Student-t df=n-1, n=10; it is detectably worse on Branin, Hartmann and
-   SixHumpCamel, §6.1) and exhibits a **global-to-local temporal action
-   pattern** *associated with* its advantage. A predeclared deterministic
-   two-phase schedule realizing that pattern **reproduces and exceeds the
-   LLM's closed-loop value** (CI-excluding-zero wins on 3/5 families, never
-   loses; §6.2/§6.5) — a two-phase schedule suffices to match or exceed the
-   LLM's value on this panel, so LLM-specific per-step reasoning is not
-   needed to explain it (a step-level causal decomposition remains open,
-   §7.9). A simple `dim≥5` router beats
-   Surrogate on the BOCoDe panel (p=0.0120) but does NOT transfer to
-   IOH/BBOB (p=0.1376, negative result).
-4. **Cost frontier (10 seeds, closed loop)** — with a frozen RF System-1
-   deployed through full BO trajectories, the always-LLM policy never beats
-   System-1-only with a CI excluding zero and is detectably worse on Ackley,
-   Hartmann, and SixHumpCamel; no confidence-threshold or random-rate routing
-   arm earns its cost. A deterministic two-phase schedule dominates the LLM
-   itself on 3/5 families — the frontier's degeneracy is a property of the
-   System-2 decisions, formalized by a routing-dominance proposition.
-5. **Distilling the teacher (decision-level)** — single-roll counterfactual
-   labels are noise-dominated (per-re-roll pair flip 0.40 above-median), yet
-   RLCD fine-tuning of a 0.4B typed-decision model lifts decision-level
-   pairwise ranking from 0.40 (zero-shot) to 0.87 (BT) / 0.80 (proper-score,
-   the only calibrated arm), and transfers cross-family at decision level
-   (+0.140 and +0.188 on two independent seed streams, 5/5 families each;
-   GearTrain engineering probe holds) — but both fine-tuned arms collapse
-   to a constant policy in closed loop (§4.7/§5.6).
-
-Our contribution is a 7-component framework (backend/state/action/utility/
-rollout/dataset/system-1+router) with **423 unit tests**, four formal
-results in `docs/THEORY.md` (P1/P2 verified numerically through the live
-code path; P3/L1 tied empirically), and run artifacts for every reported
-experiment. Cross-family transfer is partial and heterogeneous: the RF
-System-1 has lower one-step decision regret than the real
-state-conditional rule policy on 3/5 families (§4), and an RLCD
-fine-tuned model transfers at decision level (+0.140, analysis-rerun;
-§4.7); closed-loop and full engineering transfer are not demonstrated,
-and within-function dimension transfer is a clean negative.
+Bayesian Optimization (BO) reduces many sequential control decisions (refit,
+switch acquisition, expand region, stop) to one fixed acquisition function.
+We re-frame them as an explicit meta-decision: at every state choose one of
+eight typed strategy actions. On a 5-family BOCoDe panel × 20 paired seeds
+(replicated on an independent seed stream) we measure: (1) a decision
+landscape — three regimes via an adaptive-value bound on counterfactual
+oracle labels; (2) label affine invariance — median Spearman ρ = 1.0 in
+all 17 buckets, with the predeclared joint gate failing on 2/17; (3) an
+LLM System-1 — beats AlwaysSurrogate on Rastrigin (+17.54, p=0.0058) yet
+is detectably worse on 3/5 families, and a deterministic two-phase
+schedule subsumes its closed-loop value; a dim≥5 router does not transfer
+to IOH; (4) a closed-loop cost frontier (450 paired trajectories) — a
+frozen RF System-1 with zero LLM calls dominates every LLM-calling arm;
+(5) distillation — RLCD fine-tuning lifts decision-level ranking 0.40 →
+0.87 and transfers cross-family (BT arm +0.140/+0.188 on two independent
+seed streams), but collapses to a constant policy in closed loop.
+Contributions: a 7-component framework (423 unit tests), four formal
+results tied to the experiments, and honest negative boundaries — on this
+panel no learned policy beats a constant local baseline in closed loop.
 
 ---
 
@@ -115,7 +80,7 @@ and within-function dimension transfer is a clean negative.
   95% CI upper < 0); aggregate Cross − Rule = -0.065; loses to a constant
   `local_exploitation` policy (AlwaysLocal) on aggregate; an RLCD fine-tuned
   model transfers at decision level, +0.140 / +0.188 on two independent
-  seed streams, 5/5 families each — family-level locking still open, §4.7); RQ3 has one strong
+  seed streams, 5/5 families each — family-level locking still open, §4.2); RQ3 has one strong
   pilot (LLM > Surrogate on Rastrigin, p=0.0058), one negative pilot
   (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
   cost frontier (450 paired trajectories) in which a frozen RF System-1 with
@@ -155,9 +120,12 @@ and within-function dimension transfer is a clean negative.
   utility-plus-menu lifts that structure to the strategy level where no
   closed form exists; GP-Hedge (UAI 2011) and its portfolio successors
   allocate among rules by online bandits, and LMABO (ICLR 2026) delegates
-  that allocation to a zero-shot LLM — our P2 is the utility-unit Value of
-  Information (Howard 1966 / Lindley 1956 lineage; entropy-based
-  acquisitions ES/PES/MES are the nats version) and P3 gives the
+  that allocation to a zero-shot LLM — our P2 is the decision-theoretic
+  counterpart of those information-theoretic acquisitions (a
+  perfect-information value measured in utility units, in the Howard-1966 /
+  Lindley-1956 value-of-information lineage; ES/PES target the optimum's
+  location and MES its value — a related but different functional, not a
+  unit conversion) and P3 gives the
   degenerate case the portfolio line assumes away (per-state advantage
   ≤ 0 ⇒ no allocation helps), which our cost frontier measures.
 
@@ -255,14 +223,16 @@ Four short results formalize claims the experiments measure:
 - **P3 (routing degeneracy).** If the System-2's per-state advantage
   `A(s) = Q(s, a₂(s)) − Q(s, a₁(s)) ≤ 0` a.s., *every* router — oracle or
   learned — has non-positive value over never routing. The 10-seed sweep
-  (0/40 arms beat `rf` with CI excluding zero) is the empirical signature
-  of `A ≤ 0`, so the routing failure is a property of the LLM's decisions,
-  not of the routing heuristic.
-- **L1 (exact imitation of axis-aligned rules).** A random forest whose
-  features contain an axis-aligned threshold rule's inputs reproduces the
-  rule exactly under noiseless labels with no feature aliasing — explaining
-  RQ2.2's `rf − rule_full = +0.0000` and the inherited losses to
-  Surrogate/Local.
+  (0/40 arms beat `rf` with CI excluding zero) is CONSISTENT with this
+  premise (we measure the routing outcomes, not A(s) itself — see §6.5's
+  conditional wording and limitation 9).
+- **L1 (representability of axis-aligned rules by trees).** Axis-aligned
+  regression trees CAN represent an axis-aligned threshold rule exactly;
+  under noiseless labels, no feature aliasing, and sufficient per-leaf
+  samples, a fitted forest can recover it. The RQ2.2 observation
+  (`rf − rule_full = +0.0000` on all functions) is the empirical
+  realization of this representability, and explains the inherited
+  losses to Surrogate/Local.
 
 ## §4 RQ2 — Cross-Family Transfer (Leave-One-Family-Out CV)
 
@@ -364,8 +334,10 @@ this single 5-family panel.
 
 **Limitations specific to §4 RQ2**:
 - **One-step decision regret, not closed-loop trajectory** — the RF is
-  evaluated on its one-step choice against the oracle; we do not measure
-  the effect of deploying the RF through a full BO trajectory.
+  evaluated on its one-step choice against the oracle. (Closed-loop RF
+  deployment IS measured separately — §6.5's cost frontier and the
+  final-goal closed-loop audit — but not under the §4 cross-family
+  transfer comparison.)
 - **Single model class (RF)** — MLP / GBM / Transformer may behave differently.
 - **Family × dimension confounded** — disentangling requires a crossed design
   (same family at multiple dimensions). EXP-RQ2.2 below addresses the
@@ -374,7 +346,7 @@ this single 5-family panel.
 - **Aggregate records-weighted mean is arithmetic**, not inferential for
   an average effect across new families.
 
-### §4.6 Within-function dimension transfer (EXP-RQ2.2) — clean negative
+### §4.1 Within-function dimension transfer (EXP-RQ2.2) — clean negative
 
 **Why.** Every BOCoDe family has a fixed dimension, so RQ2.1's cross-family
 result confounds family with dimension. EXP-RQ2.2 fixes the function and
@@ -400,7 +372,7 @@ at 10 seeds. **Within-function dimension transfer is a clean negative**;
 the RQ2.1 cross-family signal is at least partly a *family* signal, not a
 dimension signal.
 
-### §4.7 Fine-tuned System-1 cross-family transfer (EXP-RLCD, analysis-rerun)
+### §4.2 Fine-tuned System-1 cross-family transfer (EXP-RLCD, analysis-rerun)
 
 > NEW 2026-09-28 (branch `exp/rlcd-laya-finetune`; codex journal-round
 > review APPROVE on the underlying reports). **Status caveat**: labeled
@@ -418,16 +390,21 @@ evaluated leave-one-family-out (5 folds, dual training seeds, 663 records;
 
 - Pooled cross-family pairwise accuracy (fine-tuned vs RF baseline, per-record
   paired bootstrap): **bt +0.140 [+0.126, +0.154]**; proper +0.019
-  [+0.007, +0.032]. **5/5 family CIs exclude 0.** Per-family deltas:
-  sixhump +0.305, ackley +0.209, rastrigin +0.151, branin +0.045,
-  hartmann +0.016.
+  [+0.007, +0.032]. **Per-family directions differ by arm**: the BT arm
+  improves over RF on 5/5 families (sixhump +0.305, ackley +0.209,
+  rastrigin +0.151, branin +0.045, hartmann +0.016 — all CIs exclude 0);
+  the proper arm is positive on 3/5 (ackley +0.089, sixhump +0.144,
+  rastrigin +0.048) and NEGATIVE on branin (−0.095) and hartmann
+  (−0.065) — its pooled positive delta is carried by the three winners.
 - **Independent-seed-stream replication (2026-09-28, seeds 100–119, train
   AND eval both on the new stream;
   `exp_rlcd_loo_confirmatory_replication_s100_119.json`)**: bt − RF
-  **+0.188 [+0.175, +0.202]**; proper − RF +0.053 [+0.041, +0.064];
-  **5/5 family CIs exclude 0 again**, with the same per-family strength
-  ordering (ackley 0.282 / sixhump 0.255 / rastrigin 0.230 strong,
-  branin 0.098 / hartmann 0.037 small). The seed-reuse half of the
+  **+0.188 [+0.175, +0.202]** (5/5 families CI-positive again); proper −
+  RF +0.052 [+0.041, +0.064] pooled, with the same per-arm pattern
+  (positive ackley +0.161 / sixhump +0.072 / rastrigin +0.087; negative
+  branin −0.034 / hartmann −0.053). The per-family strong/small grouping
+  replicates (ackley/sixhump/rastrigin strong, branin/hartmann small;
+  the top two exchange places across streams). The seed-reuse half of the
   analysis-rerun caveat is discharged; the family-reuse half is not
   (same 5 informed-design families — a locked family-level eval needs
   new allowlisted problems).
@@ -441,7 +418,7 @@ evaluated leave-one-family-out (5 folds, dual training seeds, 663 records;
 - Relation to §4 (RF): the RF System-1 transfers with lower one-step
   decision regret on 3/5 families; the fine-tuned model additionally
   recovers the teacher's *calibration* (proper arm, §5.6) and holds on an
-  engineering family — but neither closes the loop (§5.6, §7.15).
+  engineering family — but neither closes the loop (§5.6, limitation 15).
 
 ## §5 RQ1 — Decision Landscape
 
@@ -719,7 +696,9 @@ independently establish, that premise). Artifacts:
    s100–119 stream): (i) a trajectory-feature RF probe does not beat the
    15 scalars on 5/5 families; (ii) a rich-state LLM A/B (deepseek-chat,
    temperature 0, same frozen menu, 30 stratified records) changes 6/30
-   decisions (5 of 6 global_exploration → surrogate_acquisition) without
+   decisions — 4 of 6 global_exploration → surrogate_acquisition, one
+   local_exploitation → surrogate_acquisition, one global_exploration →
+   local_exploitation — without
    moving gold-argmax agreement (0.133 both) at 2.1× token cost. A learned
    sequence encoder over trials remains untested, and the adaptive-value
    ceiling (P2, representation-independent) caps any such gain at D on
@@ -787,7 +766,7 @@ independently establish, that premise). Artifacts:
     informative but not on a common scale; per-family + ratio-of-advantages
     is the cleaner framing.
 15. **RLCD transfer is analysis-rerun, not locked** — the +0.140 5/5-fold
-    cross-family result (§4.7) was produced after design iterations on the
+    cross-family result (§4.2) was produced after design iterations on the
     same panel; a locked evaluation on untouched families/tasks is required
     before calling it confirmatory. And the fine-tuned arms collapse to a
     constant policy in closed loop (§5.6) — no learned policy on this panel
@@ -825,13 +804,14 @@ independently establish, that premise). Artifacts:
   (wins vs real RulePolicy on 3/5; wins vs AlwaysSurrogate on 2/5; loses to a
   constant local policy on aggregate). The RLCD fine-tuned model transfers
   at decision level (+0.140, 5/5 folds, analysis-rerun; GearTrain probe
-  holds, §4.7) — closed-loop transfer remains undemonstrated for both.
+  holds, §4.2) — closed-loop transfer remains undemonstrated for both.
 
 ## §9 Conclusion
 
 - Three contributions: (1) a 7-component decision-centric BO framework
-  with **423 unit tests** (385 at first draft; +4 GearTrain; +2 partial-rollout
-  validation / Gate-3 CI-branch coverage in the 2026-09-28 audit round)
+  with **423 unit tests** (385 at first draft; 421 after the long-horizon
+  and RLCD rounds; +2 in the 2026-09-28 audit round: partial-rollout
+  validation, Gate-3 CI-branch coverage)
   and four formal propositions tied to the experiments (`docs/THEORY.md`:
   affine label invariance, adaptive-value bound, routing degeneracy,
   exact imitation of axis-aligned rules); (2) a counterfactual oracle
@@ -925,12 +905,12 @@ independently establish, that premise). Artifacts:
   `runs/exp_rq1_2_h3_20seed_replication_s100_119.json` — independent-seed-stream
   gate replication (§5.2, limitation 5)
 - `runs/exp_rlcd_loo_confirmatory_replication_s100_119.json` — LOO transfer
-  replication on the independent stream (§4.7)
+  replication on the independent stream (§4.2)
 - `runs/exp_gate4_multiplicity_sensitivity.json` — Bonferroni sensitivity (limitation 12)
 - branch `exp/lenz-state-jev-presentation`: `runs/exp_lenz_gate2_probe.json` +
   `runs/exp_lenz_vs_frozen_llm.json` + `runs/EXP_LENZ_JEV_REPORT.md` —
   rich-state A/B (both negative; limitation 3)
-- `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.7)
+- `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.2)
 - `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
   `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,
   router panel (§5.6)
