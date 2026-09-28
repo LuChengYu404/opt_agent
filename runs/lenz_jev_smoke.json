@@ -1,0 +1,20 @@
+{
+ "problem": "Branin",
+ "total_budget": 15,
+ "decision_history": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  "global_exploration",
+  "global_exploration",
+  "global_exploration",
+  "global_exploration",
+  "global_exploration",
+  "global_exploration",
+  "global_exploration",
+  "global_exploration"
+ ],
+ "prompt_chars": 4060
+}

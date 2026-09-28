@@ -130,10 +130,12 @@
 
 ## 借鉴清单（按优先级）
 
-1. **GP-Hedge 作为缺失基线**（P0，审稿风险）：8 动作菜单 ≈ 离散化
-   portfolio；GP-Hedge 是"无 oracle 标签、在线自适应"的对照。要么实现
-   GP-Hedge-over-8-actions（在线 Hedge 权重按 terminal gain 更新，
-   工作量中等），要么 related work 明确讨论差异。
+1. **组合线基线**（P0，修订 per codex round 5/6）：GP-Hedge 不能直接
+   搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对被选
+   轨迹可见；其奖励是后验均值型全信息奖励而非实现收益）。P0 =
+   related work 准确界定（THEORY.md 已修）；实验基线若做，二选一：
+   acquisition-only 的 GP-Hedge 对照，或单独命名+完整规格的策略级
+   bandit（如 Exp3-over-8-actions、terminal-gain 奖励）——规格先行。
 2. **LMABO 引用与划界**（P0，最近邻）：见上。
 3. **信息论视角补强 E2/P2**（P1）：决策价值 (D) vs 信息价值 (熵降) 的
    对照讨论，引 PES/MES。
