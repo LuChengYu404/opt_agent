@@ -6,6 +6,7 @@ from opt_agent.state.lenz_state import (
     LenzState,
     LenzTrial,
     extract_lenz_state,
+    lenz_state_from_record,
 )
 from opt_agent.state.models import (
     HistoryState,
@@ -28,4 +29,5 @@ __all__ = [
     "SurrogateState",
     "extract_lenz_state",
     "extract_state",
+    "lenz_state_from_record",
 ]

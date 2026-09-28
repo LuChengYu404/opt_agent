@@ -1,0 +1,90 @@
+{
+ "dataset": "runs/phase8_6d_h3_20seed_5family_s100_119.jsonl",
+ "families": {
+  "ackley": {
+   "frozen15": {
+    "mean_regret": 0.5731,
+    "n": 143,
+    "top1_agreement": 0.1119
+   },
+   "traj_ext": {
+    "mean_regret": 0.6447,
+    "n": 143,
+    "top1_agreement": 0.1049
+   },
+   "traj_only": {
+    "mean_regret": 0.5703,
+    "n": 143,
+    "top1_agreement": 0.1259
+   }
+  },
+  "branin": {
+   "frozen15": {
+    "mean_regret": 0.069,
+    "n": 119,
+    "top1_agreement": 0.4958
+   },
+   "traj_ext": {
+    "mean_regret": 0.0787,
+    "n": 119,
+    "top1_agreement": 0.4454
+   },
+   "traj_only": {
+    "mean_regret": 0.0911,
+    "n": 119,
+    "top1_agreement": 0.2437
+   }
+  },
+  "hartmann": {
+   "frozen15": {
+    "mean_regret": 1.2412,
+    "n": 117,
+    "top1_agreement": 0.1966
+   },
+   "traj_ext": {
+    "mean_regret": 1.3529,
+    "n": 117,
+    "top1_agreement": 0.1966
+   },
+   "traj_only": {
+    "mean_regret": 1.3146,
+    "n": 117,
+    "top1_agreement": 0.2564
+   }
+  },
+  "rastrigin": {
+   "frozen15": {
+    "mean_regret": 0.2118,
+    "n": 130,
+    "top1_agreement": 0.1846
+   },
+   "traj_ext": {
+    "mean_regret": 0.2278,
+    "n": 130,
+    "top1_agreement": 0.1923
+   },
+   "traj_only": {
+    "mean_regret": 0.2162,
+    "n": 130,
+    "top1_agreement": 0.1769
+   }
+  },
+  "sixhumpcamel": {
+   "frozen15": {
+    "mean_regret": 0.0111,
+    "n": 145,
+    "top1_agreement": 0.6552
+   },
+   "traj_ext": {
+    "mean_regret": 0.0109,
+    "n": 145,
+    "top1_agreement": 0.6483
+   },
+   "traj_only": {
+    "mean_regret": 0.0175,
+    "n": 145,
+    "top1_agreement": 0.5655
+   }
+  }
+ }
+}

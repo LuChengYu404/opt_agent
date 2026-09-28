@@ -1,0 +1,46 @@
+sampled 30 records (6/family) -> 2 conditions each
+  ... 10/30 inter-cond agreement 0.90
+  ... 20/30 inter-cond agreement 0.80
+  ... 30/30 inter-cond agreement 0.80
+{
+ "n_records": 30,
+ "n_errors": 0,
+ "model": "deepseek-chat (temperature 0)",
+ "inter_condition_choice_agreement": 0.8,
+ "gold_hit": {
+  "frozen": 0.1333,
+  "lenz": 0.1333
+ },
+ "tokens": {
+  "frozen": 765.9,
+  "lenz": 1598.6
+ },
+ "latency_s": {
+  "frozen": 0.8,
+  "lenz": 0.8
+ },
+ "per_family_gold_hit": {
+  "ackley": {
+   "frozen": 0.1667,
+   "lenz": 0.1667
+  },
+  "branin": {
+   "frozen": 0.0,
+   "lenz": 0.0
+  },
+  "hartmann": {
+   "frozen": 0.1667,
+   "lenz": 0.1667
+  },
+  "rastrigin": {
+   "frozen": 0.1667,
+   "lenz": 0.1667
+  },
+  "sixhumpcamel": {
+   "frozen": 0.1667,
+   "lenz": 0.1667
+  }
+ }
+}
+wrote runs/exp_lenz_vs_frozen_llm.json
+EXITCODE=0

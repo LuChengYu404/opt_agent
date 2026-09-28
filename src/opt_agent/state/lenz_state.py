@@ -31,7 +31,14 @@ from typing import Optional
 
 from opt_agent.backend.bocode_botorch import UnifiedBackend
 from opt_agent.state.extractor import extract_state
-from opt_agent.state.models import OptimizationState
+from opt_agent.state.models import (
+    HistoryState,
+    OptimizationProgress,
+    OptimizationState,
+    ResourceState,
+    SamplingState,
+    SurrogateState,
+)
 
 
 @dataclass(frozen=True)
@@ -155,4 +162,87 @@ def extract_lenz_state(
         config=lenz_config,
         decision_history=tuple(decision_history),
         summary=summary,
+    )
+
+
+def _summary_from_record_state(d: dict) -> OptimizationState:
+    """Rebuild the frozen OptimizationState from a record's serialized
+    ``state`` dict (JSONL round-trip: NaN surrogate fields appear as
+    ``None`` and are restored to NaN)."""
+    import math
+
+    def _f(v):
+        return float("nan") if v is None else float(v)
+
+    s, g, o, r, h = (
+        d["sampling"], d["surrogate"], d["optimization"],
+        d["resource"], d.get("history", {}),
+    )
+    return OptimizationState(
+        sampling=SamplingState(
+            n_samples=int(s["n_samples"]), dimension=int(s["dimension"]),
+            min_pairwise_distance=_f(s["min_pairwise_distance"]),
+            boundary_coverage=_f(s["boundary_coverage"]),
+        ),
+        surrogate=SurrogateState(
+            is_current=bool(g["is_current"]),
+            validation_rmse=_f(g["validation_rmse"]),
+            mean_uncertainty=_f(g["mean_uncertainty"]),
+            max_uncertainty=_f(g["max_uncertainty"]),
+        ),
+        optimization=OptimizationProgress(
+            best_value=_f(o["best_value"]), last_value=_f(o["last_value"]),
+            recent_improvement=_f(o["recent_improvement"]),
+            stagnation_steps=int(o["stagnation_steps"]),
+        ),
+        resource=ResourceState(
+            used_budget=int(r["used_budget"]), total_budget=int(r["total_budget"]),
+            remaining_budget=int(r["remaining_budget"]),
+            remaining_budget_ratio=_f(r["remaining_budget_ratio"]),
+        ),
+        history=HistoryState(last_action=h.get("last_action")),
+    )
+
+
+def lenz_state_from_record(record) -> LenzState:
+    """Rebuild a LenzState from a serialized DecisionRecord (JSONL row).
+
+    D_t and c_t are reconstructed from the record's replay metadata
+    (``backend_X`` / ``backend_objectives`` / ``backend_problem_bounds`` /
+    ``backend_problem_id`` / ``backend_fitted``); the compressed summary is
+    rebuilt from the record's ``state`` block.
+
+    H_t CAVEAT: the dataset records store only ``state.history.last_action``
+    — the full decision sequence is NOT persisted per record. The rebuilt
+    H_t is therefore truncated to that single entry (empty when the record
+    is at the initial design). Full H_t is available only on live runs via
+    ``extract_lenz_state``.
+    """
+    meta = record.metadata if hasattr(record, "metadata") else record["metadata"]
+    state_d = record.state if hasattr(record, "state") else record["state"]
+
+    X = meta["backend_X"]
+    Y = [row[0] for row in meta["backend_objectives"]]
+    trials = tuple(
+        LenzTrial(x=tuple(float(v) for v in row), y=float(y))
+        for row, y in zip(X, Y)
+    )
+    bounds = tuple(
+        (float(lo), float(hi)) for lo, hi in meta["backend_problem_bounds"]
+    )
+    config = LenzConfig(
+        problem=str(meta["backend_problem_id"]),
+        dimension=len(bounds),
+        bounds=bounds,
+        surrogate="SingleTaskGP",
+        acquisition="LogExpectedImprovement",
+        objective_transform=(1.0, 0.0),  # h3 datasets carry no affine transform
+        surrogate_fitted=bool(meta["backend_fitted"]),
+    )
+    last_action = state_d.get("history", {}).get("last_action")
+    return LenzState(
+        trials=trials,
+        config=config,
+        decision_history=(last_action,) if last_action else (),
+        summary=_summary_from_record_state(state_d),
     )

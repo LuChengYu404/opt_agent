@@ -67,6 +67,7 @@ class LLMSystem1Policy:
         state_format: str = "structured",
         criteria_format: str = "executable",
         seed: int = 0,
+        request_builder: Any | None = None,
     ) -> None:
         if mode not in ("llm", "mock"):
             raise ValueError(f"mode must be 'llm' or 'mock'; got {mode!r}")
@@ -85,6 +86,14 @@ class LLMSystem1Policy:
         self.criteria_format = criteria_format
         self.seed = seed
         self._client = client
+        # Optional request-builder injection (branch
+        # exp/lenz-state-jev-presentation): a callable
+        #     (state, choices) -> (state_arg, question)
+        # overriding the standard build_choice_request call below — e.g.
+        # system1.lenz_prompt.build_lenz_choice_request to present the
+        # lenz-style rich state. When set, state_format/criteria_format
+        # are delegated to the builder.
+        self._request_builder = request_builder
         if mode == "mock" and client is None:
             self._client = HeuristicLLMClient()
         # Counters — symmetric with JevPolicy / LayaPolicy.
@@ -104,8 +113,13 @@ class LLMSystem1Policy:
         self.last_error = None
 
     def decide(self, state: OptimizationState) -> DecisionOutput:
-        choices = candidate_actions_for_state(state, seed=self.seed)
-        if state.resource.remaining_budget <= 0:
+        # LenzState (branch exp/lenz-state-jev-presentation) is accepted
+        # transparently: candidate extraction and budget gating read the
+        # frozen summary, while the (possibly injected) request builder
+        # receives the full object.
+        summary = getattr(state, "summary", state)
+        choices = candidate_actions_for_state(summary, seed=self.seed)
+        if summary.resource.remaining_budget <= 0:
             decision = DecisionOutput(
                 choices["stop"], {"stop": 1.0}, 1.0,
                 0.0, 0, 0, self.model,
@@ -114,11 +128,14 @@ class LLMSystem1Policy:
             self.call_count += 1
             return decision
 
-        state_arg, question = build_choice_request(
-            state, choices,
-            state_format=self.state_format,
-            criteria_format=self.criteria_format,
-        )
+        if self._request_builder is not None:
+            state_arg, question = self._request_builder(state, choices)
+        else:
+            state_arg, question = build_choice_request(
+                state, choices,
+                state_format=self.state_format,
+                criteria_format=self.criteria_format,
+            )
         start = time.monotonic()
         try:
             if self.mode == "llm":

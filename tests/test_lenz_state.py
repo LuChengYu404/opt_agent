@@ -181,3 +181,53 @@ def test_frozen_and_lenz_states_coexist(branin_backend) -> None:
     s = lenz.summary
     assert s.resource.used_budget == lenz.n_trials
     assert s.resource.remaining_budget == 20 - lenz.n_trials
+
+
+def test_lenz_state_from_record_roundtrip() -> None:
+    """Rebuild from a generated record's replay metadata (JSONL path)."""
+    from dataclasses import asdict
+
+    from opt_agent.dataset import DatasetConfig, DatasetGenerator
+    from opt_agent.dataset.decision_record import _json_safe
+    from opt_agent.state import lenz_state_from_record
+
+    spec = DatasetConfig(
+        problems=("Branin",), seeds=(0,),
+        trajectories_per_problem_seed=1, n_init=3, total_budget=12,
+        max_actions=4, decision_every_k_actions=2,
+    )
+    record = next(iter(DatasetGenerator(spec).generate()))
+    payload = _json_safe(record)
+    lenz = lenz_state_from_record(payload)
+
+    meta = payload["metadata"]
+    assert lenz.n_trials == len(meta["backend_X"])
+    for trial, xs, y in zip(
+        lenz.trials, meta["backend_X"], meta["backend_objectives"]
+    ):
+        assert trial.x == tuple(xs)
+        assert trial.y == y[0]
+    assert lenz.config.problem == "Branin"
+    assert lenz.config.objective_transform == (1.0, 0.0)
+    assert lenz.config.surrogate_fitted == meta["backend_fitted"]
+    # Frozen summary rebuilt from the record's state block.
+    sd = payload["state"]
+    assert lenz.summary.sampling.n_samples == sd["sampling"]["n_samples"]
+    assert lenz.summary.resource.remaining_budget == sd["resource"]["remaining_budget"]
+    assert lenz.summary.history.last_action == sd["history"].get("last_action")
+    # H_t is truncated to last_action (dataset records carry nothing more).
+    assert lenz.decision_history in ((), (sd["history"].get("last_action"),))
+
+
+def test_llm_policy_accepts_lenz_state_with_injected_builder(branin_backend) -> None:
+    """LLMSystem1Policy with request_builder=build_lenz_choice_request
+    accepts a LenzState transparently (candidate extraction reads summary)."""
+    from opt_agent.system1.llm_system1_policy import LLMSystem1Policy
+
+    lenz = extract_lenz_state(branin_backend, total_budget=20)
+    policy = LLMSystem1Policy(
+        mode="mock", seed=0, request_builder=build_lenz_choice_request,
+    )
+    decision = policy.decide(lenz)
+    assert decision.probabilities and abs(sum(decision.probabilities.values()) - 1.0) < 1e-6
+    assert decision.model  # mock reports the heuristic model id
