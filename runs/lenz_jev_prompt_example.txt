@@ -1,0 +1,32 @@
+=== STATE (lenz-style narrative, Jev presentation) ===
+We are maximizing an expensive black-box objective ('Branin', 2 continuous variables) with a fixed budget of 15 objective evaluations.
+Trial log (11 evaluations, best marked *):
+  [ 0] f(2.12661, 8.88786) = -37.2896
+  [ 1] f(3.68145, 0.556829) = -3.5452 *
+  [ 2] f(9.26005, 12.9352) = -112.795
+  [ 3] f(-3.19313, 3.92163) = -72.2798
+  [ 4] f(-1.77582, 14.6127) = -36.9791
+  [ 5] f(2.20436, 1.75888) = -6.16634
+  [ 6] f(9.24682, 11.1453) = -78.277
+  [ 7] f(3.19841, 6.31246) = -17.0708
+  [ 8] f(0.555309, 10.8747) = -50.8625
+  [ 9] f(5.90812, 1.72433) = -19.3166
+  [10] f(-3.21935, 14.6248) = -5.10185
+Backend configuration: surrogate=SingleTaskGP (fitted=False), acquisition=LogExpectedImprovement, search region per dimension: [-5, 10]; [0, 15], objective transform y' = 1*y + 0.
+Decision history: initial-design -> initial-design -> initial-design -> initial-design -> initial-design -> global_exploration -> global_exploration -> global_exploration -> global_exploration -> global_exploration -> global_exploration
+We are maximizing an expensive black-box objective over 2 continuous variables. An objective evaluation uses one unit of the finite evaluation budget; fitting the surrogate does not use an objective evaluation. We have observed 11 points out of a total budget of 15, leaving 4 evaluations. The best objective value seen so far is -3.5452; the most recent evaluated value is -5.10185. The latest evaluation did not improve the best value. It has been 9 evaluated points since the last improvement of the best value. About 36.4% of evaluated points lie near a search-domain boundary; this is a fraction, not a measure of how well the whole domain is covered. The smallest observed pairwise point distance is 1.44358. No current surrogate diagnostics are available; an action that needs a surrogate may fit it first. The last high-level action was global_exploration.
+
+=== QUESTION ===
+Choose the next action for maximizing the best observed objective within the remaining evaluation budget. Consider exploration, surrogate reliability, and whether stopping is justified. Each option is a complete executable call with fixed parameters; choose one option, without supplying parameters.
+
+=== OPTIONS ===
+- global_exploration: Evaluate new space-filling points across the search domain. Fixed call parameters: n_samples=2, seed=14 (fixed for reproducibility). Uses 2 objective evaluations. Does not fit the surrogate.
+- local_exploitation: Evaluate a small perturbation of the best observed point. Fixed call parameters: step=0.1 of the domain width around the best point, seed=14 (fixed for reproducibility). Uses 1 objective evaluation. Does not fit the surrogate.
+- uncertainty_sampling: Evaluate where the surrogate predicts high uncertainty. Fixed call parameters: n_samples=1, seed=14 (fixed for reproducibility). Uses 1 objective evaluation. Fits the surrogate first if it is not current.
+- error_guided_sampling: Evaluate near a point with high surrogate residual. Fixed call parameters: n_samples=1, seed=14 (fixed for reproducibility). Uses 1 objective evaluation. Fits the surrogate first if it is not current.
+- boundary_sampling: Evaluate points near the search-domain boundary. Fixed call parameters: n_samples=2, tol=0.05 of the domain width from a boundary, seed=14 (fixed for reproducibility). Uses 2 objective evaluations. Does not fit the surrogate.
+- surrogate_acquisition: Evaluate the surrogate acquisition function's proposed point. Uses 1 objective evaluation. Fits the surrogate first if it is not current.
+- retrain_surrogate: Refit the surrogate without using an evaluation. Uses 0 objective evaluations and fits the surrogate now. It gives a new diagnostic state before choosing again, but no new observation. Surrogate-based sampling actions already fit automatically when needed.
+- stop: Stop optimization and return the best observed point. Uses 0 objective evaluations and ends the run with any remaining budget unused.
+
+=== MOCK CHOICE === global_exploration
