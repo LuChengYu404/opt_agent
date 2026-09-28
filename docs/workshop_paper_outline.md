@@ -76,7 +76,8 @@ state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
    labels are noise-dominated (per-re-roll pair flip 0.40 above-median), yet
    RLCD fine-tuning of a 0.4B typed-decision model lifts decision-level
    pairwise ranking from 0.40 (zero-shot) to 0.87 (BT) / 0.80 (proper-score,
-   the only calibrated arm), transfers cross-family (+0.140, 5/5 folds;
+   the only calibrated arm), and transfers cross-family at decision level
+   (+0.140 and +0.188 on two independent seed streams, 5/5 families each;
    GearTrain engineering probe holds) — but both fine-tuned arms collapse
    to a constant policy in closed loop (§4.7/§5.6).
 
@@ -109,7 +110,8 @@ and within-function dimension transfer is a clean negative.
   RulePolicy on **3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
   95% CI upper < 0); aggregate Cross − Rule = -0.065; loses to a constant
   `local_exploitation` policy (AlwaysLocal) on aggregate; an RLCD fine-tuned
-  model transfers at decision level, +0.140 5/5 folds — analysis-rerun, §4.7); RQ3 has one strong
+  model transfers at decision level, +0.140 / +0.188 on two independent
+  seed streams, 5/5 families each — family-level locking still open, §4.7); RQ3 has one strong
   pilot (LLM > Surrogate on Rastrigin, p=0.0058), one negative pilot
   (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
   cost frontier (450 paired trajectories) in which a frozen RF System-1 with
@@ -363,9 +365,12 @@ dimension signal.
 
 > NEW 2026-09-28 (branch `exp/rlcd-laya-finetune`; codex journal-round
 > review APPROVE on the underlying reports). **Status caveat**: labeled
-> *analysis-rerun* — a LOCKED evaluation on families/tasks untouched by
-> any design decision is still required before calling the effect
-> confirmatory in the strong sense.
+> *analysis-rerun* — the seed-reuse half was discharged same-day by the
+> independent-stream replication below (+0.188, same 5/5 significance);
+> the family-reuse half is NOT discharged (the same five families informed
+> the design; a locked family-level eval requires new allowlisted
+> problems — the backend allowlist currently holds exactly these 5 + the
+> consumed GearTrain probe).
 
 Setup: RLCD fine-tuned Laya checkpoints (BT and proper-score arms; trained
 on seeds 0–15, early-stopping on 16–19 of the 20-seed 5-family dataset),
@@ -377,6 +382,16 @@ evaluated leave-one-family-out (5 folds, dual training seeds, 663 records;
   [+0.007, +0.032]. **5/5 family CIs exclude 0.** Per-family deltas:
   sixhump +0.305, ackley +0.209, rastrigin +0.151, branin +0.045,
   hartmann +0.016.
+- **Independent-seed-stream replication (2026-09-28, seeds 100–119, train
+  AND eval both on the new stream;
+  `exp_rlcd_loo_confirmatory_replication_s100_119.json`)**: bt − RF
+  **+0.188 [+0.175, +0.202]**; proper − RF +0.053 [+0.041, +0.064];
+  **5/5 family CIs exclude 0 again**, with the same per-family strength
+  ordering (ackley 0.282 / sixhump 0.255 / rastrigin 0.230 strong,
+  branin 0.098 / hartmann 0.037 small). The seed-reuse half of the
+  analysis-rerun caveat is discharged; the family-reuse half is not
+  (same 5 informed-design families — a locked family-level eval needs
+  new allowlisted problems).
 - Round-1 LOO (E5, `exp_rlcd_loo_transfer.json`): cross-family ranking
   gap vs in-family doubled (+0.056 → +0.146); bt > RF on 5/5 folds
   (one-sided sign test p=0.031).
@@ -414,10 +429,17 @@ regime, so the taxonomy is unchanged.
 20-seed 5-family dataset (`phase8_6d_h3_20seed_5family.jsonl`, 663 records).
 Gate 3 (`aggregate_mass`): **adjusted_lift = 1.294, seed-clustered 95% CI = [0.848, 1.954]**,
 n_seeds=100 (up from 10-seed's 1.124, CI [0.695, 1.722]).
-Gate 4 stop-gain CI lo > 0 on 5/5 families.
-Gate 4 uniform-gain CI lo > 0 on 4/5 (Branin, Hartmann, Rastrigin, SixHumpCamel).
-Gate 4 behavior-gain CI lo > 0 on 1/5 (Rastrigin only) — honest finding,
-not overclaimed.
+**Independent-stream replication (seeds 100–119, 654 records,
+`exp_rq1_2_h3_20seed_replication_s100_119.json`): adjusted_lift 1.296,
+CI [0.881, 1.867], PASS** — essentially identical.
+Gate 4 stop-gain CI lo > 0 on 5/5 families (5/5 again on the replication
+stream). Gate 4 uniform-gain CI lo > 0 on 4/5 (Branin, Hartmann, Rastrigin,
+SixHumpCamel); the replication stream also passes 4/5 but with a DIFFERENT
+set (Ackley, Branin, Hartmann, SixHumpCamel — Rastrigin swaps out), so the
+count replicates while the passing family set does not. Gate 4
+behavior-gain CI lo > 0 on 1/5 (Rastrigin only); the replication passes
+3/5 with a disjoint set and Rastrigin reversed — report behavior-gain as
+unstable across streams.
 
 ### §5.3 Affine invariance (Step 1 — Gate 5, PARTIAL PASS)
 
@@ -652,9 +674,15 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
    because JS divergence exceeds 0.02 on Hartmann (late, mid) buckets. Median
    Spearman = 1.0 in all (problem, phase) buckets (consistent with the
    analytic rank-invariance argument; per-record invariance not established).
-5. **20-seed is not an independent replication** — seeds 0–9 are reused
-   from the 10-seed exploratory run. True replication would require an
-   independent seed stream (e.g., 100–119).
+5. **Independent replication ADDED (2026-09-28)** — the original 20-seed
+   set reused seeds 0–9 from the exploratory run; a fully independent
+   stream (seeds 100–119, 654 records, same frozen generator config) now
+   exists (`phase8_6d_h3_20seed_5family_s100_119.jsonl`). Gate 3 replicates
+   essentially exactly (1.296 [0.881, 1.867] vs 1.294 [0.848, 1.954],
+   PASS); stop-gain replicates 5/5; uniform-gain replicates 4/5 in count
+   but not in family set; behavior-gain does not replicate at family
+   level (§5.2). Remaining limitation: the family PANEL is unchanged —
+   the same five families informed the design on both streams.
 6. **Pareto frontier measured but degenerate** — the closed-loop cost
    frontier (§6.5) is measured at budget 30 on the five-family panel with
    one provider (deepseek-chat): System-1-only dominates, so there is no
@@ -682,10 +710,16 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
     weights, action set, horizon=3, regime taxonomy, and top_action_share
     threshold (0.6) are researcher-chosen; sensitivity to these choices is
     not analyzed.
-12. **Multiple unadjusted comparisons** — per-family CIs are unadjusted for
-    multiple comparisons; some borderline-pass CIs (Branin uniform CI lo
-    +0.006; Rastrigin behavior CI lo +0.015) would not survive a
-    Bonferroni-type correction.
+12. **Multiple unadjusted comparisons — sensitivity measured (2026-09-28)**:
+    recomputing the per-family Gate-4 CIs at the Bonferroni-adjusted level
+    (99%, α/5; `runs/exp_gate4_multiplicity_sensitivity.json`):
+    **stop-gain survives 5/5**; uniform-gain degrades **4/5 → 2/5**
+    (Rastrigin, SixHumpCamel hold; Branin lo −0.003 just misses; Hartmann's
+    95% lower bound is itself bootstrap-fragile at ±0.05 around 0 — its
+    family-level pass is not stable); behavior-gain degrades **1/5 → 0/5**.
+    The borderline family-set instability also appears across seed streams
+    (§5.2). We claim stop-gain as robust; uniform-gain as 2/5 robust +
+    borderline; behavior-gain as not established.
 13. **Learned System-1 closed-loop evidence is negative-to-heterogeneous** —
     EXP-RQ2.1 is one-step decision regret; the closed-loop audit
     (`runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`) and §6.5 deploy frozen RFs
@@ -829,6 +863,12 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
 - `runs/EXP_JOURNAL_ROUND2_REPORT.md` + `runs/exp_teacher_noise_diagnostic.json` /
   `exp_teacher_noise_diagnostic_r5.json` / `runs/exp_rlcd_loo_confirmatory.json` /
   `exp_rlcd_loo_transfer.json` — teacher-noise chain + LOO transfer
+- `runs/phase8_6d_h3_20seed_5family_s100_119.jsonl` +
+  `runs/exp_rq1_2_h3_20seed_replication_s100_119.json` — independent-seed-stream
+  gate replication (§5.2, limitation 5)
+- `runs/exp_rlcd_loo_confirmatory_replication_s100_119.json` — LOO transfer
+  replication on the independent stream (§4.7)
+- `runs/exp_gate4_multiplicity_sensitivity.json` — Bonferroni sensitivity (limitation 12)
 - `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.7)
 - `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
   `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,

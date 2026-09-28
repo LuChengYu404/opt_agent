@@ -1,0 +1,246 @@
+{
+ "cells": {
+  "ackley/behavior": {
+   "ci95": [
+    -0.3078,
+    0.6463
+   ],
+   "ci99_bonferroni": [
+    -0.4662,
+    0.8477
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": 0.1609,
+   "n_seeds": 20
+  },
+  "ackley/stop": {
+   "ci95": [
+    1.4246,
+    3.2699
+   ],
+   "ci99_bonferroni": [
+    1.1979,
+    3.6328
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 2.2845,
+   "n_seeds": 20
+  },
+  "ackley/uniform": {
+   "ci95": [
+    -0.1818,
+    1.0796
+   ],
+   "ci99_bonferroni": [
+    -0.4103,
+    1.3271
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": 0.4256,
+   "n_seeds": 20
+  },
+  "branin/behavior": {
+   "ci95": [
+    -0.0077,
+    0.0036
+   ],
+   "ci99_bonferroni": [
+    -0.0091,
+    0.0054
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": -0.0022,
+   "n_seeds": 20
+  },
+  "branin/stop": {
+   "ci95": [
+    0.1481,
+    0.3538
+   ],
+   "ci99_bonferroni": [
+    0.1284,
+    0.3921
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 0.2415,
+   "n_seeds": 20
+  },
+  "branin/uniform": {
+   "ci95": [
+    0.0048,
+    0.0649
+   ],
+   "ci99_bonferroni": [
+    -0.003,
+    0.075
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": false,
+   "mean_gain": 0.0328,
+   "n_seeds": 20
+  },
+  "hartmann/behavior": {
+   "ci95": [
+    -2.3643,
+    0.6979
+   ],
+   "ci99_bonferroni": [
+    -2.9859,
+    1.0777
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": -0.6646,
+   "n_seeds": 20
+  },
+  "hartmann/stop": {
+   "ci95": [
+    2.3292,
+    11.1688
+   ],
+   "ci99_bonferroni": [
+    1.6404,
+    13.0979
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 6.2896,
+   "n_seeds": 20
+  },
+  "hartmann/uniform": {
+   "ci95": [
+    -0.044,
+    4.6277
+   ],
+   "ci99_bonferroni": [
+    -0.3784,
+    5.7009
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": 1.8834,
+   "n_seeds": 20
+  },
+  "rastrigin/behavior": {
+   "ci95": [
+    0.0193,
+    0.3159
+   ],
+   "ci99_bonferroni": [
+    -0.0199,
+    0.3709
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": false,
+   "mean_gain": 0.1542,
+   "n_seeds": 20
+  },
+  "rastrigin/stop": {
+   "ci95": [
+    0.9189,
+    2.0668
+   ],
+   "ci99_bonferroni": [
+    0.7955,
+    2.2946
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 1.436,
+   "n_seeds": 20
+  },
+  "rastrigin/uniform": {
+   "ci95": [
+    0.1536,
+    0.5264
+   ],
+   "ci99_bonferroni": [
+    0.1022,
+    0.5907
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 0.3286,
+   "n_seeds": 20
+  },
+  "sixhumpcamel/behavior": {
+   "ci95": [
+    -0.0009,
+    0.0056
+   ],
+   "ci99_bonferroni": [
+    -0.0016,
+    0.007
+   ],
+   "lo_gt_0_95": false,
+   "lo_gt_0_99": false,
+   "mean_gain": 0.0022,
+   "n_seeds": 20
+  },
+  "sixhumpcamel/stop": {
+   "ci95": [
+    0.0396,
+    0.0777
+   ],
+   "ci99_bonferroni": [
+    0.0332,
+    0.0834
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 0.0581,
+   "n_seeds": 20
+  },
+  "sixhumpcamel/uniform": {
+   "ci95": [
+    0.0076,
+    0.0206
+   ],
+   "ci99_bonferroni": [
+    0.0055,
+    0.0223
+   ],
+   "lo_gt_0_95": true,
+   "lo_gt_0_99": true,
+   "mean_gain": 0.014,
+   "n_seeds": 20
+  }
+ },
+ "method": "seed-clustered bootstrap, Bonferroni alpha/5 -> 99% CI",
+ "survivors_95": {
+  "behavior": [
+   "rastrigin"
+  ],
+  "stop": [
+   "ackley",
+   "branin",
+   "hartmann",
+   "rastrigin",
+   "sixhumpcamel"
+  ],
+  "uniform": [
+   "branin",
+   "rastrigin",
+   "sixhumpcamel"
+  ]
+ },
+ "survivors_99": {
+  "behavior": [],
+  "stop": [
+   "ackley",
+   "branin",
+   "hartmann",
+   "rastrigin",
+   "sixhumpcamel"
+  ],
+  "uniform": [
+   "rastrigin",
+   "sixhumpcamel"
+  ]
+ }
+}

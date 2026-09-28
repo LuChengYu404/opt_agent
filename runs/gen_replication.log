@@ -1,0 +1,11 @@
+Generating -> /home/lcy/Documents/projects/opt_agent_v3/runs/phase8_6d_h3_20seed_5family_s100_119.jsonl
+  problems=('Branin', 'Hartmann', 'Ackley', 'SixHumpCamel', 'Rastrigin'), seeds=20, horizon=3
+  ... 100 records in 50.3s
+  ... 200 records in 151.4s
+  ... 300 records in 205.3s
+  ... 400 records in 229.8s
+  ... 500 records in 280.7s
+  ... 600 records in 317.4s
+Done. 654 records in 331.8s
+Saved to /home/lcy/Documents/projects/opt_agent_v3/runs/phase8_6d_h3_20seed_5family_s100_119.jsonl
+EXITCODE=0

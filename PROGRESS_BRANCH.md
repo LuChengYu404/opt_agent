@@ -346,3 +346,49 @@ GearTrain, split-half 2v2, aligned Gate-4 upper bounds (+0.78/+1.92),
 from exp_rq1_3_closed_loop_regret.json (local 0.332/0.0/0.005 vs
 surrogate 0.477/11.099/0.031 ✓), Hartmann RF probe (0.47 vs 0.68,
 CI [−0.038, 0.415], p=0.141 ✓), Gate 5 Spearman per-bucket = 1.0 (x17).
+
+## 13. Supplementary experiment round (2026-09-28, seeds 100–119)
+
+Three additions closing the two cheapest outline gaps + one bug found:
+
+1. **Independent-seed-stream gate replication** (limitation 5).
+   `generate_phase8_6d_20seed_replication.py` → 654 records (frozen config,
+   seeds 100–119 only) → `validate_phase8_6b.py` →
+   `exp_rq1_2_h3_20seed_replication_s100_119.json`:
+   - Gate 3: **1.296 [0.881, 1.867] PASS** vs original 1.294 [0.848, 1.954]
+     — essentially exact.
+   - Gate 2: FAIL on both streams (consistent).
+   - Gate 4 stop-gain: **5/5 on both streams** (identical family sets).
+   - Gate 4 uniform-gain: 4/5 on both streams but DIFFERENT family sets
+     (rastrigan↔ackley swap) — count replicates, family identity does not.
+   - Gate 4 behavior-gain: 1/5 (rastrigin) → 3/5 (disjoint set; rastrigin
+     reversed) — family-level claim NOT replicated; report as unstable.
+
+2. **Gate-4 multiplicity sensitivity** (limitation 12).
+   `exp_gate4_multiplicity_sensitivity.py` recomputes per-family
+   seed-clustered bootstrap CIs at Bonferroni 99% (α/5) from the stored
+   per-seed gains: **stop survives 5/5; uniform 4/5 → 2/5** (rastrigin,
+   sixhump hold; branin lo −0.003 just misses; **hartmann's 95% lower
+   bound is itself bootstrap-fragile at ±0.05 around 0** — official +0.022
+   vs recompute −0.044); **behavior 1/5 → 0/5**.
+
+3. **RLCD LOO transfer replication on the independent stream** (§4.7
+   seed-reuse half of the analysis-rerun caveat).
+   `exp_rlcd_loo_confirmatory.py --dataset …_s100_119.jsonl` (train AND
+   eval both on the new stream):
+   - bt − RF pooled **+0.188 [+0.175, +0.202]** vs original +0.140
+     [+0.126, +0.154]; proper − RF +0.053 [+0.041, +0.064] vs +0.019.
+   - **5/5 family CIs exclude 0 on both streams**, same per-family strength
+     ordering (ackley/sixhump/rastrigin strong, branin/hartmann small).
+   - Family-level locking remains open: the backend allowlist holds exactly
+     the 5 design-touched families + GearTrain (consumed by the probe) — a
+     locked family eval requires allowlisting new BOCoDe problems (frozen
+     decision, needs its own review).
+
+**Bug found & fixed during (3)**: `exp_rlcd_loo_confirmatory.py` split its
+early-stopping pool by the literal `seed < 16`; on the 100–119 stream that
+made the TRAIN SLICE EMPTY (first replication attempt silently trained
+nothing — both arms evaluated as zero-shot, pooled diff −0.249 identical
+for both arms). Fixed to split by seed RANK (16 smallest train / rest val),
+which is identity on the original 0–19 data and correct for any seed
+offset. The void artifact was overwritten by the fixed re-run.

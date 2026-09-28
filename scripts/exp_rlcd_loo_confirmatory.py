@@ -91,8 +91,14 @@ def _run_fold(task: dict) -> dict:
     held_out = task["family"]
     train_pool = [r for r in records if r.problem["family"] != held_out]
     test = [r for r in records if r.problem["family"] == held_out]
-    tr = [r for r in train_pool if int(r.problem["seed"]) < 16]
-    va = [r for r in train_pool if int(r.problem["seed"]) >= 16]
+    # Split the 20-seed pool by seed RANK (16 smallest -> train, rest ->
+    # early-stop val) so seed-offset datasets (e.g. the s100-119
+    # replication stream) split the same way; on the original seeds 0-19
+    # this is exactly `< 16` / `>= 16`.
+    pool_seeds = sorted({int(r.problem["seed"]) for r in train_pool})
+    cut = pool_seeds[15] if len(pool_seeds) >= 16 else pool_seeds[-1]
+    tr = [r for r in train_pool if int(r.problem["seed"]) <= cut]
+    va = [r for r in train_pool if int(r.problem["seed"]) > cut]
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     out = {"family": held_out, "test_records": len(test), "arms": {}}
