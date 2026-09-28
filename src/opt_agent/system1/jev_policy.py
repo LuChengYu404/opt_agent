@@ -65,7 +65,14 @@ class JevPolicy:
         self.total_latency_s = 0.0
 
     def reset(self) -> None:
+        # Symmetric with LayaPolicy / LLMSystem1Policy: reset clears the
+        # aggregate telemetry counters too, so multi-run cost reports
+        # compare like for like.
         self.decisions.clear()
+        self.call_count = 0
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.total_latency_s = 0.0
 
     def close(self) -> None:
         if self._owns_client:
@@ -78,6 +85,7 @@ class JevPolicy:
                 choices["stop"], {"stop": 1.0}, 1.0, 0.0, 0, 0, self.model,
             )
             self.decisions.append(result)
+            self.call_count += 1
             return result
         state_arg, inner = build_choice_request(
             state, choices,

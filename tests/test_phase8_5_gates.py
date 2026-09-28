@@ -191,7 +191,10 @@ def test_oracle_arms_start_from_identical_checkpoint() -> None:
     # Backend must be restored to pre-call state.
     assert torch.equal(be.get_history().X, pre_history_X)
     assert result.gold_action in ("stop", "global_exploration")
-    assert result.terminal["gold"] == result.terminal["stop"] or result.terminal["gold"] != result.terminal["stop"]
+    # Arms share the starting checkpoint, so terminal gains must be finite
+    # floats (comparable), whichever arm wins.
+    assert math.isfinite(result.terminal["gold"])
+    assert math.isfinite(result.terminal["stop"])
 
 
 def test_oracle_random_arms_are_reproducible() -> None:

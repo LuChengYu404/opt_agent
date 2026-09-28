@@ -29,9 +29,13 @@ JSONL schema (one record per decision point):
       "metadata": {...}
     }
 
-Aligned vocabulary invariant: keys in candidate_actions, gold_probs, and
-rollout_results are identical (set equality). This is enforced by the generator
-and verified by tests.
+Vocabulary invariant: keys in gold_probs and rollout_results are identical
+(set equality), and both are a subset of the candidate_actions ids. With
+partial rollouts (rollout_action_subsample < 8) only a deterministic
+k-subset of the candidates is rolled out and labeled —
+metadata["partial_rollout"] records which ids; full datasets are set-equal
+across all three fields. This is enforced by the generator and verified by
+tests.
 """
 
 from __future__ import annotations

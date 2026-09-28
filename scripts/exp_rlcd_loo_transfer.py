@@ -40,6 +40,8 @@ from opt_agent.dataset import iter_jsonl  # noqa: E402
 
 
 def _eval_arm(model, tok, records) -> dict:
+    import torch
+
     per_rec = per_record_laya(model, tok, records,
                               "cuda" if torch.cuda.is_available() else "cpu")
     n_pairs = sum(v[1] for v in per_rec.values())

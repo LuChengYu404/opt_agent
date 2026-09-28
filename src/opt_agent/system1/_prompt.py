@@ -107,6 +107,9 @@ def _executable_criterion(action: OptimizationAction, state: OptimizationState) 
             "Surrogate-based sampling actions already fit automatically when needed."
         )
 
+    # Narrative fallback (1 evaluation) matches the executor's budget-safe
+    # n_samples default; factory-built candidates always carry explicit
+    # params, so this only narrates hand-constructed bare actions.
     n_evaluations = int(params.get("n_samples", 1))
     details = []
     if "n_samples" in params:

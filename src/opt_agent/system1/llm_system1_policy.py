@@ -277,17 +277,16 @@ class LLMSystem1Policy:
 class HeuristicLLMClient:
     """Deterministic heuristic that simulates an LLM's response.
 
-    Default strategy: pick the action whose argmax in candidate list has the
-    highest gold_probs weight (i.e., what an LLM trained on the same labels
-    would say). For tests where gold_probs isn't injected, fall back to
-    argmax by surrogate_signal-derived heuristic.
+    Strategy: uniform probabilities over all offered choices, with the
+    FIRST candidate (in `choices` order) as the picked choice. This is a
+    wiring-check mock, NOT a label-faithful one — it never reads
+    gold_probs or surrogate signals.
 
-    For the quick verification: this client produces a deterministic,
-    label-faithful response. Comparing LLMSystem1Policy(mock) vs
-    AlwaysSurrogate tells us whether the prompt format + response parsing
-    is wired correctly. Once a real LLM is plugged in (mode="llm"),
-    any deviation from AlwaysSurrogate would be evidence of LLM-specific
-    decision intelligence.
+    Use: comparing LLMSystem1Policy(mock) vs AlwaysSurrogate verifies the
+    prompt format + response parsing end-to-end without external
+    dependencies. It cannot upper-bound an LLM's decision quality; once a
+    real LLM is plugged in (mode="llm"), deviations from this mock are
+    expected.
     """
 
     def __call__(

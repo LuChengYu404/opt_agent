@@ -65,9 +65,11 @@ Three additions close the remaining stated gaps:
    loss to Surrogate now has CI excluding zero on **all three** functions
    (f6 +0.128, f8 +0.244, f15 +0.225); losses to Local are CI-positive on
    f6/f8. The within-function dimension-transfer negative is strengthened.
-3. **Theory formalization** (`docs/THEORY.md`, verified by
-   `scripts/verify_theory_propositions.py` →
-   `runs/verify_theory_propositions.json`):
+3. **Theory formalization** (`docs/THEORY.md`; P1 and P2 are verified
+   numerically by `scripts/verify_theory_propositions.py` →
+   `runs/verify_theory_propositions.json`; P3 and L1 are analytical
+   arguments supported empirically by the experiments below — the
+   verification script does not cover them):
    - **P1 affine invariance (exact)**: under `y → αy+β` with recomputed
      scale, every utility label is unchanged; verified through the real
      `compute_utility` on 5,304 rollout branches (max rel err 1.4e-12).
@@ -187,11 +189,17 @@ plus two full-budget BOCoDe runs with GP fitting.
   but lost to fixed Surrogate and Local on separate seeds 100–119. The observed
   LLM schedule is not a validated causal explanation of its advantage.
 
-The real confidence/OOD System-1/System-2 cost frontier and engineering
-transfer remain unrun because no usable LLM credential or engineering
-simulator was found in the current environment. The new local results should
-be treated as evidence for revising the method claim rather than proof of
-the original final goal.
+(2026-09-28 audit correction — this paragraph previously said the real cost
+frontier and engineering transfer "remain unrun"; that was stale and
+contradicted the EXP-RQ3 section above.) The real confidence/OOD
+System-1/System-2 cost frontier HAS run: 450 paired trajectories on a real
+deepseek-chat System-2 backend (`runs/exp_rq3_cost_frontier_10seed.json`;
+System-1-only dominates every LLM-calling arm). Engineering transfer ran at
+probe level only (GearTrain decision-level probe,
+`runs/exp_geartrain_transfer_probe.json`); a full engineering-simulator
+transfer remains unrun (`scripts/run_engineering_transfer.py` is still a
+documented placeholder). The local results should be treated as evidence
+for revising the method claim rather than proof of the original final goal.
 
 ## Workshop paper evidence gap closure (2026-09-27)
 
@@ -213,7 +221,7 @@ invariance** (Track B), and **EXP-RQ0.5 per-step LLM action distribution**
 |---|---|---|
 | 3: aggregate_mass adjusted_lift | 1.124 (CI [0.695, 1.722]) | **1.294 (CI [0.848, 1.954])** |
 | 4a: stop-gain CI lo > 0 | 5/5 | **5/5** (unchanged) |
-| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Hartmann now passes) |
+| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Branin now passes; Hartmann already passed at 10 seeds) |
 | 4c: behavior-gain CI lo > 0 | 1/5 | **1/5** (Rastrigin only) |
 
 **All Gate 3/4 numbers strengthened or held at 20 seeds. 20-seed is now the

@@ -48,8 +48,10 @@ thresholds frozen on the calib slice: proper τ ∈ [0.152, 0.157] — the
 confidence distribution is nearly state-invariant; bt τ ∈ [0.376, 0.426]).
 Panel: 5 families × seeds 300–309 × budget 30, paired (450 trajectories).
 
-- Hartmann: every routed arm beats its pure arm **+5.87 [+2.29, +10.59]**
-  (CI excludes 0) — but at q40/q60 the routed trajectories are *identical*
+- Hartmann: every routed arm beats its pure arm (CI excludes 0) — five of
+  the six routed arms by **+5.87 [+2.29, +10.59]**; `bt_q20` is the
+  exception at +5.40 [+1.88, +9.74] — but at q40/q60 the routed
+  trajectories are *identical*
   to always-Surrogate (all diffs 0): the router switched essentially every
   decision.
 - Rastrigin: mirrored, negative (−0.23 vs pure, CI crosses 0; the same

@@ -18,17 +18,25 @@ based on the 4 experiments closed in this session:
 - 3 regimes (Hartmann 0.684 > Rastrigin 0.368 ≈ Ackley 0.309 > Branin 0.048 > SixHumpCamel 0.015) using `adaptive-value` metric
 - Gate 3 (aggregate_mass) on 20-seed 5-family dataset — CI to verify
 - Gate 4 stop-gain CI lo > 0 on 5/5 families — CI to verify
-- Gate 5 affine invariance on 5-family × 4 transforms — all buckets pass
+- Gate 5 affine invariance on 5-family × 4 transforms — the predeclared
+  joint gate FAILED (`exp_rq0_5_affine_report.json` `pass_=false`): JS
+  divergence > 0.02 in 2/17 buckets (hartmann/late 0.057, hartmann/mid
+  0.023); Spearman 1.0 in 17/17 and top-1 ≥ 0.83 in every bucket. See
+  `runs/EXP_AFFINE_REPORT.md` ("PARTIAL PASS ... joint Gate 5 still fails").
 
 ### RQ3 — Selective Reasoning
-- LLM beats Surrogate by +17.54 best_y on Rastrigin (paired-t p=0.0003, n=10)
-- LLM uses "global-then-local" temporal schedule (100% global step 0–9, transitions to 100% local by step 13)
+- LLM beats Surrogate by +17.54 best_y on Rastrigin (Student-t paired p=0.0058, n=10; the earlier p=0.0003 normal-approximation is withdrawn — see `runs/EXP_RQ0_5_REPORT.md` correction table)
+- LLM uses "global-then-local" temporal schedule (90–100% global steps 0–9, 1/10 trajectories spike to local earlier; transitions to ~100% local by step 13)
 - FrozenRouter NEGATIVE result on IOH (p=0.138, did not generalize from BOCoDe)
 - RoutingAware vs LLM-everywhere NOT significant on TOTAL (p=0.51)
 
 ### What's NOT claimed (limitations to verify we own)
-- RQ2 (cross-family transfer): zero experiments — workshop framing only
-- Pareto frontier (LLM cost): not yet measured
+- RQ2 (cross-family transfer): CLOSED 2026-09-27 — 5-fold leave-one-family-out
+  CV in `runs/exp_rq2_1_report.json` (weighted cross−rule −0.065); earlier
+  "zero experiments" snapshots are stale
+- Pareto frontier (LLM cost): measured 2026-09-27 — 450 paired trajectories
+  in `runs/exp_rq3_cost_frontier_10seed.json` (frontier degenerate: rf
+  dominates at every cost point)
 - External baselines (lenz, PlugBO): not yet compared
 
 ## Files to read in order
@@ -47,7 +55,8 @@ based on the 4 experiments closed in this session:
 3. **Negative results framed correctly**: IOH router NEGATIVE result + RoutingAware vs LLM NS result MUST both appear in §5, not buried
 
 ### Important
-4. **Test count**: 380 tests (was 364 before Track B); claim should match
+4. **Test count**: 423 tests pass as of 2026-09-28 (was 421 pre-audit-fix;
+   380 at the time this brief was first staged — use 423)
 5. **Sample size honesty**: per-family n=10–20, per-(problem, phase) bucket may have n<5
 6. **Reusability**: track uses of existing machinery (`affine_rescaling_test`, `validate_phase8_6b.py`, `DatasetGenerator`) vs new code
 

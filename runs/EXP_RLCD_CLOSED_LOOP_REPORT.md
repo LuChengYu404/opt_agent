@@ -22,7 +22,10 @@ therefore the results of the fixed Local policy:
 | Branin | +0.000, CI crosses 0 | **−0.016, CI [−0.025, −0.007]*** |
 | SixHumpCamel | +0.005, CI crosses 0 | −0.011, CI [−0.024, −0.000]*** |
 
-(\* = CI excludes 0.) This is the known fixed-Local profile: strong where
+(\* = CI excludes 0. 2026-09-28 audit note: the SixHumpCamel \*\*\* holds
+for the **bt arm only** — bt CI [−0.0243, −0.00003] excludes 0, while the
+proper arm's CI [−0.0240, +0.0002] touches 0 (`exp_rlcd_closed_loop.json`,
+`ci_excludes_zero: false`).) This is the known fixed-Local profile: strong where
 Local is strong (Rastrigin), dominated by Surrogate on Hartmann/Branin —
 the same pattern as the EXP-RQ1.3 closed-loop table and the
 GlobalThenLocal schedule control.

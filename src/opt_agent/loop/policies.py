@@ -33,7 +33,7 @@ class Policy(Protocol):
 
 
 class RandomPolicy:
-    """Uniformly samples one of the 5 action types with valid params.
+    """Uniformly samples one of the 8 ActionTypes with valid params.
 
     GLOBAL_EXPLORATION's n_samples is bounded by `state.resource.remaining_budget`.
     RulePolicy mirrors the same logic (no point in proposing more than that).
@@ -95,21 +95,17 @@ class RulePolicy:
 
 
 class UniformPolicy:
-    """Samples uniformly over ALL 8 ActionTypes (vs RandomPolicy's 5).
+    """Samples uniformly over ALL 8 ActionTypes — behaviorally identical to
+    RandomPolicy (both use `choice(list(ActionType))` + `sample_params`).
 
-    Per codex (gpt-6-sol) Q-T2 review: a true state-aware uniform is preferred
-    over RandomPolicy for ablation, because RandomPolicy currently samples only
-    from 5 action types (excluding RETRAIN_SURROGATE / SURROGATE_ACQUISITION /
-    STOP variants that already exist as actions) and the asymmetry can bias
-    Gate 4 results. UniformPolicy also fills in valid params (n_samples,
-    step, tol, seed) for the parameterized actions so the action is
+    Historical note (codex Q-T2 review): introduced as a state-aware uniform
+    ablation arm when RandomPolicy sampled only 5 action types; RandomPolicy
+    later converged to the full 8, so the two now coincide. Kept as the
+    named policy for the `uniform` continuation arm and ablation specs.
+    Params (n_samples, step, tol, seed) are filled in for parameterized
+    actions (GLOBAL_EXPLORATION, LOCAL_EXPLOITATION, UNCERTAINTY_SAMPLING,
+    ERROR_GUIDED_SAMPLING, BOUNDARY_SAMPLING) so the action is
     budget-feasible.
-
-    Distinct from RandomPolicy in two ways:
-      1. samples over all 8 ActionTypes (not 5).
-      2. requires explicit valid-param construction for parameterized actions
-         (GLOBAL_EXPLORATION, LOCAL_EXPLOITATION, UNCERTAINTY_SAMPLING,
-         ERROR_GUIDED_SAMPLING, BOUNDARY_SAMPLING).
     """
 
     def __init__(self, seed: int = 0) -> None:

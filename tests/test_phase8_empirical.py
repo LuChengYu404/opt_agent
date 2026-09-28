@@ -124,6 +124,30 @@ def test_record_schema_and_probability_mask() -> None:
         assert (record.gold_probs[action_id] == 0) == is_invalid
 
 
+def test_validate_record_accepts_partial_rollout_subset() -> None:
+    """Partial-rollout records label a k-subset of the candidate vocabulary."""
+    from dataclasses import replace
+
+    record = _first_record()
+    keep = sorted(record.gold_probs)[:4]
+    mass = sum(record.gold_probs[a] for a in keep)
+    partial = replace(
+        record,
+        gold_probs={a: record.gold_probs[a] / mass for a in keep},
+        rollout_results={a: record.rollout_results[a] for a in keep},
+        metadata={**record.metadata, "partial_rollout": {"k": 4, "action_ids": keep}},
+    )
+    validate_record(partial)
+
+    with pytest.raises(ValueError, match="outside candidate vocabulary"):
+        validate_record(
+            replace(partial,
+                    gold_probs={**partial.gold_probs, "not_a_candidate": 0.0},
+                    rollout_results={**partial.rollout_results,
+                                     "not_a_candidate": partial.rollout_results[keep[0]]})
+        )
+
+
 # ---------------------------------------------------------------------------
 # Trajectory structure
 # ---------------------------------------------------------------------------

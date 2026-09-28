@@ -62,7 +62,7 @@ it is a bucket-level statistic. The Gate 5 **predeclared joint test
 (`pass_: false`)** requires *all* three criteria in *every* bucket, which
 fails due to the JS threshold breach (§3.3).
 
-### 3.2 Argmax equivalence is **mostly preserved** (15/17 buckets ≥ 0.8)
+### 3.2 Argmax equivalence is **preserved in every bucket** (17/17 buckets ≥ 0.83)
 
 In 14/17 buckets, 100% of records have identical argmax under all 4 transforms.
 In 2 Hartmann buckets, 1–3 records have flipped argmax:

@@ -1,0 +1,58 @@
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+{
+  "acc": {
+    "bt": 0.8726202838352372,
+    "proper": 0.7999307718933887,
+    "rf": 0.816545517480097,
+    "zero": 0.39633091034960194
+  },
+  "ci": {
+    "bt_minus_rf": [
+      0.03324194653872514,
+      0.08027681660899655,
+      1.0
+    ],
+    "bt_minus_zero": [
+      0.43786777431637247,
+      0.5142262317834836,
+      1.0
+    ],
+    "proper_minus_bt": [
+      -0.08993427879626426,
+      -0.054941257774706265,
+      0.0
+    ],
+    "proper_minus_rf": [
+      -0.03843514070006859,
+      0.0045045045045044585,
+      0.0585
+    ],
+    "proper_minus_zero": [
+      0.3713692946058091,
+      0.4352331606217616,
+      1.0
+    ],
+    "rf_minus_zero": [
+      0.3844299001033413,
+      0.45779784647447036,
+      1.0
+    ]
+  },
+  "mean_log_score": {
+    "bt": -3.057907960725867,
+    "proper": -2.071218600480453,
+    "zero": -3.322587535692298
+  },
+  "n_records": 115,
+  "pairs": 2889,
+  "top1": {
+    "bt": 0.3652173913043478,
+    "proper": 0.25217391304347825,
+    "rf": 0.4,
+    "zero": 0.034782608695652174
+  }
+}
+EXITCODE=0

@@ -1,0 +1,71 @@
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[rlcd:proper_score] epoch 0: loss=2.0271 val_pair_acc=0.715 val_top1=0.243 val_logscore=-2.0698
+[rlcd:proper_score] epoch 0: loss=2.0257 val_pair_acc=0.700 val_top1=0.243 val_logscore=-2.0708
+[rlcd:proper_score] epoch 1: loss=1.9789 val_pair_acc=0.784 val_top1=0.243 val_logscore=-2.0688
+[rlcd:proper_score] epoch 1: loss=1.9777 val_pair_acc=0.772 val_top1=0.243 val_logscore=-2.0685
+[rlcd:proper_score] epoch 2: loss=1.9767 val_pair_acc=0.717 val_top1=0.243 val_logscore=-2.0673
+[rlcd:proper_score] epoch 2: loss=1.9780 val_pair_acc=0.716 val_top1=0.243 val_logscore=-2.0675
+[sweep] proper_wsph0.25_lr5e-06: pair_acc=0.772 log_score=-2.0685029620709625
+[sweep] proper_wsph0.25_lr1e-05: pair_acc=0.784 log_score=-2.06880233184151
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+[rlcd:proper_score] epoch 0: loss=2.0262 val_pair_acc=0.690 val_top1=0.243 val_logscore=-2.0715
+[rlcd:proper_score] epoch 0: loss=1.9410 val_pair_acc=0.709 val_top1=0.243 val_logscore=-2.0705
+[rlcd:proper_score] epoch 1: loss=1.9796 val_pair_acc=0.738 val_top1=0.243 val_logscore=-2.0691
+[rlcd:proper_score] epoch 1: loss=1.8887 val_pair_acc=0.795 val_top1=0.278 val_logscore=-2.0688
+[rlcd:proper_score] epoch 2: loss=1.9806 val_pair_acc=0.712 val_top1=0.243 val_logscore=-2.0688
+[rlcd:proper_score] epoch 2: loss=1.8878 val_pair_acc=0.713 val_top1=0.243 val_logscore=-2.0671
+[sweep] proper_wsph0.5_lr5e-06: pair_acc=0.795 log_score=-2.068761188050975
+[sweep] proper_wsph0.25_lr2e-05: pair_acc=0.738 log_score=-2.0690823015959365
+[rlcd:proper_score] epoch 0: loss=1.9383 val_pair_acc=0.707 val_top1=0.243 val_logscore=-2.0703
+[rlcd:proper_score] epoch 0: loss=1.9395 val_pair_acc=0.682 val_top1=0.243 val_logscore=-2.0705
+[rlcd:proper_score] epoch 1: loss=1.8897 val_pair_acc=0.786 val_top1=0.287 val_logscore=-2.0691
+[rlcd:proper_score] epoch 1: loss=1.8890 val_pair_acc=0.753 val_top1=0.243 val_logscore=-2.0691
+[rlcd:proper_score] epoch 2: loss=1.8890 val_pair_acc=0.705 val_top1=0.243 val_logscore=-2.0673
+[rlcd:proper_score] epoch 2: loss=1.8883 val_pair_acc=0.713 val_top1=0.243 val_logscore=-2.0672
+[sweep] proper_wsph0.5_lr1e-05: pair_acc=0.753 log_score=-2.069090609965117
+[sweep] proper_wsph0.5_lr2e-05: pair_acc=0.786 log_score=-2.0691450740980066
+[rlcd:proper_score] epoch 0: loss=1.7660 val_pair_acc=0.709 val_top1=0.243 val_logscore=-2.0700
+[rlcd:proper_score] epoch 0: loss=1.7637 val_pair_acc=0.732 val_top1=0.243 val_logscore=-2.0717
+[rlcd:proper_score] epoch 1: loss=1.7096 val_pair_acc=0.790 val_top1=0.261 val_logscore=-2.0686
+[rlcd:proper_score] epoch 1: loss=1.7108 val_pair_acc=0.784 val_top1=0.243 val_logscore=-2.0690
+[rlcd:proper_score] epoch 2: loss=1.7090 val_pair_acc=0.713 val_top1=0.243 val_logscore=-2.0668
+[rlcd:proper_score] epoch 2: loss=1.7094 val_pair_acc=0.714 val_top1=0.243 val_logscore=-2.0675
+[sweep] proper_wsph1.0_lr5e-06: pair_acc=0.784 log_score=-2.069014833284461
+[sweep] proper_wsph1.0_lr1e-05: pair_acc=0.790 log_score=-2.0686431169509887
+[rlcd:proper_score] epoch 0: loss=1.7631 val_pair_acc=0.685 val_top1=0.243 val_logscore=-2.0702
+[rlcd:bt_pairs] epoch 0: loss=0.3927 val_pair_acc=0.858 val_top1=0.243 val_logscore=-3.5926
+[rlcd:proper_score] epoch 1: loss=1.7110 val_pair_acc=0.745 val_top1=0.243 val_logscore=-2.0693
+[rlcd:proper_score] epoch 2: loss=1.7094 val_pair_acc=0.708 val_top1=0.243 val_logscore=-2.0663
+[rlcd:bt_pairs] epoch 1: loss=0.3587 val_pair_acc=0.861 val_top1=0.243 val_logscore=-3.9468
+[sweep] proper_wsph1.0_lr2e-05: pair_acc=0.745 log_score=-2.0693064337191376
+[rlcd:bt_pairs] epoch 0: loss=0.3507 val_pair_acc=0.837 val_top1=0.243 val_logscore=-3.0724
+[rlcd:bt_pairs] epoch 2: loss=0.3434 val_pair_acc=0.866 val_top1=0.278 val_logscore=-4.1800
+[sweep] bt_beta0.5_margin0: pair_acc=0.866 log_score=-4.179970080956169
+[rlcd:bt_pairs] epoch 1: loss=0.3156 val_pair_acc=0.836 val_top1=0.243 val_logscore=-3.8031
+[rlcd:bt_pairs] epoch 0: loss=0.3969 val_pair_acc=0.861 val_top1=0.243 val_logscore=-2.7820
+[rlcd:bt_pairs] epoch 2: loss=0.2990 val_pair_acc=0.852 val_top1=0.243 val_logscore=-3.4616
+[sweep] bt_beta0.5_margin0.05: pair_acc=0.852 log_score=-3.4616031667460567
+[rlcd:bt_pairs] epoch 1: loss=0.3582 val_pair_acc=0.837 val_top1=0.304 val_logscore=-2.7538
+[rlcd:bt_pairs] epoch 0: loss=0.3448 val_pair_acc=0.852 val_top1=0.296 val_logscore=-2.7387
+[rlcd:bt_pairs] epoch 2: loss=0.3392 val_pair_acc=0.878 val_top1=0.400 val_logscore=-2.9683
+[rlcd:bt_pairs] epoch 1: loss=0.2931 val_pair_acc=0.843 val_top1=0.287 val_logscore=-2.8849
+[sweep] bt_beta1_margin0: pair_acc=0.878 log_score=-2.9683427043583084
+[rlcd:bt_pairs] epoch 2: loss=0.2807 val_pair_acc=0.850 val_top1=0.304 val_logscore=-2.9107
+[sweep] bt_beta1_margin0.05: pair_acc=0.852 log_score=-2.738652511264967
+[rlcd:bt_pairs] epoch 0: loss=0.4235 val_pair_acc=0.863 val_top1=0.243 val_logscore=-2.2998
+[rlcd:bt_pairs] epoch 0: loss=0.3685 val_pair_acc=0.848 val_top1=0.270 val_logscore=-2.3787
+[rlcd:bt_pairs] epoch 1: loss=0.3563 val_pair_acc=0.873 val_top1=0.417 val_logscore=-2.2977
+[rlcd:bt_pairs] epoch 1: loss=0.3011 val_pair_acc=0.847 val_top1=0.252 val_logscore=-2.4065
+[rlcd:bt_pairs] epoch 2: loss=0.3340 val_pair_acc=0.873 val_top1=0.348 val_logscore=-2.3874
+[rlcd:bt_pairs] epoch 2: loss=0.2837 val_pair_acc=0.855 val_top1=0.313 val_logscore=-2.4684
+[sweep] bt_beta2_margin0: pair_acc=0.873 log_score=-2.3873614611832994
+[sweep] bt_beta2_margin0.05: pair_acc=0.855 log_score=-2.468408214527628
+BEST proper_score: proper_wsph0.5_lr5e-06 pair_acc=0.795
+BEST bt_pairs: bt_beta1_margin0 pair_acc=0.878
+EXITCODE=0

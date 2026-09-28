@@ -20,6 +20,16 @@ identically-named Yang et al. ICLR 2024 paper. Theory:
 RLCD arm: 13618 pairs / 548 records seen; 53.9s on cuda.
 Saved checkpoints: `runs/rlcd_laya_proper_v1` (proper-score arm), `runs/rlcd_laya_bt_v1` (BT arm) (loadable via `LayaPolicy(model_id=...)`).
 
+Estimand note (2026-09-28 audit): the Top-1 column above is the
+training-report estimand (`evaluate_ranking`: gold argmax over
+`gold_probs`, model argmax over offered options; artifact
+`exp_rlcd_report.json`). The CI artifact `exp_rlcd_ci.json` uses the
+`per_record_laya` estimand (gold argmax over raw valid utilities, model
+restricted to gold keys) and reads top-1 bt 0.365 / proper 0.252 /
+rf 0.400 / zero 0.035 — same ordering, slightly different values; the two
+estimands are not directly comparable. `per_record_laya` top-1 also wobbles
+by ±1 record (~0.009) across GPU runs on a borderline-tie record.
+
 Caveats: decision-level metrics only (teacher recovery), not
 closed-loop optimization performance; same-family split by seed
 (cross-family transfer is RQ2 and not claimed here); value capped
@@ -27,14 +37,19 @@ by the adaptive-value ceiling D (RLCD_THEORY T4).
 
 ## Paired bootstrap CIs — pairwise accuracy (clustered by record; `scripts/analyze_rlcd_ci.py`)
 
+(2026-09-28: regenerated after the audit fixed the paired-bootstrap
+denominator — each arm now normalizes by its own resampled pair total.
+CIs move by ≤0.003; no conclusion changes. Artifact:
+`exp_rlcd_ci.json`.)
+
 | Contrast | Diff | 95% CI | P(diff > 0) |
 |---|---:|---|---:|
-| RLCD proper − zero-shot | +0.403 | [+0.372, +0.435] | 1.00 |
-| RLCD proper − RandomForest | −0.017 | [−0.038, +0.004] | 0.06 |
+| RLCD proper − zero-shot | +0.403 | [+0.371, +0.435] | 1.00 |
+| RLCD proper − RandomForest | −0.017 | [−0.038, +0.005] | 0.06 |
 | RLCD proper − BT pairs | −0.073 | [−0.090, −0.055] | 0.00 |
-| BT pairs − zero-shot | +0.475 | [+0.439, +0.512] | 1.00 |
+| BT pairs − zero-shot | +0.475 | [+0.438, +0.514] | 1.00 |
 | BT pairs − RandomForest | +0.056 | [+0.033, +0.080] | 1.00 |
-| RandomForest − zero-shot | +0.420 | [+0.385, +0.457] | 1.00 |
+| RandomForest − zero-shot | +0.420 | [+0.384, +0.458] | 1.00 |
 
 ## Interpretation — the two objectives trade ranking against calibration
 

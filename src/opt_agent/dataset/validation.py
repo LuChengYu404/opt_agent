@@ -118,8 +118,9 @@ def aggregate_mass(records: list[DecisionRecord]) -> MassGateResult:
     Returns
     -------
     MassGateResult with `pass_=True` if the seed-clustered adjusted lift is
-    strictly positive (codex's criterion: CI lower bound > 0; we use the
-    point estimate with seed-level equal weighting for the gate smoke test).
+    strictly positive: with >= 5 seeds the criterion is the seed-clustered
+    bootstrap CI lower bound > 0; fewer seeds fall back to the point
+    estimate (single-seed smoke compatibility).
     """
     by_seed: dict[tuple[str, int], list[tuple[float, float]]] = defaultdict(list)
     for r in records:
@@ -238,11 +239,13 @@ def oracle_test(
     *,
     objective_scale: float = 1.0,
     random_replicates: int = 5,
-    max_actions: int = 50,
+    max_actions: int = 200,
 ) -> OracleResult:
     """Compare first actions with the same RulePolicy continuation.
 
     The backend is restored to its pre-call state at the end (try/finally).
+    max_actions defaults to 200, matching oracle_test_from_record/_run_arm —
+    the same record must get the same action cap from either entry point.
     """
     if not math.isfinite(objective_scale) or objective_scale <= 0:
         raise ValueError("objective_scale must be finite and positive")

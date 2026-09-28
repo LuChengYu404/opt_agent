@@ -35,8 +35,9 @@ class UtilityWeights:
         leave-one-out; cannot be trusted until surrogate metric is fixed.
       - w_coverage = 0: `boundary_coverage` is fraction near edge, not a
         proper coverage metric; needs a grid/fill-distance version.
-      - w_stop_opportunity = 0: optional linear STOP penalty proportional
-        to remaining_budget_ratio. Default 0 so backward-compatible.
+      - w_stop_opportunity = 0: disables the optional linear STOP penalty
+        (proportional to remaining_budget_ratio). The DEFAULT is 0.75
+        (Phase 8.5, codex-empirical), not 0.
     """
     w_optimization: float = 1.0
     w_surrogate: float = 0.0

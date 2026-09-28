@@ -152,6 +152,7 @@ def build_item(
     *,
     max_len: int = 512,
     head_max_len: int = 192,
+    margin: float = 0.0,
 ) -> dict | None:
     """Build one Laya training item for a record: ids/markers/qtype + target.
 
@@ -175,7 +176,7 @@ def build_item(
     index_of = {a: i for i, a in enumerate(option_ids)}
     pairs = [
         (index_of[p.pos], index_of[p.neg], p.margin)
-        for p in mine_pairs(record)
+        for p in mine_pairs(record, margin=margin)
         if p.pos in index_of and p.neg in index_of
     ]
     offered = [a for a in option_ids if a in record.gold_probs]
@@ -380,7 +381,8 @@ def evaluate_ranking(model, tok, records, cfg: RLCDConfig, device) -> dict:
         kept: list[tuple[dict, DecisionRecord]] = []
         for r in chunk:
             item = build_item(
-                r, tok, max_len=cfg.max_len, head_max_len=cfg.head_max_len
+                r, tok, max_len=cfg.max_len, head_max_len=cfg.head_max_len,
+                margin=cfg.margin,
             )
             if item is not None:
                 if cfg.max_pairs_per_record is not None:
@@ -445,7 +447,8 @@ def train_rlcd(
         out = []
         for r in records:
             item = build_item(
-                r, tok, max_len=config.max_len, head_max_len=config.head_max_len
+                r, tok, max_len=config.max_len, head_max_len=config.head_max_len,
+                margin=config.margin,
             )
             if item is None:
                 continue

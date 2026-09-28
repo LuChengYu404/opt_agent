@@ -98,11 +98,13 @@ expectations and subtract `max_a E[U(a, s)]` ≤ `E[max_a U(a, s)]`
 (exchange of max and expectation). Equality for the oracle policy is
 immediate. ∎
 
-**Empirical tie.** The decision-landscape regime table (Hartmann
-D = 0.684 "frequent opportunity" vs SixHumpCamel D = 0.015 "flat") is a
+**Empirical tie.** The decision-landscape regime table (20-seed
+recomputation, `runs/verify_theory_propositions.json`: Hartmann
+D = 0.710 "frequent opportunity" vs SixHumpCamel D = 0.012 "flat"; the
+original 10-seed landscape read 0.684 / 0.015 — same regime ordering) is a
 direct readout of this bound: on flat families *no* state-conditional
 policy — learned or LLM — can beat the best constant action by more than
-≈ 0.015 in one-step utility, which is why the RF probe finds no signal
+≈ 0.012 in one-step utility, which is why the RF probe finds no signal
 there. On Hartmann the bound is loose enough to permit state-conditional
 gains, and the probe found a suggestive −29 % regret reduction.
 

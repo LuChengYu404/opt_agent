@@ -49,7 +49,10 @@ def _record(
             "delta_surrogate": None, "delta_coverage": 0.0, "error": None}
         for a, u in utilities.items()
     }
-    z = torch.tensor(sorted(utilities.values())).softmax(-1).tolist()
+    # Descending utilities paired with descending softmax masses, so the
+    # highest-utility action carries the highest gold probability (matches
+    # to_gold_probs orientation).
+    z = torch.tensor(sorted(utilities.values(), reverse=True)).softmax(-1).tolist()
     order = sorted(utilities, key=lambda a: -utilities[a])
     gold = {a: p for a, p in zip(order, z)}
     return DecisionRecord(

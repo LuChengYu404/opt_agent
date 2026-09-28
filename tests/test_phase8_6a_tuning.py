@@ -12,7 +12,7 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
   - test_temperature_can_help_or_hurt_gate3: temperature 1.0 is neutral on
     the metric given equal log-odds.
   - test_gate3_requires_seed_level_ci: point estimate alone is insufficient
-    (we currently use point estimate as smoke; CI will be added with ≥10 seeds).
+    (< 5 seeds fall back to the point estimate; >= 5 seeds gate on CI).
   - test_nonfinite_utility_scales_rejected: NaN / Inf scales raise ValueError.
 """
 
@@ -87,17 +87,38 @@ def test_default_resource_scales_use_total_budget() -> None:
 
 
 def test_objective_normalization_is_affine_invariant() -> None:
-    """optimization_scale = std(initial_objectives) is affine-invariant:
-    the metric on probs is independent of utility scale."""
-    probs = {
-        "global_exploration": 0.5, "uncertainty_sampling": 0.2,
-        "boundary_sampling": 0.1, "stop": 0.1, "retrain_surrogate": 0.1,
-        "local_exploitation": 0.0, "error_guided_sampling": 0.0,
-        "surrogate_acquisition": 0.0,
-    }
-    a = _lift(probs)
-    b = _lift(probs)
-    assert a == b
+    """optimization_scale = std(initial_objectives) makes the metric on probs
+    independent of the objective frame: scaling utilities by a > 0 with the
+    scale (temperature) scaled by the same factor leaves gold_probs — hence
+    _lift — unchanged, as does shifting all utilities by a constant (the
+    softmax subtracts the max)."""
+    from typing import NamedTuple
+
+    from opt_agent.rollout import to_gold_probs
+
+    class _Res(NamedTuple):
+        action_id: str
+        status: str
+        utility: float
+
+    ids = ("global_exploration", "uncertainty_sampling", "boundary_sampling",
+           "local_exploitation", "error_guided_sampling", "stop",
+           "surrogate_acquisition", "retrain_surrogate")
+    u = dict(zip(ids, (1.4, 0.9, 0.6, 0.3, 0.1, -0.2, -0.5, -0.8)))
+
+    def probs(utilities: dict[str, float], temperature: float) -> dict[str, float]:
+        return to_gold_probs(
+            tuple(_Res(a, "valid", v) for a, v in utilities.items()),
+            temperature=temperature,
+        )
+
+    p_base = probs(u, 2.0)
+    p_scaled = probs({a: 3.0 * v for a, v in u.items()}, 6.0)   # y -> 3y, scale x3
+    p_shifted = probs({a: v - 7.5 for a, v in u.items()}, 2.0)  # y -> y - 7.5
+    assert p_base == pytest.approx(p_scaled)
+    assert p_base == pytest.approx(p_shifted)
+    assert _lift(p_base) == pytest.approx(_lift(p_scaled))
+    assert _lift(p_base) == pytest.approx(_lift(p_shifted))
 
 
 def test_nonfinite_utility_scales_rejected() -> None:
@@ -189,6 +210,41 @@ def test_gate3_requires_seed_level_ci() -> None:
     result = aggregate_mass(records)
     assert result.pass_
     assert result.adjusted_lift_mean > 0.0
+
+
+def test_gate3_seed_clustered_ci_branch() -> None:
+    """With >= 5 seeds the gate criterion is the seed-clustered bootstrap
+    CI lower bound (not the point estimate): consistently positive lift
+    passes; consistently negative lift fails even though a CI exists."""
+    probs_strong = {
+        "global_exploration": 0.5, "uncertainty_sampling": 0.3,
+        "stop": 0.05, "retrain_surrogate": 0.15,
+        "local_exploitation": 0.0, "error_guided_sampling": 0.0,
+        "boundary_sampling": 0.0, "surrogate_acquisition": 0.0,
+    }
+    probs_stop_heavy = {
+        "stop": 0.8, "retrain_surrogate": 0.15,
+        "global_exploration": 0.01, "uncertainty_sampling": 0.01,
+        "boundary_sampling": 0.01, "local_exploitation": 0.01,
+        "error_guided_sampling": 0.01, "surrogate_acquisition": 0.0,
+    }
+    strong = [
+        _record(action_probs=probs_strong, seed=s, remaining_budget_ratio=0.9)
+        for s in range(6)
+    ]
+    res_strong = aggregate_mass(strong)
+    assert res_strong.seed_clustered_ci95 is not None
+    assert res_strong.seed_clustered_ci95[0] > 0.0
+    assert res_strong.pass_
+
+    stop_heavy = [
+        _record(action_probs=probs_stop_heavy, seed=s, remaining_budget_ratio=0.9)
+        for s in range(6)
+    ]
+    res_stop = aggregate_mass(stop_heavy)
+    assert res_stop.seed_clustered_ci95 is not None
+    assert res_stop.seed_clustered_ci95[1] < 0.0
+    assert not res_stop.pass_
 
 
 def test_generator_with_corrected_scales_emits_metadata() -> None:

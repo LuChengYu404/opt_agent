@@ -42,19 +42,25 @@ def paired_bootstrap(
     repetitions: int = 2000,
     seed: int = 0,
 ) -> tuple[float, float, float]:
-    """Bootstrap CI for accuracy(A) − accuracy(B), clustered by record."""
+    """Bootstrap CI for accuracy(A) − accuracy(B), clustered by record.
+
+    Each resample recomputes both arms' correct counts AND pair totals from
+    the resampled records, so each arm is normalized by its own denominator
+    (arm pair totals need not match across arms).
+    """
     ids = sorted(set(per_rec_a) & set(per_rec_b))
     rng = random.Random(seed)
     n = len(ids)
-    tot_pairs = sum(per_rec_a[i][1] for i in ids)
     diffs = []
     for _ in range(repetitions):
-        ca = cb = 0
+        ca = cb = ta = tb = 0
         for _ in range(n):
             rid = ids[rng.randrange(n)]
             ca += per_rec_a[rid][0]
+            ta += per_rec_a[rid][1]
             cb += per_rec_b[rid][0]
-        diffs.append(ca / max(1, tot_pairs) - cb / max(1, tot_pairs))
+            tb += per_rec_b[rid][1]
+        diffs.append(ca / max(1, ta) - cb / max(1, tb))
     diffs.sort()
     return diffs[int(0.025 * repetitions)], diffs[int(0.975 * repetitions)], (
         sum(d > 0 for d in diffs) / repetitions
@@ -100,7 +106,8 @@ def main() -> int:
         return (sum(v[2] for v in d.values()) / len(d)) if d else 0.0
 
     def _logs(d):
-        vals = [v[3] for v in d.values() if v[3] == v[3]]  # NaN filter
+        vals = [v[3] for v in d.values()
+                if v[3] is not None and v[3] == v[3]]  # skip None/NaN
         return sum(vals) / len(vals) if vals else None
 
     result = {

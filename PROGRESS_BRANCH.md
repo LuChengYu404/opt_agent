@@ -89,6 +89,14 @@ design.
 Reference points: uniform-8 log score −2.079; teacher self-score −1.977
 (entropy 1.98 nats).
 
+Estimand note (2026-09-28 audit): Top-1 in this table is the
+training-report estimand (`evaluate_ranking`, artifact
+`exp_rlcd_report.json`). The CI artifact `exp_rlcd_ci.json` uses the
+`per_record_laya` estimand (raw-utility argmax, valid-only) and reads
+top-1 bt 0.365 / proper 0.252 — same ordering, not directly comparable;
+it also wobbles ±1 record across GPU runs. The bootstrap-denominator
+audit fix moved CIs by ≤0.003 (no conclusion changes).
+
 **Reading (matches the corrected theory):**
 - Both fine-tunes dominate zero-shot (CIs exclude 0 by wide margins).
 - **Ranking:** BT > RF (+0.056, CI [+0.033, +0.080]); RLCD-proper ≈ RF
@@ -116,9 +124,13 @@ Four tracks run with explicit parallelization (per user direction):
   `torch.set_num_threads(1)` + spawn context (the first attempt
   oversubscribed to load 315 with default threads).
 - **B — hyperparameter sweep** (`scripts/sweep_rlcd.py`, `runs/exp_rlcd_sweep.json`,
-  15 configs): defaults are near-optimal — best proper 0.791 (w_sph 0.5,
-  lr 5e-6), best bt 0.879 (β 1, margin 0); all bt configs within
-  0.86–0.879. The objective choice is the lever, not the knobs.
+  15 configs; RE-RUN 2026-09-28 after the margin-plumbing audit fix — the
+  original run's margin axis was inert): defaults are near-optimal — best
+  proper 0.795 (w_sph 0.5, lr 5e-6), best bt 0.878 (β 1, margin 0); all bt
+  configs within 0.852–0.878. margin 0 beats margin 0.05 at every β
+  (+1.5–2.6 pp; the margin arms also evaluate on fewer pairs, so treat the
+  margin comparison as directional). The objective choice is the lever,
+  not the knobs.
 - **C — training on the long-horizon partial dataset**
   (`runs/EXP_RLCD_LONGHORIZON_REPORT.md`): bt 0.660 > proper 0.576 >
   RF 0.545 > zero-shot 0.485 ranking; proper −2.071 log score again the
@@ -233,3 +245,73 @@ nits ADDRESSED — **VERDICT: APPROVE**.
 Pre-submission remainder (unchanged, from review): locked transfer
 evaluation on untouched families/tasks; benchmark breadth (BBOB/IOH, HPO,
 end-to-end engineering); external optimizer anchors (SMAC3/HEBO/LLAMBO).
+
+## 11. Full-repo consistency audit + Codex adjudication (2026-09-28)
+
+Independent 4-agent audit (src / scripts / docs-vs-artifacts / tests) +
+lead spot-verification, then one `codex exec` adjudication round
+(logs: `runs/AUDIT_INCONSISTENCY_FINDINGS.md`,
+`runs/codex_audit_review.log`). Verdict on 20 findings: 15 CONFIRMED /
+5 PARTIAL / 0 REFUTED, VERDICT: SELECTIVE. All findings fixed this
+session; full suite green (see below).
+
+Code fixes (conclusion-affecting):
+- `exp_rlcd_loo_transfer.py` NameError on `torch` (regression from the
+  e523119 cleanup) — LOO transfer re-runnable.
+- `RLCDConfig.margin` was dead config (never reached `mine_pairs`): the
+  sweep's margin 0.0-vs-0.05 arms were computationally identical —
+  differences in the original `exp_rlcd_sweep.json` were GPU
+  nondeterminism, NOT a margin effect. margin is now threaded through
+  `build_item`; the sweep was RE-RUN on the fixed plumbing (same session):
+  margin 0 wins at every β (+1.5–2.6 pp), best configs unchanged
+  (bt β1/margin0 0.878; proper w_sph0.5/lr5e-6 0.795) — "defaults
+  near-optimal" stands on real margin arms now.
+- `analyze_rlcd_ci.py`: paired bootstrap normalized both arms by arm A's
+  pair total (each arm now uses its own resampled total) and the NaN
+  filter missed the new `None` log-score sentinel. `exp_rlcd_ci.json`
+  regenerated: CIs move ≤0.003, no conclusion changes. NOTE:
+  `per_record_laya` top-1 wobbles ±1 record (~0.009) across GPU runs on
+  a borderline-tie record (0.365↔0.374 observed for bt).
+- `executor.py` ERROR_GUIDED_SAMPLING with n_samples>1 evaluated the SAME
+  perturbed point n times (`repeat`); now draws n independent
+  perturbations (n=1 bit-identical). The factory can emit n_samples up to
+  3 for this action, so historical datasets may contain duplicate
+  evaluations from it — semantics were "averaging the same point" (wasted
+  budget, no directional bias), but any such records are flagged by this
+  note.
+- `validate_record` rejected partial-rollout (subsample k<8) records its
+  own generator produces; invariant relaxed to gold_probs ⊆ candidates
+  (+ regression test).
+- `_rlcd_common.per_record_laya` training-mode restore was inverted.
+
+Consistency fixes (docstrings/defaults/telemetry): `w_stop_opportunity`
+docstring now states default 0.75; RandomPolicy/UniformPolicy docstrings
+no longer claim a nonexistent 5-vs-8 distinction (implementations are
+identical — `uniform` continuation arms equal `RandomPolicy`; historical
+ablation text relying on the distinction should be read accordingly);
+`HeuristicLLMClient` docstring matches its uniform mock; `oracle_test`
+default max_actions 50→200 (matches `oracle_test_from_record`);
+executor step fallback 0.05→0.1 (factory-aligned) + fallback-convention
+comments; `JevPolicy.reset()` clears counters / stop branch increments
+`call_count` (symmetric with Laya/LLMSystem1 — earlier cost comparisons
+across adapters were not apples-to-apples after reset); `_shared_rq_features`
+header no longer lists the archived rf_probe as a live consumer.
+
+Test hardening: `test_rlcd` teacher fixture was anti-correlated with its
+utilities (silent wrong-teacher risk); tautological assertion in
+`test_phase8_5_gates` replaced with finiteness checks; the fake
+"affine-invariant" test now actually tests scale/shift invariance through
+`to_gold_probs`; Gate 3's ≥5-seed seed-clustered CI branch got its first
+coverage; partial-rollout validation regression test added.
+
+Doc-vs-artifact fixes (reviewer/paper-facing): review brief no longer
+claims Gate 5 "all buckets pass" (predeclared gate FAILED, 2/17 JS
+breaches) or the withdrawn p=0.0003 (Student-t 0.0058) or stale RQ2/
+frontier status; `PROGRESS.md` self-contradiction on the cost frontier
+resolved (frontier ran, 450 trajectories; engineering transfer is
+probe-level only); teacher-noise satellites 0.084/25% traced to the
+superseded log and updated to 0.0915/29% (headline 0.40/0.36 re-verified
+reproducible); SixHumpCamel `***` scoped to the bt arm; "+5.87 every
+routed arm" corrected (+5.40 for bt_q20); "+Hartmann now passes" →
++Branin; affine §3.2 heading 15/17→17/17; THEORY.md D values moved to
+the 20-seed recomputation; P3/L1 no longer claimed as script-verified.

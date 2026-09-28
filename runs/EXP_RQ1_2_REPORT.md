@@ -27,7 +27,7 @@
 |---|---|---|
 | 3: aggregate_mass adjusted_lift | 1.124 (CI [0.695, 1.722]) | **1.294 (CI [0.848, 1.954])** |
 | 4a: stop-gain CI lo > 0 | 5/5 | **5/5** (unchanged) |
-| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Hartmann now passes) |
+| 4b: uniform-gain CI lo > 0 | 3/5 | **4/5** (+Branin now passes; Hartmann already passed at 10 seeds) |
 | 4c: behavior-gain CI lo > 0 | 1/5 | **1/5** (Rastrigin only, unchanged) |
 
 **Seed-expansion note (per codex priority #1, 2026-09-27)**: The 20-seed

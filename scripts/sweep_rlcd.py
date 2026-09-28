@@ -28,6 +28,8 @@ from opt_agent.system1.rlcd import RLCDConfig, train_rlcd  # noqa: E402
 
 
 def _one(task: dict) -> dict:
+    import time
+
     import torch
 
     torch.set_num_threads(4)
@@ -36,6 +38,7 @@ def _one(task: dict) -> dict:
     train = [r for r in records if int(r.problem["seed"]) < task["train_max"]]
     val = [r for r in records if int(r.problem["seed"]) >= task["val_min"]]
     cfg = RLCDConfig(save=False, output_dir="/tmp/rlcd_sweep_unused", **task["cfg"])
+    start = time.perf_counter()
     rep = train_rlcd(train, val, cfg)
     return {
         "tag": task["tag"],
@@ -43,7 +46,7 @@ def _one(task: dict) -> dict:
         "overrides": task["overrides"],
         "best_val_pairwise_accuracy": rep["best_val_pairwise_accuracy"],
         "final_val": rep["final_val"],
-        "train_wall_s": rep.get("wall_clock_s"),
+        "train_wall_s": round(time.perf_counter() - start, 2),
     }
 
 

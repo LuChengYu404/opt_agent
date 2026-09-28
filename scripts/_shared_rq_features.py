@@ -7,8 +7,13 @@ normalization. Factoring them here prevents silent divergence if the
 schema changes.
 
 Used by:
-- scripts/exp_rq1_3_rf_probe.py (RF probe for state conditionality)
 - scripts/exp_rq2_1_cross_family_transfer.py (RQ2 cross-family transfer)
+- scripts/exp_rlcd_loo_transfer.py / exp_rlcd_loo_confirmatory.py (RF
+  baseline arms, via local imports)
+
+Note: `exp_rq1_3_rf_probe.py` is an ARCHIVED script and intentionally keeps
+a frozen local copy of this logic (archive policy: archived scripts don't
+import shared modules); do not list it as a live consumer.
 
 Public API:
     ACTIONS          : 8-tuple of action IDs (canonical order)

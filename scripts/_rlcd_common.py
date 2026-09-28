@@ -156,8 +156,8 @@ def per_record_laya(model, tok, records, device_str: str) -> dict[str, tuple]:
                     == max(gold, key=lambda a: gold[a])),
                 log_score,
             )
-    if not was_training:
-        model.eval()
+    if was_training:
+        model.train()
     model.to("cpu")
     return out
 

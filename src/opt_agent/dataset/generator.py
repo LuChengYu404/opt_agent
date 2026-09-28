@@ -211,8 +211,9 @@ class DatasetConfig:
     horizon_mode: str = "fixed"
     # P1b denoising (2026-09-27, per the noise-vs-misspecification diagnostic
     # `exp_teacher_noise_diagnostic.py`: single-rollout labels are
-    # NOISE-dominated — inter-roll gap spread 0.084 > median stored gap 0.05,
-    # above-median-gap flip rate 0.74). When R > 1, each decision point's
+    # NOISE-dominated — inter-roll gap spread 0.0915 > median stored gap 0.05,
+    # above-median-gap any-of-3 flip rate 0.73; overall any-of-3 0.65).
+    # When R > 1, each decision point's
     # rollout is repeated R times with fresh candidate/continuation seeds and
     # the per-action utilities are AVERAGED (T2: noise shrinks as 1/sqrt(R);
     # the expected ranking is unchanged). rollout_results carry the mean

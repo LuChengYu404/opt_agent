@@ -30,12 +30,21 @@ def _phase(ratio: float) -> str:
 
 
 def validate_record(record: DecisionRecord) -> None:
-    """Enforce aligned vocabulary and probability invariants."""
+    """Enforce vocabulary and probability invariants.
+
+    ``gold_probs`` and ``rollout_results`` must cover the same action ids,
+    and those ids must be a subset of the candidate vocabulary: with
+    ``rollout_action_subsample < 8`` (partial rollout) only a k-subset of
+    the candidates is rolled out and labeled. Full datasets remain
+    set-equal across all three fields.
+    """
     ids = [a["action_id"] for a in record.candidate_actions]
     if len(ids) != len(set(ids)):
         raise ValueError(f"{record.id}: duplicate candidate IDs")
-    if set(ids) != set(record.gold_probs) or set(ids) != set(record.rollout_results):
+    if set(record.gold_probs) != set(record.rollout_results):
         raise ValueError(f"{record.id}: unaligned action vocabulary")
+    if not set(record.gold_probs) <= set(ids):
+        raise ValueError(f"{record.id}: labeled ids outside candidate vocabulary")
 
     probs = record.gold_probs
     if any(not math.isfinite(p) or p < 0 for p in probs.values()):

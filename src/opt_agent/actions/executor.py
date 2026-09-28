@@ -49,6 +49,10 @@ def execute_action(
         )
 
     # Budget pre-check + dispatch prepare.
+    # n_samples fallbacks are the budget-safe minimum (1). Canonical
+    # candidates from actions.factory always carry explicit params
+    # (n_samples=2 for GLOBAL_EXPLORATION / BOUNDARY_SAMPLING), so the
+    # fallback only fires for hand-constructed bare actions.
     if action.type == ActionType.GLOBAL_EXPLORATION:
         n_samples = int(action.params.get("n_samples", 1))
         n_fits = 0
@@ -127,7 +131,9 @@ def _do_global_exploration(backend: UnifiedBackend, action: OptimizationAction) 
 
 
 def _do_local_exploitation(backend: UnifiedBackend, action: OptimizationAction) -> None:
-    step = float(action.params.get("step", 0.05))
+    # Fallback step 0.1 matches the factory's canonical LOCAL_EXPLOITATION
+    # spec (actions.factory.ALL_CANDIDATE_SPECS).
+    step = float(action.params.get("step", 0.1))
     seed = action.params.get("seed")
     bounds = backend.bounds
     assert bounds is not None, "Backend must expose bounds for LOCAL_EXPLOITATION"
@@ -195,11 +201,13 @@ def _do_error_guided_sampling(backend: UnifiedBackend, action: OptimizationActio
     span = bounds[1] - bounds[0]
     rng = torch.Generator()
     rng.manual_seed(int(seed) if seed is not None else 0)
-    delta = (torch.rand(top_point.shape, generator=rng, dtype=torch.double) * 2.0 - 1.0) * 0.05 * span
-    candidates = (top_point + delta).clamp(min=bounds[0], max=bounds[1]).unsqueeze(0)
-    if n_samples > 1:
-        # repeat with different perturbations.
-        candidates = candidates.repeat(n_samples, 1)
+    n = max(1, int(n_samples))
+    delta = (
+        torch.rand((n, top_point.shape[0]), generator=rng, dtype=torch.double) * 2.0 - 1.0
+    ) * 0.05 * span
+    candidates = (top_point.unsqueeze(0) + delta).clamp(
+        min=bounds[0], max=bounds[1]
+    )
     backend.evaluate(candidates)
 
 
