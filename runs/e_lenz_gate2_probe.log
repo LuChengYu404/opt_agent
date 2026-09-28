@@ -1,0 +1,7 @@
+ackley {"frozen15": {"top1_agreement": 0.1119, "mean_regret": 0.5731, "n": 143}, "traj_ext": {"top1_agreement": 0.1049, "mean_regret": 0.6447, "n": 143}, "traj_only": {"top1_agreement": 0.1259, "mean_regret": 0.5703, "n": 143}}
+branin {"frozen15": {"top1_agreement": 0.4958, "mean_regret": 0.069, "n": 119}, "traj_ext": {"top1_agreement": 0.4454, "mean_regret": 0.0787, "n": 119}, "traj_only": {"top1_agreement": 0.2437, "mean_regret": 0.0911, "n": 119}}
+hartmann {"frozen15": {"top1_agreement": 0.1966, "mean_regret": 1.2412, "n": 117}, "traj_ext": {"top1_agreement": 0.1966, "mean_regret": 1.3529, "n": 117}, "traj_only": {"top1_agreement": 0.2564, "mean_regret": 1.3146, "n": 117}}
+rastrigin {"frozen15": {"top1_agreement": 0.1846, "mean_regret": 0.2118, "n": 130}, "traj_ext": {"top1_agreement": 0.1923, "mean_regret": 0.2278, "n": 130}, "traj_only": {"top1_agreement": 0.1769, "mean_regret": 0.2162, "n": 130}}
+sixhumpcamel {"frozen15": {"top1_agreement": 0.6552, "mean_regret": 0.0111, "n": 145}, "traj_ext": {"top1_agreement": 0.6483, "mean_regret": 0.0109, "n": 145}, "traj_only": {"top1_agreement": 0.5655, "mean_regret": 0.0175, "n": 145}}
+wrote runs/exp_lenz_gate2_probe.json
+EXITCODE=0
