@@ -437,3 +437,20 @@ Empirical closure for §14; cited from outline limitation 3. Caveats
 (handcrafted features only, n=30 single-model A/B, H_t truncated to
 last_action in dataset records) in the report. Scripts are
 dataset-agnostic — rerun first on any journal-version panel.
+
+## 16. Theory grounded in classical lineage + investigation rounds indexed (2026-09-28)
+
+- `docs/THEORY.md` new section "Relation to classical theory": P2 = the
+  utility-unit Value of Information (Howard 1966 / Lindley 1956 lineage;
+  ES/PES/MES are the nats version); 15-scalar state = projection of the GP
+  posterior sufficient statistic (E1 negative consistent); utility+menu =
+  acquisition-function structure lifted to the strategy level; P3 = the
+  degenerate case the GP-Hedge→LMABO portfolio line assumes away; L1 =
+  standard tree representational behavior.
+- outline §2: classical-chain paragraph added (posterior → EI/UCB →
+  GP-Hedge → LMABO; P2/P3 positioning).
+- `docs/ref_papers/exploration_rounds.md`: six investigation rounds
+  indexed with prioritized future directions (P0 GP-Hedge baseline,
+  LMABO citation/scoping, codex re-review; P1 locked-eval/external
+  baselines; P2 journal-version panel swaps with branch A/B scripts as
+  first diagnostic).

@@ -219,6 +219,62 @@ LLM's closed-loop value on this panel."
 
 ---
 
+## Relation to classical theory (added 2026-09-28)
+
+The propositions are not built from scratch; each is a strategy-level
+counterpart of a classical result. Making the lineage explicit (also the
+related-work framing in the outline §2):
+
+- **P2 (adaptive-value) is the utility-unit form of the classical Value of
+  Information.** Decision theory has long measured "what is knowing more
+  worth": expected value of information (Howard, 1966, *Information Value
+  Theory*; Raiffa & Schlaifer, 1961) and expected information gain in
+  Bayesian experimental design (Lindley, 1956). Entropy-based BO
+  acquisitions operationalize the nats version — Entropy Search (Hennig &
+  Schuler, 2012), Predictive Entropy Search (Hernández-Lobato et al.,
+  2014), Max-Value Entropy Search (Wang & Jegelka, 2017) value a candidate
+  point by the posterior entropy reduction about the optimum. Our `D` is
+  the same quantity expressed in utility units *about the state's oracle
+  label* rather than in nats *about the optimum's location*: `D` is the
+  most any policy could gain from perfectly knowing which state it is in.
+  The two views compose: `D ≈ 0` means no entropy reduction about the
+  state can pay for itself in utility — which is why richer state
+  observation (branch `exp/lenz-state-jev-presentation`, E1/E2) buys
+  nothing on the flat families.
+- **The compressed state is a projection of the classical sufficient
+  statistic.** Under the GP model the posterior `p(f | D_t)` is a
+  sufficient summary of the full trial log; our 15-scalar state is a
+  fixed-dimensional projection of `(D_t, c_t)`. The E1 negative result
+  (trajectory features add nothing over the projection on 5/5 families)
+  is consistent with near-lossless projection *for predicting the action
+  label*.
+- **The utility-plus-menu design lifts acquisition functions to the
+  strategy level.** EI (Mockus, 1978) and GP-UCB (Srinivas et al., 2010)
+  are closed-form one-step decision rules derived from the posterior; our
+  8-action menu plus hand-specified utility is the same one-step-greedy
+  structure at the level of *which optimizer action*, where no closed-form
+  rule exists — which is precisely why supervision is needed.
+- **P3 is the negative complement of the portfolio/bandit line.**
+  GP-Hedge (Hoffman, Brochu & Freitas, UAI 2011) allocates among
+  acquisition functions by online exponential weights from realized gains;
+  Shahriari et al.'s Entropy Search Portfolio and Vasconcelos et al.
+  (2022) continue the line; LMABO (ICLR 2026) delegates the portfolio
+  choice to a zero-shot LLM. That line assumes the portfolio contains an
+  arm worth switching to; P3 states the complementary degenerate case —
+  when the expensive arm's per-state advantage is ≤ 0, no allocation
+  (online bandit, learned router, or LLM) can extract positive value.
+  Our RQ3 cost frontier is the empirical measurement of exactly that
+  condition, which the portfolio line does not ask.
+- **L1 is standard tree representational behavior** (axis-aligned splits
+  reproduce axis-aligned threshold rules), used here as an explanation
+  device for the RQ2.2 exact-imitation negative.
+
+Canon attribution note: the citations above are textbook-level; per repo
+convention, double-check page-precise references at camera-ready
+(`docs/ref_papers/model_interaction_survey.md` tracks verification state).
+
+---
+
 ## Proposition-to-evidence map
 
 | Statement | Type | Code anchor | Empirical test |

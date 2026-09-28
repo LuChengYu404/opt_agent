@@ -148,8 +148,18 @@ and within-function dimension transfer is a clean negative.
 - LLM-as-decision-maker literature (LLAMBO ICLR 2024 — prompt-state with the
   full evaluation history, action = next x; GPTOpt 2025 — fine-tuned
   LLM-as-optimizer; both act in x-space, we act at the strategy layer).
-- Decision-theoretic foundations: counterfactual decision-making, instrument
-  of decision theory (no need to be exhaustive).
+- Decision-theoretic and classical-BO foundations (one paragraph in the
+  paper, full map in `docs/THEORY.md` "Relation to classical theory"):
+  the GP posterior is the classical sufficient statistic our 15-scalar
+  state projects; EI/GP-UCB are closed-form one-step decision rules — our
+  utility-plus-menu lifts that structure to the strategy level where no
+  closed form exists; GP-Hedge (UAI 2011) and its portfolio successors
+  allocate among rules by online bandits, and LMABO (ICLR 2026) delegates
+  that allocation to a zero-shot LLM — our P2 is the utility-unit Value of
+  Information (Howard 1966 / Lindley 1956 lineage; entropy-based
+  acquisitions ES/PES/MES are the nats version) and P3 gives the
+  degenerate case the portfolio line assumes away (per-state advantage
+  ≤ 0 ⇒ no allocation helps), which our cost frontier measures.
 
 ## §3 The v3 Framework
 
