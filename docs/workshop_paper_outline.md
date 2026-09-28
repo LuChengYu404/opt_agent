@@ -11,6 +11,13 @@
 > (§4.1–4.5 under §5 and §5.1–5.5 under §6 renumbered to match their
 > parents); test count 385→423; title aligned with the schedule-sufficiency
 > finding (previous title kept below as an alternative).
+> **2026-09-28 content update**: the branch RLCD line is integrated (§4.7
+> fine-tuned-model cross-family transfer + GearTrain probe; §5.6 teacher
+> noise + decision-level distillation + closed-loop collapse; limitations
+> 15–16; discussion/conclusion/abstract updated). All quoted numbers were
+> re-verified against `runs/*.json` in the same session. A fresh codex
+> review pass is recommended before submission — the prior APPROVE predates
+> this integration.
 > **Target venue**: ICLR / NeurIPS workshop on Meta-Learning for Optimization
 > or AutoML/BO workshop; NOT a main-track submission.
 > **Length**: 8 pages + appendix.
@@ -35,7 +42,7 @@ Bayesian Optimization (BO) practice reduces many sequential decision points
 (refit surrogate, switch acquisition, expand region, or stop) to a single fixed
 acquisition function. We re-frame these as an explicit meta-decision: at every
 state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
-5-family BOCoDe panel × 20 paired seeds we measure four things:
+5-family BOCoDe panel × 20 paired seeds we measure five things:
 
 1. **Decision landscape** — we identify three regimes (Flat, Heavy-tailed,
    Frequent-opportunity) using an `adaptive-value` metric on counterfactual
@@ -65,16 +72,24 @@ state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
    arm earns its cost. A deterministic two-phase schedule dominates the LLM
    itself on 3/5 families — the frontier's degeneracy is a property of the
    System-2 decisions, formalized by a routing-dominance proposition.
+5. **Distilling the teacher (decision-level)** — single-roll counterfactual
+   labels are noise-dominated (per-re-roll pair flip 0.40 above-median), yet
+   RLCD fine-tuning of a 0.4B typed-decision model lifts decision-level
+   pairwise ranking from 0.40 (zero-shot) to 0.87 (BT) / 0.80 (proper-score,
+   the only calibrated arm), transfers cross-family (+0.140, 5/5 folds;
+   GearTrain engineering probe holds) — but both fine-tuned arms collapse
+   to a constant policy in closed loop (§4.7/§5.6).
 
 Our contribution is a 7-component framework (backend/state/action/utility/
 rollout/dataset/system-1+router) with **423 unit tests**, four formal
 results in `docs/THEORY.md` (P1/P2 verified numerically through the live
 code path; P3/L1 tied empirically), and run artifacts for every reported
-experiment. Cross-family transfer of a learned System-1 is partial and
-heterogeneous (lower one-step decision regret than the real
-state-conditional rule policy on 3/5 families; §4); closed-loop and
-engineering transfer are not demonstrated, and within-function dimension
-transfer is a clean negative.
+experiment. Cross-family transfer is partial and heterogeneous: the RF
+System-1 has lower one-step decision regret than the real
+state-conditional rule policy on 3/5 families (§4), and an RLCD
+fine-tuned model transfers at decision level (+0.140, analysis-rerun;
+§4.7); closed-loop and full engineering transfer are not demonstrated,
+and within-function dimension transfer is a clean negative.
 
 ---
 
@@ -86,11 +101,15 @@ transfer is a clean negative.
 - Three RQs: Learnability (RQ1), Generalization (RQ2), Selective Reasoning (RQ3).
 - **Status**: RQ1 partially settled (Gate 3 adjusted_lift 1.294 CI [0.848, 1.954] at 20 seeds;
   Gate 4 stop-gain 5/5; **Gate 5 partial — median Spearman = 1.0 but predeclared joint
-  fails on 2/17 buckets; Gate 2 still fails**); **RQ2 partially answered** (5-fold
+  fails on 2/17 buckets; Gate 2 still fails**); the teacher itself is noise-dominated
+  (single-roll pair flip 0.40 above-median) yet distillable at decision level
+  (RLCD fine-tuning of Laya: 0.40 → 0.87 pairwise; closed loop collapses to a
+  constant policy, §5.6); **RQ2 partially answered** (5-fold
   leave-one-family-out CV: cross-family RF wins vs the real state-conditional
   RulePolicy on **3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
   95% CI upper < 0); aggregate Cross − Rule = -0.065; loses to a constant
-  `local_exploitation` policy (AlwaysLocal) on aggregate); RQ3 has one strong
+  `local_exploitation` policy (AlwaysLocal) on aggregate; an RLCD fine-tuned
+  model transfers at decision level, +0.140 5/5 folds — analysis-rerun, §4.7); RQ3 has one strong
   pilot (LLM > Surrogate on Rastrigin, p=0.0058), one negative pilot
   (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
   cost frontier (450 paired trajectories) in which a frozen RF System-1 with
@@ -340,6 +359,36 @@ at 10 seeds. **Within-function dimension transfer is a clean negative**;
 the RQ2.1 cross-family signal is at least partly a *family* signal, not a
 dimension signal.
 
+### §4.7 Fine-tuned System-1 cross-family transfer (EXP-RLCD, analysis-rerun)
+
+> NEW 2026-09-28 (branch `exp/rlcd-laya-finetune`; codex journal-round
+> review APPROVE on the underlying reports). **Status caveat**: labeled
+> *analysis-rerun* — a LOCKED evaluation on families/tasks untouched by
+> any design decision is still required before calling the effect
+> confirmatory in the strong sense.
+
+Setup: RLCD fine-tuned Laya checkpoints (BT and proper-score arms; trained
+on seeds 0–15, early-stopping on 16–19 of the 20-seed 5-family dataset),
+evaluated leave-one-family-out (5 folds, dual training seeds, 663 records;
+`runs/exp_rlcd_loo_confirmatory.json`).
+
+- Pooled cross-family pairwise accuracy (fine-tuned vs RF baseline, per-record
+  paired bootstrap): **bt +0.140 [+0.126, +0.154]**; proper +0.019
+  [+0.007, +0.032]. **5/5 family CIs exclude 0.** Per-family deltas:
+  sixhump +0.305, ackley +0.209, rastrigin +0.151, branin +0.045,
+  hartmann +0.016.
+- Round-1 LOO (E5, `exp_rlcd_loo_transfer.json`): cross-family ranking
+  gap vs in-family doubled (+0.056 → +0.146); bt > RF on 5/5 folds
+  (one-sided sign test p=0.031).
+- **Engineering probe (GearTrain)**: decision-level transfer holds —
+  bt 0.893 ≈ RF 0.890 > proper 0.801 > zero-shot 0.423 (65 records,
+  1,595 pairs; `exp_geartrain_transfer_probe.json`). Full
+  engineering-simulator transfer remains unrun.
+- Relation to §4 (RF): the RF System-1 transfers with lower one-step
+  decision regret on 3/5 families; the fine-tuned model additionally
+  recovers the teacher's *calibration* (proper arm, §5.6) and holds on an
+  engineering family — but neither closes the loop (§5.6, §7.15).
+
 ## §5 RQ1 — Decision Landscape
 
 ### §5.1 Three regimes (Step 1)
@@ -404,6 +453,57 @@ For each (problem, seed), replay with one first action then AlwaysSurrogate
 continuation. **Best first action across opportunity-rich families is
 `local_exploitation`** (Hartmann 0.33 vs Surrogate 0.48; Rastrigin 0.00
 vs Surrogate 11.10; Ackley 0.005 vs Surrogate 0.03).
+
+### §5.6 Teacher noise and decision-level distillation (EXP-RLCD)
+
+> NEW 2026-09-28. Artifacts: `runs/EXP_JOURNAL_ROUND2_REPORT.md`,
+> `exp_teacher_noise_diagnostic{,_r5}.json`, `runs/EXP_RLCD_REPORT.md`,
+> `exp_rlcd_report.json` / `exp_rlcd_ci.json`, `exp_rlcd_sweep.json`,
+> `exp_rlcd_longhorizon.json`, `exp_rlcd_closed_loop.json`,
+> `exp_rlcd_router_panel.json`; theory `docs/RLCD_THEORY.md`.
+
+**Label noise (P1a).** Single-roll counterfactual labels are
+noise-dominated: per-re-roll pair flip probability **0.40** on
+above-median-gap pairs (0.36 overall; conservative any-of-3 union 0.73
+above-median / 0.65 overall); inter-roll gap spread 0.0915 exceeds the
+median stored gap 0.05; argmax stable across re-rolls for only 29% of
+records. R=5 replicate-averaging reduces the 2v2 split-half pair flip to
+0.36 overall / 0.33 above-median — necessary hygiene, not stabilization.
+A Gate-4-aligned teacher (rule continuation, pure terminal-Δbest utility,
+R=5) still fails Gate 4 with wide upper bounds (+0.78 Ackley / +1.92
+Hartmann): first-action labels cannot demonstrate terminal behavior-gain
+on this panel.
+
+**Distillation (4-arm, held-out 115 records / 2,889 pairs).** RLCD
+fine-tuning of the 0.4B Laya typed-decision model on counterfactual pairs:
+
+| Arm | Pairwise acc | Top-1 | Mean log score |
+|---|---:|---:|---:|
+| zero-shot | 0.396 (< chance) | 0.035 | −3.32 |
+| RLCD proper-score | 0.800 | 0.252 | **−2.07** (only arm beating uniform −2.079) |
+| BT pairs | **0.873** | 0.383 | −3.06 (below uniform — overconfidence) |
+| RF (utilities) | 0.817 | 0.400 | — |
+
+Pairwise CIs (record-clustered bootstrap, `exp_rlcd_ci.json`):
+BT − RF +0.056 [+0.033, +0.080]; proper − BT −0.073 [−0.090, −0.055];
+proper ≈ RF (CI crosses 0). Hyperparameter sweep (15 configs, re-run
+2026-09-28 on the fixed margin plumbing): defaults near-optimal (best bt
+0.878 at β1/margin0; best proper 0.795 at w_sph 0.5 / lr 5e-6) — the
+objective choice is the lever, not the knobs. On the long-horizon partial
+dataset the ordering is preserved at smaller margins (bt 0.660 > proper
+0.576 > RF 0.545 > zero 0.485).
+
+**Closed loop (negative).** Both fine-tuned arms collapse to the same
+constant policy (1,250/1,250 decisions `local_exploitation`), so their
+closed-loop results ARE the fixed-Local policy's: Rastrigin +0.624
+[+0.288, +0.936] vs rule; Hartmann −9.041 [−17.89, −1.91]; Branin −0.016
+[−0.025, −0.007] vs surrogate. A confidence router on top (quantile
+thresholds) routes essentially every decision to surrogate on Hartmann
+(routed ≡ always-surrogate, all diffs 0) and is negative-in-mean on
+Rastrigin (−0.23, CI crosses 0): no free closed-loop win from routing the
+fine-tuned model either. Decision-level recovery does not yield a deployed
+optimizer — consistent with RLCD_THEORY T4/L1 (the h3 teacher's argmax is
+dominated by its constant component) and with §6.5's schedule finding.
 
 ## §6 RQ3 — Selective Reasoning
 
@@ -597,11 +697,26 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
     problems have different objective scales. The TOTAL comparison is
     informative but not on a common scale; per-family + ratio-of-advantages
     is the cleaner framing.
+15. **RLCD transfer is analysis-rerun, not locked** — the +0.140 5/5-fold
+    cross-family result (§4.7) was produced after design iterations on the
+    same panel; a locked evaluation on untouched families/tasks is required
+    before calling it confirmatory. And the fine-tuned arms collapse to a
+    constant policy in closed loop (§5.6) — no learned policy on this panel
+    (RF or RLCD) beats the constant local baseline in closed loop.
+16. **Teacher noise bounds the supervision** — counterfactual labels are
+    noise-dominated at single roll (per-re-roll flip 0.40 above-median);
+    all §5.6 distillation results are relative to that teacher, and Gate 4
+    (terminal behavior-gain) is unattainable for first-action labels on
+    this panel even after R=5 denoising and utility alignment.
 
 ## §8 Discussion
 
 - "Is decision-intelligence learnable?" — partially yes (Hartmann
-  suggestive; flat families no signal).
+  suggestive; flat families no signal). At the distillation level: the
+  noise-dominated counterfactual teacher is still learnable at decision
+  level (0.40 → 0.87 pairwise; proper-score arm uniquely calibrated,
+  §5.6) — but the learned policy collapses to the teacher's constant
+  component in closed loop.
 - "Does it transfer across problems?" — see §4 RQ2 below.
   Cross-family has lower regret vs real RulePolicy on 3/5 (Branin, Ackley,
   Rastrigin) and vs AlwaysSurrogate on 2/5 (Ackley, Rastrigin); higher regret
@@ -618,7 +733,9 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
   value is the open question.
 - "Does the trained System-1 transfer across problems?" — see §4 RQ2 below
   (wins vs real RulePolicy on 3/5; wins vs AlwaysSurrogate on 2/5; loses to a
-  constant local policy on aggregate).
+  constant local policy on aggregate). The RLCD fine-tuned model transfers
+  at decision level (+0.140, 5/5 folds, analysis-rerun; GearTrain probe
+  holds, §4.7) — closed-loop transfer remains undemonstrated for both.
 
 ## §9 Conclusion
 
@@ -647,7 +764,15 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
   all five families; always-LLM is CI-detectably worse on Ackley, Hartmann,
   and SixHumpCamel. No confidence-threshold or random-rate router earns
   its cost. The measured frontier is degenerate: System-1 only.
-- Six negative results that sharpen the claim: (a) trained router does
+- **EXP-RLCD (NEW 2026-09-28)**: decision-level distillation of the
+  counterfactual teacher into a 0.4B typed-decision model (pairwise
+  0.40 → 0.87; the proper-score arm is the only calibrated one), with
+  cross-family transfer (+0.140, 5/5 folds, analysis-rerun) and a
+  decision-level engineering probe (GearTrain 0.89 ≈ RF). Closed loop
+  collapses both fine-tuned arms to the teacher's constant component —
+  decision-level recovery without a deployed optimizer, mirroring the
+  schedule finding of §6.5.
+- Seven negative results that sharpen the claim: (a) trained router does
   not transfer from BOCoDe to IOH; (b) RoutingAware does not beat
   LLM-everywhere on the same panel; (c) cross-family transfer does not
   help Hartmann or SixHumpCamel vs AlwaysSurrogate; (d) cross-family RF
@@ -656,7 +781,10 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
   function dimension transfer fails (RQ2.2 at 10 seeds — the RQ2.1 signal
   is a family signal, not a dimension signal); (f) in closed loop,
   always-LLM is dominated by both the frozen System-1 and a deterministic
-  two-phase schedule (§6.5) — and by P3 no router could have fixed this.
+  two-phase schedule (§6.5) — and by P3 no router could have fixed this;
+  (g) RLCD fine-tuned decision models collapse to a constant policy in
+  closed loop (§5.6) — decision-level metrics do not imply
+  trajectory-level value.
 - Future work: regimes where an LLM System-2 repays its cost (longer
   horizons, stochastic objectives, OOD states), external lenz/PlugBO
   baseline, fine-tuning a small decision model from LLM trajectories,
@@ -696,6 +824,16 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
 - `scripts/analyze_rq3_cost_frontier.py` — merged analysis; reproduces the
   3-seed numbers exactly on the original file (how the sign error was found)
 - `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md` — RQ2.2 clean negative
+- `runs/EXP_RLCD_REPORT.md` + `runs/exp_rlcd_report.json` / `exp_rlcd_ci.json` /
+  `exp_rlcd_sweep.json` — RLCD 4-arm decision-level result, CIs, sweep
+- `runs/EXP_JOURNAL_ROUND2_REPORT.md` + `runs/exp_teacher_noise_diagnostic.json` /
+  `exp_teacher_noise_diagnostic_r5.json` / `runs/exp_rlcd_loo_confirmatory.json` /
+  `exp_rlcd_loo_transfer.json` — teacher-noise chain + LOO transfer
+- `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.7)
+- `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
+  `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,
+  router panel (§5.6)
+- `docs/RLCD_THEORY.md` — R1–R4 / T1–T5 for the distillation line
 - `runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md` — closed-loop audit
   (`rf_all` / `rf_transfer` vs fixed controls, seeds 100–119 / 200–219)
 - `src/opt_agent/backend/bocode_botorch.py` — affine transform (Gate 5)

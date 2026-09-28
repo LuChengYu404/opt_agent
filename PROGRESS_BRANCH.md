@@ -315,3 +315,34 @@ reproducible); SixHumpCamel `***` scoped to the bt arm; "+5.87 every
 routed arm" corrected (+5.40 for bt_q20); "+Hartmann now passes" →
 +Branin; affine §3.2 heading 15/17→17/17; THEORY.md D values moved to
 the 20-seed recomputation; P3/L1 no longer claimed as script-verified.
+
+## 12. Paper outline: consistency revision + RLCD integration (2026-09-28)
+
+Two commits on `docs/workshop_paper_outline.md`:
+
+1. **Internal-consistency revision** (7 contradictions fixed): abstract
+   point 3 said the schedule control "has not been run" while its own
+   point 4 and §6.2/§6.5 reported its results; the abstract still said
+   cross-problem transfer "not yet demonstrated" (RQ2.1 predates the
+   sentence); §5.1 regime table carried 10-seed D values whose
+   Rastrigin/Ackeli ordering flips in §3.8's 20-seed table; subsection
+   numbering was off (§4.1–4.5 under §5, §5.1–5.5 under §6 → renumbered);
+   test count 385→423 (x4); title aligned with the schedule-sufficiency
+   finding (old title kept as noted alternative).
+2. **RLCD line integrated** (content update, numbers re-verified against
+   `runs/*.json` in the same session): new §4.7 (fine-tuned-model
+   cross-family transfer +0.140 5/5 folds analysis-rerun; GearTrain
+   probe), new §5.6 (teacher-noise chain; 4-arm distillation table; sweep
+   re-run numbers; long-horizon; closed-loop collapse + router panel),
+   limitations 15–16, discussion/conclusion/abstract point 5, negative
+   result (g). Fresh codex review recommended before submission — the
+   prior APPROVE predates this integration.
+
+Verification this pass (all personally re-pulled): §5.1 D values
+(verify_theory_propositions.json), §4.7 LOO confirmatory + per-family +
+E5 recompute (gap +0.146 = 0.8657−0.7200 ✓, 5/5 ✓, one-sided p=0.031 ✓),
+GearTrain, split-half 2v2, aligned Gate-4 upper bounds (+0.78/+1.92),
+4-arm + CIs, sweep re-run, long-horizon, closed-loop regrets recomputed
+from exp_rq1_3_closed_loop_regret.json (local 0.332/0.0/0.005 vs
+surrogate 0.477/11.099/0.031 ✓), Hartmann RF probe (0.47 vs 0.68,
+CI [−0.038, 0.415], p=0.141 ✓), Gate 5 Spearman per-bucket = 1.0 (x17).
