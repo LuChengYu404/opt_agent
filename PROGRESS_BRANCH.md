@@ -392,3 +392,21 @@ nothing — both arms evaluated as zero-shot, pooled diff −0.249 identical
 for both arms). Fixed to split by seed RANK (16 smallest train / rest val),
 which is identity on the original 0–19 data and correct for any seed
 offset. The void artifact was overwritten by the fixed re-run.
+
+## 14. State/action design survey + codex adjudication (2026-09-28)
+
+Literature spectrum survey (Sara/lenz full-text fetched; LLAMBO / GPTOpt /
+Volpp / TempoRL / FunBO search-verified) in
+`docs/ref_papers/state_action_design_survey.md` — the project sits at
+"most-compressed state + mid-level strategy actions + unique per-decision
+counterfactual supervision"; the closed menu is the expressiveness-for-
+measurability trade that makes gates/cost-frontier possible.
+
+Codex adjudication (`runs/codex_design_review.log`):
+**VERDICT: KEEP_FROZEN_QUALIFY.** (a)+(e) now: freeze the design, qualify
+the wording; (b) sidecar / (d) reconfigure-actions are journal-version
+options; (c) trajectory-level state not recommended. No lossless
+state/action change exists. Six claim-wording fixes applied to the outline
+(P2 scope, P3 conditionality, schedule sufficiency — title now "…Whose
+Value a Two-Phase Schedule Subsumes", menu closure scoped, Gate-2
+granularity, Gate-4 "not established" not "unattainable").

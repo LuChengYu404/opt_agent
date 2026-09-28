@@ -94,3 +94,21 @@
    - (c) state 升级到轨迹级（向 Sara/LLAMBO 靠拢，监督/gate 全部重做）；
    - (d) action 空间扩容（加 reconfigure 类动作，oracle rollout 语义需重定义）；
    - (e) 任何改动推迟到期刊版，workshop 版按 (a)。
+
+## 五、codex 裁决（2026-09-28，runs/codex_design_review.log）
+
+**VERDICT: KEEP_FROZEN_QUALIFY**（状态/动作定义冻结，只修措辞）。
+
+- 选项裁定：(a) 冻结+措辞限定 VIABLE_NOW；(b) sidecar VIABLE_LATER（留给
+  期刊版 HPO/工程任务）；(c) 轨迹级状态 NOT_RECOMMENDED（本面板无已证收益、
+  清空证据库、4/5 家族 D 上限依旧低）；(d) 扩动作（reconfigure 类）
+  VIABLE_LATER（需重定义 oracle rollout 语义）；(e) workshop 按 (a) 出、
+  期刊版再评估 VIABLE_NOW。
+- 无损改动：**None**——没有任何状态/动作定义变更能在不推翻现有 artifact 的
+  前提下带来足够收益。
+- 六条 claim 措辞修正（已落实到 outline）：P2 的 D 需注明范围（固定 8-action
+  菜单+采样状态+rollout utility，不含闭环 terminal value/扩容动作）；
+  P3 是条件命题（"tested routers 未赚回成本"+P3 为充分条件解释，非实证证明）；
+  schedule 是 sufficiency（标题从 "Reduces to" 改为 "Subsumes"）；封闭菜单=
+  "exhaustive labels over our predefined menu"（不排除别处反事实比较）；
+  Gate 2 保持粒度限定；Gate 4/首动作标签 "not established"（非 "unattainable"）。

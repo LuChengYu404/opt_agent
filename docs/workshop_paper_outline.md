@@ -26,13 +26,16 @@
 
 ## Title (draft)
 
-**"Decision-Centric Bayesian Optimization: A Decision-Landscape Framework and an LLM System-1 Whose Value Reduces to a Two-Phase Schedule"**
+**"Decision-Centric Bayesian Optimization: A Decision-Landscape Framework and an LLM System-1 Whose Value a Two-Phase Schedule Subsumes"**
 
 > Alternative (previous title, dropped 2026-09-28): *"...and the Surprising
 > Value of an LLM as System-1"* — it over-promises relative to the paper's
 > own mechanism result: the deterministic two-phase schedule reproduces and
 > exceeds the LLM's closed-loop value (§6.2/§6.5), and the LLM is detectably
 > worse than Surrogate on 3/5 families in the one-step comparison (§6.1).
+> ("Reduces to a Two-Phase Schedule" was also considered and dropped:
+> reduction is a causal claim; the evidence establishes sufficiency —
+> per codex design adjudication 2026-09-28.)
 
 ---
 
@@ -60,9 +63,10 @@ state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
    pattern** *associated with* its advantage. A predeclared deterministic
    two-phase schedule realizing that pattern **reproduces and exceeds the
    LLM's closed-loop value** (CI-excluding-zero wins on 3/5 families, never
-   loses; §6.2/§6.5) — the schedule, not LLM-specific per-step reasoning,
-   accounts for the LLM's measurable decision value (a step-level causal
-   decomposition remains open, §7.9). A simple `dim≥5` router beats
+   loses; §6.2/§6.5) — a two-phase schedule suffices to match or exceed the
+   LLM's value on this panel, so LLM-specific per-step reasoning is not
+   needed to explain it (a step-level causal decomposition remains open,
+   §7.9). A simple `dim≥5` router beats
    Surrogate on the BOCoDe panel (p=0.0120) but does NOT transfer to
    IOH/BBOB (p=0.1376, negative result).
 4. **Cost frontier (10 seeds, closed loop)** — with a frozen RF System-1
@@ -132,9 +136,11 @@ and within-function dimension transfer is a clean negative.
   BoTorch backend, full (trials, config, instructions, deliberation-history)
   state, no learned policy, token cost reported but not optimized. Our
   closed 8-action space over a compressed 15-scalar process state is the
-  opposite trade: expressiveness for measurability — it is what makes
-  per-decision counterfactual supervision, predeclared gates, and a
-  noninferiority cost frontier possible. Full state/action design spectrum:
+  opposite trade: expressiveness for measurability — closure enables
+  exhaustive per-decision counterfactual labels over our predefined menu
+  (and with them the predeclared gates and the noninferiority cost
+  frontier); it does not rule out counterfactual comparisons elsewhere.
+  Full state/action design spectrum:
   `docs/ref_papers/state_action_design_survey.md`.
 - Meta-learning for algorithm selection (Biedenkapp et al. on algorithm
   configuration; TempoRL's skip-actions are the anchor for our zero-cost
@@ -228,7 +234,10 @@ Four short results formalize claims the experiments measure:
 - **P2 (`adaptive-value` = tight value of state-conditionality).**
   `D = E[max_a U] − max_a E[U] ≥ 0` equals the one-step regret of the best
   constant action against per-state oracle selection and tightly bounds the
-  gain of *any* state-conditional policy over the best constant action.
+  gain of *any* state-conditional policy over the best constant action —
+  **scope: this fixed 8-action menu, the sampled states, and the rollout
+  utility**; it does not bound closed-loop terminal value or gains from an
+  expanded action menu.
   The Flat families (SixHumpCamel D = 0.012 at 20 seeds) admit no
   state-conditional gain by bound, which is why the RF probe finds no
   signal there. Recomputed at 20 seeds: Hartmann 0.710 > Ackley 0.332 >
@@ -593,12 +602,14 @@ picks `surrogate_acquisition` 100% of all 25 steps.
   On Rastrigin the ordering is schedule ≈ rf > llm, which **subsumes** the
   earlier "LLM > AlwaysSurrogate on Rastrigin" pilot: the schedule alone
   reproduces and exceeds the LLM's value. See §6.5.
-- **Recommended paper wording (updated)**: *"On Rastrigin, the LLM
-  exhibited a global-to-local temporal action pattern associated with its
-  advantage over AlwaysSurrogate. A deterministic two-phase schedule
-  realizing that pattern matches the LLM's value and exceeds it on three
-  of five families, so the schedule — not LLM-specific per-step reasoning
-  — accounts for the LLM's measurable decision value on this panel."*
+- **Recommended paper wording (updated per codex design adjudication
+  2026-09-28)**: *"On Rastrigin, the LLM exhibited a global-to-local
+  temporal action pattern associated with its advantage over
+  AlwaysSurrogate. A deterministic two-phase schedule realizing that
+  pattern matches the LLM's value and exceeds it on three of five
+  families — a two-phase schedule suffices to match or exceed the LLM's
+  value on this panel, so LLM-specific per-step reasoning is not needed
+  to explain it."*
 
 ### §6.3 FrozenRouter: BOCoDe advantage does NOT transfer
 
@@ -665,8 +676,10 @@ zero on Hartmann (+0.334), SixHumpCamel (+0.674), and Rastrigin (+9.628)**
 and never loses to it; it ties `rf` on Branin/Hartmann/Rastrigin while RF
 keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
 decision content is dominated by the fixed two-phase schedule its own
-per-step distribution exhibits — and by THEORY.md P3, no router could have
-rescued an arm with nonpositive per-state advantage. Artifacts:
+per-step distribution exhibits — none of the tested routers earned its
+cost, consistent with THEORY.md P3 (IF an arm's per-state advantage is
+≤ 0, no router can rescue it; our data are consistent with, but do not
+independently establish, that premise). Artifacts:
 `runs/exp_rq3_schedule_baseline.json`,
 `scripts/exp_rq3_schedule_baseline.py`.
 
@@ -766,8 +779,9 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
 16. **Teacher noise bounds the supervision** — counterfactual labels are
     noise-dominated at single roll (per-re-roll flip 0.40 above-median);
     all §5.6 distillation results are relative to that teacher, and Gate 4
-    (terminal behavior-gain) is unattainable for first-action labels on
-    this panel even after R=5 denoising and utility alignment.
+    (terminal behavior-gain) was NOT established for first-action labels on
+    this panel even after R=5 denoising and utility alignment (wide upper
+    bounds are absence of evidence, not proof of impossibility).
 
 ## §8 Discussion
 
@@ -841,7 +855,9 @@ rescued an arm with nonpositive per-state advantage. Artifacts:
   function dimension transfer fails (RQ2.2 at 10 seeds — the RQ2.1 signal
   is a family signal, not a dimension signal); (f) in closed loop,
   always-LLM is dominated by both the frozen System-1 and a deterministic
-  two-phase schedule (§6.5) — and by P3 no router could have fixed this;
+  two-phase schedule (§6.5) — none of the tested routers earned its cost,
+  and P3 supplies a sufficient-condition explanation (if per-state
+  advantage ≤ 0, no router can help);
   (g) RLCD fine-tuned decision models collapse to a constant policy in
   closed loop (§5.6) — decision-level metrics do not imply
   trajectory-level value.

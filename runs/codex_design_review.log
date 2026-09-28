@@ -1,0 +1,2545 @@
+OpenAI Codex v0.156.1
+--------
+workdir: /home/lcy/Documents/projects/opt_agent_v3
+model: gpt-6-sol
+provider: openai
+approval: on-request
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0e68e-6e46-72c1-900f-7528257b2e38
+--------
+user
+Design adjudication: does this project's STATE and ACTION design need adjustment?
+
+Context: opt_agent_v3 studies meta-decisions in Bayesian Optimization (which optimization strategy to take next), targeting a workshop paper now and a journal paper later. Current design (frozen since Phase 2-6):
+- STATE: OptimizationState = 5 frozen dataclasses, ~15 process-only scalars (sampling geometry, GP summary stats, progress, budget, last_action only). No raw trajectory, no config, no deliberation history. src/opt_agent/state/models.py + extractor.py.
+- ACTION: 8 typed strategy actions (global_exploration, local_exploitation, uncertainty_sampling, error_guided_sampling, boundary_sampling, surrogate_acquisition, retrain_surrogate, stop). Actions generate x via the backend; the policy never picks x. src/opt_agent/actions/models.py.
+- SUPERVISION (unique): per-decision counterfactual oracle labels (rollout each candidate action h=3, softmax over utilities) -> this is only possible because the action space is closed.
+
+READ FIRST: docs/ref_papers/state_action_design_survey.md (literature spectrum: Sara/lenz open command space + full (D,c,K,H) state; LLAMBO/GPTOpt act in x-space with full trajectory prompts; Volpp picks x from candidates; TempoRL skip-actions; FunBO evolves acquisition code).
+
+Key empirical evidence (all verified against runs/*.json this week):
+- P2 adaptive-value ceiling D (representation-INdependent, computed from oracle labels directly): hartmann 0.71, ackley 0.33, rastrigin 0.26, branin 0.04, sixhump 0.01. On 4/5 families even an omniscient per-state picker barely beats the best constant action.
+- Gate 2 (state->action learnability from the 15-scalar state): FAILS (5/15 buckets). This negative IS representation-dependent.
+- Gate 3 (early exploration mass) replicates on an independent seed stream (1.296 vs 1.294); stop-gain 5/5 robust to Bonferroni; uniform/behavior gains fragile.
+- RLCD fine-tuning: decision-level pairwise 0.40->0.87, cross-family transfer +0.140/+0.188 on two independent streams; BUT both fine-tuned arms collapse to a constant local_exploitation policy in closed loop (1250/1250).
+- RQ3 cost frontier: frozen RF System-1 (0 LLM calls) dominates every LLM-calling arm on 5/5 families; a deterministic two-phase schedule reproduces+exceeds the LLM's closed-loop value. Frontier degenerate (P3: per-state advantage <= 0).
+- Teacher labels are noise-dominated (per-re-roll pair flip 0.40 above-median); Gate 4 (terminal behavior-gain) unattainable for first-action labels on this panel.
+- The 5-family synthetic panel is the benchmark; family-level locked eval requires extending the backend allowlist (frozen decision).
+
+Constraints on any change:
+- Changing state or action definitions invalidates: both datasets (663+654 records), all RLCD checkpoints, all gates, all reported numbers -> full regeneration + retraining + codex re-review (frozen-config discipline).
+- Workshop paper is near submission (outline at docs/workshop_paper_outline.md, internally consistent, all numbers artifact-verified).
+- Journal upgrade path exists (docs/ref_papers/journal_positioning.md: needs HPO/engineering problems + external baselines anyway).
+
+Evaluate the five options from the survey:
+(a) keep frozen + qualify wording (Gate-2 granularity qualifier already added to the outline; zero re-run cost)
+(b) add optional sidecar problem-features to state (Q-T6: Optional[ProblemFeatures], backward compatible; datasets regenerate)
+(c) upgrade state to trajectory-level (toward Sara/LLAMBO richness; supervision/gates all redone)
+(d) expand action space (add reconfigure-like actions, e.g. change acquisition/surrogate config; oracle rollout semantics must be redefined for them)
+(e) defer any change to the journal version; workshop ships with (a)
+
+Answer exactly:
+1) One line per option (a)-(e): VIABLE_NOW | VIABLE_LATER | NOT_RECOMMENDED — <short why, referencing the evidence above>
+2) The single most valuable LOW-COST state/action change (if any) that does NOT invalidate existing artifacts — or "none"
+3) Whether any current paper CLAIM is at risk from the present design (list claim -> risk -> wording fix if so)
+4) One final line: VERDICT: KEEP_FROZEN_QUALIFY | SIDEcar_NOW | REDESIGN_NOW | OTHER
+
+Read-only adjudication: do NOT edit files, do NOT run tests or training. You may read any repo file and parse runs/*.json.
+
+warning: Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+codex
+I’ll read the survey and paper outline first, then check the implementation and cited run artifacts for claims that depend on the frozen state or action definitions. I’ll keep this read-only.
+exec
+/bin/bash -lc 'cat docs/ref_papers/state_action_design_survey.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# 状态/动作设计谱系调研（agentic BO 及近邻）
+
+> 2026-09-28 整理。目的：回答"本项目的 OptimizationState（15 维过程标量）
+> 与 8-action 封闭决策空间，相对文献处于什么位置；是否/如何需要调整"。
+> 供 codex 评审与 related-work 写作使用。
+> 核实标记：✅ = 本次经全文抓取或检索确认设计细节；⚠️ = 检索摘要确认，引用前需对 PDF。
+
+## 一、谱系总览
+
+各家分布在两条轴上：
+- **状态轴**：原始轨迹（GPTOpt/LLAMBO）→ 后验上下文+候选集（Volpp）→
+  过程统计量（TempoRL/DAC、本项目）→ 全量 (数据, 配置, 指令, 审议史)（Sara）。
+- **动作轴**：直接选下一个 x（GPTOpt/LLAMBO/Volpp）→ 策略级 typed 动作
+  （本项目）→ 开放机器控制命令（Sara reconfigure/probe）→ 程序空间（FunBO）。
+
+**本项目的位置：状态最压缩 + 动作居中（策略层）+ 唯一逐决策反事实监督。**
+
+## 二、逐家细节
+
+### 1. Sara/lenz — Agentic BO（Brunzema et al., arXiv:2608.00316, 2026）✅
+（全文抓取核对；本项目最近邻，ref 库主条目）
+
+- **动作** 𝒜 = 𝒜_comp ∪ 𝒜_eval ∪ {stop}：
+  - `probe`：只读查询后端（预测、acquisition 分数、诊断、Pareto、trial 历史）；
+  - `reconfigure`：改配置 c_t（换 acquisition/surrogate、收紧搜索域、改目标/约束）；
+  - `propose`：向后端要候选 x̃，agent 采纳/精修/**否决**，可先在不同配置下比较假想候选；
+  - `evaluate`：提交 x，唯一推进预算 t 的动作；
+  - `stop`。
+  计算类动作不消耗评估预算（消耗 token，**只报告不优化**，附录 E 才憧憬 meta-MDP 训练）。
+- **状态** s_t^(j) = (𝒟_t 观测对, c_t 配置, 𝒦_t 外生指令上下文, ℋ_t 审议历史含推理轨迹)。
+- metalevel MDP 形式化；通用 LLM 直接当策略，无学习。
+- **同构点**：计算/评估动作二分 ↔ 本项目 `n_new_samples ∈ {0,1,2,3}` 记账；
+  四元组状态是呈现本项目状态设计的现成语言（本项目 = (𝒟,c) 的投影摘要，
+  c 冻结、ℋ 退化为 last_action、无 𝒦）。
+- **关键差异**：开放命令空间 → 无法做反事实监督与预设定 gate。
+
+### 2. LLAMBO（Liu et al., ICLR 2024, arXiv:2402.03921）✅
+- **状态**：prompt 即状态——任务描述 + 搜索空间 + 预算 + **全部 (配置, 值) 历史的表格渲染**
+  + 任务元数据先验。
+- **动作**：warm-start 初始配置；surrogate (均值, 不确定性) 预测；navigator 提议
+  **下一个 x**；"eliciting temperature/propensity" 提示词控制探索-利用。
+- 复现研究（arXiv:2511.18891, 2025）：其判别式 surrogate 作为单任务回归器弱于
+  GP/SMAC，收益主要来自跨任务语义先验——**富状态≠高信号**的一个证据点。
+
+### 3. GPTOpt（arXiv:2510.25404, 2025）✅
+- **状态**：原始 (x_i, y_i) 轨迹直接作输入；**动作**：输出下一个 x。
+- 微调小型 LLM（非 prompt），生成优化数据训练，BBOB/COCO 基准。
+- "LLM 即优化器"路线：状态最原始、动作最底层、与本项目的 meta 决策层不同层。
+
+### 4. Volpp et al. — Meta-Learning Acquisition Functions（ICLR 2021, arXiv:1904.02642）✅
+- **状态**：输入 + 观测 + GP 后验上下文 + 候选点集，注意力编码，context-agnostic
+  （跨任务迁移）；**动作**：从候选集选下一个 x；RL 以 regret 训练。
+- 形式上最像本项目"从固定菜单挑"——但菜单是 x、监督是 RL 而非反事实 oracle。
+
+### 5. TempoRL / DAC 线（Biedenkapp et al., ICML 2021, arXiv:2106.05262）✅
+- **状态**：优化器 trace 统计（loss 曲线、特征统计）；**动作**：显式扩充 **skip 动作**
+  ——学"何时出手"（behavior Q + skip Q）。
+- 本项目"零成本动作（stop/retrain）+ 何时路由 System-2"的问题原型与文献锚点。
+
+### 6. FunBO（DeepMind/Oxford, arXiv:2406.04824, 2024）✅
+- 不在逐步决策层：FunSearch 进化 **acquisition 函数代码**，LLM 提议程序变异；
+  动作空间 = 程序空间，离线策略搜索。支持带 context features 的任务。
+
+### 7. 其他相关（一句话，未深挖）⚠️
+- OptFormer（Chen et al., 2022）：transformer 优化器，轨迹输入、下一 x 分布输出。
+- Maraval et al. transformer meta-BO（Volpp 引文线）：上下文编码 + 候选打分。
+- AISTATS 2024 "Timing as an Action"：TempoRL 后续，何时观测/出手。
+- BO-METS（Wang et al., NeurIPS 2023）：meta-learned transfer BO（DISCUSS Q-S2 已引）。
+
+## 三、对比表（论文 related work 可直接改造）
+
+| 工作 | 状态 | 动作 | 监督/策略 | 记忆 |
+|---|---|---|---|---|
+| Sara/lenz | (𝒟, c, 𝒦, ℋ) 全量 | probe/reconfigure/propose/evaluate/stop（开放） | 无学习 | 完整审议史 |
+| LLAMBO | prompt：任务+全历史表+元数据 | 下一 x（+温度倾向） | zero-shot prompt | 全历史 |
+| GPTOpt | 原始 (x,y) 轨迹 | 下一 x | 微调 | 全轨迹 |
+| Volpp | GP 后验上下文+候选集 | 候选集中选 x | RL (regret) | 上下文编码 |
+| TempoRL/DAC | trace 统计特征 | 干预 or skip | Q-learning | 特征统计 |
+| FunBO | — | acquisition 代码（程序空间） | 演化搜索 | — |
+| **本项目** | **15 维过程标量（5 frozen 块）** | **8 个 typed 策略动作** | **反事实 oracle 逐决策标签** | 仅 last_action |
+
+## 四、对本项目的三点含义（待 codex 裁决）
+
+1. **表达力 ↔ 可测性权衡**：封闭 8-action 空间是反事实监督 + Gate 2-5 +
+   非劣效成本前沿的前提；Sara 的开放空间无法做这些。卖点而非缺陷。
+2. **"信号薄"结论的表示限定**：P2 的 D 上限与状态表示无关（oracle 标签直算），
+   天花板结论安全；但 **Gate 2（可学性）的阴性是"在 15 维过程状态上"的阴性**
+   ——文献中富状态（全轨迹）设计理论上可提取更细模式（LLAMBO 复现研究
+   同时表明富状态也带来噪声与成本）。Gate 2 措辞应加 granularity 限定。
+3. **候选调整方向**（成本递增）：
+   - (a) 冻结现状 + 措辞限定（零重跑成本）；
+   - (b) state 加 optional sidecar（Q-T6 方案 b：`Optional[ProblemFeatures]`，
+     向后兼容，数据集需重生成或双轨）；
+   - (c) state 升级到轨迹级（向 Sara/LLAMBO 靠拢，监督/gate 全部重做）；
+   - (d) action 空间扩容（加 reconfigure 类动作，oracle rollout 语义需重定义）；
+   - (e) 任何改动推迟到期刊版，workshop 版按 (a)。
+
+exec
+/bin/bash -lc 'cat docs/workshop_paper_outline.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# Workshop Paper Outline — Decision-Centric BO
+
+> **Status**: draft outline, 2026-09-27 (updated same day: Tracks A/B/D complete;
+> RQ3 real-LLM cost frontier added at 10 seeds; RQ2.2 dimension-transfer
+> negative added; RQ3 router-sweep sign error corrected).
+> **2026-09-28 internal-consistency revision**: abstract no longer says the
+> schedule control "has not been run" (it contradicted its own point 4 and
+> §6.2/§6.5); RQ2.1 partial-transfer added to the abstract (was "not yet
+> demonstrated"); §5.1 regime table moved to the 20-seed recomputation
+> (10-seed Rastrigin/Ackley order swap noted); subsection numbering fixed
+> (§4.1–4.5 under §5 and §5.1–5.5 under §6 renumbered to match their
+> parents); test count 385→423; title aligned with the schedule-sufficiency
+> finding (previous title kept below as an alternative).
+> **2026-09-28 content update**: the branch RLCD line is integrated (§4.7
+> fine-tuned-model cross-family transfer + GearTrain probe; §5.6 teacher
+> noise + decision-level distillation + closed-loop collapse; limitations
+> 15–16; discussion/conclusion/abstract updated). All quoted numbers were
+> re-verified against `runs/*.json` in the same session. A fresh codex
+> review pass is recommended before submission — the prior APPROVE predates
+> this integration.
+> **Target venue**: ICLR / NeurIPS workshop on Meta-Learning for Optimization
+> or AutoML/BO workshop; NOT a main-track submission.
+> **Length**: 8 pages + appendix.
+
+---
+
+## Title (draft)
+
+**"Decision-Centric Bayesian Optimization: A Decision-Landscape Framework and an LLM System-1 Whose Value Reduces to a Two-Phase Schedule"**
+
+> Alternative (previous title, dropped 2026-09-28): *"...and the Surprising
+> Value of an LLM as System-1"* — it over-promises relative to the paper's
+> own mechanism result: the deterministic two-phase schedule reproduces and
+> exceeds the LLM's closed-loop value (§6.2/§6.5), and the LLM is detectably
+> worse than Surrogate on 3/5 families in the one-step comparison (§6.1).
+
+---
+
+## Abstract (≤ 200 words)
+
+Bayesian Optimization (BO) practice reduces many sequential decision points
+(refit surrogate, switch acquisition, expand region, or stop) to a single fixed
+acquisition function. We re-frame these as an explicit meta-decision: at every
+state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
+5-family BOCoDe panel × 20 paired seeds we measure five things:
+
+1. **Decision landscape** — we identify three regimes (Flat, Heavy-tailed,
+   Frequent-opportunity) using an `adaptive-value` metric on counterfactual
+   oracle labels.
+2. **Affine invariance (partial)** — gold_probs **median rank correlation is
+   Spearman ρ = 1.0000 across all 17 (problem, phase) buckets** under
+   y → scale * y + shift. The predeclared joint Gate 5 (which also requires
+   JS ≤ 0.02) **fails on 2/17 Hartmann buckets** due to GP-fit numerical
+   fragility in the rollout's surrogate acquisition proposal. Per-record
+   rank invariance is not established.
+3. **LLM as System-1** — a deepseek-chat LLM used at every decision beats
+   AlwaysSurrogate by **+17.54 best_y** on Rastrigin (paired-t **p=0.0058**,
+   Student-t df=n-1, n=10; it is detectably worse on Branin, Hartmann and
+   SixHumpCamel, §6.1) and exhibits a **global-to-local temporal action
+   pattern** *associated with* its advantage. A predeclared deterministic
+   two-phase schedule realizing that pattern **reproduces and exceeds the
+   LLM's closed-loop value** (CI-excluding-zero wins on 3/5 families, never
+   loses; §6.2/§6.5) — the schedule, not LLM-specific per-step reasoning,
+   accounts for the LLM's measurable decision value (a step-level causal
+   decomposition remains open, §7.9). A simple `dim≥5` router beats
+   Surrogate on the BOCoDe panel (p=0.0120) but does NOT transfer to
+   IOH/BBOB (p=0.1376, negative result).
+4. **Cost frontier (10 seeds, closed loop)** — with a frozen RF System-1
+   deployed through full BO trajectories, the always-LLM policy never beats
+   System-1-only with a CI excluding zero and is detectably worse on Ackley,
+   Hartmann, and SixHumpCamel; no confidence-threshold or random-rate routing
+   arm earns its cost. A deterministic two-phase schedule dominates the LLM
+   itself on 3/5 families — the frontier's degeneracy is a property of the
+   System-2 decisions, formalized by a routing-dominance proposition.
+5. **Distilling the teacher (decision-level)** — single-roll counterfactual
+   labels are noise-dominated (per-re-roll pair flip 0.40 above-median), yet
+   RLCD fine-tuning of a 0.4B typed-decision model lifts decision-level
+   pairwise ranking from 0.40 (zero-shot) to 0.87 (BT) / 0.80 (proper-score,
+   the only calibrated arm), and transfers cross-family at decision level
+   (+0.140 and +0.188 on two independent seed streams, 5/5 families each;
+   GearTrain engineering probe holds) — but both fine-tuned arms collapse
+   to a constant policy in closed loop (§4.7/§5.6).
+
+Our contribution is a 7-component framework (backend/state/action/utility/
+rollout/dataset/system-1+router) with **423 unit tests**, four formal
+results in `docs/THEORY.md` (P1/P2 verified numerically through the live
+code path; P3/L1 tied empirically), and run artifacts for every reported
+experiment. Cross-family transfer is partial and heterogeneous: the RF
+System-1 has lower one-step decision regret than the real
+state-conditional rule policy on 3/5 families (§4), and an RLCD
+fine-tuned model transfers at decision level (+0.140, analysis-rerun;
+§4.7); closed-loop and full engineering transfer are not demonstrated,
+and within-function dimension transfer is a clean negative.
+
+---
+
+## §1 Introduction
+
+- BO is usually presented as `x → f(x) → x*`, hiding the **sequential
+  control decisions** the practitioner makes between sample acquisitions.
+- We re-frame as `s_t → a_t → backend → s_{t+1}` — a meta-policy π(a|s).
+- Three RQs: Learnability (RQ1), Generalization (RQ2), Selective Reasoning (RQ3).
+- **Status**: RQ1 partially settled (Gate 3 adjusted_lift 1.294 CI [0.848, 1.954] at 20 seeds;
+  Gate 4 stop-gain 5/5; **Gate 5 partial — median Spearman = 1.0 but predeclared joint
+  fails on 2/17 buckets; Gate 2 still fails**); the teacher itself is noise-dominated
+  (single-roll pair flip 0.40 above-median) yet distillable at decision level
+  (RLCD fine-tuning of Laya: 0.40 → 0.87 pairwise; closed loop collapses to a
+  constant policy, §5.6); **RQ2 partially answered** (5-fold
+  leave-one-family-out CV: cross-family RF wins vs the real state-conditional
+  RulePolicy on **3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
+  95% CI upper < 0); aggregate Cross − Rule = -0.065; loses to a constant
+  `local_exploitation` policy (AlwaysLocal) on aggregate; an RLCD fine-tuned
+  model transfers at decision level, +0.140 / +0.188 on two independent
+  seed streams, 5/5 families each — family-level locking still open, §4.7); RQ3 has one strong
+  pilot (LLM > Surrogate on Rastrigin, p=0.0058), one negative pilot
+  (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
+  cost frontier (450 paired trajectories) in which a frozen RF System-1 with
+  zero LLM calls beats or ties every LLM-calling arm on all five families;
+  a predeclared deterministic two-phase schedule reproduces and exceeds the
+  LLM's closed-loop value (§6.2/§6.5).
+  Within-function dimension transfer (RQ2.2) is a clean negative: the RQ2.1
+  signal is a family signal, not a dimension signal.
+- This paper presents the framework + RQ1 + RQ2 partial pilot + RQ3 pilots;
+  full RQ2 transfer with engineering families and a crossed (family × dimension)
+  design is deferred.
+
+## §2 Background & Related Work
+
+- BO and BoTorch (briefly).
+- **Agentic BO (Sara/lenz, Brunzema et al. 2026)** — nearest neighbor: open
+  command action space (probe/reconfigure/propose/evaluate/stop) over a
+  BoTorch backend, full (trials, config, instructions, deliberation-history)
+  state, no learned policy, token cost reported but not optimized. Our
+  closed 8-action space over a compressed 15-scalar process state is the
+  opposite trade: expressiveness for measurability — it is what makes
+  per-decision counterfactual supervision, predeclared gates, and a
+  noninferiority cost frontier possible. Full state/action design spectrum:
+  `docs/ref_papers/state_action_design_survey.md`.
+- Meta-learning for algorithm selection (Biedenkapp et al. on algorithm
+  configuration; TempoRL's skip-actions are the anchor for our zero-cost
+  actions and when-to-route; our analogue is per-trajectory action selection).
+- LLM-as-decision-maker literature (LLAMBO ICLR 2024 — prompt-state with the
+  full evaluation history, action = next x; GPTOpt 2025 — fine-tuned
+  LLM-as-optimizer; both act in x-space, we act at the strategy layer).
+- Decision-theoretic foundations: counterfactual decision-making, instrument
+  of decision theory (no need to be exhaustive).
+
+## §3 The v3 Framework
+
+Architecture diagram: `state → policy → action → backend → new_state`.
+
+### §3.1 Backend — `BocodeBotorchBackend`
+
+- BOCoDe problem + BoTorch SingleTaskGP + LogExpectedImprovement.
+- Single-objective, unconstrained, continuous box-bounded (audited allowlist).
+- Checkpoint / restore preserves GP state + RNG (`backend.checkpoint()`).
+- Optional **affine objective transform** `y → scale * y + shift` (Gate 5).
+
+### §3.2 State — `OptimizationState` (5 frozen dataclasses)
+
+```
+SamplingState        — n_samples, dimension, min_pairwise_distance, boundary_coverage
+SurrogateState       — is_current, validation_rmse (in-sample), mean/max posterior std (64-pt Sobol grid; NaN when unfitted)
+OptimizationProgress — best_value, last_value, recent_improvement, stagnation_steps
+ResourceState        — used/total/remaining budget, remaining_budget_ratio
+HistoryState         — last_action only (no action-sequence memory)
+```
+
+Frozen + JSON-safe (NaN→None); `to_payload()` exposes 15 keys for LLM
+prompts; the RF System-1 uses the same 15 numbers + 3 phase one-hots.
+Phase (early/mid/late) is derived downstream from remaining_budget_ratio,
+not stored. 2026-09-28: field list corrected to match
+`src/opt_agent/state/models.py` (the previous draft listed
+gap_to_best / last_n_actions / action_diversity, which were never
+implemented).
+
+### §3.3 Action — 8 typed `OptimizationAction`
+
+`global_exploration`, `local_exploitation`, `uncertainty_sampling`,
+`error_guided_sampling`, `boundary_sampling`, `surrogate_acquisition`,
+`retrain_surrogate`, `stop`. Each has fixed params, fixed eval cost,
+and an `execute_action` runner.
+
+### §3.4 Utility — 4-term weighted sum
+
+```
+U(a|s) = w_optimization · Δopt / σ_init
+       − w_evaluation · n_new_samples / total_budget
+       − w_fit · n_model_fits / total_budget
+       + w_stop_opportunity · I[STOP]
+P*(a|s) = softmax(U(a|s) / T)
+```
+
+Picked empirically per Phase 8.6A so that 1 sample ≈ 1/total_budget
+utility units, comparable to Δopt fractions.
+
+### §3.5 Counterfactual Rollout
+
+`CounterfactualRollout(s, candidates, horizon)` — for each candidate, runs
+`backend.restore(checkpoint) → execute(candidate) → run continuation policy
+for `horizon-1` steps → return utility`. Tries to restore on every step
+to keep the backend state clean.
+
+### §3.6 Decision Dataset — JSONL
+
+Each record: `state + candidate_actions + gold_probs + rollout_results +
+metadata + replay_checkpoint`. 423 unit tests cover the schema, generation,
+validation.
+
+### §3.7 System-1 + Router
+
+`LayaPolicy` (typed-decision adapter) and `LLMSystem1Policy` (DeepSeek-chat
+API or mock). `HybridPolicy` wraps a System-1 + confidence-based router that
+falls back to `System2LLMDeepSeek`.
+
+### §3.8 Theoretical results (full statements + proofs: `docs/THEORY.md`)
+
+Four short results formalize claims the experiments measure:
+
+- **P1 (affine invariance, exact).** Under `y → αy + β` (α > 0) with the
+  scale `σ_opt = std(y_init)` recomputed, every utility label is unchanged
+  (β cancels in the Δopt difference; α cancels against the scale), so
+  gold_probs and all rank statistics are invariant by construction. This
+  makes Gate 5's Spearman = 1.0 *necessary*, and localizes the 2/17 JS
+  breaches to GP-fit numerics rather than the supervision signal. Verified
+  through the actual `compute_utility` code path on 5,304 rollout branches
+  (max relative error 1.4e-12; `scripts/verify_theory_propositions.py`).
+- **P2 (`adaptive-value` = tight value of state-conditionality).**
+  `D = E[max_a U] − max_a E[U] ≥ 0` equals the one-step regret of the best
+  constant action against per-state oracle selection and tightly bounds the
+  gain of *any* state-conditional policy over the best constant action.
+  The Flat families (SixHumpCamel D = 0.012 at 20 seeds) admit no
+  state-conditional gain by bound, which is why the RF probe finds no
+  signal there. Recomputed at 20 seeds: Hartmann 0.710 > Ackley 0.332 >
+  Rastrigin 0.262 > Branin 0.040 > SixHumpCamel 0.012.
+- **P3 (routing degeneracy).** If the System-2's per-state advantage
+  `A(s) = Q(s, a₂(s)) − Q(s, a₁(s)) ≤ 0` a.s., *every* router — oracle or
+  learned — has non-positive value over never routing. The 10-seed sweep
+  (0/40 arms beat `rf` with CI excluding zero) is the empirical signature
+  of `A ≤ 0`, so the routing failure is a property of the LLM's decisions,
+  not of the routing heuristic.
+- **L1 (exact imitation of axis-aligned rules).** A random forest whose
+  features contain an axis-aligned threshold rule's inputs reproduces the
+  rule exactly under noiseless labels with no feature aliasing — explaining
+  RQ2.2's `rf − rule_full = +0.0000` and the inherited losses to
+  Surrogate/Local.
+
+## §4 RQ2 — Cross-Family Transfer (Leave-One-Family-Out CV)
+
+> **NEW 2026-09-27**: this section fills the RQ2 gap that PROGRESS_BRANCH §1
+> explicitly flagged as 0%. The pilot is **partial** — exploratory, one-step,
+> synthetic-only.
+
+**Setup.** 5-fold leave-one-family-out CV with multi-output
+`RandomForestRegressor(n_estimators=200, max_depth=8, min_samples_leaf=5)`
+System-1 (one regressor per action; argmax = chosen action). Trained on
+`runs/phase8_6d_h3_20seed_5family.jsonl` (661 non-terminal records, 5 families
+× 20 seeds × horizon=3). Features: 15-dim state vector (12 numeric + 3 phase
+one-hot), via `scripts/_shared_rq_features.py` (shared with `exp_rq1_3_rf_probe.py`).
+
+**Baselines (all run on every held-out fold).**
+- **AlwaysSurrogate** (constant) — always picks `surrogate_acquisition`
+- **In-family RF** (LOSO reference, **not** an upper bound — see below)
+- **AlwaysLocal** (constant) — always picks `local_exploitation` (informational)
+- **RulePolicy (real, state-conditional)** — the actual `RulePolicy.select_action()` from
+  `src/opt_agent/loop/policies.py`: STOP if remaining_budget ≤ 4, GLOBAL_EXPLORATION
+  if stagnation_steps ≥ 3 AND budget ≥ 2, else SURROGATE_ACQUISITION. Reads state
+  from each record to produce a per-record action choice.
+
+**Metric.** Held-out decision regret = U(s, a*) − U(s, a_hat), where a_hat is
+the model's argmax over predicted utilities and a* is the oracle argmax.
+Lower is better.
+
+**Inference.** Per-family paired bootstrap 95% CIs in two flavors — (a)
+record-level (underestimates variance due to within-seed correlation) and (b)
+seed-block (resamples whole seeds with their records, preserving within-seed
+correlation; preferred per codex gpt-6-sol 2026-09-27 REVISE).
+
+**Per-family results** (lower regret is better; negative diff = cross is BETTER):
+
+| Held-out | dim | cross-fam regret | in-fam (ref) | AlwaysSurrogate | RulePolicy (real) | AlwaysLocal | Cross − Sur CI (seed-block) | Cross − Rule CI (seed-block) | Cross − Local CI (seed-block) |
+|---|---|---|---|---|---|---|---|---|---|
+| **Branin** | 2D | +0.0550 | +0.0415 | +0.0582 | +0.0730 | +0.0488 | `[-0.0145, +0.0086]` | **`[-0.0301, -0.0059]`** | `[-0.0029, +0.0162]` |
+| Hartmann | 6D | +0.9520 | +0.5776 | +0.7674 | +0.9249 | +0.7095 | `[+0.0414, +0.3466]` | `[-0.1155, +0.2101]` | `[+0.0925, +0.3910]` |
+| **Ackley** | 10D | +0.4674 | +0.3117 | +0.7051 | +0.6575 | +0.3324 | **`[-0.4342, -0.0762]`** | **`[-0.3350, -0.0770]`** | `[+0.0185, +0.2487]` |
+| SixHumpCamel | 2D | +0.0501 | +0.0128 | +0.0397 | +0.0471 | +0.0176 | `[+0.0075, +0.0134]` | `[-0.0013, +0.0075]` | `[+0.0259, +0.0391]` |
+| **Rastrigin** | 10D | +0.2245 | +0.2858 | +0.3807 | +0.3793 | +0.2639 | **`[-0.2511, -0.0837]`** | **`[-0.2472, -0.0716]`** | `[-0.1012, +0.0163]` |
+
+**Headline (per codex gpt-6-sol 2026-09-27 REVISE, exploratory)**:
+
+- **vs AlwaysSurrogate** (seed-block 95% CI): cross WINS on **2/5** (Ackley,
+  Rastrigin); LOSES on 2/5 (Hartmann, SixHumpCamel); inconclusive on Branin.
+- **vs RulePolicy (real, state-conditional)**: cross WINS on **3/5** (Branin,
+  Ackley, Rastrigin); inconclusive on Hartmann, SixHumpCamel. **0/5 losses.**
+- **vs AlwaysLocal (constant local_exploitation)**: cross LOSES on 3/5
+  (Hartmann, SixHumpCamel, Ackley); inconclusive on Branin + Rastrigin.
+  This is the weakest baseline (it ignores budget awareness and keeps
+  exploiting locally even at low remaining budget).
+
+**Two findings that sharpen the claim**:
+
+1. **Lower one-step regret than the real state-conditional RulePolicy on 3/5 BOCoDe families**, including the
+   10D multimodal pair (Ackley + Rastrigin) AND the 2D smooth Branin. The
+   real, state-conditional RulePolicy is a stronger baseline than the
+   constant AlwaysSurrogate, and the cross-family RF still wins on 3/5.
+   Cross − RulePolicy records-weighted mean = **−0.065** (cross is
+   better on aggregate).
+2. **In-family is not an upper bound**. On Rastrigin, cross-family regret
+   (+0.225) is **lower** than in-family regret (+0.286) — the in-family fit
+   has access to the held-out family but does not dominate. The in-family
+   RF is best described as a **reference**, not an upper bound.
+
+**Aggregate (records-weighted across 5 folds)**:
+- Cross-family RF mean regret: +0.351
+- In-family RF mean regret: +0.246 (reference)
+- AlwaysSurrogate mean regret: +0.389
+- RulePolicy (real) mean regret: +0.416 ← **always stops / global-explorates at low budget, picks surrogate the rest**
+- AlwaysLocal mean regret: +0.275 ← **best in aggregate because it always exploits locally**
+- Cross − Surrogate records-weighted mean: -0.038
+- Cross − RulePolicy records-weighted mean: **-0.065** (cross is better)
+- Cross − AlwaysLocal records-weighted mean: +0.076 (cross is worse)
+- Cross − In-family records-weighted mean: +0.105
+
+**Pattern**: cross-family transfer **wins on 2/5 vs AlwaysSurrogate**
+(Ackley, Rastrigin — both 10D), and **wins on 3/5 vs RulePolicy** (adds
+Branin 2D). The cross family signal correlates with dimensionality but
+family × dim are confounded. We do not claim dimension-specificity from
+this single 5-family panel.
+
+**Recommended paper wording (per codex gpt-6-sol REVISE)**:
+
+> "We test whether a learned System-1 (multi-output RandomForestRegressor)
+> trained on 4 BOCoDe families transfers to a held-out 5th. **Lower
+> one-step regret than the real state-conditional RulePolicy on three of
+> five tested family–dimension combinations** (Branin, Ackley, Rastrigin;
+> seed-block 95% CI upper bound < 0). The cross-family RF also has lower
+> regret than AlwaysSurrogate on the two 10D multimodal families (Ackley,
+> Rastrigin). It does **not** beat the constant `local_exploitation`
+> policy (AlwaysLocal) on aggregate, but that constant policy is
+> unrealistic — it does not respond to budget. We conclude that **a learned
+> System-1 transfers usefully across related BOCoDe families**, but the
+> transfer is heterogeneous (two inconclusive families, two losses vs
+> AlwaysSurrogate). Whether this transfers to engineering problems or to
+> closed-loop trajectory evaluation is left for future work."
+
+**Limitations specific to §4 RQ2**:
+- **One-step decision regret, not closed-loop trajectory** — the RF is
+  evaluated on its one-step choice against the oracle; we do not measure
+  the effect of deploying the RF through a full BO trajectory.
+- **Single model class (RF)** — MLP / GBM / Transformer may behave differently.
+- **Family × dimension confounded** — disentangling requires a crossed design
+  (same family at multiple dimensions). EXP-RQ2.2 below addresses the
+  dimension axis within a fixed function.
+- **No multiplicity adjustment** on the 5 per-family CIs.
+- **Aggregate records-weighted mean is arithmetic**, not inferential for
+  an average effect across new families.
+
+### §4.6 Within-function dimension transfer (EXP-RQ2.2) — clean negative
+
+**Why.** Every BOCoDe family has a fixed dimension, so RQ2.1's cross-family
+result confounds family with dimension. EXP-RQ2.2 fixes the function and
+varies only the dimension: a multi-output RF (same hyperparameters as
+RQ2.1) trained on the action labels of `RuleFullBudget` at IOH functions
+f6 (AttractiveSector), f8 (Rosenbrock), f15 (RotatedRastrigin) × source
+dims {2, 10} × instances {0, 1} × seeds {100–102}, then deployed on the
+untouched target dim 5 × instance 2 (72 trajectories total).
+
+| Cell (test d5/i2, n=10 seeds) | `rf − rule_full` | `rf − surrogate` | `rf − local` |
+|---|---:|---:|---:|
+| f6 | **+0.000** [+0.000, +0.000] | **+0.128** [+0.009, +0.282] | **+0.153** [+0.006, +0.303] |
+| f8 | **+0.000** [+0.000, +0.000] | **+0.244** [+0.059, +0.453] | **+0.321** [+0.141, +0.526] |
+| f15 | **+0.000** [+0.000, +0.000] | **+0.225** [+0.088, +0.378] | +0.105 [−0.033, +0.265] |
+
+(10-seed confirmation of the original 3-seed run; W/T/L and the 3-seed
+numbers in `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md`.)
+
+The RF imitates the rule perfectly on the held-out dimension (THEORY.md
+Lemma 1 makes this exact, not expected), and both lose to the fixed
+Surrogate baseline on every function — with CI excluding zero on all three
+at 10 seeds. **Within-function dimension transfer is a clean negative**;
+the RQ2.1 cross-family signal is at least partly a *family* signal, not a
+dimension signal.
+
+### §4.7 Fine-tuned System-1 cross-family transfer (EXP-RLCD, analysis-rerun)
+
+> NEW 2026-09-28 (branch `exp/rlcd-laya-finetune`; codex journal-round
+> review APPROVE on the underlying reports). **Status caveat**: labeled
+> *analysis-rerun* — the seed-reuse half was discharged same-day by the
+> independent-stream replication below (+0.188, same 5/5 significance);
+> the family-reuse half is NOT discharged (the same five families informed
+> the design; a locked family-level eval requires new allowlisted
+> problems — the backend allowlist currently holds exactly these 5 + the
+> consumed GearTrain probe).
+
+Setup: RLCD fine-tuned Laya checkpoints (BT and proper-score arms; trained
+on seeds 0–15, early-stopping on 16–19 of the 20-seed 5-family dataset),
+evaluated leave-one-family-out (5 folds, dual training seeds, 663 records;
+`runs/exp_rlcd_loo_confirmatory.json`).
+
+- Pooled cross-family pairwise accuracy (fine-tuned vs RF baseline, per-record
+  paired bootstrap): **bt +0.140 [+0.126, +0.154]**; proper +0.019
+  [+0.007, +0.032]. **5/5 family CIs exclude 0.** Per-family deltas:
+  sixhump +0.305, ackley +0.209, rastrigin +0.151, branin +0.045,
+  hartmann +0.016.
+- **Independent-seed-stream replication (2026-09-28, seeds 100–119, train
+  AND eval both on the new stream;
+  `exp_rlcd_loo_confirmatory_replication_s100_119.json`)**: bt − RF
+  **+0.188 [+0.175, +0.202]**; proper − RF +0.053 [+0.041, +0.064];
+  **5/5 family CIs exclude 0 again**, with the same per-family strength
+  ordering (ackley 0.282 / sixhump 0.255 / rastrigin 0.230 strong,
+  branin 0.098 / hartmann 0.037 small). The seed-reuse half of the
+  analysis-rerun caveat is discharged; the family-reuse half is not
+  (same 5 informed-design families — a locked family-level eval needs
+  new allowlisted problems).
+- Round-1 LOO (E5, `exp_rlcd_loo_transfer.json`): cross-family ranking
+  gap vs in-family doubled (+0.056 → +0.146); bt > RF on 5/5 folds
+  (one-sided sign test p=0.031).
+- **Engineering probe (GearTrain)**: decision-level transfer holds —
+  bt 0.893 ≈ RF 0.890 > proper 0.801 > zero-shot 0.423 (65 records,
+  1,595 pairs; `exp_geartrain_transfer_probe.json`). Full
+  engineering-simulator transfer remains unrun.
+- Relation to §4 (RF): the RF System-1 transfers with lower one-step
+  decision regret on 3/5 families; the fine-tuned model additionally
+  recovers the teacher's *calibration* (proper arm, §5.6) and holds on an
+  engineering family — but neither closes the loop (§5.6, §7.15).
+
+## §5 RQ1 — Decision Landscape
+
+### §5.1 Three regimes (Step 1)
+
+`adaptive-value(family) = E[max_a U] − max_a E[U]`. Primary numbers are the
+**20-seed recomputation** on the confirmatory dataset
+(`runs/verify_theory_propositions.json`, 663 records; same source as §3.8
+P2). The original 10-seed landscape (354 labels) read Hartmann 0.684 >
+Rastrigin 0.368 > Ackley 0.309 > Branin 0.048 > SixHumpCamel 0.015 — the
+**Rastrigin/Ackley order swaps at 20 seeds**, but both remain in the same
+regime, so the taxonomy is unchanged.
+
+| Family | adaptive-value (20 seeds) | Regime |
+|---|---|---|
+| Hartmann | 0.710 | Frequent opportunity |
+| Ackley | 0.332 | Heavy-tailed |
+| Rastrigin | 0.262 | Heavy-tailed |
+| Branin | 0.040 | Flat |
+| SixHumpCamel | 0.012 | Flat (clean negative control: 0% above δ=0.1) |
+
+### §5.2 Counterfactual oracle replay (Step 1 — Gate 3)
+
+20-seed 5-family dataset (`phase8_6d_h3_20seed_5family.jsonl`, 663 records).
+Gate 3 (`aggregate_mass`): **adjusted_lift = 1.294, seed-clustered 95% CI = [0.848, 1.954]**,
+n_seeds=100 (up from 10-seed's 1.124, CI [0.695, 1.722]).
+**Independent-stream replication (seeds 100–119, 654 records,
+`exp_rq1_2_h3_20seed_replication_s100_119.json`): adjusted_lift 1.296,
+CI [0.881, 1.867], PASS** — essentially identical.
+Gate 4 stop-gain CI lo > 0 on 5/5 families (5/5 again on the replication
+stream). Gate 4 uniform-gain CI lo > 0 on 4/5 (Branin, Hartmann, Rastrigin,
+SixHumpCamel); the replication stream also passes 4/5 but with a DIFFERENT
+set (Ackley, Branin, Hartmann, SixHumpCamel — Rastrigin swaps out), so the
+count replicates while the passing family set does not. Gate 4
+behavior-gain CI lo > 0 on 1/5 (Rastrigin only); the replication passes
+3/5 with a disjoint set and Rastrigin reversed — report behavior-gain as
+unstable across streams.
+
+### §5.3 Affine invariance (Step 1 — Gate 5, PARTIAL PASS)
+
+Gold_probs invariance under `y → scale * y + shift` (see `runs/EXP_AFFINE_REPORT.md`).
+Result on the 5-family panel × 4 transforms:
+- **Median Spearman ρ = 1.0000 across all 17 (problem, phase) buckets**
+  (consistent with the analytic argument: shift cancels in Δopt; scale
+  cancels via the `optimization_scale = std(initial_obj)` denominator)
+- **Argmax agreement ≥ 0.83 on all 17 buckets** (full ≥ 0.8)
+- **JS divergence ≤ 0.02 on 15/17 buckets; predeclared Gate 5 fails
+  because 2/17 Hartmann (late, mid) buckets breach the threshold due to
+  GP-fit numerical fragility** — BoTorch's `optimize_acqf(LogEI)` lands on
+  a duplicate X under shift=5, producing `delta_opt = 0` and a sharp
+  utility drop. **This is a known numerical fragility, NOT a violation of
+  the analytic rank invariance. Per-record rank invariance is not
+  established.**
+
+Paper claim: "Counterfactual oracle labels have median rank correlation
+1.0 under affine y transforms, with a known near-tie caveat in
+decision-rich (Hartmann) states; the predeclared joint Gate 5 fails on
+2/17 buckets due to GP-fit numerical fragility."
+
+### §5.4 State conditionality (Step 2 — RF probe)
+
+Hartmann: RF regret 0.47 vs Surrogate 0.68 (−29%) — paired bootstrap
+CI [−0.038, 0.415], t p=0.141 → suggestive pilot. Rastrigin/Ackley:
+RF ≈ best-fixed, no state-conditional learnability demonstrated.
+Branin/SixHumpCamel: too flat for learnability signal.
+
+### §5.5 Closed-loop regret (Step 3)
+
+For each (problem, seed), replay with one first action then AlwaysSurrogate
+continuation. **Best first action across opportunity-rich families is
+`local_exploitation`** (Hartmann 0.33 vs Surrogate 0.48; Rastrigin 0.00
+vs Surrogate 11.10; Ackley 0.005 vs Surrogate 0.03).
+
+### §5.6 Teacher noise and decision-level distillation (EXP-RLCD)
+
+> NEW 2026-09-28. Artifacts: `runs/EXP_JOURNAL_ROUND2_REPORT.md`,
+> `exp_teacher_noise_diagnostic{,_r5}.json`, `runs/EXP_RLCD_REPORT.md`,
+> `exp_rlcd_report.json` / `exp_rlcd_ci.json`, `exp_rlcd_sweep.json`,
+> `exp_rlcd_longhorizon.json`, `exp_rlcd_closed_loop.json`,
+> `exp_rlcd_router_panel.json`; theory `docs/RLCD_THEORY.md`.
+
+**Label noise (P1a).** Single-roll counterfactual labels are
+noise-dominated: per-re-roll pair flip probability **0.40** on
+above-median-gap pairs (0.36 overall; conservative any-of-3 union 0.73
+above-median / 0.65 overall); inter-roll gap spread 0.0915 exceeds the
+median stored gap 0.05; argmax stable across re-rolls for only 29% of
+records. R=5 replicate-averaging reduces the 2v2 split-half pair flip to
+0.36 overall / 0.33 above-median — necessary hygiene, not stabilization.
+A Gate-4-aligned teacher (rule continuation, pure terminal-Δbest utility,
+R=5) still fails Gate 4 with wide upper bounds (+0.78 Ackley / +1.92
+Hartmann): first-action labels cannot demonstrate terminal behavior-gain
+on this panel.
+
+**Distillation (4-arm, held-out 115 records / 2,889 pairs).** RLCD
+fine-tuning of the 0.4B Laya typed-decision model on counterfactual pairs:
+
+| Arm | Pairwise acc | Top-1 | Mean log score |
+|---|---:|---:|---:|
+| zero-shot | 0.396 (< chance) | 0.035 | −3.32 |
+| RLCD proper-score | 0.800 | 0.252 | **−2.07** (only arm beating uniform −2.079) |
+| BT pairs | **0.873** | 0.383 | −3.06 (below uniform — overconfidence) |
+| RF (utilities) | 0.817 | 0.400 | — |
+
+Pairwise CIs (record-clustered bootstrap, `exp_rlcd_ci.json`):
+BT − RF +0.056 [+0.033, +0.080]; proper − BT −0.073 [−0.090, −0.055];
+proper ≈ RF (CI crosses 0). Hyperparameter sweep (15 configs, re-run
+2026-09-28 on the fixed margin plumbing): defaults near-optimal (best bt
+0.878 at β1/margin0; best proper 0.795 at w_sph 0.5 / lr 5e-6) — the
+objective choice is the lever, not the knobs. On the long-horizon partial
+dataset the ordering is preserved at smaller margins (bt 0.660 > proper
+0.576 > RF 0.545 > zero 0.485).
+
+**Closed loop (negative).** Both fine-tuned arms collapse to the same
+constant policy (1,250/1,250 decisions `local_exploitation`), so their
+closed-loop results ARE the fixed-Local policy's: Rastrigin +0.624
+[+0.288, +0.936] vs rule; Hartmann −9.041 [−17.89, −1.91]; Branin −0.016
+[−0.025, −0.007] vs surrogate. A confidence router on top (quantile
+thresholds) routes essentially every decision to surrogate on Hartmann
+(routed ≡ always-surrogate, all diffs 0) and is negative-in-mean on
+Rastrigin (−0.23, CI crosses 0): no free closed-loop win from routing the
+fine-tuned model either. Decision-level recovery does not yield a deployed
+optimizer — consistent with RLCD_THEORY T4/L1 (the h3 teacher's argmax is
+dominated by its constant component) and with §6.5's schedule finding.
+
+## §6 RQ3 — Selective Reasoning
+
+### §6.1 Joint 10-seed 5-policy comparison (Student-t corrected)
+
+| Family | LLM − Jev (=Surrogate) | p (paired-t, df=n-1, two-sided) |
+|---|---|---|
+| Branin | -2.267 (CI [-3.375, -1.159]) | **0.0012** (LLM worse) |
+| Hartmann | -0.985 (CI [-1.423, -0.547]) | **0.0007** (LLM worse) |
+| Ackley | +0.461 (CI [-0.372, +1.294]) | **0.2423** (LLM slightly better, NS) |
+| SixHumpCamel | -0.247 (CI [-0.487, -0.007]) | **0.0446** (LLM worse) |
+| **Rastrigin** | **+17.540** (CI [+6.500, +28.579]) | **0.0058** (LLM better) |
+
+All p-values use Student-t distribution with df=n-1 (n=10 paired seeds).
+Source: `scripts/exp_rq0_5_proper_stats.py`. The early-report
+normal-approximation values were **stale** and inflated significance
+(e.g., Branin and Hartmann were reported as p<0.0001; the corrected
+Student-t values are 0.0012 and 0.0007 respectively).
+
+### §6.2 Mechanism: global-to-local temporal action pattern (correlational)
+
+From `runs/exp_rq0_5_action_distribution.md` — On Rastrigin (10D multimodal),
+the LLM exhibits a two-phase temporal pattern: predominantly `global_exploration`
+at steps 0–9 (90–100% across these steps; 1/10 trajectories spike to
+`local_exploitation` at steps 3, 6, 8, 9); mixed at steps 10–12 (30–40% global,
+60–80% local); 100% `local_exploitation` from step 13 onward. AlwaysSurrogate
+picks `surrogate_acquisition` 100% of all 25 steps.
+
+**Important caveats**:
+- The earlier §5 of `EXP_RQ1_3_REPORT.md` hypothesized the LLM might be picking
+  `local_exploitation` (the closed-loop best first action) — that hypothesis is
+  **rejected** by the per-step distribution (LLM picks `global_exploration` 70%
+  on Rastrigin, not `local_exploitation`).
+- The LLM's **pooled** top action on Rastrigin is `global_exploration` at 70%,
+  which is **similar to its share on smoother families** (Branin 76%, Hartmann
+  67%, Ackley 66%, SixHumpCamel 68%) — *families where LLM does NOT beat
+  Surrogate*. The pooled distribution alone does not explain the Rastrigin-
+  specific advantage; only the *temporal pattern* is unique.
+- **Deterministic schedule control now run (NEW)**: the predeclared
+  `GlobalThenLocal` baseline (10 global decisions, then local) was run on
+  the exact RQ3 panel (seeds 100–109, paired starts verified). It **beats
+  the real LLM with CI excluding zero on Hartmann (+0.334), SixHumpCamel
+  (+0.674), and Rastrigin (+9.628)** and never loses to it; it ties the
+  frozen RF on three families (RF keeps Ackley and SixHumpCamel).
+  On Rastrigin the ordering is schedule ≈ rf > llm, which **subsumes** the
+  earlier "LLM > AlwaysSurrogate on Rastrigin" pilot: the schedule alone
+  reproduces and exceeds the LLM's value. See §6.5.
+- **Recommended paper wording (updated)**: *"On Rastrigin, the LLM
+  exhibited a global-to-local temporal action pattern associated with its
+  advantage over AlwaysSurrogate. A deterministic two-phase schedule
+  realizing that pattern matches the LLM's value and exceeds it on three
+  of five families, so the schedule — not LLM-specific per-step reasoning
+  — accounts for the LLM's measurable decision value on this panel."*
+
+### §6.3 FrozenRouter: BOCoDe advantage does NOT transfer
+
+| Panel | FrozenRouter − Surrogate | p |
+|---|---|---|
+| BOCoDe (5-family) | +15.69 (sum) | 0.012 |
+| IOH (f1–f5, dim 2/5/10/20) | +0.036 (mean normalized regret) | 0.138 |
+
+**Negative result**: a simple `dim≥5` router trained on BOCoDe does not
+generalize to IOH/BBOB at the same scale.
+
+### §6.4 RoutingAware vs LLM-everywhere (negative finding)
+
+On the BOCoDe panel sum, RoutingAware − LLM = +1.18 (paired-t p=**0.5134**,
+not significant). The simple dimension-based routing rule is NOT measurably
+better than LLM-everywhere on this benchmark. **The Pareto frontier
+deferral**: more elaborate routing needs RQ2 transfer experiments to
+become a defensible claim.
+
+### §6.5 Real-LLM cost frontier, closed loop, 10 seeds (EXP-RQ3)
+
+Frozen RF System-1 (trained on rollout seeds 0–15, temperature-calibrated on
+16–19) deployed through full budget-30 BO trajectories against the same
+`deepseek-chat` System-2, with confidence-threshold routers (τ ∈ {0.25,
+0.5, 0.75, 0.9}) and random-rate baselines (rate ∈ {0.25, 0.5, 0.75}).
+**450 paired trajectories** (5 families × seeds 100–109 × 9 policies),
+identical Sobol starts per (family, seed), zero LLM fallbacks, identical
+frozen-model hash across both sweep files.
+
+| Family | `rf − llm` (mean) | `llm − rf` 95 % CI | verdict |
+|---|---:|---|---|
+| Branin | +0.515 | [-1.224, +0.152] | rf better in mean, CI crosses 0 |
+| Hartmann | +0.576 | **[-1.032, -0.103]** | rf detectably better |
+| Ackley | +1.017 | **[-1.658, -0.436]** | rf detectably better |
+| SixHumpCamel | +1.015 | **[-1.512, -0.587]** | rf detectably better |
+| Rastrigin | +10.109 | [-22.356, +0.404] | rf better in mean, CI crosses 0 |
+
+**No arm on the whole grid (8 LLM-calling arms × 5 families) beats `rf`
+with a CI excluding zero**; the only positive point estimates anywhere are
+Hartmann/confidence_0.25 (+0.018) and Hartmann/random_0.25 (+0.149), both
+CI-crossing. Always-LLM spends ~12–17 calls (~4.7–6.5k tokens) per
+trajectory and is dominated. The pre-specified acceptance criteria (≥ 50 %
+call/token reduction at ≤ 0.10 σ_family regret margin) pass trivially via
+the System-1-only arm — the measured frontier is degenerate.
+
+**Sign correction (documentation integrity).** The first 3-seed version of
+this experiment inverted the sign of its own Hartmann numbers in prose
+("the one family where the LLM is genuinely useful"); the recorded data had
+`rf` winning 3/0/0. The corrected reading agrees with §6.1 above (LLM
+−0.985 on Hartmann, p=0.0007). See the correction block at the top of
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
+
+**Routing diagnostic.** The 3-seed "random rate beats the confidence
+router" observation does not generalize: at 10 seeds neither scheme
+produces a CI-detectable gain over `rf`, and Branin random_0.5/0.75 are
+CI-detectably worse. The RF softmax maximum rarely exceeds 0.25, so
+confidence thresholds route nearly every step to System-2;
+`ConfidenceRouter.tau_conf` is not a useful routing signal on this panel.
+
+**Schedule control (mechanism).** A predeclared deterministic
+`GlobalThenLocal` control (10 global decisions, then local) run on this
+exact panel (paired starts verified) **beats the LLM arm with CI excluding
+zero on Hartmann (+0.334), SixHumpCamel (+0.674), and Rastrigin (+9.628)**
+and never loses to it; it ties `rf` on Branin/Hartmann/Rastrigin while RF
+keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
+decision content is dominated by the fixed two-phase schedule its own
+per-step distribution exhibits — and by THEORY.md P3, no router could have
+rescued an arm with nonpositive per-state advantage. Artifacts:
+`runs/exp_rq3_schedule_baseline.json`,
+`scripts/exp_rq3_schedule_baseline.py`.
+
+## §7 Limitations
+
+(per codex round-1 review 2026-09-27; ordered roughly by importance)
+
+1. **RQ2 partially answered** — `EXP-RQ2.1` (5-fold leave-one-family-out
+   RF) shows cross-family transfer has **lower one-step regret than the
+   real state-conditional RulePolicy on 3/5 BOCoDe families** (Branin,
+   Ackley, Rastrigin; seed-block 95% CI upper < 0). It also has lower
+   regret than AlwaysSurrogate on 2/5 (Ackley, Rastrigin — both 10D).
+   It has higher regret than AlwaysSurrogate on 2/5 (Hartmann, SixHumpCamel);
+   inconclusive on Branin. It loses to AlwaysLocal on aggregate. The pattern
+   is family-specific; not a uniform "transfer works" claim. Family ×
+   dimension confounded: a crossed design (same problem at multiple dimensions)
+   is required to disentangle — deferred.
+2. **Synthetic five-family panel only** — no real engineering objective.
+   Family, dimension, smoothness, and multimodality are **confounded**;
+   "Hartmann beats Branin" could be a dimensionality effect, a smoothness
+   effect, or a multimodality effect.
+3. **Gate 2 fails — at this state granularity** — stable state-to-action
+   learnability is **not demonstrated** (5/15 buckets pass at
+   top_action_share ≥ 0.6 threshold) *from the compressed 15-scalar process
+   state*. Related agentic-BO designs condition on the full trajectory or
+   posterior context (`docs/ref_papers/state_action_design_survey.md`);
+   whether a richer state representation would support learnability is open
+   — but the adaptive-value ceiling (P2, representation-independent) caps
+   any such gain at D on four of five families.
+4. **Gate 5 fails on 2/17 buckets** — predeclared joint test (`pass_: false`)
+   because JS divergence exceeds 0.02 on Hartmann (late, mid) buckets. Median
+   Spearman = 1.0 in all (problem, phase) buckets (consistent with the
+   analytic rank-invariance argument; per-record invariance not established).
+5. **Independent replication ADDED (2026-09-28)** — the original 20-seed
+   set reused seeds 0–9 from the exploratory run; a fully independent
+   stream (seeds 100–119, 654 records, same frozen generator config) now
+   exists (`phase8_6d_h3_20seed_5family_s100_119.jsonl`). Gate 3 replicates
+   essentially exactly (1.296 [0.881, 1.867] vs 1.294 [0.848, 1.954],
+   PASS); stop-gain replicates 5/5; uniform-gain replicates 4/5 in count
+   but not in family set; behavior-gain does not replicate at family
+   level (§5.2). Remaining limitation: the family PANEL is unchanged —
+   the same five families informed the design on both streams.
+6. **Pareto frontier measured but degenerate** — the closed-loop cost
+   frontier (§6.5) is measured at budget 30 on the five-family panel with
+   one provider (deepseek-chat): System-1-only dominates, so there is no
+   interesting quality-cost tradeoff on this panel. Whether any regime
+   (longer horizons, stochastic objectives, genuinely OOD states) gives
+   the LLM System-2 positive marginal value is open.
+7. **No external baseline** — lenz / PlugBO / TuRBO not yet compared. The
+   internal baselines (Rule, AlwaysSurrogate, Jev) are sufficient for RQ3
+   pilot framing but not for state-of-the-art comparison.
+8. **Single LLM provider / prompt configuration** — only deepseek-chat via
+   DeepSeek API. Other LLMs (GPT-4, Claude, Gemini) may exhibit different
+   decision patterns; we have no evidence the Rastrigin finding transfers,
+   and the §6.5 cost-frontier result is provider-specific.
+9. **Mechanism: schedule-sufficiency shown, full causal decomposition not** —
+   the deterministic global-then-local control now exists and dominates the
+   LLM (3/5 families, CI excluding zero; never loses), which establishes
+   that the schedule *suffices* for — and exceeds — the LLM's closed-loop
+   value on this panel. This is stronger than the earlier correlational
+   statement but still not a step-level causal decomposition of the LLM's
+   individual decisions.
+10. **Per-step trajectory attrition** — by step 15, only 1 LLM trajectory
+    has not yet terminated; later-step means are computed on small subsamples.
+    The +45.7 advantage at step 15 is illustrative, not inferential.
+11. **Researcher-designed choices without sensitivity sweep** — utility
+    weights, action set, horizon=3, regime taxonomy, and top_action_share
+    threshold (0.6) are researcher-chosen; sensitivity to these choices is
+    not analyzed.
+12. **Multiple unadjusted comparisons — sensitivity measured (2026-09-28)**:
+    recomputing the per-family Gate-4 CIs at the Bonferroni-adjusted level
+    (99%, α/5; `runs/exp_gate4_multiplicity_sensitivity.json`):
+    **stop-gain survives 5/5**; uniform-gain degrades **4/5 → 2/5**
+    (Rastrigin, SixHumpCamel hold; Branin lo −0.003 just misses; Hartmann's
+    95% lower bound is itself bootstrap-fragile at ±0.05 around 0 — its
+    family-level pass is not stable); behavior-gain degrades **1/5 → 0/5**.
+    The borderline family-set instability also appears across seed streams
+    (§5.2). We claim stop-gain as robust; uniform-gain as 2/5 robust +
+    borderline; behavior-gain as not established.
+13. **Learned System-1 closed-loop evidence is negative-to-heterogeneous** —
+    EXP-RQ2.1 is one-step decision regret; the closed-loop audit
+    (`runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`) and §6.5 deploy frozen RFs
+    through full trajectories. The RF beats AlwaysSurrogate on Ackley but
+    not the stronger AlwaysLocal control, and dominates every LLM arm at
+    zero cost on this panel; a general learned-policy gain is not
+    established. The "RoutingAware" rule remains hand-coded (dim ≥ 5).
+14. **Summing raw best_y across families is not principled** — different
+    problems have different objective scales. The TOTAL comparison is
+    informative but not on a common scale; per-family + ratio-of-advantages
+    is the cleaner framing.
+15. **RLCD transfer is analysis-rerun, not locked** — the +0.140 5/5-fold
+    cross-family result (§4.7) was produced after design iterations on the
+    same panel; a locked evaluation on untouched families/tasks is required
+    before calling it confirmatory. And the fine-tuned arms collapse to a
+    constant policy in closed loop (§5.6) — no learned policy on this panel
+    (RF or RLCD) beats the constant local baseline in closed loop.
+16. **Teacher noise bounds the supervision** — counterfactual labels are
+    noise-dominated at single roll (per-re-roll flip 0.40 above-median);
+    all §5.6 distillation results are relative to that teacher, and Gate 4
+    (terminal behavior-gain) is unattainable for first-action labels on
+    this panel even after R=5 denoising and utility alignment.
+
+## §8 Discussion
+
+- "Is decision-intelligence learnable?" — partially yes (Hartmann
+  suggestive; flat families no signal). At the distillation level: the
+  noise-dominated counterfactual teacher is still learnable at decision
+  level (0.40 → 0.87 pairwise; proper-score arm uniquely calibrated,
+  §5.6) — but the learned policy collapses to the teacher's constant
+  component in closed loop.
+- "Does it transfer across problems?" — see §4 RQ2 below.
+  Cross-family has lower regret vs real RulePolicy on 3/5 (Branin, Ackley,
+  Rastrigin) and vs AlwaysSurrogate on 2/5 (Ackley, Rastrigin); higher regret
+  vs AlwaysSurrogate on Hartmann + SixHumpCamel; inconclusive on Branin.
+- "Is LLM-as-System-1 worth it?" — against AlwaysSurrogate, only on hard
+  multimodal problems (Rastrigin +17.54, p=0.0058). But in closed loop
+  against a frozen RF System-1 (§6.5), the always-LLM policy never wins
+  with a CI excluding zero and loses detectably on 3/5 families at ~12–17
+  calls per trajectory. The LLM's positive value on this panel is confined
+  to the one-step comparison against weaker baselines.
+- "Is routing a Pareto win?" — measured (§6.5): no. No confidence threshold
+  or random rate earns its cost over System-1-only; the frontier is
+  degenerate on this panel. Whether any regime gives routing positive
+  value is the open question.
+- "Does the trained System-1 transfer across problems?" — see §4 RQ2 below
+  (wins vs real RulePolicy on 3/5; wins vs AlwaysSurrogate on 2/5; loses to a
+  constant local policy on aggregate). The RLCD fine-tuned model transfers
+  at decision level (+0.140, 5/5 folds, analysis-rerun; GearTrain probe
+  holds, §4.7) — closed-loop transfer remains undemonstrated for both.
+
+## §9 Conclusion
+
+- Three contributions: (1) a 7-component decision-centric BO framework
+  with **423 unit tests** (385 at first draft; +4 GearTrain; +2 partial-rollout
+  validation / Gate-3 CI-branch coverage in the 2026-09-28 audit round)
+  and four formal propositions tied to the experiments (`docs/THEORY.md`:
+  affine label invariance, adaptive-value bound, routing degeneracy,
+  exact imitation of axis-aligned rules); (2) a counterfactual oracle
+  dataset validation methodology that closes
+  Gate 3 (PASS at 20 seeds, adjusted_lift CI [0.848, 1.954]) and Gate 4
+  stop-gain (5/5), with **Gate 2 still failing** (5/15 buckets pass at
+  top_action_share ≥ 0.6) and **Gate 5 partial** (median Spearman = 1.0
+  necessarily by P1; predeclared joint fails on 2/17 buckets); (3) a
+  global-to-local temporal action pattern whose *sufficiency* is now
+  demonstrated: a deterministic two-phase schedule reproduces and exceeds
+  the LLM's closed-loop value on this panel.
+- **RQ2 (NEW)**: cross-family transfer **wins vs the real state-conditional
+  RulePolicy on 3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
+  95% CI upper < 0). It also wins vs AlwaysSurrogate on 2/5 (Ackley,
+  Rastrigin). Aggregate Cross − Rule = -0.065 (cross is better). The cross
+  signal is heterogeneous (loses on Hartmann, SixHumpCamel vs Surrogate);
+  family × dimension confounded.
+- **RQ3 (cost frontier, NEW)**: in closed loop at 10 paired seeds the
+  frozen RF System-1 (0 LLM calls) beats or ties every LLM-calling arm on
+  all five families; always-LLM is CI-detectably worse on Ackley, Hartmann,
+  and SixHumpCamel. No confidence-threshold or random-rate router earns
+  its cost. The measured frontier is degenerate: System-1 only.
+- **EXP-RLCD (NEW 2026-09-28)**: decision-level distillation of the
+  counterfactual teacher into a 0.4B typed-decision model (pairwise
+  0.40 → 0.87; the proper-score arm is the only calibrated one), with
+  cross-family transfer (+0.140, 5/5 folds, analysis-rerun) and a
+  decision-level engineering probe (GearTrain 0.89 ≈ RF). Closed loop
+  collapses both fine-tuned arms to the teacher's constant component —
+  decision-level recovery without a deployed optimizer, mirroring the
+  schedule finding of §6.5.
+- Seven negative results that sharpen the claim: (a) trained router does
+  not transfer from BOCoDe to IOH; (b) RoutingAware does not beat
+  LLM-everywhere on the same panel; (c) cross-family transfer does not
+  help Hartmann or SixHumpCamel vs AlwaysSurrogate; (d) cross-family RF
+  loses to a constant `local_exploitation` policy (AlwaysLocal) on
+  aggregate because that policy ignores budget awareness; (e) within-
+  function dimension transfer fails (RQ2.2 at 10 seeds — the RQ2.1 signal
+  is a family signal, not a dimension signal); (f) in closed loop,
+  always-LLM is dominated by both the frozen System-1 and a deterministic
+  two-phase schedule (§6.5) — and by P3 no router could have fixed this;
+  (g) RLCD fine-tuned decision models collapse to a constant policy in
+  closed loop (§5.6) — decision-level metrics do not imply
+  trajectory-level value.
+- Future work: regimes where an LLM System-2 repays its cost (longer
+  horizons, stochastic objectives, OOD states), external lenz/PlugBO
+  baseline, fine-tuning a small decision model from LLM trajectories,
+  dimension-crossed design to disentangle dimension vs family effects,
+  engineering families (vehicle suspension).
+
+---
+
+## Appendix
+
+- A1 — Test inventory (423 tests, file-by-file)
+- A2 — Replay / checkpoint invariants
+- A3 — Per-seed action distribution tables
+- A4 — Full CI tables for Gate 3/4/5
+
+---
+
+## File references (one-line per claim)
+
+- `docs/THEORY.md` — P1/P2/P3/L1 with proofs, scope conditions, and the
+  proposition-to-evidence map
+- `scripts/verify_theory_propositions.py` → `runs/verify_theory_propositions.json`
+  — P1 checked through `compute_utility` on 5,304 branches (max rel err
+  1.4e-12); P2 recomputed at 20 seeds
+- `runs/exp_rq3_schedule_baseline.json` + `scripts/exp_rq3_schedule_baseline.py`
+  — deterministic schedule control on the RQ3 panel (paired starts verified)
+- `runs/exp_rq2_2_ioh_within_function_dim_transfer_10seed.json` — RQ2.2
+  10-seed confirmation
+- `runs/phase8_6d_h3_20seed_5family.jsonl` — Track A dataset
+- `runs/exp_rq1_2_h3_20seed_report.json` — Track A gate results
+- `runs/EXP_RQ0_5_REPORT.md` — Track C source (joint 10-seed)
+- `runs/exp_rq0_5_action_distribution.md` — Track D mechanism analysis
+- `runs/EXP_AFFINE_REPORT.md` — Track B Gate 5 result
+- `runs/exp_rq3_router_sweep.json` + `runs/exp_rq3_router_sweep_seeds103_109.json`
+  + `runs/exp_rq3_cost_frontier_10seed.json` — RQ3 cost frontier
+  (450 paired trajectories; merged paired bootstrap analysis)
+- `scripts/analyze_rq3_cost_frontier.py` — merged analysis; reproduces the
+  3-seed numbers exactly on the original file (how the sign error was found)
+- `runs/EXP_RQ2_2_WITHIN_FUNCTION_DIM_TRANSFER_REPORT.md` — RQ2.2 clean negative
+- `runs/EXP_RLCD_REPORT.md` + `runs/exp_rlcd_report.json` / `exp_rlcd_ci.json` /
+  `exp_rlcd_sweep.json` — RLCD 4-arm decision-level result, CIs, sweep
+- `runs/EXP_JOURNAL_ROUND2_REPORT.md` + `runs/exp_teacher_noise_diagnostic.json` /
+  `exp_teacher_noise_diagnostic_r5.json` / `runs/exp_rlcd_loo_confirmatory.json` /
+  `exp_rlcd_loo_transfer.json` — teacher-noise chain + LOO transfer
+- `runs/phase8_6d_h3_20seed_5family_s100_119.jsonl` +
+  `runs/exp_rq1_2_h3_20seed_replication_s100_119.json` — independent-seed-stream
+  gate replication (§5.2, limitation 5)
+- `runs/exp_rlcd_loo_confirmatory_replication_s100_119.json` — LOO transfer
+  replication on the independent stream (§4.7)
+- `runs/exp_gate4_multiplicity_sensitivity.json` — Bonferroni sensitivity (limitation 12)
+- `runs/exp_geartrain_transfer_probe.json` — engineering probe (§4.7)
+- `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
+  `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,
+  router panel (§5.6)
+- `docs/RLCD_THEORY.md` — R1–R4 / T1–T5 for the distillation line
+- `runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md` — closed-loop audit
+  (`rf_all` / `rf_transfer` vs fixed controls, seeds 100–119 / 200–219)
+- `src/opt_agent/backend/bocode_botorch.py` — affine transform (Gate 5)
+- `src/opt_agent/dataset/generator.py` — DatasetConfig affine fields
+- `tests/test_objective_transform.py` — 16 new tests for Gate 5
+exec
+/bin/bash -lc 'cat docs/ref_papers/journal_positioning.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# 期刊论文定位：创新性主张与完整性缺口
+
+> 2026-09-27 整理。目标：从 workshop paper 升级为期刊论文（目标档次参考
+> JMLR / JAIR / ML journal / 或 BO 强相关的期刊）。本文回答两个问题：
+> **相对 2024–2026 最近邻工作，我们的创新点是什么**；**期刊审稿人会要求
+> 补什么**。
+
+---
+
+## 一、与最近邻工作的差异定位
+
+### vs. Sara/lenz（Brunzema et al., arXiv:2608.00316, 2026）——最重要的对照
+
+| 维度 | Sara/lenz (2026) | 本项目 |
+|---|---|---|
+| 决策形式 | LLM agent 自由探查/提点/改配置/停止（open-ended） | 8 个 typed action 的封闭决策空间 |
+| 策略来源 | 系统 prompt 指令，无学习 | 反事实 oracle 监督 → 训练的校准 System-1（RF） |
+| LLM 成本 | **只报告不优化**（token 记录在附录 C.2） | **选择性 System-2：置信度路由 + 预设非劣效 margin 的成本前沿** |
+| 统计处理 | 10 seeds 中位数 + IQR + Mann–Whitney | 配对 seed bootstrap CI、预设定验收标准、诚实阴性结果 |
+| 计算成本入模 | future work（附录 E meta-MDP） | **已做**（RQ3 全网格，含 10-seed 确认） |
+
+**核心论点：我们正面回答了该文留下的开放问题（计算成本何时值得花）。**
+他们证明了 LLM 能坐进决策环；我们回答"什么时候值得让它坐进来"。
+
+### vs. LLAMBO（ICLR 2024）
+
+- LLAMBO 把 LLM 放进环里（当 surrogate/提议器）但无成本治理；2026 复现研究
+  （arXiv:2603.24647）指出其结果对实现细节高度敏感。
+- 我们的对应设计：typed action 空间 + 冻结提示 + 确定性 RF + mock/real 双模式
+  对照——稳健性是设计出来的，不是调出来的。
+
+### vs. GPTOpt / AdaEvolve（2025–2026）
+
+- 它们让 LLM **本身当优化器**；我们研究 **meta 决策层**上 LLM 推理何时值得花
+  （决策对象是"下一步采取什么优化策略"，不是"下一个 x"）。层面不同，可互补。
+
+### 我们独有的框架贡献
+
+**Decision Landscape（adaptive-value 三 regime 分类）**：Flat / Heavy-tailed /
+Frequent-opportunity。在上述所有近邻工作中都没有对应物——这是"在哪类问题上
+值得用学习策略/LLM"的先验刻画，直接解释我们的阴性结果（Flat 家族上 LLM/学习
+策略赚不回成本）。
+
+---
+
+## 二、一句话卖点（摘要/引言用）
+
+> Agentic Bayesian Optimization 已经证明 LLM 能坐进优化决策环；本文回答
+> **"它什么时候值得坐进来"**：我们用反事实 oracle 监督训练校准的 System-1，
+> 以预设定非劣效 margin 在五个优化家族上给出首个优化决策环内的质量-成本
+> 前沿——结论是诚实的阴性：冻结 System-1（0 次 LLM 调用）在 5/5 家族上
+> 支配 always-LLM，且没有任何置信度/随机路由策略能赚回成本；机制分析表明
+> LLM 的价值在于"全局→局部"的调度结构而非逐步选择。我们同时给出
+> decision-landscape 刻画（三类 regime）与跨家族/跨维度迁移的系统性阴性结果。
+
+**阴性结果为什么是贡献而非弱点**：agentic BO 文献（Sara/lenz、LLAMBO 及其
+复现研究）普遍只报告 LLM 参与的正向故事；第一个系统性的成本前沿阴性 + 机制
+解释 + 预设定标准，是该领域目前缺失的对照证据。写作时要主动把阴性结果
+框定为"成本治理的 benchmark 时刻"。
+
+---
+
+## 三、期刊级完整性缺口（按优先级，审稿人视角）
+
+### P0 — 基准面（最大风险）
+
+- 现状：5 个合成 BOCoDe 家族 + 少量 IOH。Sara/lenz 用了 HPO（LCBench）+
+  化学反应 + scaling law；审稿人会照此标准要求。
+- 必补：
+  1. **BBOB/COCO 全套或 IOH 更广覆盖**（IOH backend 已有，扩函数/维度即可）；
+  2. **≥1 个 HPO 任务**（LCBench 或 Optuna benchmarking 类）；
+  3. **≥1 个真实工程/仿真问题**——Phase 14 不能再是占位符；若车辆悬架仿真器
+     不可得，用 BBOB-exp / 工程参数辨识类问题垫，并在 limitations 说明。
+
+### P0 — 外部基线
+
+- 现状：全部内部基线（Rule/Surrogate/Local/Jev/LLM）。
+- 必补：**Sobol/Ax/SMAC3 或 HEBO**（经典优化器锚点）+ **LLAMBO**
+  （OptunaHub 移植版，注意引用 2603.24647 的保真度差异表）。
+- 可选：GPTOpt 作为"微调 LLM 优化器"参照。
+
+### P1 — 缺一个"赢"的 regime
+
+- 全阴性对 workshop 够、对期刊需至少一个正向结果。（2026-09-27 更新：
+  **部分达成，走的是"蒸馏泛化"而非"调度蒸馏"路径**——EXP-RLCD-JOURNAL
+  轮的 E5 显示：反事实蒸馏的 Laya typed-decision 模型在 leave-one-family-
+  out 下保持 ~99% 族内排序精度（0.866 vs 0.873），对 RF 基线的优势在家族
+  偏移下从 +0.056 翻倍到 +0.146，5/5 折全胜（符号检验 p=0.031）。这是
+  RQ2 式的"跨问题泛化"阳性。机制边界的诚实刻画同时到手：置信度无判别力
+  （AURC≈1−acc，E1）→ 量化路由退化为家族级整体切换（E4，预申明标准未过）
+  → RQ3 前沿保持退化的原因比"RF 平"更深：现有监督不提供判别性不确定性。
+  详见 `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`。原"调度蒸馏"路径仍是
+  备选：机制检查里确定性 global-then-local 基线已在 dev seeds 上赢过 LLM；
+  在多峰问题族上展示 learned schedule > 固定规则仍是可选的第二个"赢"。）
+- 确认性补强（E5 后续）：per-record 日志 + record-clustered CI；每折
+  2 个训练种子。
+
+### P1 — 统计完整化
+
+- 多重比较校正（Benjamini–Hochberg 或按家族分层）；全实验统一 ≥10 seeds
+  （RQ3 已到，RQ1/RQ2 对齐）；报告 IQM（Agarwal 2021 处方）。
+- σ_family 等预设定量的定义先于实验写进脚本（本次 10-seed 复核发现原报告
+  未记录 σ 定义——流程教训写进论文可加分）。
+
+### P2 — 保持并显式声称的强项
+
+- 385 unit tests、数据集 SHA-256 溯源、预设定验收标准、阴性结果全保留、
+  符号错误主动修正——写进 reproducibility 段落，是对审稿人的差异化卖点。
+- Phase 14 工程迁移：若 P0 补了一个工程问题，该段落从"占位符"转为真实结果。
+
+---
+
+## 四、写作映射（结构 → 文献支撑）
+
+| 论文段落 | 支撑文献 |
+|---|---|
+| §1 引言 | agentic BO 叙事：LLAMBO → 复现批判 → Sara/lenz → 我们的成本前沿 |
+| §2 Related work | papers_2024plus.md 四条线各一段 |
+| §3 方法 | OPE 术语接口（arXiv:2501.05278）+ temperature scaling（Guo 2017）+ 非劣效 margin（CONSORT 扩展） |
+| §5 RQ3 | 路由线 8–13 + 阴性结果框定 |
+| §6/§7 Limitations | Ross & Bagnell 2011（单步 vs 闭环分叉）+ 基准面/多重比较 |
+| 附录 | Agarwal 2021 统计处方、预设定标准全文 |
+
+相关文件：`docs/workshop_paper_outline.md`（现有 8 页骨架，可直接扩展）；
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`（10-seed 修正版结论）；
+`PROGRESS.md`（三 RQ 现状）。
+
+exec
+/bin/bash -lc 'cat src/opt_agent/state/models.py src/opt_agent/state/extractor.py src/opt_agent/actions/models.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""OptimizationState dataclass tree (Phase 2 + Phase 6 extension).
+
+Per MASTER_PLAN.md §7 and codex (gpt-5.6-sol) review 2025-09-23 + Phase 6
+correction (added coverage / uncertainty / error / boundary fields).
+
+Conventions
+-----------
+- BOCoDe objectives are MAXIMIZED (see project-opt-agent-v3-bocode-direction).
+  best_value = objectives.max(); recent_improvement > 0 means improving.
+- All dataclasses are frozen=True so JSON serialization is trivial and
+  extract_state() output is immutable across callers.
+- SurrogateState posterior fields are populated when backend.is_fitted; when
+  not fitted, validation_rmse / mean_uncertainty / max_uncertainty are NaN
+  and is_current is False.
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass
+from typing import Any, Optional
+
+
+def _finite(value: float) -> float | None:
+    """Coerce a float to JSON-safe form: NaN/Inf → None, finite → float.
+    Shared helper for any state serialization that needs to round-trip
+    through JSON (LLM prompts, dataset JSONL)."""
+    number = float(value)
+    return number if math.isfinite(number) else None
+
+
+@dataclass(frozen=True)
+class SamplingState:
+    n_samples: int
+    dimension: int
+    min_pairwise_distance: float  # smallest distance between any two sampled points
+    boundary_coverage: float     # fraction of samples within `tol` of any bounds edge
+
+
+@dataclass(frozen=True)
+class SurrogateState:
+    is_current: bool            # True iff backend.is_fitted
+    validation_rmse: float      # RMSE of one-step GP predictions on history (NaN if not fitted)
+    mean_uncertainty: float     # mean posterior std on a Sobol grid (NaN if not fitted)
+    max_uncertainty: float      # max posterior std on the same grid (NaN if not fitted)
+
+
+@dataclass(frozen=True)
+class OptimizationProgress:
+    best_value: float
+    last_value: float
+    recent_improvement: float
+    stagnation_steps: int
+
+
+@dataclass(frozen=True)
+class ResourceState:
+    used_budget: int
+    total_budget: int
+    remaining_budget: int
+    remaining_budget_ratio: float
+
+
+@dataclass(frozen=True)
+class HistoryState:
+    last_action: Optional[str]
+
+
+@dataclass(frozen=True)
+class OptimizationState:
+    sampling: SamplingState
+    surrogate: SurrogateState
+    optimization: OptimizationProgress
+    resource: ResourceState
+    history: HistoryState
+
+    def to_payload(self) -> dict[str, Any]:
+        """Compact dict representation for LLM prompts.
+
+        NaN/Inf float values are coerced to None so the resulting dict is
+        JSON-safe. Used by ``system1._prompt._state_payload`` and any other
+        System-1 adapter that needs the same observable field set.
+        """
+        return {
+            "objective": "maximize",
+            "samples": self.sampling.n_samples,
+            "dimension": self.sampling.dimension,
+            "min_pairwise_distance": _finite(self.sampling.min_pairwise_distance),
+            "boundary_coverage": _finite(self.sampling.boundary_coverage),
+            "surrogate_current": self.surrogate.is_current,
+            "validation_rmse": _finite(self.surrogate.validation_rmse),
+            "mean_uncertainty": _finite(self.surrogate.mean_uncertainty),
+            "max_uncertainty": _finite(self.surrogate.max_uncertainty),
+            "best_value": _finite(self.optimization.best_value),
+            "recent_improvement": _finite(self.optimization.recent_improvement),
+            "stagnation_steps": self.optimization.stagnation_steps,
+            "remaining_budget": self.resource.remaining_budget,
+            "total_budget": self.resource.total_budget,
+            "last_action": self.history.last_action,
+        }
+"""extract_state() — converts a backend's history into OptimizationState (Phase 2 + 6).
+
+Pure read: must not mutate the backend or affect its RNG state.
+
+Phase 6 additions: SamplingState includes min_pairwise_distance and
+boundary_coverage; SurrogateState includes validation_rmse, mean_uncertainty,
+max_uncertainty (populated only when backend.is_fitted; NaN otherwise).
+"""
+
+from __future__ import annotations
+
+import functools
+import math
+from typing import Optional
+
+import torch
+from torch.quasirandom import SobolEngine
+
+from opt_agent.backend.bocode_botorch import UnifiedBackend
+from opt_agent.state.models import (
+    HistoryState,
+    OptimizationProgress,
+    OptimizationState,
+    ResourceState,
+    SamplingState,
+    SurrogateState,
+)
+
+# Grid size for posterior uncertainty statistics.
+_UNCERTAINTY_GRID_SIZE = 64
+
+
+def _boundary_tol() -> float:
+    """Boundary coverage threshold as a fraction of the per-dimension
+    range. Deferred import keeps `state.extractor` from depending on
+    `actions.factory` at module load time. The single source of truth is
+    `actions.factory.BOUNDARY_TOL`; that constant also drives
+    BOUNDARY_SAMPLING's default `tol` so the coverage metric stays in
+    sync with the action's actual search margin."""
+    from opt_agent.actions.factory import BOUNDARY_TOL
+    return BOUNDARY_TOL
+
+
+def _min_pairwise_distance(X: torch.Tensor) -> float:
+    if X.shape[0] < 2:
+        return float("inf")
+    # torch.cdist avoids the [n, n, d] intermediate the unsqueeze-sub
+    # form would allocate; same answer, ~10x less transient memory for
+    # n>=30 / d>=10.
+    dists = torch.cdist(X, X)
+    n = X.shape[0]
+    mask = ~torch.eye(n, dtype=torch.bool, device=X.device)
+    return float(dists[mask].min().item())
+
+
+def _boundary_coverage(X: torch.Tensor, bounds: torch.Tensor, tol: float) -> float:
+    """Fraction of samples within `tol` of any bounds edge.
+
+    Phase 8.5 fix: validate bounds span > 0, validate samples are inside bounds,
+    and use unit-cube normalized distance so the result is affine-invariant.
+
+    Note (per codex): this is a "boundary-fraction" metric, NOT a true
+    boundary coverage metric. Duplicates at one corner still score highly,
+    and baseline increases with dimension. A grid-based fill-distance metric
+    would be more rigorous but is out of scope for Phase 8.5.
+    """
+    if X.shape[0] == 0:
+        return 0.0
+    if not 0.0 <= tol <= 0.5:
+        raise ValueError(f"tol must be in [0, 0.5]; got {tol}")
+    span = bounds[1] - bounds[0]
+    if torch.any(span <= 0):
+        raise ValueError("bounds must have positive span")
+    unit = (X - bounds[0]) / span
+    eps = 10 * torch.finfo(unit.dtype).eps
+    if torch.any((unit < -eps) | (unit > 1.0 + eps)):
+        raise ValueError("samples lie outside bounds")
+    near = ((unit <= tol) | (unit >= 1.0 - tol)).any(dim=-1)
+    return float(near.to(torch.double).mean().item())
+
+
+def _validation_rmse(backend: UnifiedBackend) -> float:
+    """One-step RMSE of the GP on training history (predict at each X, compare to y)."""
+    history = backend.get_history()
+    if history.objectives.shape[0] < 2:
+        return float("nan")
+    mean, _ = backend.predict(history.X)
+    residuals = mean - history.objectives
+    return float(residuals.pow(2).mean().sqrt().item())
+
+
+@functools.lru_cache(maxsize=16)
+def _sobol_grid(d: int, size: int) -> torch.Tensor:
+    """A unit-cube Sobol grid is deterministic for fixed (d, size) and
+    is rebuilt on every ``extract_state`` call without this cache. The
+    grid is reused across all backends of a given dimension."""
+    return SobolEngine(dimension=d, scramble=True, seed=0).draw(size)
+
+
+def _uncertainty_stats(backend: UnifiedBackend) -> tuple[float, float]:
+    """Compute mean and max posterior std on a Sobol grid."""
+    bounds = backend.bounds
+    if bounds is None:
+        return float("nan"), float("nan")
+    d = bounds.shape[1]
+    grid = bounds[0] + _sobol_grid(d, _UNCERTAINTY_GRID_SIZE).to(
+        dtype=torch.double
+    ) * (bounds[1] - bounds[0])
+    _, std = backend.predict(grid)
+    return float(std.mean().item()), float(std.max().item())
+
+
+def extract_state(
+    backend: UnifiedBackend,
+    *,
+    total_budget: int,
+    last_action: Optional[str] = None,
+) -> OptimizationState:
+    """Read backend history + optional action label, produce OptimizationState.
+
+    Parameters
+    ----------
+    backend : UnifiedBackend
+        Must be initialized (have history). is_fitted is read.
+    total_budget : int
+        Maximum number of evaluations allowed for this run. Must be > 0 and
+        >= n_samples.
+    last_action : Optional[str]
+        Name of the action that produced the most recent sample. None means
+        "no action recorded yet" (typically the initial design).
+
+    Returns
+    -------
+    OptimizationState — frozen, JSON-serializable, tensor-free.
+    """
+    if total_budget <= 0:
+        raise ValueError(f"total_budget must be > 0; got {total_budget}")
+
+    history = backend.get_history()
+    n_samples = len(history)
+    if total_budget < n_samples:
+        raise ValueError(
+            f"total_budget ({total_budget}) is less than current n_samples "
+            f"({n_samples}); cannot extract state for a budget that is "
+            f"already exhausted."
+        )
+
+    values = history.objectives[:, 0].tolist()  # Phase 1: single-objective only
+    dimension = int(history.X.shape[1])
+
+    incumbent = values[0]
+    best_value = incumbent
+    stagnation_steps = 0
+    recent_improvement = 0.0
+    for value in values[1:]:
+        if value > incumbent:
+            recent_improvement = value - incumbent
+            incumbent = value
+            stagnation_steps = 0
+        else:
+            recent_improvement = 0.0
+            stagnation_steps += 1
+    best_value = incumbent
+    last_value = values[-1]
+
+    # SamplingState coverage (Phase 6 extension).
+    bounds = backend.bounds
+    if bounds is not None and bounds.shape[1] == dimension:
+        min_pd = _min_pairwise_distance(history.X)
+        bcov = _boundary_coverage(history.X, bounds, tol=_boundary_tol())
+    else:
+        min_pd = float("inf")
+        bcov = 0.0
+
+    # SurrogateState (Phase 6 extension).
+    is_fitted = bool(backend.is_fitted)
+    if is_fitted:
+        try:
+            val_rmse = _validation_rmse(backend)
+            mean_u, max_u = _uncertainty_stats(backend)
+        except Exception:
+            val_rmse, mean_u, max_u = float("nan"), float("nan"), float("nan")
+    else:
+        val_rmse, mean_u, max_u = float("nan"), float("nan"), float("nan")
+
+    remaining_budget = total_budget - n_samples
+    remaining_budget_ratio = remaining_budget / total_budget
+
+    return OptimizationState(
+        sampling=SamplingState(
+            n_samples=n_samples,
+            dimension=dimension,
+            min_pairwise_distance=float(min_pd),
+            boundary_coverage=float(bcov),
+        ),
+        surrogate=SurrogateState(
+            is_current=is_fitted,
+            validation_rmse=float(val_rmse),
+            mean_uncertainty=float(mean_u),
+            max_uncertainty=float(max_u),
+        ),
+        optimization=OptimizationProgress(
+            best_value=float(best_value),
+            last_value=float(last_value),
+            recent_improvement=float(recent_improvement),
+            stagnation_steps=int(stagnation_steps),
+        ),
+        resource=ResourceState(
+            used_budget=n_samples,
+            total_budget=total_budget,
+            remaining_budget=remaining_budget,
+            remaining_budget_ratio=float(remaining_budget_ratio),
+        ),
+        history=HistoryState(last_action=last_action),
+    )
+"""OptimizationAction dataclass + ActionType enum (Phase 3).
+
+Per MASTER_PLAN.md §8 and codex (gpt-5.6-sol) review 2025-09-23.
+
+Phase 3 actions (5 total — ERROR_GUIDED deferred because we don't yet have
+leave-one-out residuals to distinguish "high uncertainty" from "high error"):
+  - GLOBAL_EXPLORATION     Sobol sampling, ignores surrogate
+  - LOCAL_EXPLOITATION     Perturb current best within bounds
+  - SURROGATE_ACQUISITION  Fit GP (if needed), propose via LogEI, evaluate
+  - RETRAIN_SURROGATE      Force a fresh GP fit, no evaluation
+  - STOP                   Signal termination; does not mutate backend
+
+`OptimizationAction.__post_init__` validates params at construction time so
+invalid actions fail before reaching `execute_action`.
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Mapping
+
+
+class ActionType(str, Enum):
+    GLOBAL_EXPLORATION = "global_exploration"
+    LOCAL_EXPLOITATION = "local_exploitation"
+    UNCERTAINTY_SAMPLING = "uncertainty_sampling"
+    ERROR_GUIDED_SAMPLING = "error_guided_sampling"
+    BOUNDARY_SAMPLING = "boundary_sampling"
+    SURROGATE_ACQUISITION = "surrogate_acquisition"
+    RETRAIN_SURROGATE = "retrain_surrogate"
+    STOP = "stop"
+
+
+# Param schemas per action. Each entry lists (name, type, check_fn).
+# check_fn returns the parsed value or raises ValueError.
+def _positive_int(name: str, value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{name!r} must be int; got {type(value).__name__}")
+    if value <= 0:
+        raise ValueError(f"{name!r} must be > 0; got {value}")
+    return int(value)
+
+
+def _finite_float(name: str, value: Any, lo: float, hi: float) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise ValueError(f"{name!r} must be a number; got {type(value).__name__}")
+    value = float(value)
+    if not math.isfinite(value):
+        raise ValueError(f"{name!r} must be finite; got {value}")
+    if not (lo <= value <= hi):
+        raise ValueError(f"{name!r} must lie in [{lo}, {hi}]; got {value}")
+    return value
+
+
+def _strictly_positive_finite_float(name: str, value: Any, hi: float) -> float:
+    """Float in (0, hi] — used for step sizes where 0 is meaningless."""
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise ValueError(f"{name!r} must be a number; got {type(value).__name__}")
+    value = float(value)
+    if not math.isfinite(value):
+        raise ValueError(f"{name!r} must be finite; got {value}")
+    if not (0.0 < value <= hi):
+        raise ValueError(f"{name!r} must lie in (0, {hi}]; got {value}")
+    return value
+
+
+def _non_negative_int(name: str, value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{name!r} must be int; got {type(value).__name__}")
+    if value < 0:
+        raise ValueError(f"{name!r} must be >= 0; got {value}")
+    return int(value)
+
+
+_PARAM_SCHEMAS: dict[ActionType, dict[str, Any]] = {
+    ActionType.GLOBAL_EXPLORATION: {
+        "n_samples": _positive_int,
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.LOCAL_EXPLOITATION: {
+        "step": lambda n, v: _strictly_positive_finite_float(n, v, hi=1.0),
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.UNCERTAINTY_SAMPLING: {
+        "n_samples": _positive_int,
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.ERROR_GUIDED_SAMPLING: {
+        "n_samples": _positive_int,
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.BOUNDARY_SAMPLING: {
+        "n_samples": _positive_int,
+        "tol": lambda n, v: _finite_float(n, v, 0.0, 0.5),
+        "seed": lambda n, v: _non_negative_int(n, v) if v is not None else None,
+    },
+    ActionType.SURROGATE_ACQUISITION: {},
+    ActionType.RETRAIN_SURROGATE: {},
+    ActionType.STOP: {},
+}
+
+_ALLOWED_PARAMS: dict[ActionType, set[str]] = {
+    ActionType.GLOBAL_EXPLORATION: {"n_samples", "seed"},
+    ActionType.LOCAL_EXPLOITATION: {"step", "seed"},
+    ActionType.UNCERTAINTY_SAMPLING: {"n_samples", "seed"},
+    ActionType.ERROR_GUIDED_SAMPLING: {"n_samples", "seed"},
+    ActionType.BOUNDARY_SAMPLING: {"n_samples", "tol", "seed"},
+    ActionType.SURROGATE_ACQUISITION: set(),
+    ActionType.RETRAIN_SURROGATE: set(),
+    ActionType.STOP: set(),
+}
+
+
+@dataclass(frozen=True)
+class OptimizationAction:
+    """A structured optimization action.
+
+    Parameters
+    ----------
+    type : ActionType
+    params : Mapping[str, Any]
+        Per-action-type params; validated in __post_init__.
+        See _ALLOWED_PARAMS for the allowed keys per type.
+    """
+
+    type: ActionType
+    params: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.type, ActionType):
+            raise TypeError(
+                f"action.type must be ActionType; got {type(self.type).__name__}: "
+                f"{self.type!r}"
+            )
+        params = dict(self.params) if self.params is not None else {}
+        allowed = _ALLOWED_PARAMS[self.type]
+        for k in params:
+            if k not in allowed:
+                raise ValueError(
+                    f"Unsupported params {k!r} for action {self.type.value}. "
+                    f"Allowed: {sorted(allowed) or '<none>'}."
+                )
+        schema = _PARAM_SCHEMAS[self.type]
+        validated: dict[str, Any] = {}
+        for k, fn in schema.items():
+            if k in params:
+                validated[k] = fn(k, params[k])
+        # Copy validated back so default values like seed=None don't leak through.
+        for k in allowed - set(schema):
+            if k in params:
+                validated[k] = params[k]
+        # Bypass frozen to install validated params.
+        object.__setattr__(self, "params", validated)
+
+
+@dataclass(frozen=True)
+class ActionResult:
+    """What `execute_action` returns after performing an action.
+
+    Attributes
+    ----------
+    action : OptimizationAction
+        The action that was executed (echo for logging).
+    n_new_samples : int
+        How many new samples were added to the backend (0 for RETRAIN / STOP).
+    n_model_fits : int
+        How many GP fits were triggered. SURROGATE_ACQUISITION triggers 1
+        implicit fit when the surrogate is not yet fitted; RETRAIN_SURROGATE
+        always triggers 1 fit; other actions trigger 0.
+    should_stop : bool
+        True iff action.type == STOP. Caller should break its loop.
+    """
+
+    action: OptimizationAction
+    n_new_samples: int
+    n_model_fits: int = 0
+    should_stop: bool = False
+
+codex
+The survey supports keeping the workshop design frozen: a richer state would change the learnability test, while the oracle-derived adaptive-value ceiling is independent of the state encoding for this action menu. I’m checking the outline for places where a result about this menu or panel is phrased as a broader claim.
+exec
+/bin/bash -lc "rg -n 'Gate 2|Gate-2|granularity|state|action|P2|P3|routing|causal|schedule|closed|dominates|upper bound|ceiling|unattainable|noise' docs/workshop_paper_outline.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+7:> schedule control "has not been run" (it contradicted its own point 4 and
+12:> parents); test count 385→423; title aligned with the schedule-sufficiency
+16:> noise + decision-level distillation + closed-loop collapse; limitations
+33:> own mechanism result: the deterministic two-phase schedule reproduces and
+34:> exceeds the LLM's closed-loop value (§6.2/§6.5), and the LLM is detectably
+44:state `s_t`, choose an action `a_t ∈ A` that updates the BO process. On a
+59:   SixHumpCamel, §6.1) and exhibits a **global-to-local temporal action
+61:   two-phase schedule realizing that pattern **reproduces and exceeds the
+62:   LLM's closed-loop value** (CI-excluding-zero wins on 3/5 families, never
+63:   loses; §6.2/§6.5) — the schedule, not LLM-specific per-step reasoning,
+64:   accounts for the LLM's measurable decision value (a step-level causal
+68:4. **Cost frontier (10 seeds, closed loop)** — with a frozen RF System-1
+71:   Hartmann, and SixHumpCamel; no confidence-threshold or random-rate routing
+72:   arm earns its cost. A deterministic two-phase schedule dominates the LLM
+74:   System-2 decisions, formalized by a routing-dominance proposition.
+76:   labels are noise-dominated (per-re-roll pair flip 0.40 above-median), yet
+82:   to a constant policy in closed loop (§4.7/§5.6).
+84:Our contribution is a 7-component framework (backend/state/action/utility/
+86:results in `docs/THEORY.md` (P1/P2 verified numerically through the live
+87:code path; P3/L1 tied empirically), and run artifacts for every reported
+90:state-conditional rule policy on 3/5 families (§4), and an RLCD
+92:§4.7); closed-loop and full engineering transfer are not demonstrated,
+105:  fails on 2/17 buckets; Gate 2 still fails**); the teacher itself is noise-dominated
+107:  (RLCD fine-tuning of Laya: 0.40 → 0.87 pairwise; closed loop collapses to a
+109:  leave-one-family-out CV: cross-family RF wins vs the real state-conditional
+116:  (router does not transfer to IOH, p=0.1376), and a closed-loop 10-seed
+119:  a predeclared deterministic two-phase schedule reproduces and exceeds the
+120:  LLM's closed-loop value (§6.2/§6.5).
+131:  command action space (probe/reconfigure/propose/evaluate/stop) over a
+133:  state, no learned policy, token cost reported but not optimized. Our
+134:  closed 8-action space over a compressed 15-scalar process state is the
+137:  noninferiority cost frontier possible. Full state/action design spectrum:
+138:  `docs/ref_papers/state_action_design_survey.md`.
+140:  configuration; TempoRL's skip-actions are the anchor for our zero-cost
+141:  actions and when-to-route; our analogue is per-trajectory action selection).
+142:- LLM-as-decision-maker literature (LLAMBO ICLR 2024 — prompt-state with the
+143:  full evaluation history, action = next x; GPTOpt 2025 — fine-tuned
+150:Architecture diagram: `state → policy → action → backend → new_state`.
+156:- Checkpoint / restore preserves GP state + RNG (`backend.checkpoint()`).
+166:HistoryState         — last_action only (no action-sequence memory)
+173:`src/opt_agent/state/models.py` (the previous draft listed
+174:gap_to_best / last_n_actions / action_diversity, which were never
+182:and an `execute_action` runner.
+195:utility units, comparable to Δopt fractions.
+202:to keep the backend state clean.
+206:Each record: `state + candidate_actions + gold_probs + rollout_results +
+216:### §3.8 Theoretical results (full statements + proofs: `docs/THEORY.md`)
+228:- **P2 (`adaptive-value` = tight value of state-conditionality).**
+230:  constant action against per-state oracle selection and tightly bounds the
+231:  gain of *any* state-conditional policy over the best constant action.
+233:  state-conditional gain by bound, which is why the RF probe finds no
+236:- **P3 (routing degeneracy).** If the System-2's per-state advantage
+238:  learned — has non-positive value over never routing. The 10-seed sweep
+240:  of `A ≤ 0`, so the routing failure is a property of the LLM's decisions,
+241:  not of the routing heuristic.
+244:  rule exactly under noiseless labels with no feature aliasing — explaining
+256:System-1 (one regressor per action; argmax = chosen action). Trained on
+258:× 20 seeds × horizon=3). Features: 15-dim state vector (12 numeric + 3 phase
+263:- **In-family RF** (LOSO reference, **not** an upper bound — see below)
+265:- **RulePolicy (real, state-conditional)** — the actual `RulePolicy.select_action()` from
+267:  if stagnation_steps ≥ 3 AND budget ≥ 2, else SURROGATE_ACQUISITION. Reads state
+268:  from each record to produce a per-record action choice.
+293:- **vs RulePolicy (real, state-conditional)**: cross WINS on **3/5** (Branin,
+302:1. **Lower one-step regret than the real state-conditional RulePolicy on 3/5 BOCoDe families**, including the
+304:   real, state-conditional RulePolicy is a stronger baseline than the
+308:2. **In-family is not an upper bound**. On Rastrigin, cross-family regret
+311:   RF is best described as a **reference**, not an upper bound.
+334:> one-step regret than the real state-conditional RulePolicy on three of
+336:> seed-block 95% CI upper bound < 0). The cross-family RF also has lower
+344:> closed-loop trajectory evaluation is left for future work."
+347:- **One-step decision regret, not closed-loop trajectory** — the RF is
+363:RQ2.1) trained on the action labels of `RuleFullBudget` at IOH functions
+434:P2). The original 10-seed landscape (354 labels) read Hartmann 0.684 >
+482:decision-rich (Hartmann) states; the predeclared joint Gate 5 fails on
+489:RF ≈ best-fixed, no state-conditional learnability demonstrated.
+494:For each (problem, seed), replay with one first action then AlwaysSurrogate
+495:continuation. **Best first action across opportunity-rich families is
+499:### §5.6 Teacher noise and decision-level distillation (EXP-RLCD)
+502:> `exp_teacher_noise_diagnostic{,_r5}.json`, `runs/EXP_RLCD_REPORT.md`,
+504:> `exp_rlcd_longhorizon.json`, `exp_rlcd_closed_loop.json`,
+507:**Label noise (P1a).** Single-roll counterfactual labels are
+508:noise-dominated: per-re-roll pair flip probability **0.40** on
+515:R=5) still fails Gate 4 with wide upper bounds (+0.78 Ackley / +1.92
+516:Hartmann): first-action labels cannot demonstrate terminal behavior-gain
+540:closed-loop results ARE the fixed-Local policy's: Rastrigin +0.624
+545:Rastrigin (−0.23, CI crosses 0): no free closed-loop win from routing the
+548:dominated by its constant component) and with §6.5's schedule finding.
+568:### §6.2 Mechanism: global-to-local temporal action pattern (correlational)
+570:From `runs/exp_rq0_5_action_distribution.md` — On Rastrigin (10D multimodal),
+579:  `local_exploitation` (the closed-loop best first action) — that hypothesis is
+582:- The LLM's **pooled** top action on Rastrigin is `global_exploration` at 70%,
+587:- **Deterministic schedule control now run (NEW)**: the predeclared
+593:  On Rastrigin the ordering is schedule ≈ rf > llm, which **subsumes** the
+594:  earlier "LLM > AlwaysSurrogate on Rastrigin" pilot: the schedule alone
+597:  exhibited a global-to-local temporal action pattern associated with its
+598:  advantage over AlwaysSurrogate. A deterministic two-phase schedule
+600:  of five families, so the schedule — not LLM-specific per-step reasoning
+616:not significant). The simple dimension-based routing rule is NOT measurably
+618:deferral**: more elaborate routing needs RQ2 transfer experiments to
+621:### §6.5 Real-LLM cost frontier, closed loop, 10 seeds (EXP-RQ3)
+659:`ConfidenceRouter.tau_conf` is not a useful routing signal on this panel.
+666:keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
+667:decision content is dominated by the fixed two-phase schedule its own
+668:per-step distribution exhibits — and by THEORY.md P3, no router could have
+669:rescued an arm with nonpositive per-state advantage. Artifacts:
+670:`runs/exp_rq3_schedule_baseline.json`,
+671:`scripts/exp_rq3_schedule_baseline.py`.
+679:   real state-conditional RulePolicy on 3/5 BOCoDe families** (Branin,
+691:3. **Gate 2 fails — at this state granularity** — stable state-to-action
+693:   top_action_share ≥ 0.6 threshold) *from the compressed 15-scalar process
+694:   state*. Related agentic-BO designs condition on the full trajectory or
+695:   posterior context (`docs/ref_papers/state_action_design_survey.md`);
+696:   whether a richer state representation would support learnability is open
+697:   — but the adaptive-value ceiling (P2, representation-independent) caps
+712:6. **Pareto frontier measured but degenerate** — the closed-loop cost
+714:   one provider (deepseek-chat): System-1-only dominates, so there is no
+716:   (longer horizons, stochastic objectives, genuinely OOD states) gives
+720:   pilot framing but not for state-of-the-art comparison.
+725:9. **Mechanism: schedule-sufficiency shown, full causal decomposition not** —
+726:   the deterministic global-then-local control now exists and dominates the
+728:   that the schedule *suffices* for — and exceeds — the LLM's closed-loop
+730:   statement but still not a step-level causal decomposition of the LLM's
+736:    weights, action set, horizon=3, regime taxonomy, and top_action_share
+749:13. **Learned System-1 closed-loop evidence is negative-to-heterogeneous** —
+750:    EXP-RQ2.1 is one-step decision regret; the closed-loop audit
+753:    not the stronger AlwaysLocal control, and dominates every LLM arm at
+764:    constant policy in closed loop (§5.6) — no learned policy on this panel
+765:    (RF or RLCD) beats the constant local baseline in closed loop.
+766:16. **Teacher noise bounds the supervision** — counterfactual labels are
+767:    noise-dominated at single roll (per-re-roll flip 0.40 above-median);
+769:    (terminal behavior-gain) is unattainable for first-action labels on
+776:  noise-dominated counterfactual teacher is still learnable at decision
+779:  component in closed loop.
+785:  multimodal problems (Rastrigin +17.54, p=0.0058). But in closed loop
+790:- "Is routing a Pareto win?" — measured (§6.5): no. No confidence threshold
+792:  degenerate on this panel. Whether any regime gives routing positive
+798:  holds, §4.7) — closed-loop transfer remains undemonstrated for both.
+806:  affine label invariance, adaptive-value bound, routing degeneracy,
+810:  stop-gain (5/5), with **Gate 2 still failing** (5/15 buckets pass at
+811:  top_action_share ≥ 0.6) and **Gate 5 partial** (median Spearman = 1.0
+813:  global-to-local temporal action pattern whose *sufficiency* is now
+814:  demonstrated: a deterministic two-phase schedule reproduces and exceeds
+815:  the LLM's closed-loop value on this panel.
+816:- **RQ2 (NEW)**: cross-family transfer **wins vs the real state-conditional
+822:- **RQ3 (cost frontier, NEW)**: in closed loop at 10 paired seeds the
+834:  schedule finding of §6.5.
+842:  is a family signal, not a dimension signal); (f) in closed loop,
+844:  two-phase schedule (§6.5) — and by P3 no router could have fixed this;
+846:  closed loop (§5.6) — decision-level metrics do not imply
+849:  horizons, stochastic objectives, OOD states), external lenz/PlugBO
+860:- A3 — Per-seed action distribution tables
+867:- `docs/THEORY.md` — P1/P2/P3/L1 with proofs, scope conditions, and the
+871:  1.4e-12); P2 recomputed at 20 seeds
+872:- `runs/exp_rq3_schedule_baseline.json` + `scripts/exp_rq3_schedule_baseline.py`
+873:  — deterministic schedule control on the RQ3 panel (paired starts verified)
+879:- `runs/exp_rq0_5_action_distribution.md` — Track D mechanism analysis
+889:- `runs/EXP_JOURNAL_ROUND2_REPORT.md` + `runs/exp_teacher_noise_diagnostic.json` /
+890:  `exp_teacher_noise_diagnostic_r5.json` / `runs/exp_rlcd_loo_confirmatory.json` /
+891:  `exp_rlcd_loo_transfer.json` — teacher-noise chain + LOO transfer
+899:- `runs/exp_rlcd_longhorizon.json` + `runs/exp_rlcd_closed_loop.json` +
+900:  `runs/exp_rlcd_router_panel.json` — long-horizon, closed-loop collapse,
+903:- `runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md` — closed-loop audit
+
+exec
+/bin/bash -lc 'cat docs/ref_papers/journal_positioning.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+# 期刊论文定位：创新性主张与完整性缺口
+
+> 2026-09-27 整理。目标：从 workshop paper 升级为期刊论文（目标档次参考
+> JMLR / JAIR / ML journal / 或 BO 强相关的期刊）。本文回答两个问题：
+> **相对 2024–2026 最近邻工作，我们的创新点是什么**；**期刊审稿人会要求
+> 补什么**。
+
+---
+
+## 一、与最近邻工作的差异定位
+
+### vs. Sara/lenz（Brunzema et al., arXiv:2608.00316, 2026）——最重要的对照
+
+| 维度 | Sara/lenz (2026) | 本项目 |
+|---|---|---|
+| 决策形式 | LLM agent 自由探查/提点/改配置/停止（open-ended） | 8 个 typed action 的封闭决策空间 |
+| 策略来源 | 系统 prompt 指令，无学习 | 反事实 oracle 监督 → 训练的校准 System-1（RF） |
+| LLM 成本 | **只报告不优化**（token 记录在附录 C.2） | **选择性 System-2：置信度路由 + 预设非劣效 margin 的成本前沿** |
+| 统计处理 | 10 seeds 中位数 + IQR + Mann–Whitney | 配对 seed bootstrap CI、预设定验收标准、诚实阴性结果 |
+| 计算成本入模 | future work（附录 E meta-MDP） | **已做**（RQ3 全网格，含 10-seed 确认） |
+
+**核心论点：我们正面回答了该文留下的开放问题（计算成本何时值得花）。**
+他们证明了 LLM 能坐进决策环；我们回答"什么时候值得让它坐进来"。
+
+### vs. LLAMBO（ICLR 2024）
+
+- LLAMBO 把 LLM 放进环里（当 surrogate/提议器）但无成本治理；2026 复现研究
+  （arXiv:2603.24647）指出其结果对实现细节高度敏感。
+- 我们的对应设计：typed action 空间 + 冻结提示 + 确定性 RF + mock/real 双模式
+  对照——稳健性是设计出来的，不是调出来的。
+
+### vs. GPTOpt / AdaEvolve（2025–2026）
+
+- 它们让 LLM **本身当优化器**；我们研究 **meta 决策层**上 LLM 推理何时值得花
+  （决策对象是"下一步采取什么优化策略"，不是"下一个 x"）。层面不同，可互补。
+
+### 我们独有的框架贡献
+
+**Decision Landscape（adaptive-value 三 regime 分类）**：Flat / Heavy-tailed /
+Frequent-opportunity。在上述所有近邻工作中都没有对应物——这是"在哪类问题上
+值得用学习策略/LLM"的先验刻画，直接解释我们的阴性结果（Flat 家族上 LLM/学习
+策略赚不回成本）。
+
+---
+
+## 二、一句话卖点（摘要/引言用）
+
+> Agentic Bayesian Optimization 已经证明 LLM 能坐进优化决策环；本文回答
+> **"它什么时候值得坐进来"**：我们用反事实 oracle 监督训练校准的 System-1，
+> 以预设定非劣效 margin 在五个优化家族上给出首个优化决策环内的质量-成本
+> 前沿——结论是诚实的阴性：冻结 System-1（0 次 LLM 调用）在 5/5 家族上
+> 支配 always-LLM，且没有任何置信度/随机路由策略能赚回成本；机制分析表明
+> LLM 的价值在于"全局→局部"的调度结构而非逐步选择。我们同时给出
+> decision-landscape 刻画（三类 regime）与跨家族/跨维度迁移的系统性阴性结果。
+
+**阴性结果为什么是贡献而非弱点**：agentic BO 文献（Sara/lenz、LLAMBO 及其
+复现研究）普遍只报告 LLM 参与的正向故事；第一个系统性的成本前沿阴性 + 机制
+解释 + 预设定标准，是该领域目前缺失的对照证据。写作时要主动把阴性结果
+框定为"成本治理的 benchmark 时刻"。
+
+---
+
+## 三、期刊级完整性缺口（按优先级，审稿人视角）
+
+### P0 — 基准面（最大风险）
+
+- 现状：5 个合成 BOCoDe 家族 + 少量 IOH。Sara/lenz 用了 HPO（LCBench）+
+  化学反应 + scaling law；审稿人会照此标准要求。
+- 必补：
+  1. **BBOB/COCO 全套或 IOH 更广覆盖**（IOH backend 已有，扩函数/维度即可）；
+  2. **≥1 个 HPO 任务**（LCBench 或 Optuna benchmarking 类）；
+  3. **≥1 个真实工程/仿真问题**——Phase 14 不能再是占位符；若车辆悬架仿真器
+     不可得，用 BBOB-exp / 工程参数辨识类问题垫，并在 limitations 说明。
+
+### P0 — 外部基线
+
+- 现状：全部内部基线（Rule/Surrogate/Local/Jev/LLM）。
+- 必补：**Sobol/Ax/SMAC3 或 HEBO**（经典优化器锚点）+ **LLAMBO**
+  （OptunaHub 移植版，注意引用 2603.24647 的保真度差异表）。
+- 可选：GPTOpt 作为"微调 LLM 优化器"参照。
+
+### P1 — 缺一个"赢"的 regime
+
+- 全阴性对 workshop 够、对期刊需至少一个正向结果。（2026-09-27 更新：
+  **部分达成，走的是"蒸馏泛化"而非"调度蒸馏"路径**——EXP-RLCD-JOURNAL
+  轮的 E5 显示：反事实蒸馏的 Laya typed-decision 模型在 leave-one-family-
+  out 下保持 ~99% 族内排序精度（0.866 vs 0.873），对 RF 基线的优势在家族
+  偏移下从 +0.056 翻倍到 +0.146，5/5 折全胜（符号检验 p=0.031）。这是
+  RQ2 式的"跨问题泛化"阳性。机制边界的诚实刻画同时到手：置信度无判别力
+  （AURC≈1−acc，E1）→ 量化路由退化为家族级整体切换（E4，预申明标准未过）
+  → RQ3 前沿保持退化的原因比"RF 平"更深：现有监督不提供判别性不确定性。
+  详见 `runs/EXP_RLCD_JOURNAL_ROUND_REPORT.md`。原"调度蒸馏"路径仍是
+  备选：机制检查里确定性 global-then-local 基线已在 dev seeds 上赢过 LLM；
+  在多峰问题族上展示 learned schedule > 固定规则仍是可选的第二个"赢"。）
+- 确认性补强（E5 后续）：per-record 日志 + record-clustered CI；每折
+  2 个训练种子。
+
+### P1 — 统计完整化
+
+- 多重比较校正（Benjamini–Hochberg 或按家族分层）；全实验统一 ≥10 seeds
+  （RQ3 已到，RQ1/RQ2 对齐）；报告 IQM（Agarwal 2021 处方）。
+- σ_family 等预设定量的定义先于实验写进脚本（本次 10-seed 复核发现原报告
+  未记录 σ 定义——流程教训写进论文可加分）。
+
+### P2 — 保持并显式声称的强项
+
+- 385 unit tests、数据集 SHA-256 溯源、预设定验收标准、阴性结果全保留、
+  符号错误主动修正——写进 reproducibility 段落，是对审稿人的差异化卖点。
+- Phase 14 工程迁移：若 P0 补了一个工程问题，该段落从"占位符"转为真实结果。
+
+---
+
+## 四、写作映射（结构 → 文献支撑）
+
+| 论文段落 | 支撑文献 |
+|---|---|
+| §1 引言 | agentic BO 叙事：LLAMBO → 复现批判 → Sara/lenz → 我们的成本前沿 |
+| §2 Related work | papers_2024plus.md 四条线各一段 |
+| §3 方法 | OPE 术语接口（arXiv:2501.05278）+ temperature scaling（Guo 2017）+ 非劣效 margin（CONSORT 扩展） |
+| §5 RQ3 | 路由线 8–13 + 阴性结果框定 |
+| §6/§7 Limitations | Ross & Bagnell 2011（单步 vs 闭环分叉）+ 基准面/多重比较 |
+| 附录 | Agarwal 2021 统计处方、预设定标准全文 |
+
+相关文件：`docs/workshop_paper_outline.md`（现有 8 页骨架，可直接扩展）；
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`（10-seed 修正版结论）；
+`PROGRESS.md`（三 RQ 现状）。
+
+exec
+/bin/bash -lc "rg -n 'Q-T6|Optional\\[ProblemFeatures\\]|sidecar' docs PROGRESS.md MASTER_PLAN.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+docs/ref_papers/state_action_design_survey.md:92:   - (b) state 加 optional sidecar（Q-T6 方案 b：`Optional[ProblemFeatures]`，
+
+exec
+/bin/bash -lc "sed -n '420,550p;585,610p;621,780p;805,850p' docs/workshop_paper_outline.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+  1,595 pairs; `exp_geartrain_transfer_probe.json`). Full
+  engineering-simulator transfer remains unrun.
+- Relation to §4 (RF): the RF System-1 transfers with lower one-step
+  decision regret on 3/5 families; the fine-tuned model additionally
+  recovers the teacher's *calibration* (proper arm, §5.6) and holds on an
+  engineering family — but neither closes the loop (§5.6, §7.15).
+
+## §5 RQ1 — Decision Landscape
+
+### §5.1 Three regimes (Step 1)
+
+`adaptive-value(family) = E[max_a U] − max_a E[U]`. Primary numbers are the
+**20-seed recomputation** on the confirmatory dataset
+(`runs/verify_theory_propositions.json`, 663 records; same source as §3.8
+P2). The original 10-seed landscape (354 labels) read Hartmann 0.684 >
+Rastrigin 0.368 > Ackley 0.309 > Branin 0.048 > SixHumpCamel 0.015 — the
+**Rastrigin/Ackley order swaps at 20 seeds**, but both remain in the same
+regime, so the taxonomy is unchanged.
+
+| Family | adaptive-value (20 seeds) | Regime |
+|---|---|---|
+| Hartmann | 0.710 | Frequent opportunity |
+| Ackley | 0.332 | Heavy-tailed |
+| Rastrigin | 0.262 | Heavy-tailed |
+| Branin | 0.040 | Flat |
+| SixHumpCamel | 0.012 | Flat (clean negative control: 0% above δ=0.1) |
+
+### §5.2 Counterfactual oracle replay (Step 1 — Gate 3)
+
+20-seed 5-family dataset (`phase8_6d_h3_20seed_5family.jsonl`, 663 records).
+Gate 3 (`aggregate_mass`): **adjusted_lift = 1.294, seed-clustered 95% CI = [0.848, 1.954]**,
+n_seeds=100 (up from 10-seed's 1.124, CI [0.695, 1.722]).
+**Independent-stream replication (seeds 100–119, 654 records,
+`exp_rq1_2_h3_20seed_replication_s100_119.json`): adjusted_lift 1.296,
+CI [0.881, 1.867], PASS** — essentially identical.
+Gate 4 stop-gain CI lo > 0 on 5/5 families (5/5 again on the replication
+stream). Gate 4 uniform-gain CI lo > 0 on 4/5 (Branin, Hartmann, Rastrigin,
+SixHumpCamel); the replication stream also passes 4/5 but with a DIFFERENT
+set (Ackley, Branin, Hartmann, SixHumpCamel — Rastrigin swaps out), so the
+count replicates while the passing family set does not. Gate 4
+behavior-gain CI lo > 0 on 1/5 (Rastrigin only); the replication passes
+3/5 with a disjoint set and Rastrigin reversed — report behavior-gain as
+unstable across streams.
+
+### §5.3 Affine invariance (Step 1 — Gate 5, PARTIAL PASS)
+
+Gold_probs invariance under `y → scale * y + shift` (see `runs/EXP_AFFINE_REPORT.md`).
+Result on the 5-family panel × 4 transforms:
+- **Median Spearman ρ = 1.0000 across all 17 (problem, phase) buckets**
+  (consistent with the analytic argument: shift cancels in Δopt; scale
+  cancels via the `optimization_scale = std(initial_obj)` denominator)
+- **Argmax agreement ≥ 0.83 on all 17 buckets** (full ≥ 0.8)
+- **JS divergence ≤ 0.02 on 15/17 buckets; predeclared Gate 5 fails
+  because 2/17 Hartmann (late, mid) buckets breach the threshold due to
+  GP-fit numerical fragility** — BoTorch's `optimize_acqf(LogEI)` lands on
+  a duplicate X under shift=5, producing `delta_opt = 0` and a sharp
+  utility drop. **This is a known numerical fragility, NOT a violation of
+  the analytic rank invariance. Per-record rank invariance is not
+  established.**
+
+Paper claim: "Counterfactual oracle labels have median rank correlation
+1.0 under affine y transforms, with a known near-tie caveat in
+decision-rich (Hartmann) states; the predeclared joint Gate 5 fails on
+2/17 buckets due to GP-fit numerical fragility."
+
+### §5.4 State conditionality (Step 2 — RF probe)
+
+Hartmann: RF regret 0.47 vs Surrogate 0.68 (−29%) — paired bootstrap
+CI [−0.038, 0.415], t p=0.141 → suggestive pilot. Rastrigin/Ackley:
+RF ≈ best-fixed, no state-conditional learnability demonstrated.
+Branin/SixHumpCamel: too flat for learnability signal.
+
+### §5.5 Closed-loop regret (Step 3)
+
+For each (problem, seed), replay with one first action then AlwaysSurrogate
+continuation. **Best first action across opportunity-rich families is
+`local_exploitation`** (Hartmann 0.33 vs Surrogate 0.48; Rastrigin 0.00
+vs Surrogate 11.10; Ackley 0.005 vs Surrogate 0.03).
+
+### §5.6 Teacher noise and decision-level distillation (EXP-RLCD)
+
+> NEW 2026-09-28. Artifacts: `runs/EXP_JOURNAL_ROUND2_REPORT.md`,
+> `exp_teacher_noise_diagnostic{,_r5}.json`, `runs/EXP_RLCD_REPORT.md`,
+> `exp_rlcd_report.json` / `exp_rlcd_ci.json`, `exp_rlcd_sweep.json`,
+> `exp_rlcd_longhorizon.json`, `exp_rlcd_closed_loop.json`,
+> `exp_rlcd_router_panel.json`; theory `docs/RLCD_THEORY.md`.
+
+**Label noise (P1a).** Single-roll counterfactual labels are
+noise-dominated: per-re-roll pair flip probability **0.40** on
+above-median-gap pairs (0.36 overall; conservative any-of-3 union 0.73
+above-median / 0.65 overall); inter-roll gap spread 0.0915 exceeds the
+median stored gap 0.05; argmax stable across re-rolls for only 29% of
+records. R=5 replicate-averaging reduces the 2v2 split-half pair flip to
+0.36 overall / 0.33 above-median — necessary hygiene, not stabilization.
+A Gate-4-aligned teacher (rule continuation, pure terminal-Δbest utility,
+R=5) still fails Gate 4 with wide upper bounds (+0.78 Ackley / +1.92
+Hartmann): first-action labels cannot demonstrate terminal behavior-gain
+on this panel.
+
+**Distillation (4-arm, held-out 115 records / 2,889 pairs).** RLCD
+fine-tuning of the 0.4B Laya typed-decision model on counterfactual pairs:
+
+| Arm | Pairwise acc | Top-1 | Mean log score |
+|---|---:|---:|---:|
+| zero-shot | 0.396 (< chance) | 0.035 | −3.32 |
+| RLCD proper-score | 0.800 | 0.252 | **−2.07** (only arm beating uniform −2.079) |
+| BT pairs | **0.873** | 0.383 | −3.06 (below uniform — overconfidence) |
+| RF (utilities) | 0.817 | 0.400 | — |
+
+Pairwise CIs (record-clustered bootstrap, `exp_rlcd_ci.json`):
+BT − RF +0.056 [+0.033, +0.080]; proper − BT −0.073 [−0.090, −0.055];
+proper ≈ RF (CI crosses 0). Hyperparameter sweep (15 configs, re-run
+2026-09-28 on the fixed margin plumbing): defaults near-optimal (best bt
+0.878 at β1/margin0; best proper 0.795 at w_sph 0.5 / lr 5e-6) — the
+objective choice is the lever, not the knobs. On the long-horizon partial
+dataset the ordering is preserved at smaller margins (bt 0.660 > proper
+0.576 > RF 0.545 > zero 0.485).
+
+**Closed loop (negative).** Both fine-tuned arms collapse to the same
+constant policy (1,250/1,250 decisions `local_exploitation`), so their
+closed-loop results ARE the fixed-Local policy's: Rastrigin +0.624
+[+0.288, +0.936] vs rule; Hartmann −9.041 [−17.89, −1.91]; Branin −0.016
+[−0.025, −0.007] vs surrogate. A confidence router on top (quantile
+thresholds) routes essentially every decision to surrogate on Hartmann
+(routed ≡ always-surrogate, all diffs 0) and is negative-in-mean on
+Rastrigin (−0.23, CI crosses 0): no free closed-loop win from routing the
+fine-tuned model either. Decision-level recovery does not yield a deployed
+optimizer — consistent with RLCD_THEORY T4/L1 (the h3 teacher's argmax is
+dominated by its constant component) and with §6.5's schedule finding.
+
+## §6 RQ3 — Selective Reasoning
+  Surrogate*. The pooled distribution alone does not explain the Rastrigin-
+  specific advantage; only the *temporal pattern* is unique.
+- **Deterministic schedule control now run (NEW)**: the predeclared
+  `GlobalThenLocal` baseline (10 global decisions, then local) was run on
+  the exact RQ3 panel (seeds 100–109, paired starts verified). It **beats
+  the real LLM with CI excluding zero on Hartmann (+0.334), SixHumpCamel
+  (+0.674), and Rastrigin (+9.628)** and never loses to it; it ties the
+  frozen RF on three families (RF keeps Ackley and SixHumpCamel).
+  On Rastrigin the ordering is schedule ≈ rf > llm, which **subsumes** the
+  earlier "LLM > AlwaysSurrogate on Rastrigin" pilot: the schedule alone
+  reproduces and exceeds the LLM's value. See §6.5.
+- **Recommended paper wording (updated)**: *"On Rastrigin, the LLM
+  exhibited a global-to-local temporal action pattern associated with its
+  advantage over AlwaysSurrogate. A deterministic two-phase schedule
+  realizing that pattern matches the LLM's value and exceeds it on three
+  of five families, so the schedule — not LLM-specific per-step reasoning
+  — accounts for the LLM's measurable decision value on this panel."*
+
+### §6.3 FrozenRouter: BOCoDe advantage does NOT transfer
+
+| Panel | FrozenRouter − Surrogate | p |
+|---|---|---|
+| BOCoDe (5-family) | +15.69 (sum) | 0.012 |
+| IOH (f1–f5, dim 2/5/10/20) | +0.036 (mean normalized regret) | 0.138 |
+
+**Negative result**: a simple `dim≥5` router trained on BOCoDe does not
+### §6.5 Real-LLM cost frontier, closed loop, 10 seeds (EXP-RQ3)
+
+Frozen RF System-1 (trained on rollout seeds 0–15, temperature-calibrated on
+16–19) deployed through full budget-30 BO trajectories against the same
+`deepseek-chat` System-2, with confidence-threshold routers (τ ∈ {0.25,
+0.5, 0.75, 0.9}) and random-rate baselines (rate ∈ {0.25, 0.5, 0.75}).
+**450 paired trajectories** (5 families × seeds 100–109 × 9 policies),
+identical Sobol starts per (family, seed), zero LLM fallbacks, identical
+frozen-model hash across both sweep files.
+
+| Family | `rf − llm` (mean) | `llm − rf` 95 % CI | verdict |
+|---|---:|---|---|
+| Branin | +0.515 | [-1.224, +0.152] | rf better in mean, CI crosses 0 |
+| Hartmann | +0.576 | **[-1.032, -0.103]** | rf detectably better |
+| Ackley | +1.017 | **[-1.658, -0.436]** | rf detectably better |
+| SixHumpCamel | +1.015 | **[-1.512, -0.587]** | rf detectably better |
+| Rastrigin | +10.109 | [-22.356, +0.404] | rf better in mean, CI crosses 0 |
+
+**No arm on the whole grid (8 LLM-calling arms × 5 families) beats `rf`
+with a CI excluding zero**; the only positive point estimates anywhere are
+Hartmann/confidence_0.25 (+0.018) and Hartmann/random_0.25 (+0.149), both
+CI-crossing. Always-LLM spends ~12–17 calls (~4.7–6.5k tokens) per
+trajectory and is dominated. The pre-specified acceptance criteria (≥ 50 %
+call/token reduction at ≤ 0.10 σ_family regret margin) pass trivially via
+the System-1-only arm — the measured frontier is degenerate.
+
+**Sign correction (documentation integrity).** The first 3-seed version of
+this experiment inverted the sign of its own Hartmann numbers in prose
+("the one family where the LLM is genuinely useful"); the recorded data had
+`rf` winning 3/0/0. The corrected reading agrees with §6.1 above (LLM
+−0.985 on Hartmann, p=0.0007). See the correction block at the top of
+`runs/EXP_RQ3_REAL_LLM_COST_FRONTIER_REPORT.md`.
+
+**Routing diagnostic.** The 3-seed "random rate beats the confidence
+router" observation does not generalize: at 10 seeds neither scheme
+produces a CI-detectable gain over `rf`, and Branin random_0.5/0.75 are
+CI-detectably worse. The RF softmax maximum rarely exceeds 0.25, so
+confidence thresholds route nearly every step to System-2;
+`ConfidenceRouter.tau_conf` is not a useful routing signal on this panel.
+
+**Schedule control (mechanism).** A predeclared deterministic
+`GlobalThenLocal` control (10 global decisions, then local) run on this
+exact panel (paired starts verified) **beats the LLM arm with CI excluding
+zero on Hartmann (+0.334), SixHumpCamel (+0.674), and Rastrigin (+9.628)**
+and never loses to it; it ties `rf` on Branin/Hartmann/Rastrigin while RF
+keeps Ackley (−0.853) and SixHumpCamel (−0.341). The LLM's closed-loop
+decision content is dominated by the fixed two-phase schedule its own
+per-step distribution exhibits — and by THEORY.md P3, no router could have
+rescued an arm with nonpositive per-state advantage. Artifacts:
+`runs/exp_rq3_schedule_baseline.json`,
+`scripts/exp_rq3_schedule_baseline.py`.
+
+## §7 Limitations
+
+(per codex round-1 review 2026-09-27; ordered roughly by importance)
+
+1. **RQ2 partially answered** — `EXP-RQ2.1` (5-fold leave-one-family-out
+   RF) shows cross-family transfer has **lower one-step regret than the
+   real state-conditional RulePolicy on 3/5 BOCoDe families** (Branin,
+   Ackley, Rastrigin; seed-block 95% CI upper < 0). It also has lower
+   regret than AlwaysSurrogate on 2/5 (Ackley, Rastrigin — both 10D).
+   It has higher regret than AlwaysSurrogate on 2/5 (Hartmann, SixHumpCamel);
+   inconclusive on Branin. It loses to AlwaysLocal on aggregate. The pattern
+   is family-specific; not a uniform "transfer works" claim. Family ×
+   dimension confounded: a crossed design (same problem at multiple dimensions)
+   is required to disentangle — deferred.
+2. **Synthetic five-family panel only** — no real engineering objective.
+   Family, dimension, smoothness, and multimodality are **confounded**;
+   "Hartmann beats Branin" could be a dimensionality effect, a smoothness
+   effect, or a multimodality effect.
+3. **Gate 2 fails — at this state granularity** — stable state-to-action
+   learnability is **not demonstrated** (5/15 buckets pass at
+   top_action_share ≥ 0.6 threshold) *from the compressed 15-scalar process
+   state*. Related agentic-BO designs condition on the full trajectory or
+   posterior context (`docs/ref_papers/state_action_design_survey.md`);
+   whether a richer state representation would support learnability is open
+   — but the adaptive-value ceiling (P2, representation-independent) caps
+   any such gain at D on four of five families.
+4. **Gate 5 fails on 2/17 buckets** — predeclared joint test (`pass_: false`)
+   because JS divergence exceeds 0.02 on Hartmann (late, mid) buckets. Median
+   Spearman = 1.0 in all (problem, phase) buckets (consistent with the
+   analytic rank-invariance argument; per-record invariance not established).
+5. **Independent replication ADDED (2026-09-28)** — the original 20-seed
+   set reused seeds 0–9 from the exploratory run; a fully independent
+   stream (seeds 100–119, 654 records, same frozen generator config) now
+   exists (`phase8_6d_h3_20seed_5family_s100_119.jsonl`). Gate 3 replicates
+   essentially exactly (1.296 [0.881, 1.867] vs 1.294 [0.848, 1.954],
+   PASS); stop-gain replicates 5/5; uniform-gain replicates 4/5 in count
+   but not in family set; behavior-gain does not replicate at family
+   level (§5.2). Remaining limitation: the family PANEL is unchanged —
+   the same five families informed the design on both streams.
+6. **Pareto frontier measured but degenerate** — the closed-loop cost
+   frontier (§6.5) is measured at budget 30 on the five-family panel with
+   one provider (deepseek-chat): System-1-only dominates, so there is no
+   interesting quality-cost tradeoff on this panel. Whether any regime
+   (longer horizons, stochastic objectives, genuinely OOD states) gives
+   the LLM System-2 positive marginal value is open.
+7. **No external baseline** — lenz / PlugBO / TuRBO not yet compared. The
+   internal baselines (Rule, AlwaysSurrogate, Jev) are sufficient for RQ3
+   pilot framing but not for state-of-the-art comparison.
+8. **Single LLM provider / prompt configuration** — only deepseek-chat via
+   DeepSeek API. Other LLMs (GPT-4, Claude, Gemini) may exhibit different
+   decision patterns; we have no evidence the Rastrigin finding transfers,
+   and the §6.5 cost-frontier result is provider-specific.
+9. **Mechanism: schedule-sufficiency shown, full causal decomposition not** —
+   the deterministic global-then-local control now exists and dominates the
+   LLM (3/5 families, CI excluding zero; never loses), which establishes
+   that the schedule *suffices* for — and exceeds — the LLM's closed-loop
+   value on this panel. This is stronger than the earlier correlational
+   statement but still not a step-level causal decomposition of the LLM's
+   individual decisions.
+10. **Per-step trajectory attrition** — by step 15, only 1 LLM trajectory
+    has not yet terminated; later-step means are computed on small subsamples.
+    The +45.7 advantage at step 15 is illustrative, not inferential.
+11. **Researcher-designed choices without sensitivity sweep** — utility
+    weights, action set, horizon=3, regime taxonomy, and top_action_share
+    threshold (0.6) are researcher-chosen; sensitivity to these choices is
+    not analyzed.
+12. **Multiple unadjusted comparisons — sensitivity measured (2026-09-28)**:
+    recomputing the per-family Gate-4 CIs at the Bonferroni-adjusted level
+    (99%, α/5; `runs/exp_gate4_multiplicity_sensitivity.json`):
+    **stop-gain survives 5/5**; uniform-gain degrades **4/5 → 2/5**
+    (Rastrigin, SixHumpCamel hold; Branin lo −0.003 just misses; Hartmann's
+    95% lower bound is itself bootstrap-fragile at ±0.05 around 0 — its
+    family-level pass is not stable); behavior-gain degrades **1/5 → 0/5**.
+    The borderline family-set instability also appears across seed streams
+    (§5.2). We claim stop-gain as robust; uniform-gain as 2/5 robust +
+    borderline; behavior-gain as not established.
+13. **Learned System-1 closed-loop evidence is negative-to-heterogeneous** —
+    EXP-RQ2.1 is one-step decision regret; the closed-loop audit
+    (`runs/EXP_FINAL_GOAL_CLOSED_LOOP_REPORT.md`) and §6.5 deploy frozen RFs
+    through full trajectories. The RF beats AlwaysSurrogate on Ackley but
+    not the stronger AlwaysLocal control, and dominates every LLM arm at
+    zero cost on this panel; a general learned-policy gain is not
+    established. The "RoutingAware" rule remains hand-coded (dim ≥ 5).
+14. **Summing raw best_y across families is not principled** — different
+    problems have different objective scales. The TOTAL comparison is
+    informative but not on a common scale; per-family + ratio-of-advantages
+    is the cleaner framing.
+15. **RLCD transfer is analysis-rerun, not locked** — the +0.140 5/5-fold
+    cross-family result (§4.7) was produced after design iterations on the
+    same panel; a locked evaluation on untouched families/tasks is required
+    before calling it confirmatory. And the fine-tuned arms collapse to a
+    constant policy in closed loop (§5.6) — no learned policy on this panel
+    (RF or RLCD) beats the constant local baseline in closed loop.
+16. **Teacher noise bounds the supervision** — counterfactual labels are
+    noise-dominated at single roll (per-re-roll flip 0.40 above-median);
+    all §5.6 distillation results are relative to that teacher, and Gate 4
+    (terminal behavior-gain) is unattainable for first-action labels on
+    this panel even after R=5 denoising and utility alignment.
+
+## §8 Discussion
+
+- "Is decision-intelligence learnable?" — partially yes (Hartmann
+  suggestive; flat families no signal). At the distillation level: the
+  noise-dominated counterfactual teacher is still learnable at decision
+  level (0.40 → 0.87 pairwise; proper-score arm uniquely calibrated,
+  §5.6) — but the learned policy collapses to the teacher's constant
+  component in closed loop.
+- "Does it transfer across problems?" — see §4 RQ2 below.
+  and four formal propositions tied to the experiments (`docs/THEORY.md`:
+  affine label invariance, adaptive-value bound, routing degeneracy,
+  exact imitation of axis-aligned rules); (2) a counterfactual oracle
+  dataset validation methodology that closes
+  Gate 3 (PASS at 20 seeds, adjusted_lift CI [0.848, 1.954]) and Gate 4
+  stop-gain (5/5), with **Gate 2 still failing** (5/15 buckets pass at
+  top_action_share ≥ 0.6) and **Gate 5 partial** (median Spearman = 1.0
+  necessarily by P1; predeclared joint fails on 2/17 buckets); (3) a
+  global-to-local temporal action pattern whose *sufficiency* is now
+  demonstrated: a deterministic two-phase schedule reproduces and exceeds
+  the LLM's closed-loop value on this panel.
+- **RQ2 (NEW)**: cross-family transfer **wins vs the real state-conditional
+  RulePolicy on 3/5 BOCoDe families** (Branin, Ackley, Rastrigin; seed-block
+  95% CI upper < 0). It also wins vs AlwaysSurrogate on 2/5 (Ackley,
+  Rastrigin). Aggregate Cross − Rule = -0.065 (cross is better). The cross
+  signal is heterogeneous (loses on Hartmann, SixHumpCamel vs Surrogate);
+  family × dimension confounded.
+- **RQ3 (cost frontier, NEW)**: in closed loop at 10 paired seeds the
+  frozen RF System-1 (0 LLM calls) beats or ties every LLM-calling arm on
+  all five families; always-LLM is CI-detectably worse on Ackley, Hartmann,
+  and SixHumpCamel. No confidence-threshold or random-rate router earns
+  its cost. The measured frontier is degenerate: System-1 only.
+- **EXP-RLCD (NEW 2026-09-28)**: decision-level distillation of the
+  counterfactual teacher into a 0.4B typed-decision model (pairwise
+  0.40 → 0.87; the proper-score arm is the only calibrated one), with
+  cross-family transfer (+0.140, 5/5 folds, analysis-rerun) and a
+  decision-level engineering probe (GearTrain 0.89 ≈ RF). Closed loop
+  collapses both fine-tuned arms to the teacher's constant component —
+  decision-level recovery without a deployed optimizer, mirroring the
+  schedule finding of §6.5.
+- Seven negative results that sharpen the claim: (a) trained router does
+  not transfer from BOCoDe to IOH; (b) RoutingAware does not beat
+  LLM-everywhere on the same panel; (c) cross-family transfer does not
+  help Hartmann or SixHumpCamel vs AlwaysSurrogate; (d) cross-family RF
+  loses to a constant `local_exploitation` policy (AlwaysLocal) on
+  aggregate because that policy ignores budget awareness; (e) within-
+  function dimension transfer fails (RQ2.2 at 10 seeds — the RQ2.1 signal
+  is a family signal, not a dimension signal); (f) in closed loop,
+  always-LLM is dominated by both the frozen System-1 and a deterministic
+  two-phase schedule (§6.5) — and by P3 no router could have fixed this;
+  (g) RLCD fine-tuned decision models collapse to a constant policy in
+  closed loop (§5.6) — decision-level metrics do not imply
+  trajectory-level value.
+- Future work: regimes where an LLM System-2 repays its cost (longer
+  horizons, stochastic objectives, OOD states), external lenz/PlugBO
+  baseline, fine-tuning a small decision model from LLM trajectories,
+
+exec
+/bin/bash -lc "sed -n '50,185p' docs/THEORY.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+
+exactly. Consequently `gold_probs`, the argmax action, and all rank
+statistics of the labels are invariant.
+
+**Proof.** `Δopt` is a difference of two objective values, so
+`Δ̃opt = α · Δopt` (β cancels). The initial values transform the same way,
+and the population standard deviation is positively homogeneous of degree
+one: `σ̃_opt = α · σ_opt`. Hence
+`w_opt · Δ̃opt / σ̃_opt = w_opt · Δopt / σ_opt`. The evaluation and fit
+terms depend only on action counts and the fixed budget scales, which the
+transform does not touch; the STOP term depends only on the remaining
+budget ratio. Every term is unchanged. ∎
+
+**Scope conditions.** (i) The scale must be *recomputed* on the
+transformed initial values (the generator does this); a frozen σ would
+leave a global α factor that softmax cancels only if T is rescaled too.
+(ii) If `w_sur` or `w_cov` were nonzero, `Δsur`/`Δcov` would have to be
+α-equivariant (or normalized) — with unnormalized RMSE-like quantities the
+identity can break. The project runs with both weights zero, so the
+condition holds by configuration.
+
+**Consequence for Gate 5.** Spearman ρ = 1 across buckets is *necessary*,
+not a lucky measurement; the observed 2/17 JS breaches on Hartmann cannot
+come from the label definition and must come from numerics of the GP fit /
+acquisition proposal (BoTorch `optimize_acqf` landing on duplicate X under
+shift), which is what the affine report concludes empirically. The
+predeclared joint Gate 5 therefore measures **GP-fit numerical stability
+under shift**, not invariance of the supervision signal.
+
+---
+
+## P2. `adaptive-value` is the tight value of state-conditionality
+
+**Proposition 2.** Define `D(family) = E_s[max_a U(a, s)] −
+max_a E_s[U(a, s)]`. Then `D ≥ 0`, and for every (possibly randomized)
+policy π,
+
+```
+E_s[U(π(s), s)] − max_a E_s[U(a, s)]  ≤  D,
+```
+
+with equality attained by the per-state oracle `π*(s) ∈ argmax_a U(a, s)`.
+That is, `D` is exactly the one-step regret of the best **constant**
+action against per-state oracle selection, and it tightly upper-bounds
+what any state-conditional policy can gain over the best constant action.
+
+**Proof.** For each π, `U(π(s), s) ≤ max_a U(a, s)` pointwise; take
+expectations and subtract `max_a E[U(a, s)]` ≤ `E[max_a U(a, s)]`
+(exchange of max and expectation). Equality for the oracle policy is
+immediate. ∎
+
+**Empirical tie.** The decision-landscape regime table (20-seed
+recomputation, `runs/verify_theory_propositions.json`: Hartmann
+D = 0.710 "frequent opportunity" vs SixHumpCamel D = 0.012 "flat"; the
+original 10-seed landscape read 0.684 / 0.015 — same regime ordering) is a
+direct readout of this bound: on flat families *no* state-conditional
+policy — learned or LLM — can beat the best constant action by more than
+≈ 0.012 in one-step utility, which is why the RF probe finds no signal
+there. On Hartmann the bound is loose enough to permit state-conditional
+gains, and the probe found a suggestive −29 % regret reduction.
+
+**Caveat.** `D` bounds one-step utility gains. Closed-loop terminal value
+is a different functional (the policy changes which states are visited);
+Phase 8.6F showed first-action and continuation effects are not additive.
+The bound is a screening result, not a closed-loop guarantee.
+
+---
+
+## P3. Routing cannot win under nonpositive System-2 advantage
+
+**Proposition 3** (one-step routing model). Fix a state distribution ρ,
+a System-1 action map `a₁(s)`, a System-2 action map `a₂(s)`, and a
+per-call cost `c ≥ 0`. A router is a measurable set `S₂` of states on
+which System-2 is consulted. With matched one-step continuation, define
+the per-state net advantage `A(s) = Q(s, a₂(s)) − Q(s, a₁(s))`. Then the
+router's value over never routing is
+
+```
+V(S₂) = E[ 1{s ∈ S₂} · A(s) ] − c · ρ(S₂).
+```
+
+If `A(s) ≤ 0` ρ-almost surely, then `V(S₂) ≤ 0` for **every** router —
+oracle or learned, confidence-based or not — with strict inequality
+unless `S₂` avoids all states where `A(s) < 0`.
+
+**Proof.** Both terms are nonpositive term-by-term. ∎
+
+**Corollary (frontier degeneracy).** On a panel where the System-2's
+per-state advantage is nonpositive, no routing design can recover value;
+the cost frontier is degenerate at "System-1 only". Routing research on
+such a panel can only lose.
+
+**Empirical reading.** The 10-seed EXP-RQ3 sweep measured eight
+LLM-calling arms (always-LLM, four confidence thresholds, three random
+rates); none beat `rf` with a CI excluding zero on any family, and
+always-LLM lost detectably on three families. Under the one-step model
+this is the signature of `A(s) ≤ 0` across visited states — i.e., the
+routing failure is a property of the LLM's decisions on this panel, not
+of the routing heuristic. Two supplementary observations fit: (a) the
+calibrated RF softmax maximum rarely exceeds 0.25 with m = 8 (near the
+uniform 0.125), so confidence thresholds τ ≥ 0.25 all induce the *same*
+router (route-always); the tested router family collapses to its two
+extremes, and the random-rate arms confirm the interior points also lose.
+(b) The deterministic schedule control (below) shows the LLM's decisions
+are dominated even by a fixed two-phase schedule, reinforcing `A ≤ 0`.
+
+**Caveat.** `V` is additive only in the one-step model with matched
+continuation. Sequential composition breaks additivity (Phase 8.6F), so
+the closed-loop statement is verified empirically per-arm rather than
+deduced; P3 explains *why* the sweep came out as it did and predicts the
+same outcome for any untested router on this panel.
+
+---
+
+## L1. Random forests exactly imitate axis-aligned threshold rules
+
+**Lemma 1.** Let the target rule `r(s)` be a function of a subset of
+axis-aligned features (e.g., `stagnation_steps`, remaining-budget ratio).
+Suppose training pairs `(features(sᵢ), r(sᵢ))` are noiseless and cover the
+rule's decision cells, and there is **no aliasing**: equal feature vectors
+imply equal rule actions. Then a random forest whose trees can realize the
+rule's threshold rectangles (depth ≥ number of thresholds), with one
+regressor per action trained on indicator targets, reproduces `r` exactly:
+`argmax_a f̂_a(features(s)) = r(s)` on covered states.
+
+**Proof sketch.** Each CART tree partitions the feature space into
+axis-aligned rectangles; the rule's cells are a partition of this kind, so
+some tree realizations isolate them. With noiseless indicator targets and
+sufficient leaf samples, each per-action regressor converges to the
+indicator of the rule picking that action on every covered cell, and the
+argmax is unique. Randomization only affects which realizations appear;
+coverage ensures at least one correct partition dominates the ensemble
+average. ∎
+
+**Empirical tie.** `RuleFullBudget` decides on
+(`stagnation_steps ≥ 3` with budget, low-budget threshold 0) — both
+
+codex
+1) **(a) VIABLE_NOW** — Qualify the claims at zero rerun cost; Gate 2 already has the needed state granularity qualifier.  
+**(b) VIABLE_LATER** — Problem features may matter on new HPO or engineering tasks, but adding them now requires regenerating datasets and retraining.  
+**(c) NOT_RECOMMENDED** — A full trajectory state has no demonstrated benefit on this panel; it would reset the evidence base while the oracle ceiling remains low on 4/5 families.  
+**(d) VIABLE_LATER** — Reconfiguration may be useful for journal tasks, but it changes the action menu and requires new oracle rollout semantics.  
+**(e) VIABLE_NOW** — Ship the workshop with (a); assess changes alongside the journal’s broader benchmark and external baselines.
+
+2) **None.** Wording changes are valuable and preserve the artifacts, but no state or action definition change meets that constraint.
+
+3) **Claims at risk:**
+
+| Claim | Risk | Wording fix |
+|---|---|---|
+| Gate 2 shows weak state-to-action learnability | Depends on the compressed state; the [outline](/home/lcy/Documents/projects/opt_agent_v3/docs/workshop_paper_outline.md) already qualifies this. | Keep “not demonstrated **from this 15-scalar process state**.” |
+| P2 limits adaptive policy value | Its representation-independent bound applies to the **fixed action menu, sampled states, and rollout utility**, not closed-loop terminal value or expanded actions. | State that scope whenever quoting D. |
+| P3 means no router could help | The tested arms’ losses do not establish per-state advantage ≤ 0; [P3](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md) is conditional. | Say “none of the tested routers earned its cost”; present P3 as a possible explanation, not an empirical proof about every router. |
+| The schedule accounts for the LLM’s value | Matching or exceeding closed-loop value establishes sufficiency on this panel, not a causal decomposition of LLM decisions. | Say “the two-phase schedule suffices to match or exceed the LLM on this panel.” |
+| The closed menu makes counterfactual supervision possible | Closure makes **exhaustive comparison of these eight actions** practical; it does not rule out counterfactual comparisons elsewhere. | Use “enables exhaustive per-decision labels over our predefined menu.” |
+| First-action labels cannot yield terminal behavior gain | No gain was established here, even after denoising; wide bounds do not prove impossibility. | Say “did not establish terminal behavior gain on this panel.” |
+
+4) **VERDICT: KEEP_FROZEN_QUALIFY**
+tokens used
+35,269
+1) **(a) VIABLE_NOW** — Qualify the claims at zero rerun cost; Gate 2 already has the needed state granularity qualifier.  
+**(b) VIABLE_LATER** — Problem features may matter on new HPO or engineering tasks, but adding them now requires regenerating datasets and retraining.  
+**(c) NOT_RECOMMENDED** — A full trajectory state has no demonstrated benefit on this panel; it would reset the evidence base while the oracle ceiling remains low on 4/5 families.  
+**(d) VIABLE_LATER** — Reconfiguration may be useful for journal tasks, but it changes the action menu and requires new oracle rollout semantics.  
+**(e) VIABLE_NOW** — Ship the workshop with (a); assess changes alongside the journal’s broader benchmark and external baselines.
+
+2) **None.** Wording changes are valuable and preserve the artifacts, but no state or action definition change meets that constraint.
+
+3) **Claims at risk:**
+
+| Claim | Risk | Wording fix |
+|---|---|---|
+| Gate 2 shows weak state-to-action learnability | Depends on the compressed state; the [outline](/home/lcy/Documents/projects/opt_agent_v3/docs/workshop_paper_outline.md) already qualifies this. | Keep “not demonstrated **from this 15-scalar process state**.” |
+| P2 limits adaptive policy value | Its representation-independent bound applies to the **fixed action menu, sampled states, and rollout utility**, not closed-loop terminal value or expanded actions. | State that scope whenever quoting D. |
+| P3 means no router could help | The tested arms’ losses do not establish per-state advantage ≤ 0; [P3](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md) is conditional. | Say “none of the tested routers earned its cost”; present P3 as a possible explanation, not an empirical proof about every router. |
+| The schedule accounts for the LLM’s value | Matching or exceeding closed-loop value establishes sufficiency on this panel, not a causal decomposition of LLM decisions. | Say “the two-phase schedule suffices to match or exceed the LLM on this panel.” |
+| The closed menu makes counterfactual supervision possible | Closure makes **exhaustive comparison of these eight actions** practical; it does not rule out counterfactual comparisons elsewhere. | Use “enables exhaustive per-decision labels over our predefined menu.” |
+| First-action labels cannot yield terminal behavior gain | No gain was established here, even after denoising; wide bounds do not prove impossibility. | Say “did not establish terminal behavior gain on this panel.” |
+
+4) **VERDICT: KEEP_FROZEN_QUALIFY**
+EXITCODE=0
