@@ -147,12 +147,20 @@ Architecture diagram: `state → policy → action → backend → new_state`.
 ### §3.2 State — `OptimizationState` (5 frozen dataclasses)
 
 ```
-SamplingState    — n, coverage, boundary_fraction, gap_to_best
-SurrogateState   — fitted?, model_output_at_current_best, posterior_var_at_current_best
-OptimizationState — best_y, recent_best_y, n_no_improve
-ResourceState    — budget_remaining, fraction_used
-HistoryState     — last_action, last_n_actions, action_diversity
+SamplingState        — n_samples, dimension, min_pairwise_distance, boundary_coverage
+SurrogateState       — is_current, validation_rmse (in-sample), mean/max posterior std (64-pt Sobol grid; NaN when unfitted)
+OptimizationProgress — best_value, last_value, recent_improvement, stagnation_steps
+ResourceState        — used/total/remaining budget, remaining_budget_ratio
+HistoryState         — last_action only (no action-sequence memory)
 ```
+
+Frozen + JSON-safe (NaN→None); `to_payload()` exposes 15 keys for LLM
+prompts; the RF System-1 uses the same 15 numbers + 3 phase one-hots.
+Phase (early/mid/late) is derived downstream from remaining_budget_ratio,
+not stored. 2026-09-28: field list corrected to match
+`src/opt_agent/state/models.py` (the previous draft listed
+gap_to_best / last_n_actions / action_diversity, which were never
+implemented).
 
 ### §3.3 Action — 8 typed `OptimizationAction`
 
