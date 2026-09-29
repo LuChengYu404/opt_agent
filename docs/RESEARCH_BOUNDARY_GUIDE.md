@@ -631,8 +631,9 @@ round-2 处置状态（2026-09-29）：
    网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
    DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
   I² = 80%，联合 bootstrap SE）；并撤回
-   阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
-   d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
+   阶段一的 Rastrigin 个体结论（种子区块间不复制；n = 240 深采样臂
+   点估计 d_z = 0.106、95% CI [−0.47, 4.82]，中等效应量结论不
+   成立）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
    evaluation（唯一两次复现的正面结果）与 schedule/continuation
    标注列前，元层筛选已执行，state 富化靠后。

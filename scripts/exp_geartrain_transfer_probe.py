@@ -100,11 +100,14 @@ def main() -> int:
                       version_policy="warn")
     train = read_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
                        version_policy="warn")
-    # cross-dataset consumption: check the COMBINED pool explicitly
+    # Cross-dataset consumption: CHECK the combined pool without an
+    # opt-in — identical stamps must pass on their own; a cross-version
+    # mix raises/warns and only a justified same-data A/B note may opt in
+    # (codex final-audit-2).
     assert_combinable(
         {"geartrain_h3_10seed.jsonl": [r.metadata for r in test],
          "phase8_6d_h3_20seed_5family.jsonl": [r.metadata for r in train]},
-        "warn", pooling_note="transfer probe: train 5-family / eval GearTrain")
+        "warn")
     print(f"geartrain records: {len(test)}", flush=True)
 
     out: dict = {}

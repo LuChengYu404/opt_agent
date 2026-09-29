@@ -25,7 +25,7 @@ from scripts.evaluate_no_fit_student import (  # noqa: E402
     RuleFullBudget, StateStudent, WEIGHTS, _bootstrap_ci, _train,
 )
 from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
-from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
 from opt_agent.loop import DecisionLoop  # noqa: E402
 
 
@@ -124,7 +124,7 @@ def main() -> None:
     if min(args.seeds) < 10:
         parser.error("evaluation seeds must be >= 10")
     torch.set_num_threads(1)
-    records = list(iter_jsonl(args.dataset))
+    records = read_jsonl(args.dataset, version_policy="warn")
     model_data = _train(records, WEIGHTS["no_fit_student"], seed=20260926)[:3]
     rows = []
     for problem in args.problems:

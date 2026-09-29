@@ -61,7 +61,31 @@ from opt_agent.dataset import (  # noqa: E402
 PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
 
 
-def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
+def _expected_resume_meta(spec) -> dict:
+    """Metadata projection of the REQUESTED config, for resume comparison
+    (codex final-audit-2): same-stamp resumes with a different horizon
+    mode / utility weights / continuation policy / quota must not append.
+    Fields not serialized into record metadata (decision_every_k,
+    replicates) cannot be compared here — the refusal message says so."""
+    from opt_agent.rollout.specs import spec_to_metadata
+
+    return {
+        "horizon_mode": str(spec.horizon_mode),
+        "utility_weights": {
+            "w_optimization": float(spec.utility_weights.w_optimization),
+            "w_surrogate": float(spec.utility_weights.w_surrogate),
+            "w_coverage": float(spec.utility_weights.w_coverage),
+            "w_evaluation": float(spec.utility_weights.w_evaluation),
+            "w_fit": float(spec.utility_weights.w_fit),
+            "w_stop_opportunity": float(
+                spec.utility_weights.w_stop_opportunity),
+        },
+        "continuation_policy": spec_to_metadata(spec.continuation_spec),
+        "expects_partial_rollout": spec.rollout_action_subsample < 8,
+    }
+
+
+def _existing_trajectory_keys(path: Path, spec=None) -> set[tuple[str, int, int]]:
     """(family, problem_seed, trajectory_id) triples already on disk.
 
     Resume guard (codex final audit B2): the existing file's version stamps
@@ -87,16 +111,40 @@ def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
         ))
     if len(stamps_seen) > 1:
         raise SystemExit(
-            f"{path} already mixes version stamps {sorted(stamps_seen)}; "
-            f"refusing to resume into a mixed-version artifact — write a "
-            f"new output file")
+            f"{path} already mixes version stamps "
+            f"{sorted(map(str, stamps_seen))}; refusing to resume into a "
+            f"mixed-version artifact — write a new output file")
     if stamps_seen and stamps_seen.pop() != (HARNESS_VERSION,
                                              UTILITY_VERSION):
         raise SystemExit(
             f"{path} was written under different version stamps than the "
             f"current code ({HARNESS_VERSION}/{UTILITY_VERSION}); refusing "
             f"to append — write a new versioned output file")
+    if spec is not None and keys:
+        expected = _expected_resume_meta(spec)
+        first_meta = _first_record_meta(path)
+        mismatched = [
+            k for k in ("horizon_mode", "utility_weights",
+                        "continuation_policy")
+            if k in first_meta and first_meta[k] != expected[k]
+        ]
+        has_partial = "partial_rollout" in first_meta
+        if has_partial != expected["expects_partial_rollout"]:
+            mismatched.append("partial_rollout (quota)")
+        if mismatched:
+            raise SystemExit(
+                f"{path} was generated with a different configuration on "
+                f"{mismatched}; refusing to append under the requested "
+                f"config — write a new output file. (Fields not recorded "
+                f"in record metadata — decision_every_k, replicates — "
+                f"cannot be compared; verify them manually.)")
     return keys
+
+
+def _first_record_meta(path: Path) -> dict:
+    for rec in iter_jsonl(path):
+        return rec.metadata
+    return {}
 
 
 def _config_from_task(cfg: dict) -> "DatasetConfig":
@@ -217,7 +265,8 @@ def main() -> int:
         rollout_replicates=args.replicates,
     )
 
-    done_keys = _existing_trajectory_keys(args.output) if args.resume else set()
+    done_keys = (_existing_trajectory_keys(args.output, spec)
+                 if args.resume else set())
     tasks = [
         {"family": p, "seed": s, "trajectory_id": t, "config": asdict(spec)}
         for p in spec.problems

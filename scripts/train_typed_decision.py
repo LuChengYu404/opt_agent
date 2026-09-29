@@ -50,15 +50,13 @@ from opt_agent.system1.typed_decision import (  # noqa: E402
 
 
 def _iter_records(path: Path) -> Iterator[dict]:
-    with path.open() as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                yield json.loads(line)
-            except json.JSONDecodeError:
-                continue
+    """Checked loader boundary: training reads go through read_jsonl with
+    an explicit version policy (codex final-audit-2). Malformed lines now
+    raise instead of being silently skipped."""
+    from opt_agent.dataset.decision_record import read_jsonl
+
+    for record in read_jsonl(path, version_policy="warn"):
+        yield dict(record.__dict__)
 
 
 def _prepare_batch(

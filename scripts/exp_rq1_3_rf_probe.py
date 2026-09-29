@@ -25,7 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from opt_agent.dataset import iter_jsonl
+from opt_agent.dataset import read_jsonl
 from opt_agent.dataset.validation import phase_of_ratio
 
 ACTIONS = (
@@ -172,7 +172,7 @@ def main() -> int:
     args = parser.parse_args()
 
     print(f"Loading {args.dataset}...")
-    records = list(iter_jsonl(args.dataset))
+    records = read_jsonl(args.dataset, version_policy="warn")
     print(f"Loaded {len(records)} records")
 
     record_dicts = [r.__dict__ for r in records]

@@ -905,3 +905,46 @@ had scoped out. All fixed same session:
 
 All five touched scripts pass runtime --help smoke; targeted tests
 green; both grid artifacts refreshed deterministically.
+## 29. Final-audit round 2: findings fixed; loader boundary closed by sweep (2026-09-29)
+
+Final-audit round 2 (`runs/codex_boundary_final_audit2.log`): REVISE —
+1 BLOCKER / 2 MAJOR / 1 MINOR + 3 PARTIALs. All fixed same session:
+
+- BLOCKER (three more training consumers — found this time by our own
+  systematic sweep rather than name-chasing): exp_rq1_3_rf_probe
+  (RandomForestRegressor fit), diagnose_continuation_effect (_train),
+  and train_typed_decision (which used its OWN raw json.loads reader
+  that silently skipped malformed lines — stricter now: read_jsonl
+  raises). All on read_jsonl(version_policy="warn").
+  Loader-consumer classification (verifiable sweep, fit/train grep over
+  all iter_jsonl users): TRAINING -> read_jsonl: train_rlcd_laya,
+  train_system1_compare, train_typed_decision, phase9_baselines,
+  sweep_rlcd, exp_rq2_1_cross_family_transfer,
+  exp_rlcd_{calibration_ablation, loo_confirmatory, loo_transfer,
+  router_panel}, analyze_rlcd_ci, exp_lenz_{vs_frozen_llm,
+  gate2_probe}, evaluate_no_fit_student, exp_geartrain_transfer_probe,
+  exp_rq3_router_sweep, exp_rq1_rq2_closed_loop, exp_rq2_ioh_closed_loop,
+  exp_rq1_3_rf_probe, diagnose_continuation_effect. ANALYSIS/REPLAY on
+  own frozen artifacts (iter_jsonl retained, documented raw access):
+  exp_rq1_3_decision_landscape (docstring mention only — no fit),
+  exp_rq1_3_scale_sensitivity, exp_teacher_noise_diagnostic,
+  exp_rq0_5_prompt_controls, diagnose_qs5, ablate_phase8_6d_utility,
+  verify_theory_propositions, validate_phase8_6b, run_oracle_gate.
+- MAJOR (geartrain opt-in semantics): assert_combinable now called
+  WITHOUT a note — identical stamps pass on their own; a mix raises/
+  warns and only a justified same-data A/B note may opt in.
+- MAJOR (resume config gap): --resume now also compares the recorded
+  generation configuration (horizon_mode, utility_weights,
+  continuation_policy, partial-rollout presence) against the requested
+  spec and refuses on mismatch; fields not serialized into record
+  metadata (decision_every_k, replicates) are named in the refusal
+  message as manually verifiable.
+- MINOR: mixed-stamp sort uses map(str, ...) — no TypeError in the
+  refusal path.
+- PARTIALs closed: grid report H0_slope bullet states the standardized
+  null; all four remaining "effect at most d_z 0.11" phrasings
+  (screen abstract + 6.2, grid abstract, guide ledger) replaced with
+  point-estimate + CI + precision caveat.
+
+All five touched scripts pass runtime --help smoke; targeted tests
+green.
