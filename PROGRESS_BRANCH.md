@@ -948,3 +948,18 @@ Final-audit round 2 (`runs/codex_boundary_final_audit2.log`): REVISE —
 
 All five touched scripts pass runtime --help smoke; targeted tests
 green.
+## 30. Final-audit round-3 interrupted by codex usage limit (2026-09-30)
+
+The round-3 closing audit (prompt archived at
+runs/codex_boundary_final3_prompt.txt) ran ~82k tokens of investigation
+and died on the account usage limit mid-review (reset 01:16 local; the
+error is an approval-system rejection, not a review verdict). No
+findings of its own had been emitted before the interruption (log
+contains only prompt echoes). Its one visible open lead —
+src/opt_agent/dataset/analysis.py:92 using iter_jsonl — was verified by
+us: analyze_dataset is a single-file statistics/validation utility
+(runs validate_record per record; consumers are the validation scripts),
+i.e. the documented analysis/replay class, not a training/pooling
+bypass. A scheduled retry at 01:26 (automation
+"额度重置后重跑 codex 终审 round-3") will rerun the identical prompt
+and commit the verdict.

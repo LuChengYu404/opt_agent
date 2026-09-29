@@ -1,0 +1,20 @@
+FINAL PACKAGE AUDIT round 3 (closing approval re-check). Branch: exp/boundary-scheme-round2, commit bff415b. Your final-audit round 2 (runs/codex_boundary_final_audit2.log) returned REVISE — 1 BLOCKER / 2 MAJOR / 1 MINOR + 3 PARTIALs. All fixed in bff415b:
+
+- BLOCKER (three more training consumers): found this time by OUR OWN systematic sweep (fit/train grep over every iter_jsonl user) rather than name-chasing — exp_rq1_3_rf_probe (RandomForestRegressor), diagnose_continuation_effect (_train), and train_typed_decision (which had its own raw json.loads reader silently skipping malformed lines — now routed through read_jsonl, which raises on malformed records). The complete training-vs-replay classification is recorded in PROGRESS §29 for verifiability: 21 training/pooling consumers on read_jsonl; 9 analysis/replay scripts on iter_jsonl (documented raw access on their own frozen artifacts; exp_rq1_3_decision_landscape's "train" hit is a docstring mention only — no fit call).
+- MAJOR (geartrain opt-in semantics): assert_combinable is now called WITHOUT a note — identical stamps pass on their own; a cross-version mix raises/warns, and only a justified same-data A/B note may opt in.
+- MAJOR (resume config gap): --resume now compares the recorded generation configuration against the requested spec (horizon_mode, utility_weights, continuation_policy via spec_to_metadata, partial-rollout presence vs quota) and refuses on mismatch; fields not serialized into record metadata (decision_every_k, replicates) are named in the refusal message as manually verifiable.
+- MINOR: the mixed-stamp sort uses map(str, ...) — the refusal path no longer raises TypeError.
+- PARTIALs closed: the grid report's H0_slope bullet states the standardized null (b_f/sd_ref(f) equality) consistent with script+artifact; all four remaining "effect at most d_z ~ 0.11" phrasings (screen abstract + section 6, grid abstract, guide ledger) replaced with the point estimate (d_z = 0.106), its CI [−0.47, 4.82], and a precision caveat.
+
+All five touched scripts pass runtime --help smoke; 40 targeted tests green.
+
+Review tasks:
+
+A. Verify each round-2 finding's disposition (ADDRESSED / PARTIAL / UNADDRESSED), including independently re-running the training-consumer sweep (fit/train grep over all iter_jsonl users) to confirm the classification is now complete.
+B. New-issue check on these changes (the resume config comparison's field coverage vs what the generator actually records; the check-only assert_combinable call; the stricter _iter_records semantics in train_typed_decision).
+C. Final merge-readiness judgment for the standing modification specification.
+
+Answer format: A verdict table + your independent sweep result; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs, and recompute statistics from serialized trajectories.
