@@ -774,3 +774,38 @@ session:
   four cells and detects a second table in the section.
 
 Tests: 24 in registry/versioning (pooling-note path added).
+## 24. Round-5 review verdict + full disposition (2026-09-29)
+
+Codex round-5 (`runs/codex_boundary_round5_review.log`, 70k tokens):
+VERDICT REVISE — 0 BLOCKER / 4 MAJOR / 2 MINOR (14 -> 9 -> 5 -> 4). The
+joint-bootstrap SE was endorsed as coherent with a reasonable Wald
+approximation; primary numbers verified bit-for-bit. All six findings
+fixed same session:
+
+- Declared-vs-executed rule sync: grid docstring decision rule and the
+  report's methods section now state the executed every-contrast
+  equivalence rule (no best-vs-reference/half-width remnants).
+- Serialized primary null corrected to "b_f / sd_ref(f) identical across
+  families"; both grid artifacts refreshed (deterministic trajectories,
+  identical statistics).
+- Loader default flipped allow -> warn (a pooling boundary must not
+  silently default to unchecked); docstring states the semantics.
+- Pooling opt-in now PERSISTS: enforce_record_pooling appends each
+  pool_legacy decision (with its pooling_note) to
+  runs/POOLING_DECISIONS.jsonl (best effort; env-overridable
+  OPT_AGENT_POOLING_AUDIT); in-memory trail retained.
+- Cross-file rule: new versioning.assert_combinable(stamps_by_source,
+  policy, pooling_note) unions stamps across the combined pool and
+  applies the same mixing rule; guide 4.5 now states the same-note-per-
+  source requirement.
+- Remaining iter_jsonl pooling consumers migrated to
+  read_jsonl(version_policy="warn"): exp_rlcd_{calibration_ablation,
+  loo_confirmatory, loo_transfer, router_panel}, analyze_rlcd_ci,
+  exp_lenz_{vs_frozen_llm, gate2_probe}, evaluate_no_fit_student.
+- Minors: parser ends the table at ANY non-table line (blank included) —
+  second table in 2.4 fails closed; report's raw-unit secondary line no
+  longer mislabels sd_ref involvement (the fixed-sd_ref description now
+  attaches only to the superseded 38.69 version).
+
+Tests: 40 across registry/versioning/RLCD (persistence + combinable
+added).

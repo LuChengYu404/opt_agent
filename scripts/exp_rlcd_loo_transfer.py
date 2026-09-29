@@ -36,7 +36,7 @@ from _rlcd_common import (  # noqa: E402
     rf_pairwise_and_top1 as _rf_pairwise_and_top1,
 )
 
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 
 
 def _eval_arm(model, tok, records) -> dict:
@@ -157,7 +157,7 @@ def main() -> int:
                         default=Path("runs/exp_rlcd_loo_transfer.json"))
     args = parser.parse_args()
 
-    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
+    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
     tasks = [
         {"family": f, "dataset": str(args.dataset), "epochs": args.epochs}
         for f in families

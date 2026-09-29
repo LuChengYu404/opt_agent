@@ -59,8 +59,8 @@ Inference.
 Predeclared decision rules.
 
   - CONDITIONALITY_DETECTED iff slope-homogeneity p < 0.05.
-  - FUTILE iff not detected AND every family's best-vs-reference CI
-    half-width < 0.25 sd (precise null).
+  - FUTILE iff not detected AND, for every family, EVERY level-vs-reference
+    contrast CI lies entirely within +/- 0.25 sd (equivalence bound).
   - Otherwise INCONCLUSIVE.
 """
 from __future__ import annotations
@@ -373,7 +373,7 @@ def main() -> int:
             "contrast": f"Delta_fL = E[y(n_init=L) - y(n_init={REFERENCE})]",
             "dose_slope": "b_f = mean seed-paired OLS slope of y on "
                           "c = n_init/(2d+1) over levels",
-            "primary_null": "b_f identical across families "
+            "primary_null": "b_f / sd_ref(f) identical across families "
                             "(no family x dose interaction)",
         },
         "predeclared_rules": {

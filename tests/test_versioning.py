@@ -223,3 +223,39 @@ def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
     decisions = ver.pooling_decisions()
     assert len(decisions) == 1
     assert "A/B" in decisions[0]["note"]
+
+
+def test_pooling_note_persists_and_combinable(tmp_path, monkeypatch):
+    """Opt-in notes persist to the audit file; cross-file combination is
+    checked over the union of stamps (codex round-5 B3/B4)."""
+    import warnings as _w
+
+    import opt_agent.dataset.versioning as ver
+
+    audit = tmp_path / "audit.jsonl"
+    monkeypatch.setattr(ver, "POOLING_AUDIT_PATH", audit)
+    monkeypatch.setattr(ver, "_legacy_warned", set())
+    monkeypatch.setattr(ver, "_recorded_pooling_decisions", [])
+
+    # one source current-only, one source legacy-only: individually fine,
+    # combined they are a cross-version pool
+    src_a = [{"harness_version": ver.HARNESS_VERSION,
+              "utility_version": ver.UTILITY_VERSION}]
+    src_b = [{"utility_version": ver.UTILITY_VERSION}]  # pre-h1 record
+    with _w.catch_warnings(record=True):
+        _w.simplefilter("always")
+        ver.enforce_record_pooling(src_a, "warn", source="a.jsonl")
+        ver.enforce_record_pooling(src_b, "warn", source="b.jsonl")
+
+    import pytest as _pytest
+    with _pytest.raises(ver.VersionPolicyError):
+        ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b},
+                              "strict")
+    # with a note the combination is recorded and persisted
+    ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b}, "strict",
+                          pooling_note="A/B: same seeds across both files")
+    assert audit.exists()
+    lines = [l for l in audit.read_text(encoding="utf-8").splitlines() if l]
+    assert len(lines) == 1
+    entry = __import__("json").loads(lines[0])
+    assert "A/B" in entry["note"]

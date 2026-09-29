@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from _rlcd_common import per_record_laya  # noqa: E402
 
-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
+from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
     build_item,
@@ -69,8 +69,8 @@ def paired_bootstrap(
 
 def main() -> int:
     dataset = Path("runs/phase8_6d_h3_20seed_5family.jsonl")
-    train_records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) < 16]
-    records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) >= 16]
+    train_records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) < 16]
+    records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) >= 16]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     eval_cfg = RLCDConfig(device=str(device), batch_size=8)

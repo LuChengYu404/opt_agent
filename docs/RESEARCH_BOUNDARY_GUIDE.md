@@ -315,10 +315,13 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
    为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
    分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
    **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
-   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
-   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
-   显式豁免）；`iter_jsonl` 为无校验的原始访问，仅限单一冻结工件的
-   回放分析。任何 A/S 类修改**必须**递增对应戳
+   version_policy 读取（默认 warn）**——warn 策略对 legacy 与混池发出
+   警告、strict 对 mismatch 与跨版本混池直接拒绝（`pool_legacy=True`
+   + `pooling_note` 记录显式豁免并**持久化**到
+   `runs/POOLING_DECISIONS.jsonl` 审计日志）；**合并多个来源时必须经
+   `versioning.assert_combinable` 对合并后全池校验、并引用同一
+   pooling_note**；`iter_jsonl` 为无校验的原始访问，仅限单一冻结
+   工件的回放分析。任何 A/S 类修改**必须**递增对应戳
    并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
    走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
    轨迹库跨版本不可比，RF/微调吸收污染。

@@ -4,7 +4,7 @@
   "estimands": {
     "contrast": "Delta_fL = E[y(n_init=L) - y(n_init=5)]",
     "dose_slope": "b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels",
-    "primary_null": "b_f identical across families (no family x dose interaction)"
+    "primary_null": "b_f / sd_ref(f) identical across families (no family x dose interaction)"
   },
   "predeclared_rules": {
     "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
@@ -102,7 +102,7 @@
   "n_evals_observed": [
     30
   ],
-  "wall_seconds": 107.39560253103264,
+  "wall_seconds": 108.5304240619298,
   "per_family": {
     "Branin": {
       "dimension": 2,

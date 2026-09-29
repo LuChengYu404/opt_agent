@@ -4,7 +4,7 @@
   "estimands": {
     "contrast": "Delta_fL = E[y(n_init=L) - y(n_init=5)]",
     "dose_slope": "b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels",
-    "primary_null": "b_f identical across families (no family x dose interaction)"
+    "primary_null": "b_f / sd_ref(f) identical across families (no family x dose interaction)"
   },
   "predeclared_rules": {
     "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
@@ -274,7 +274,7 @@
   "n_evals_observed": [
     30
   ],
-  "wall_seconds": 33.701504478929564,
+  "wall_seconds": 33.04372409498319,
   "per_family": {
     "Rastrigin": {
       "dimension": 10,

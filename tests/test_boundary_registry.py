@@ -58,17 +58,21 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
     )
     rows: dict[str, tuple[str, str, str]] = {}
     table_ended = False
+    saw_row = False
     for line in lines[header_idx + 1:]:
         stripped = line.strip()
         if not stripped.startswith("|"):
-            if stripped:
+            # ANY non-table line — blank included — ends the first table
+            # once a data row was seen; later '|' rows are a second table.
+            if saw_row:
                 table_ended = True
-            continue  # allow blank lines inside; any later '|' row is a
-            # SECOND table in the section -> fail closed
+            continue
         assert not table_ended, (
             "found a second markdown table inside section 2.4 — the sync "
             "check covers exactly one table")
         cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if not (cells and cells[0].startswith("-")):
+            saw_row = True
         if cells and cells[0].startswith("-"):
             continue  # separator row
         assert len(cells) == 4, (

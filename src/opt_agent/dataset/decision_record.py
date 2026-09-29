@@ -118,15 +118,19 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
 
 
 def read_jsonl(
-    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+    path: Path, *, version_policy: str = "warn", pool_legacy: bool = False,
     pooling_note: str = "",
 ) -> list[DecisionRecord]:
     """Materialize records from JSONL, enforcing a version-pooling policy.
 
     The version policy (guide 4.5/6.6) is the explicit pooling decision at
-    the loading boundary: "allow" (default, historical behavior), "warn"
-    (summarize legacy, warn on unrecognized stamps), or "strict" (raise on
-    unrecognized stamps). See opt_agent.dataset.versioning for semantics.
+    the loading boundary. DEFAULT IS "warn" (codex round-5 B3: a pooling
+    boundary must not silently default to unchecked): legacy stamps are
+    summarized once with a do-not-pool reminder, unrecognized stamps and
+    cross-version mixes warn; "strict" raises on unrecognized stamps and
+    mixes (pool_legacy=True + pooling_note records the explicit opt-in,
+    persisted to the pooling audit log); "allow" is the explicit
+    unchecked escape hatch. See opt_agent.dataset.versioning.
     """
     from opt_agent.dataset.versioning import (
         enforce_record_pooling,

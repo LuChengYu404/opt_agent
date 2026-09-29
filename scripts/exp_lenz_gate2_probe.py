@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from _shared_rq_features import ACTIONS, extract_features  # noqa: E402
-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
+from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
 
 FAMILIES = ("ackley", "branin", "hartmann", "rastrigin", "sixhumpcamel")
 
@@ -100,7 +100,7 @@ def main() -> int:
                         default=Path("runs/exp_lenz_gate2_probe.json"))
     args = parser.parse_args()
 
-    records = [r for r in iter_jsonl(args.dataset)]
+    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
     out = {"dataset": str(args.dataset), "families": {}}
 
     for fam in FAMILIES:

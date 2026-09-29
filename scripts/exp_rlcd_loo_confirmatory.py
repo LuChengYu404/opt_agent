@@ -36,7 +36,7 @@ from _rlcd_common import (  # noqa: E402
     rf_pairwise_and_top1,
 )
 
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 
 def _per_record_laya_compat(model, tok, records, device_str):
     from _rlcd_common import per_record_laya
@@ -159,7 +159,7 @@ def main() -> int:
                         default=Path("runs/exp_rlcd_loo_confirmatory.json"))
     args = parser.parse_args()
 
-    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
+    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
     tasks = [{"family": f, "dataset": str(args.dataset),
               "epochs": args.epochs, "train_seeds": args.train_seeds}
              for f in families]

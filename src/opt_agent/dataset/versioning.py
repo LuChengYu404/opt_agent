@@ -25,7 +25,9 @@ either constant so old data reads as LEGACY rather than MISMATCH.
 
 from __future__ import annotations
 
+import json
 from enum import Enum
+from pathlib import Path
 from typing import Any, Mapping
 
 HARNESS_VERSION = "h1"
@@ -110,12 +112,52 @@ def enforce_record_versions(
     return status
 
 
+import os
+
 _recorded_pooling_decisions: list[dict] = []
+
+# Pooling opt-ins are persisted here (best effort) so the decision survives
+# the process that made it (codex round-5 B3). Override for tests/other CWDs.
+POOLING_AUDIT_PATH = Path(
+    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
 
 
 def pooling_decisions() -> list[dict]:
     """Audit trail of explicit cross-version pooling decisions."""
     return list(_recorded_pooling_decisions)
+
+
+def _persist_pooling_decision(entry: dict) -> None:
+    try:
+        POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(entry, ensure_ascii=False,
+                                    sort_keys=True) + "\n")
+    except OSError:
+        pass  # read-only FS / no permission: in-memory trail only
+
+
+def assert_combinable(
+    stamps_by_source: dict[str, list[dict]],
+    policy: str | VersionPolicy,
+    *,
+    pooling_note: str = "",
+) -> None:
+    """Cross-file companion to enforce_record_pooling (guide 4.5).
+
+    Any consumer combining records from SEVERAL loaded sources must pass
+    each source's raw metadata dicts here: the check unions the stamps
+    across the complete combined pool and applies the same no-silent-
+    mixing rule (warn/raise under non-allow policies; pooling_note
+    required for the explicit opt-in, identical across sources).
+    """
+    combined: list[dict] = []
+    for source, stamps in stamps_by_source.items():
+        for s in stamps:
+            combined.append({**s, "_source": source})
+    enforce_record_pooling(
+        combined, policy, source="+".join(stamps_by_source),
+        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
 
 
 def enforce_record_pooling(
@@ -149,8 +191,9 @@ def enforce_record_pooling(
                 f"{source}: pool_legacy=True requires a pooling_note "
                 f"describing the same-data A/B justification (guide 6.6 "
                 f"rule 1)")
-        _recorded_pooling_decisions.append(
-            {"source": source, "note": pooling_note})
+        entry = {"source": source, "note": pooling_note}
+        _recorded_pooling_decisions.append(entry)
+        _persist_pooling_decision(entry)
         return
     import warnings
 

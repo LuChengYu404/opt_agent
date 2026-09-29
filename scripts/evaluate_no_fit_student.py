@@ -31,7 +31,7 @@ from opt_agent.actions.factory import (  # noqa: E402
     ALL_CANDIDATE_SPECS, candidate_actions_for_state,
 )
 from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
-from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
 from opt_agent.loop import DecisionLoop  # noqa: E402
 from opt_agent.loop.policies import RulePolicy  # noqa: E402
 from opt_agent.rollout.utility import UtilityWeights  # noqa: E402
@@ -222,7 +222,7 @@ def main() -> None:
     if min(args.budgets) <= 5:
         parser.error("budgets must exceed the five initial evaluations")
     torch.set_num_threads(1)
-    records = list(iter_jsonl(args.dataset))
+    records = read_jsonl(args.dataset, version_policy="warn")
     models = {}
     training = {}
     for name, weights in WEIGHTS.items():

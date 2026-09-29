@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
+from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
 from opt_agent.state import lenz_state_from_record  # noqa: E402
 from opt_agent.system1.llm_system1_policy import LLMSystem1Policy  # noqa: E402
 from opt_agent.system1.lenz_prompt import build_lenz_choice_request  # noqa: E402
@@ -54,7 +54,7 @@ def main() -> int:
     args = parser.parse_args()
 
     api_key = _load_env()
-    records = [r for r in iter_jsonl(args.dataset)]
+    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
 
     # Stratified sample: per family, spread across seeds and phases.
     by_family: dict[str, list] = defaultdict(list)

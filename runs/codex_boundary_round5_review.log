@@ -1,0 +1,2746 @@
+OpenAI Codex v0.156.1
+--------
+workdir: /home/lcy/Documents/projects/opt_agent_v3
+model: gpt-6-sol
+provider: openai
+approval: on-request
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0edbd-97f2-71a1-a306-a29093a86dc9
+--------
+user
+Boundary-guide review round 5 (convergence check). Branch: exp/boundary-scheme-round2, commit e3aa72c. Verdict trajectory: round-1 REVISE (7 BLOCKER) -> round-2 REVISE (0/14) -> round-3 REVISE (0/9) -> round-4 REVISE (0 BLOCKER / 5 MAJOR / 4 MINOR). All round-4 findings were fixed in e3aa72c (+70cee30 carried the round-3 dispositions you reviewed). This is the next convergence check; the package is intended as the project's standing modification specification.
+
+Your round-4 findings and their dispositions (verify against the tree):
+
+- B1 (standardized-slope SE treats sd_ref as fixed; your jackknife Q~20.8, p~3.5e-4): the primary SEs now come from JOINT seed resampling — each bootstrap replicate re-estimates sd_ref from the resampled reference outcomes (grid script, dose_slope.std_se_joint_boot + std_ci95_boot). Primary: chi^2_4 = 20.06, p = 5e-4, I^2 = 80% (your jackknife: ~20.8/3.5e-4). Both grid arms re-run deterministically; report abstract/results/interpretation, guide 5.2/10.3, and PROGRESS carry 20.06/5e-4/80% with the raw-unit version (30.87) and the fixed-sd_ref standardized version (38.69) explicitly labeled secondary/superseded (PROGRESS 20 carries supersession notes).
+- B2 (train_system1_compare unchecked default; phase9_baselines on iter_jsonl): both now read via read_jsonl with explicit version_policy="warn".
+- B3 (pooling check coarse; no A/B note stored): enforce_record_pooling now compares RAW stamp values — absent-vs-present and two-different-known-past mixes both count; pool_legacy=True REQUIRES a non-empty pooling_note and records the decision to an audit trail (versioning.pooling_decisions()); the one-source boundary limitation (combining multiple separately loaded files) is documented in guide 4.5 with the normative requirement to cite the same note per source.
+- B4/E2a/E2b (futility inconsistencies; only best-vs-reference checked; half-width wording remnants): the FUTILE rule now requires the equivalence bound on EVERY level-vs-reference contrast per family; guide 5.5.4 uses the equivalence wording; the script's declared and serialized rule strings synchronized; guide 5.4 closed-loop success now "CI lower bound > 0".
+- B5 (stale primary wording/numbers): all authoritative passages updated as above.
+- Minors: screen 6.3 Rastrigin statement marked retracted; grid 8.2 relabeled candidate baseline pending held-out comparison; parser header now requires exactly four cells and any second markdown table inside section 2.4 fails closed.
+
+Review tasks:
+
+A. Verify each round-4 disposition (ADDRESSED / PARTIAL / UNADDRESSED).
+B. Check the fixes introduced no NEW issues — in particular: (i) the joint-bootstrap SE implementation (is the seed-level resampling of slopes and sd_ref coherent? does the homogeneity Wald test on bootstrap SEs remain a valid approximation?); (ii) the raw-stamp pooling semantics (absent counts as a value — any false positives on legitimately stamped single-version files?); (iii) the pooling_note audit trail (can it be bypassed?); (iv) the parser's second-table detection (blank-line handling); (v) number/wording consistency across report/guide/PROGRESS/artifacts (20.06 / 5e-4 / 80% primary; 38.69 labeled superseded-fixed-sd; 30.87 labeled secondary raw).
+C. Final standing-spec judgment: is the package fit to serve as the project's standing modification specification?
+
+Answer format:
+A: compact verdict table. B: PASS or issues [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes. C: one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs. Tests: 39 across registry/versioning/RLCD green; full suite green at 930281e (454).
+
+warning: Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+codex
+I’ll inspect the round-4 fixes, trace the statistical and pooling logic, and compare the standing-spec wording with the saved artifacts. I’ll keep this read-only and won’t run tests or training.
+exec
+/bin/bash -lc 'git status --short --branch' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+## exp/boundary-scheme-round2
+?? runs/codex_boundary_round5_review.log
+
+exec
+/bin/bash -lc "pwd && git log --oneline -8 && rg --files -g AGENTS.md -g '*boundary*' -g '*version*' -g '*grid*' -g '*report*' -g 'PROGRESS*' | head -150" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+/home/lcy/Documents/projects/opt_agent_v3
+e3aa72c Round-4 review dispositions: joint-bootstrap SE; honest p; pooling audit; equivalence everywhere
+70cee30 Round-3 review dispositions: all 13 findings fixed; scale-stable primary estimand
+930281e Round-3 closure: codex round-2 leftovers landed
+cd3d608 Terminology: replace 'panel' calque with 基准问题集; 'individually significant' with 逐族显著
+84e31aa Config-axis dose-response grid: conditionality DETECTED; Rastrigin screen claim retracted
+12ef050 Register elevation: formal scientific register throughout guide + screen report
+d99b3fa E2 analysis rigor upgrade: paper-grade inference replaces boundary bootstrap; verdict corrected POSITIVE -> INCONCLUSIVE
+c8b949e Codex round-2 review log: REVISE (0 BLOCKER / 14 MAJOR / 4 MINOR; round-1 items 11 ADDRESSED / 13 PARTIAL / 0 UNADDRESSED)
+tests/test_versioning.py
+tests/test_boundary_registry.py
+PROGRESS_BRANCH.md
+src/opt_agent/actions/boundary_registry.py
+src/opt_agent/dataset/versioning.py
+runs/exp_rlcd_report.json
+runs/codex_boundary_round2_review.log
+runs/exp_meta_config_grid.json
+runs/rlcd_laya_proper_v1/rlcd_train_report.json
+runs/codex_boundary_guide_review.log
+runs/exp_rq0_5_affine_report.json
+runs/codex_boundary_round5_review.log
+runs/rlcd_laya_proper_al/rlcd_train_report.json
+runs/exp_rq2_1_report.json
+runs/exp_rq1_2_h3_report.json
+runs/exp_meta_config_grid_rastrigin240.json
+runs/exp_rq1_2_h3_20seed_report.json
+runs/rlcd_laya_proper_lh/rlcd_train_report.json
+runs/rlcd_laya_bt_al/rlcd_train_report.json
+runs/exp_rq1_2_h3_5family_report.json
+runs/codex_boundary_round3_review.log
+runs/rlcd_laya_bt_v1/rlcd_train_report.json
+runs/phase8_6b_h3_report.json
+runs/phase8_6d_report.json
+runs/exp_rq1_2_hfull_report.json
+runs/rlcd_laya_bt_lh/rlcd_train_report.json
+runs/phase8_6b_h3_no_retrain_report.json
+runs/codex_boundary_round4_review.log
+runs/exp_rq1_2_h1_report.json
+scripts/exp_meta_config_grid.py
+PROGRESS.md
+
+exec
+/bin/bash -lc "git show --stat --oneline e3aa72c && git show --format= --name-only e3aa72c && rg --files | rg '(guide|report|PROGRESS|versioning|baseline|compare|grid|registry|parser)' | head -120 && if [ -f AGENTS.md ]; then cat AGENTS.md; fi" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+e3aa72c Round-4 review dispositions: joint-bootstrap SE; honest p; pooling audit; equivalence everywhere
+ PROGRESS_BRANCH.md                          |   43 +-
+ docs/RESEARCH_BOUNDARY_GUIDE.md             |   19 +-
+ runs/EXP_META_CONFIG_GRID.md                |   20 +-
+ runs/EXP_META_CONFIG_SCREEN.md              |    4 +-
+ runs/codex_boundary_round4_review.log       | 3802 +++++++++++++++++++++++++++
+ runs/exp_meta_config_grid.json              |   38 +-
+ runs/exp_meta_config_grid_rastrigin240.json |   16 +-
+ scripts/exp_meta_config_grid.py             |   52 +-
+ scripts/phase9_baselines.py                 |    4 +-
+ scripts/train_system1_compare.py            |    2 +-
+ src/opt_agent/dataset/decision_record.py    |    9 +-
+ src/opt_agent/dataset/versioning.py         |   56 +-
+ tests/test_boundary_registry.py             |   13 +-
+ tests/test_versioning.py                    |   12 +-
+ 14 files changed, 4019 insertions(+), 71 deletions(-)
+PROGRESS_BRANCH.md
+docs/RESEARCH_BOUNDARY_GUIDE.md
+runs/EXP_META_CONFIG_GRID.md
+runs/EXP_META_CONFIG_SCREEN.md
+runs/codex_boundary_round4_review.log
+runs/exp_meta_config_grid.json
+runs/exp_meta_config_grid_rastrigin240.json
+scripts/exp_meta_config_grid.py
+scripts/phase9_baselines.py
+scripts/train_system1_compare.py
+src/opt_agent/dataset/decision_record.py
+src/opt_agent/dataset/versioning.py
+tests/test_boundary_registry.py
+tests/test_versioning.py
+tests/test_versioning.py
+tests/test_boundary_registry.py
+PROGRESS_BRANCH.md
+src/opt_agent/actions/boundary_registry.py
+src/opt_agent/dataset/versioning.py
+runs/exp_rlcd_report.json
+runs/exp_meta_config_grid.json
+runs/rlcd_laya_proper_v1/rlcd_train_report.json
+runs/codex_boundary_guide_review.log
+runs/exp_rq0_5_affine_report.json
+runs/phase9_5_system1_baseline_comparison.json
+runs/phase8_6d_report.json
+runs/rlcd_laya_proper_al/rlcd_train_report.json
+runs/exp_rq2_1_report.json
+runs/exp_rq3_schedule_baseline.json
+runs/exp_rq1_2_h3_report.json
+runs/exp_rq1_2_hfull_report.json
+runs/exp_meta_config_grid_rastrigin240.json
+runs/exp_rq1_2_h3_20seed_report.json
+runs/rlcd_laya_proper_lh/rlcd_train_report.json
+runs/rlcd_laya_bt_al/rlcd_train_report.json
+runs/phase9_baseline_smoke.json
+runs/exp_rq1_2_h3_5family_report.json
+runs/rlcd_laya_bt_v1/rlcd_train_report.json
+runs/phase8_6b_h3_report.json
+runs/exp_rq1_2_h1_report.json
+runs/phase8_6b_h3_no_retrain_report.json
+runs/rlcd_laya_bt_lh/rlcd_train_report.json
+PROGRESS.md
+scripts/phase9_baselines.py
+scripts/exp_rq3_schedule_baseline.py
+scripts/train_system1_compare.py
+scripts/exp_meta_config_grid.py
+scripts/run_jev_baseline.py
+scripts/run_laya_baseline.py
+
+exec
+/bin/bash -lc 'git show --format= -- scripts/exp_meta_config_grid.py src/opt_agent/dataset/versioning.py src/opt_agent/dataset/decision_record.py scripts/phase9_baselines.py scripts/train_system1_compare.py tests/test_versioning.py tests/test_boundary_registry.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/scripts/exp_meta_config_grid.py b/scripts/exp_meta_config_grid.py
+index 705f96a..b44277a 100644
+--- a/scripts/exp_meta_config_grid.py
++++ b/scripts/exp_meta_config_grid.py
+@@ -23,8 +23,10 @@ Estimands (declared before running).
+              across families (common dose response — no family x dose
+              interaction). PRIMARY test. Standardization by each family's
+              reference-level sd makes the test invariant to per-family
+-             objective rescaling (scale-stable; codex round-3 D1); raw-unit
+-             slopes are reported secondarily.
++             objective rescaling (scale-stable; codex round-3 D1); the SEs
++             come from joint seed resampling so the sd_ref estimation
++             uncertainty is included (codex round-4 B1). Raw-unit slopes
++             are reported secondarily.
+   H0_pair  : Delta_{f,12} identical across families (direct comparability
+              with the screen). SECONDARY.
+   Mechanistic (directional, predeclared): multimodal families (Rastrigin,
+@@ -238,21 +240,38 @@ def main() -> int:
+         # seed-paired dose slopes in c-space
+         slopes = [ols_slope(cvals, [by_key[(fam, s, L)]["best"] for L in LEVELS])
+                   for s in range(args.seeds)]
+-        sd_ref = statistics.pstdev(
+-            [by_key[(fam, s, REFERENCE)]["best"] for s in range(args.seeds)]) or 1.0
++        ref_best = [by_key[(fam, s, REFERENCE)]["best"]
++                    for s in range(args.seeds)]
++        sd_ref = statistics.pstdev(ref_best) or 1.0
+         # Reference-standardized slopes (PRIMARY estimand, scale-stable):
+         # dividing by the family's reference-level sd makes the slope
+         # invariant to affine rescaling of that family's objective, so the
+         # cross-family homogeneity test does not depend on raw units
+         # (codex round-3 D1). Raw-unit slopes are retained for reporting.
+         std_slopes = [b / sd_ref for b in slopes]
++        # SE of the standardized-slope mean by JOINT seed resampling: each
++        # replicate re-estimates sd_ref from the resampled reference
++        # outcomes, so the uncertainty of the standardizing sd enters the
++        # SE (codex round-4 B1; treating sd_ref as fixed understates it).
++        rng = random.Random(3)
++        n_seeds = args.seeds
++        boot_means = []
++        for _ in range(args.n_boot):
++            idx = [rng.randrange(n_seeds) for _ in range(n_seeds)]
++            sd_star = statistics.pstdev([ref_best[i] for i in idx]) or 1.0
++            boot_means.append(
++                statistics.fmean([slopes[i] for i in idx]) / sd_star)
++        boot_means.sort()
+         slope = {
+             "c_values": cvals,
+             "mean": statistics.fmean(slopes),
+             "sd": statistics.stdev(slopes),
+-            "se": statistics.stdev(slopes) / math.sqrt(args.seeds),
++            "se": statistics.stdev(slopes) / math.sqrt(n_seeds),
+             "std_mean": statistics.fmean(std_slopes),
+-            "std_se": statistics.stdev(std_slopes) / math.sqrt(args.seeds),
++            "std_se": statistics.stdev(std_slopes) / math.sqrt(n_seeds),
++            "std_se_joint_boot": statistics.pstdev(boot_means),
++            "std_ci95_boot": [boot_means[int(0.025 * args.n_boot)],
++                              boot_means[int(0.975 * args.n_boot) - 1]],
+         }
+         slope["ci95"] = paired_bootstrap_ci(slopes, args.n_boot, seed=2)
+         slope["t"] = slope["mean"] / slope["se"] if slope["se"] > 0 else float("nan")
+@@ -276,10 +295,15 @@ def main() -> int:
+                 for L in LEVELS},
+         }
+ 
+-    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable)
++    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable),
++    # with SEs from joint seed resampling (sd_ref uncertainty included).
+     slope_homog = homogeneity(
+         {fam: row["dose_slope"]["std_mean"] for fam, row in per_family.items()},
+-        {fam: row["dose_slope"]["std_se"] ** 2 for fam, row in per_family.items()})
++        {fam: row["dose_slope"]["std_se_joint_boot"] ** 2
++         for fam, row in per_family.items()})
++    slope_homog["se_method"] = (
++        "joint seed bootstrap (sd_ref re-estimated per replicate; "
++        "codex round-4 B1)")
+     # SECONDARY: Delta_{.,12} homogeneity (the screen's statistic, n=60)
+     pair12_homog = homogeneity(
+         {fam: per_family[fam]["contrasts_vs_reference"][12]["mean"]
+@@ -320,9 +344,13 @@ def main() -> int:
+ 
+     # Predeclared rules (cross-family; single-family arms have no such rule)
+     detected = slope_homog["p_value"] < 0.05
++    # Futility requires the equivalence bound on EVERY level contrast vs
++    # the reference (not only the selected best; codex round-4 E2b) — a
++    # reference-winning family is futile only if all its contrasts are
++    # equivalence-bounded.
+     precise_null = all(
+-        (row["best_vs_reference"] is None)
+-        or row["best_vs_reference"]["precise_enough_for_null"]
++        all(c["precise_enough_for_null"]
++            for c in row["contrasts_vs_reference"].values())
+         for row in per_family.values())
+     if len(args.families) < 2:
+         verdict = "SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate " \
+@@ -350,8 +378,8 @@ def main() -> int:
+         },
+         "predeclared_rules": {
+             "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
+-            "futile": "not detected AND all best-vs-reference CI "
+-                      f"half-widths < {MISE} sd",
++            "futile": "not detected AND every level-vs-reference CI lies "
++                      f"entirely within +/- {MISE} sd (equivalence bound)",
+             "otherwise": "INCONCLUSIVE",
+         },
+         "families": args.families, "dimensions": dims, "levels": LEVELS,
+diff --git a/scripts/phase9_baselines.py b/scripts/phase9_baselines.py
+index 1cb37e6..fff1efd 100644
+--- a/scripts/phase9_baselines.py
++++ b/scripts/phase9_baselines.py
+@@ -19,7 +19,7 @@ import torch
+ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT / "src"))
+ 
+-from opt_agent.dataset import iter_jsonl  # noqa: E402
++from opt_agent.dataset import read_jsonl  # noqa: E402
+ 
+ 
+ def _rule_action(record) -> str:
+@@ -177,7 +177,7 @@ def main() -> int:
+     parser.add_argument("dataset", type=Path)
+     parser.add_argument("--holdout-seeds", type=int, nargs="+", default=[8, 9])
+     args = parser.parse_args()
+-    records = list(iter_jsonl(args.dataset))
++    records = read_jsonl(args.dataset, version_policy="warn")
+     heldout = set(args.holdout_seeds)
+     train = [r for r in records if int(r.problem["seed"]) not in heldout]
+     test = [r for r in records if int(r.problem["seed"]) in heldout]
+diff --git a/scripts/train_system1_compare.py b/scripts/train_system1_compare.py
+index ec9fc78..efa39e4 100644
+--- a/scripts/train_system1_compare.py
++++ b/scripts/train_system1_compare.py
+@@ -71,7 +71,7 @@ def main():
+     torch.manual_seed(20260926)
+     torch.set_num_threads(1)
+     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+-    records = read_jsonl(args.input)
++    records = read_jsonl(args.input, version_policy="warn")
+     train = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) < 8]
+     valid = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) in (8, 9)]
+     if not train or not valid:
+diff --git a/src/opt_agent/dataset/decision_record.py b/src/opt_agent/dataset/decision_record.py
+index b224633..d538b55 100644
+--- a/src/opt_agent/dataset/decision_record.py
++++ b/src/opt_agent/dataset/decision_record.py
+@@ -118,7 +118,8 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+ 
+ 
+ def read_jsonl(
+-    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
++    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
++    pooling_note: str = "",
+ ) -> list[DecisionRecord]:
+     """Materialize records from JSONL, enforcing a version-pooling policy.
+ 
+@@ -144,6 +145,8 @@ def read_jsonl(
+         )
+         for record in records
+     ]
+-    enforce_record_pooling(statuses, version_policy,
+-                           source=str(path), pool_legacy=pool_legacy)
++    enforce_record_pooling(
++        [record.metadata for record in records], version_policy,
++        source=str(path), pool_legacy=pool_legacy,
++        pooling_note=pooling_note)
+     return records
+diff --git a/src/opt_agent/dataset/versioning.py b/src/opt_agent/dataset/versioning.py
+index 24cdb2d..bd314fd 100644
+--- a/src/opt_agent/dataset/versioning.py
++++ b/src/opt_agent/dataset/versioning.py
+@@ -110,37 +110,59 @@ def enforce_record_versions(
+     return status
+ 
+ 
++_recorded_pooling_decisions: list[dict] = []
++
++
++def pooling_decisions() -> list[dict]:
++    """Audit trail of explicit cross-version pooling decisions."""
++    return list(_recorded_pooling_decisions)
++
++
+ def enforce_record_pooling(
+-    statuses: list[dict],
++    stamps: list[dict],
+     policy: str | VersionPolicy,
+     *,
+     source: str = "",
+     pool_legacy: bool = False,
++    pooling_note: str = "",
+ ) -> None:
+     """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+ 
+-    A source that mixes CURRENT and LEGACY stamps on the same axis is a
+-    cross-version pool; the guide requires an explicit decision (same-data
+-    A/B note) rather than a silent read. Under any non-ALLOW policy:
+-    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+-    records the explicit opt-in (no enforcement). Mismatched stamps are
+-    handled per-record by enforce_record_versions and are not re-checked
+-    here.
++    Compares RAW stamp values (not status classes), so two DIFFERENT
++    known-past stamps also count as a mix (codex round-4 B3). A mix of
++    distinct stamps on one axis is a cross-version pool; the guide
++    requires an explicit decision with a recorded same-data A/B note.
++    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
++    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
++    the decision in the audit trail (pooling_decisions()), and proceeds.
++
++    Boundary limitation (documented in guide 4.5): this checks ONE loaded
++    source; combining multiple separately loaded files must pass each
++    through read_jsonl and cite the same pooling note.
+     """
+     policy = VersionPolicy(policy)
+-    if policy is VersionPolicy.ALLOW or pool_legacy:
++    if policy is VersionPolicy.ALLOW:
++        return
++    if pool_legacy:
++        if not pooling_note.strip():
++            raise VersionPolicyError(
++                f"{source}: pool_legacy=True requires a pooling_note "
++                f"describing the same-data A/B justification (guide 6.6 "
++                f"rule 1)")
++        _recorded_pooling_decisions.append(
++            {"source": source, "note": pooling_note})
+         return
+     import warnings
+ 
+     for axis in ("harness", "utility"):
+-        values = {s[axis] for s in statuses if axis in s}
+-        if {type(s[axis]) for s in statuses if axis in s} and len(values) > 1:
+-            msg = (f"{source}: mixes "
+-                   + " and ".join(str(x.value) for x in sorted(values, key=lambda e: e.value))
+-                   + f" {axis} stamps in one source; pooling across versions "
+-                     f"requires an explicit same-data A/B note (guide 6.6 "
+-                     f"rule 1) — pass pool_legacy=True to record that "
+-                     f"decision")
++        # An absent stamp counts as its own value: records that predate the
++        # stamp mechanism pool with stamped records only by explicit note.
++        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
++        if len(values) > 1:
++            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
++                   f"across versions requires an explicit same-data A/B "
++                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
++                   f"a pooling_note to record that decision")
+             if policy is VersionPolicy.STRICT:
+                 raise VersionPolicyError(msg)
+             warnings.warn(msg, stacklevel=2)
+diff --git a/tests/test_boundary_registry.py b/tests/test_boundary_registry.py
+index 9a15ebb..fc10a3d 100644
+--- a/tests/test_boundary_registry.py
++++ b/tests/test_boundary_registry.py
+@@ -52,15 +52,22 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
+         f"expected exactly one §2.4 table, found {len(header_hits)}")
+     header_idx = header_hits[0]
+     header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
+-    assert tuple(header_cells[:4]) == EXPECTED_HEADER, (
++    assert len(header_cells) == 4 and tuple(header_cells) == EXPECTED_HEADER, (
+         f"unexpected §2.4 table header: {header_cells!r} "
+-        f"(expected {EXPECTED_HEADER})"
++        f"(expected exactly {EXPECTED_HEADER})"
+     )
+     rows: dict[str, tuple[str, str, str]] = {}
++    table_ended = False
+     for line in lines[header_idx + 1:]:
+         stripped = line.strip()
+         if not stripped.startswith("|"):
+-            break  # table ended
++            if stripped:
++                table_ended = True
++            continue  # allow blank lines inside; any later '|' row is a
++            # SECOND table in the section -> fail closed
++        assert not table_ended, (
++            "found a second markdown table inside section 2.4 — the sync "
++            "check covers exactly one table")
+         cells = [c.strip() for c in stripped.strip("|").split("|")]
+         if cells and cells[0].startswith("-"):
+             continue  # separator row
+diff --git a/tests/test_versioning.py b/tests/test_versioning.py
+index e8818de..e3d9fe1 100644
+--- a/tests/test_versioning.py
++++ b/tests/test_versioning.py
+@@ -208,10 +208,18 @@ def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
+     from opt_agent.dataset.versioning import VersionPolicyError
+     with _pytest.raises(VersionPolicyError):
+         read_jsonl(path, version_policy="strict")
+-    # explicit opt-in records the pooling decision
++    # explicit opt-in REQUIRES a note; without it, strict raises
++    with _pytest.raises(VersionPolicyError):
++        read_jsonl(path, version_policy="strict", pool_legacy=True)
++    # with a note, the decision is recorded and readable
++    ver._recorded_pooling_decisions.clear()
+     with _w.catch_warnings(record=True) as caught:
+         _w.simplefilter("always")
+         records = read_jsonl(path, version_policy="strict",
+-                             pool_legacy=True)
++                             pool_legacy=True,
++                             pooling_note="A/B: same seeds, utility v2")
+     assert len(records) == 2
+     assert not any("mixes" in str(w.message) for w in caught)
++    decisions = ver.pooling_decisions()
++    assert len(decisions) == 1
++    assert "A/B" in decisions[0]["note"]
+
+codex
+The code fixes are present. I’m checking whether the joint bootstrap supports the reported homogeneity test and whether the pooling audit leaves a route around the stated rule.
+exec
+/bin/bash -lc "git show --format= -- docs/RESEARCH_BOUNDARY_GUIDE.md runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md PROGRESS_BRANCH.md && nl -ba src/opt_agent/dataset/versioning.py | sed -n '1,240p' && nl -ba src/opt_agent/dataset/decision_record.py | sed -n '100,170p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/PROGRESS_BRANCH.md b/PROGRESS_BRANCH.md
+index 26308b8..902390f 100644
+--- a/PROGRESS_BRANCH.md
++++ b/PROGRESS_BRANCH.md
+@@ -632,7 +632,9 @@ predeclared in-script: per-level contrasts vs reference L0=5; per-family
+ OLS dose slope in c = n_init/(2d+1) space over seed-paired levels;
+ PRIMARY test = slope homogeneity (Wald chi^2, Cochran's-Q form).
+ 
+-- PRIMARY: chi^2_4 = 30.87, p < 1e-4, I^2 = 87% -> CONDITIONALITY_
++- PRIMARY (as reported at the time, raw-unit slopes; superseded by
++  the standardized estimand, see section 22/23): chi^2_4 = 30.87,
++  p < 1e-4, I^2 = 87% -> CONDITIONALITY_
+   DETECTED. The family x dose interaction is decisively present.
+ - Structure: smooth families individually significant NEGATIVE slopes
+   (Hartmann -0.84 sd/unit c, p<1e-4; Branin -1.56, p=0.002; SixHumpCamel
+@@ -713,7 +715,9 @@ All 13 new findings fixed in the same session:
+ 
+ - D1 (real statistical catch): the grid PRIMARY test ran on raw-unit
+   slopes — not scale-stable. Primary re-declared as reference-
+-  standardized slopes (b_f/sd_ref): chi^2_4 = 38.69, p < 1e-4, I^2 = 90%
++  standardized slopes (b_f/sd_ref, sd_ref treated as fixed): chi^2_4
++  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
++  version, see section 23]
+   — matches codex's own recomputation; verdict unchanged
+   (CONDITIONALITY_DETECTED). Raw-unit version demoted to secondary.
+ - E2/C1: "precise null" now an equivalence bound (CI entirely within
+@@ -736,4 +740,37 @@ All 13 new findings fixed in the same session:
+   guide's presence (skipifs removed).
+ 
+ Tests: 55 across affected modules (4 new). Grid + deep arm re-run under
+-the corrected estimand (deterministic; artifacts refreshed).
+\ No newline at end of file
++the corrected estimand (deterministic; artifacts refreshed).
++## 23. Round-4 review verdict + full disposition (2026-09-29)
++
++Codex round-4 (`runs/codex_boundary_round4_review.log`): VERDICT REVISE —
++0 BLOCKER / 5 MAJOR / 4 MINOR (14 -> 9 -> 5 MAJOR). All fixed same
++session:
++
++- B1 (statistical): the standardized-slope SE treated the estimated
++  sd_ref as fixed. Fixed with JOINT SEED RESAMPLING: every bootstrap
++  replicate re-estimates sd_ref from the resampled reference outcomes;
++  the primary homogeneity now uses these SEs — chi^2_4 = 20.06,
++  p = 5e-4, I^2 = 80% (matches codex's jackknife Q~20.8 / p~3.5e-4;
++  verdict unchanged). Both grid arms re-run.
++- B2: train_system1_compare.py now passes version_policy="warn"
++  explicitly; phase9_baselines.py migrated from iter_jsonl to
++  read_jsonl(version_policy="warn").
++- B3: pooling check compares RAW stamp values (two different known-past
++  stamps, and absent-vs-present stamps, both count as a mix);
++  pool_legacy=True now REQUIRES a pooling_note and records the decision
++  in an audit trail (pooling_decisions()); the one-source boundary
++  limitation (cross-file combination) documented in guide 4.5.
++- B4/E2: futility now requires the equivalence bound on EVERY
++  level-vs-reference contrast (not only the selected best); guide 5.5.4
++  and the script's declared + serialized rules synchronized to the
++  equivalence wording.
++- B5: report/guide/PROGRESS all carry the corrected primary numbers
++  (20.06 / 5e-4 / 80%) with the raw-unit version labeled secondary and
++  superseded notes in PROGRESS 20.
++- Minors: guide 5.4 closed-loop success = CI lower bound > 0; screen
++  6.3 Rastrigin statement marked retracted; grid 8.2 relabeled
++  candidate baseline pending held-out; parser header requires exactly
++  four cells and detects a second table in the section.
++
++Tests: 24 in registry/versioning (pooling-note path added).
+\ No newline at end of file
+diff --git a/docs/RESEARCH_BOUNDARY_GUIDE.md b/docs/RESEARCH_BOUNDARY_GUIDE.md
+index 51cd5a3..8170e70 100644
+--- a/docs/RESEARCH_BOUNDARY_GUIDE.md
++++ b/docs/RESEARCH_BOUNDARY_GUIDE.md
+@@ -350,8 +350,9 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项
+   （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
+   p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
+   （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
+-  ——参照标准化斜率同质性（尺度稳定）χ²₄ = 38.69、p < 10⁻⁴、
+-  I² = 90%（原始单位次要版本 30.87）；光滑族逐族显著负斜率、多峰
++  ——参照标准化斜率同质性（尺度稳定，联合种子 bootstrap SE 含
++  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
++  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+   高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
+   更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
+   臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
+@@ -374,7 +375,7 @@ P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边
+   +0.140 与 +0.188，5/5 folds CI 排零）；RLCD-proper 臂原始流 ≈ RF
+   （CI 跨零）、复制流 +0.053 显著；两臂闭环均塌缩为常动作策略
+   （PROGRESS_BRANCH §5/§9；RLCD_THEORY.md T4）。
+-- 闭环级：terminal value 对比的 CI 排零（Phase 8.6F 提示首动作与
++- 闭环级：terminal value 对比的 CI 下界 > 0（Phase 8.6F 提示首动作与
+   延续效应不可加，闭环必须整程评估）。
+ - 不变量：Gate 5 仿射不变性——标签侧 Spearman ρ=1 是**必要条件**
+   （实测 17/17 桶中位 ρ=1，但预宣告联合 gate 因 2/17 JS breach
+@@ -406,7 +407,8 @@ PROGRESS 记录条件与数据，方案回到 §10 重议：
+    超过单条 budget-30 闭环轨迹评估成本的 10× → 重新设计标注单位
+    （更长视程、更少标签），而非增加复制数。
+ 4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+-   半宽 < 0.25·sd 的精确零界）→ 该轴元层管线停建（§4.4）；**仅未检出
++   等价界：全部相关对比的 CI 完整落在 ±0.25·sd 内）→ 该轴元层管线
++   停建（§4.4）；**仅未检出
+    但零不精确（INCONCLUSIVE）→ 暂缓决策**（加种子/加配置档位后重筛），
+    不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+    本条未被触发）。
+@@ -620,8 +622,8 @@ round-2 处置状态（2026-09-29）：
+    `runs/EXP_META_CONFIG_SCREEN.md`。阶段二（按阶段一预宣告的升级
+    路径）`scripts/exp_meta_config_grid.py`：n_init ∈ {5,8,12,18} 剂量
+    网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
+-   DETECTED**（参照标准化斜率同质性 χ²₄ = 38.69、p < 10⁻⁴、
+-  I² = 90%）；并撤回
++   DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
++  I² = 80%，联合 bootstrap SE）；并撤回
+    阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
+    d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
+ 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
+@@ -649,6 +651,7 @@ round-2 处置状态（2026-09-29）：
+    （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+    §5.5.2 成功改为 CI 下界 > 0、终止改等价界（CI 完整落在
+    ±0.25 sd 内）；§5.5.1 补复制数细节；§4.5 执行边界与规范对齐；
+-   网格主检验改为参照标准化斜率（尺度稳定，χ²₄ = 38.69，判定
+-   不变，原始单位版降为次要）；筛选报告 Rastrigin 陈述加撤回
++   网格主检验改为参照标准化斜率（尺度稳定，联合 bootstrap SE 下
++   χ²₄ = 20.06、p = 5×10⁻⁴，判定不变，原始单位版降为次要）；筛选
++   报告 Rastrigin 陈述加撤回
+    标注；解析器恰 4 列/单表/指南必须在场。
+diff --git a/runs/EXP_META_CONFIG_GRID.md b/runs/EXP_META_CONFIG_GRID.md
+index 13bf96c..751a5d4 100644
+--- a/runs/EXP_META_CONFIG_GRID.md
++++ b/runs/EXP_META_CONFIG_GRID.md
+@@ -13,8 +13,9 @@
+ 执行两项扩展：增加配置档位（n_init ∈ {5, 8, 12, 18}）与增加种子
+ （20 → 60，原样本嵌套）。在维度归一化设计规模 c = n_init/(2d+1) 空间
+ 中，以各族**参照标准化**剂量-反应斜率（b_f / sd_ref，尺度稳定）的
+-同质性为主检验，**配置条件性被检出**：χ²₄ = 38.69，p < 10⁻⁴，
+-I² = 90%（原始单位斜率的次要版本：χ²₄ = 30.87，同判）。结构为：三个光滑族的负斜率逐族
++同质性为主检验（联合种子重抽样 SE，含 sd_ref 估计不确定性），
++**配置条件性被检出**：χ²₄ = 20.06，p = 5×10⁻⁴，I² = 80%（原始单位
++斜率的次要版本：χ²₄ = 30.87，同判）。结构为：三个光滑族的负斜率逐族
+ 显著（Hartmann per-sd −0.84，p < 10⁻⁴；Branin −1.56，p = 0.002；
+ SixHumpCamel −0.30，p = 0.0007），多峰高维的 Ackley 呈显著正斜率
+ （+0.45 sd/单位 c，p = 0.029）。两项更正随之确立：(i) 筛选实验的
+@@ -90,10 +91,11 @@ df = F − 1）；机理符号的精确单侧二项检验；发现区（0–19
+ 光滑族的均值随档位单调下降；Ackley 在 L = 18 处抬升；Rastrigin
+ 非单调且方差主导。
+ 
+-**主检验（参照标准化斜率同质性，尺度稳定）**：χ²₄ = 38.69，
+-**p < 10⁻⁴**，I² = 0.90，合并标准化斜率 −0.276。原始单位斜率的次要
+-版本（非尺度稳定，仅作参考）：χ²₄ = 30.87，I² = 0.87。**判定：
+-CONDITIONALITY_DETECTED。**
++**主检验（参照标准化斜率同质性，尺度稳定；SE 取自联合种子
++bootstrap——每个重抽样重复内 sd_ref 重新估计，其不确定性进入 SE）**：
++χ²₄ = 20.06，**p = 5×10⁻⁴**，I² = 0.80，合并标准化斜率 −0.140。
++原始单位斜率的次要版本（非尺度稳定、sd_ref 视为固定，仅作参考）：
++χ²₄ = 30.87，I² = 0.87。**判定：CONDITIONALITY_DETECTED。**
+ 
+ **次要检验（Δ₁₂ 同质性，与筛选可比）**：n = 60 时 χ²₄ = 9.07，
+ p = 0.059；仅新种子 20–59 时 p = 0.114——两档单对比保持边缘，
+@@ -117,7 +119,8 @@ CI 触零（边缘）；Rastrigin 全部未通过。
+ ## 6. 推断与解读
+ 
+ 1. **主问题解决：配置条件性确立。** 族 × 剂量交互在 α = 0.05 下
+-   检出（p < 10⁻⁴，I² = 87%）。初始设计规模的最优取值因问题族而异
++   检出（联合 bootstrap SE 下 p = 5×10⁻⁴，I² = 80%）。初始设计规模
++   的最优取值因问题族而异
+    在本基准问题集上成立。
+ 2. **异质性来源明确且机理一致。** 负斜率全部位于光滑族且逐族
+    显著（危害方向、单调剂量反应）；正斜率位于多峰高维族，其中
+@@ -161,7 +164,8 @@ CI 触零（边缘）；Rastrigin 全部未通过。
+    评估集用未参与拟合的族与种子区块。
+ 2. 基准问题集内的即时实用结论：光滑族不应对初始设计超配（本基准问题集内最优
+    c ≈ 1×(2d+1) 或更低），多峰高维族受益于更高的设计占比——该
+-   结论可直接作为 always-usable 基线配置写入 benchmark 基线组。
++   结论是**候选基线**：须先通过 held-out 比较（赢家选择使用了同一
++   份数据；Rastrigin 效应未获跨区块复制），方可进入基线组。
+ 3. Rastrigin 型高方差族的任何族级结论，确认标准应提高为跨独立
+    种子区块复制（≥ 2 个互斥区块 CI 同向排零）。
+ 
+diff --git a/runs/EXP_META_CONFIG_SCREEN.md b/runs/EXP_META_CONFIG_SCREEN.md
+index eeccc27..6c1c44b 100644
+--- a/runs/EXP_META_CONFIG_SCREEN.md
++++ b/runs/EXP_META_CONFIG_SCREEN.md
+@@ -126,7 +126,9 @@ LOFO 符号预测 3/5（默认平票规则；F = 5、近均分下无分辨率）
+    当时的陈述保留并加撤回标记；跨区块复制是族级结论的必要确认
+    标准（网格报告 §6.3、§8.3）。
+ 3. **机理假设获方向性支持但幅度分化**：5/5 符号符合预宣告方向
+-   （p = 0.031）；幅度上仅多峰-高维的 Rastrigin 显著，同为多峰的
++   （p = 0.031）；幅度上仅多峰-高维的 Rastrigin 显著（**该个体结论
++   同日被网格实验撤回**——跨种子区块不复制，见 §6.2 标注与网格
++   报告），同为多峰的
+    Ackley 只有 d_z = 0.14 的趋势。d = 2 的光滑族负效应（超配设计）
+    与 H-mech-2 一致但均不显著（|d_z| ≤ 0.35）。
+ 4. **维度是理解本轴的前提**：同一 n_init 档位在 d = 2 与 d = 10 族上
+     1	"""Dataset / harness version stamps — code-side half of guide §4.5 + §6.6.
+     2	
+     3	Discipline (RESEARCH_BOUNDARY_GUIDE.md):
+     4	
+     5	- ``HARNESS_VERSION`` freezes the measurement system: observation format
+     6	  (state features), action menu, and label pipeline. Any change to state
+     7	  features, the ActionType menu, or any S-class supervision-defining
+     8	  component (§6.6) REQUIRES a bump.
+     9	- ``UTILITY_VERSION`` is the finer stamp: it tracks the S-class label
+    10	  definition only (utility weights/scales, continuation policy, rollout
+    11	  horizon, gold temperature, action-subset quota, replicate count).
+    12	
+    13	Reading rule (:func:`check_record_versions`):
+    14	
+    15	- ``OK``       — record carries the current stamps; poolable.
+    16	- ``LEGACY``   — stamp missing (records predate the mechanism) or holds a
+    17	  known-past value: readable, but must not be pooled with current-version
+    18	  records without an explicit same-data A/B note (§6.6 rule 1).
+    19	- ``MISMATCH`` — stamp is not a recognized value (e.g. a future version
+    20	  read by older code): refuse to pool.
+    21	
+    22	Known-past values are listed in ``_KNOWN_PAST``; extend it when bumping
+    23	either constant so old data reads as LEGACY rather than MISMATCH.
+    24	"""
+    25	
+    26	from __future__ import annotations
+    27	
+    28	from enum import Enum
+    29	from typing import Any, Mapping
+    30	
+    31	HARNESS_VERSION = "h1"
+    32	UTILITY_VERSION = "phase8.6b"
+    33	
+    34	# Stamps that may appear in historical records. "phase8.6b" doubles as the
+    35	# current UTILITY_VERSION; harness_version was simply absent before h1.
+    36	_KNOWN_PAST: dict[str, set[str]] = {
+    37	    "harness": set(),  # h1 is the first stamped harness version
+    38	    "utility": set(),  # phase8.6b is the first formalized utility version
+    39	}
+    40	
+    41	
+    42	class VersionStatus(str, Enum):
+    43	    OK = "ok"
+    44	    LEGACY = "legacy"
+    45	    MISMATCH = "mismatch"
+    46	
+    47	
+    48	class VersionPolicy(str, Enum):
+    49	    """Pooling policy enforced at a dataset loading boundary (guide 4.5/6.6).
+    50	
+    51	    ALLOW  - no check (back-compat; implicit pooling decision is "unchecked").
+    52	    WARN   - summarize LEGACY once per source (do-not-pool reminder) and warn
+    53	             on MISMATCH, but keep reading.
+    54	    STRICT - raise VersionPolicyError on the first MISMATCH; LEGACY still only
+    55	             warns (legacy records are the repo's history, the policy makes
+    56	             the pooling decision EXPLICIT rather than forbidding reads).
+    57	    """
+    58	
+    59	    ALLOW = "allow"
+    60	    WARN = "warn"
+    61	    STRICT = "strict"
+    62	
+    63	
+    64	class VersionPolicyError(ValueError):
+    65	    """A record carries an unrecognized version stamp under STRICT policy."""
+    66	
+    67	
+    68	_legacy_warned: set[str] = set()
+    69	
+    70	
+    71	def enforce_record_versions(
+    72	    record_metadata: Mapping[str, Any],
+    73	    policy: str | VersionPolicy,
+    74	    *,
+    75	    record_id: str = "",
+    76	    source: str = "",
+    77	) -> dict[str, VersionStatus]:
+    78	    """Apply a pooling policy to one record's metadata.
+    79	
+    80	    Returns the per-axis status (same shape as check_record_versions).
+    81	    LEGACY warns at most once per (source, axis) to avoid spam on large
+    82	    legacy datasets; MISMATCH raises under STRICT.
+    83	    """
+    84	    policy = VersionPolicy(policy)
+    85	    status = check_record_versions(record_metadata)
+    86	    if policy is VersionPolicy.ALLOW:
+    87	        return status
+    88	    import warnings
+    89	
+    90	    for axis, st in status.items():
+    91	        key = f"{source}:{axis}"
+    92	        if st is VersionStatus.LEGACY and key not in _legacy_warned:
+    93	            _legacy_warned.add(key)
+    94	            warnings.warn(
+    95	                f"{source}: {axis} stamp is legacy/absent (record "
+    96	                f"{record_id!r} first seen); pooling legacy records with "
+    97	                f"current-version records requires an explicit same-data "
+    98	                f"A/B note (guide 6.6 rule 1)",
+    99	                stacklevel=2,
+   100	            )
+   101	        if st is VersionStatus.MISMATCH:
+   102	            stamp = record_metadata.get(f"{axis}_version")
+   103	            msg = (f"{source}: record {record_id!r} has unrecognized "
+   104	                   f"{axis} stamp {stamp!r} (current: "
+   105	                   f"{HARNESS_VERSION if axis == 'harness' else UTILITY_VERSION}); "
+   106	                   f"refusing to pool under STRICT policy")
+   107	            if policy is VersionPolicy.STRICT:
+   108	                raise VersionPolicyError(msg)
+   109	            warnings.warn(msg, stacklevel=2)
+   110	    return status
+   111	
+   112	
+   113	_recorded_pooling_decisions: list[dict] = []
+   114	
+   115	
+   116	def pooling_decisions() -> list[dict]:
+   117	    """Audit trail of explicit cross-version pooling decisions."""
+   118	    return list(_recorded_pooling_decisions)
+   119	
+   120	
+   121	def enforce_record_pooling(
+   122	    stamps: list[dict],
+   123	    policy: str | VersionPolicy,
+   124	    *,
+   125	    source: str = "",
+   126	    pool_legacy: bool = False,
+   127	    pooling_note: str = "",
+   128	) -> None:
+   129	    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+   130	
+   131	    Compares RAW stamp values (not status classes), so two DIFFERENT
+   132	    known-past stamps also count as a mix (codex round-4 B3). A mix of
+   133	    distinct stamps on one axis is a cross-version pool; the guide
+   134	    requires an explicit decision with a recorded same-data A/B note.
+   135	    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+   136	    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+   137	    the decision in the audit trail (pooling_decisions()), and proceeds.
+   138	
+   139	    Boundary limitation (documented in guide 4.5): this checks ONE loaded
+   140	    source; combining multiple separately loaded files must pass each
+   141	    through read_jsonl and cite the same pooling note.
+   142	    """
+   143	    policy = VersionPolicy(policy)
+   144	    if policy is VersionPolicy.ALLOW:
+   145	        return
+   146	    if pool_legacy:
+   147	        if not pooling_note.strip():
+   148	            raise VersionPolicyError(
+   149	                f"{source}: pool_legacy=True requires a pooling_note "
+   150	                f"describing the same-data A/B justification (guide 6.6 "
+   151	                f"rule 1)")
+   152	        _recorded_pooling_decisions.append(
+   153	            {"source": source, "note": pooling_note})
+   154	        return
+   155	    import warnings
+   156	
+   157	    for axis in ("harness", "utility"):
+   158	        # An absent stamp counts as its own value: records that predate the
+   159	        # stamp mechanism pool with stamped records only by explicit note.
+   160	        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
+   161	        if len(values) > 1:
+   162	            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+   163	                   f"across versions requires an explicit same-data A/B "
+   164	                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+   165	                   f"a pooling_note to record that decision")
+   166	            if policy is VersionPolicy.STRICT:
+   167	                raise VersionPolicyError(msg)
+   168	            warnings.warn(msg, stacklevel=2)
+   169	
+   170	
+   171	def stamp_metadata(
+   172	    metadata: Mapping[str, Any] | None,
+   173	    *,
+   174	    harness_version: str = HARNESS_VERSION,
+   175	    utility_version: str = UTILITY_VERSION,
+   176	) -> dict[str, Any]:
+   177	    """Return a copy of ``metadata`` with both version stamps applied.
+   178	
+   179	    Existing stamp keys are overwritten (the caller is generating records
+   180	    with the current code, whose stamps ARE the current constants).
+   181	    """
+   182	    out = dict(metadata) if metadata else {}
+   183	    out["harness_version"] = harness_version
+   184	    out["utility_version"] = utility_version
+   185	    return out
+   186	
+   187	
+   188	def check_record_versions(
+   189	    record_metadata: Mapping[str, Any],
+   190	) -> dict[str, VersionStatus]:
+   191	    """Classify a record's stamps against the current constants.
+   192	
+   193	    ``record_metadata`` is the ``metadata`` dict of a DecisionRecord (the
+   194	    stamps live at its top level; see the generator).
+   195	    """
+   196	    return {
+   197	        "harness": _status(record_metadata.get("harness_version"),
+   198	                           HARNESS_VERSION, "harness"),
+   199	        "utility": _status(record_metadata.get("utility_version"),
+   200	                           UTILITY_VERSION, "utility"),
+   201	    }
+   202	
+   203	
+   204	def _status(stamp: Any, current: str, axis: str) -> VersionStatus:
+   205	    if stamp == current:
+   206	        return VersionStatus.OK
+   207	    if stamp is None or stamp in _KNOWN_PAST.get(axis, set()):
+   208	        return VersionStatus.LEGACY
+   209	    return VersionStatus.MISMATCH
+   100	    """Read DecisionRecords from JSONL. Skips blank lines.
+   101	
+   102	    RAW ACCESS: no version enforcement. Replay/analysis scripts that walk a
+   103	    single frozen artifact end-to-end may use this. Any consumer that POOLS
+   104	    records (training, labeling, cross-dataset merging) must use
+   105	    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+   106	    """
+   107	    path = Path(path)
+   108	    with path.open("r", encoding="utf-8") as stream:
+   109	        for line_number, line in enumerate(stream, 1):
+   110	            if not line.strip():
+   111	                continue
+   112	            try:
+   113	                yield DecisionRecord(**json.loads(line))
+   114	            except Exception as exc:
+   115	                raise ValueError(
+   116	                    f"{path}:{line_number}: invalid DecisionRecord"
+   117	                ) from exc
+   118	
+   119	
+   120	def read_jsonl(
+   121	    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+   122	    pooling_note: str = "",
+   123	) -> list[DecisionRecord]:
+   124	    """Materialize records from JSONL, enforcing a version-pooling policy.
+   125	
+   126	    The version policy (guide 4.5/6.6) is the explicit pooling decision at
+   127	    the loading boundary: "allow" (default, historical behavior), "warn"
+   128	    (summarize legacy, warn on unrecognized stamps), or "strict" (raise on
+   129	    unrecognized stamps). See opt_agent.dataset.versioning for semantics.
+   130	    """
+   131	    from opt_agent.dataset.versioning import (
+   132	        enforce_record_pooling,
+   133	        enforce_record_versions,
+   134	    )
+   135	
+   136	    records = list(iter_jsonl(path))
+   137	    if version_policy == "allow":
+   138	        return records
+   139	    statuses = [
+   140	        enforce_record_versions(
+   141	            record.metadata,
+   142	            version_policy,
+   143	            record_id=record.id,
+   144	            source=str(path),
+   145	        )
+   146	        for record in records
+   147	    ]
+   148	    enforce_record_pooling(
+   149	        [record.metadata for record in records], version_policy,
+   150	        source=str(path), pool_legacy=pool_legacy,
+   151	        pooling_note=pooling_note)
+   152	    return records
+
+exec
+/bin/bash -lc "nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '312,445p;510,580p;675,755p' && nl -ba scripts/exp_meta_config_grid.py | sed -n '1,430p' && nl -ba tests/test_boundary_registry.py | sed -n '1,150p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+   312	5. **Harness 版本冻结。** 同一版本内，观测格式、动作菜单、标签管线
+   313	   一致；数据带版本戳。机制（round-2 落地）：`dataset/versioning.py`
+   314	   定义 HARNESS_VERSION / UTILITY_VERSION，generator 经 `stamp_metadata`
+   315	   为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
+   316	   分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
+   317	   **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+   318	   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+   319	   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+   320	   显式豁免）；`iter_jsonl` 为无校验的原始访问，仅限单一冻结工件的
+   321	   回放分析。任何 A/S 类修改**必须**递增对应戳
+   322	   并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
+   323	   走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
+   324	   轨迹库跨版本不可比，RF/微调吸收污染。
+   325	
+   326	---
+   327	
+   328	## 5. 期望实现的效果
+   329	
+   330	### 5.1 能力目标：双层可学习的自主优化 agent
+   331	
+   332	- 内层：π 覆盖 A_flow ∪ A_pt，在 D(family) 允许的域上超过最优常
+   333	  动作（P2 给上界与筛选）。
+   334	- 元层：配置策略随经验改进（问题签名 → 配置映射），episode 间
+   335	  warm start 复用数据。
+   336	- 终态：给定问题签名与预算，系统自主完成"配置选择 → episode 执行 →
+   337	  结果输出（解/Pareto 前沿）"全流程，人工介入点收敛到问题定义本身。
+   338	
+   339	### 5.2 科学目标：在两层各造一次可测性
+   340	
+   341	- 内层（基建完成，**升级为决策点管理**）：counterfactual rollout →
+   342	  U(a,s) → gold_probs → RF/Laya 监督。与其实测限制并读（round-2 起
+   343	  同等地位）：标签噪声主导（单次 flip 0.74，R=5 复制后仍 0.37）、
+   344	  Gate-4 对齐教师首动作终端优势 ≈0（Ackley/Hartmann CI 很宽，未排除
+   345	  全部首动作价值）、8.6F 不可加、微调策略闭环塌缩。**下一决策点**：
+   346	  schedule/continuation 级标注（把"价值在延续里"变成标注单位）+
+   347	  匹配的闭环检验——其结果出来前，不再扩大首动作标签投入。
+   348	- 元层（开放，研究空隙更大；**配置轴筛选已完成两阶段**）：配置级监督 =
+   349	  同一问题多 episode 结果差 + 跨问题签名匹配下的标签迁移。两阶段筛选
+   350	  （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
+   351	  p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
+   352	  （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
+   353	  ——参照标准化斜率同质性（尺度稳定，联合种子 bootstrap SE 含
+   354	  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+   355	  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+   356	  高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
+   357	  更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
+   358	  臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
+   359	  下一步的正当投入对象；配置级监督管线仍不启动**（oracle 选择价值
+   360	  ≠ 签名可学性，LOFO 3/5 无分辨率）。文献现状：per-instance 配置 BO 的
+   361	  元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
+   362	  在 HPO 域有，BO-self-configuration 域近乎空白）。
+   363	
+   364	### 5.3 理论目标：层层干净 + 判据可迁移
+   365	
+   366	每层内部理论自洽（内层标准 BO + 策略层经验比较；元层 bandit），
+   367	P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边界最保守
+   368	端的实证点（1 个动作位、零监督、最强 LLM、50 问题稳定增益）；
+   369	本项目在中间偏激进处（8 动作位 + 人造监督）。
+   370	
+   371	### 5.4 可检验的成功判据（挂现有 Gate 体系）
+   372	
+   373	- 决策级：标签拟合与校准（现有 RF/Gate 体系）。微调结果按臂与种子流
+   374	  陈述：BT 臂在两条独立种子流上均显著超过 RF（pooled +0.056 /
+   375	  +0.140 与 +0.188，5/5 folds CI 排零）；RLCD-proper 臂原始流 ≈ RF
+   376	  （CI 跨零）、复制流 +0.053 显著；两臂闭环均塌缩为常动作策略
+   377	  （PROGRESS_BRANCH §5/§9；RLCD_THEORY.md T4）。
+   378	- 闭环级：terminal value 对比的 CI 下界 > 0（Phase 8.6F 提示首动作与
+   379	  延续效应不可加，闭环必须整程评估）。
+   380	- 不变量：Gate 5 仿射不变性——标签侧 Spearman ρ=1 是**必要条件**
+   381	  （实测 17/17 桶中位 ρ=1，但预宣告联合 gate 因 2/17 JS breach
+   382	  FAIL，归因 GP 拟合数值，见 THEORY.md P1 与 affine 报告）。
+   383	- 停止位：Gate 4 stop-gain 为正的 family 上检验 STOP 学习——注意
+   384	  其估计量是"gold 首动作延续 vs 立即停止"的效用差，不等于"学到的
+   385	  STOP 策略有增益"，后者需另行闭环测量。
+   386	- 元层（筛选已执行，见 §5.2）：同问题多配置 episode 的 regret 差分布 +
+   387	  签名特征的可分性检验。
+   388	
+   389	### 5.5 预宣告终止判据（kill criteria；round-2 新增，D3）
+   390	
+   391	成功判据（§5.4）的配对物——**满足即停，不再扩投入**，触发时在
+   392	PROGRESS 记录条件与数据，方案回到 §10 重议：
+   393	
+   394	1. **教师可靠性**（估计量预宣告钉死：同记录配对标签的 2v2
+   395	   split-half 符号翻转率，复制数 0–3 参与、第 5 个复制未参与该
+   396	   指标；当前值 0.359，`runs/exp_teacher_noise_diagnostic_r5.json`。
+   397	   标签单位重设计后，配对采样规则须重新预宣告方可与 0.359 比较）：若标注单位重设计
+   398	   （长视程 / schedule 级）后，该估计量下 flip 率仍 ≥ 0.359 → 冻结
+   399	   "构造可测性"的强声明，降格为"噪声标签仍可训练排序模型"。
+   400	2. **闭环增量（成功与终止规则一并预宣告）**：固定 5 族基准问题集、
+   401	   预宣告种子数与各族把握度（MDD₈₀）。**成功** = 相对最优常动作或
+   402	   两段 schedule 的配对 terminal-value 增量在 ≥3 族满足 **CI 下界
+   403	   > 0**（显著为正；显著为负计为失败）；**终止（等价界）** = 全部
+   404	   相关对比的 CI 完整落在 ±0.25 sd 之内（不仅是"未检出"——窄而
+   405	   远离零的 CI 不构成终止依据）→ 该路线止步于决策级报告，不进主线。
+   406	3. **成本上限**：同一硬件上，单条标签的期望 rollout 成本（CPU·s）
+   407	   超过单条 budget-30 闭环轨迹评估成本的 10× → 重新设计标注单位
+   408	   （更长视程、更少标签），而非增加复制数。
+   409	4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+   410	   等价界：全部相关对比的 CI 完整落在 ±0.25·sd 内）→ 该轴元层管线
+   411	   停建（§4.4）；**仅未检出
+   412	   但零不精确（INCONCLUSIVE）→ 暂缓决策**（加种子/加配置档位后重筛），
+   413	   不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+   414	   本条未被触发）。
+   415	
+   416	---
+   417	
+   418	## 6. 修改指导方略（操作规程）
+   419	
+   420	### 6.1 新增动作位
+   421	
+   422	流程：写动机（覆盖哪类人工操作）→ §3.4 三项前置检查 → ActionType +
+   423	参数 schema + 校验（`actions/models.py` 模式）→ 接入 U(a,s) 分支
+   424	（`rollout/utility.py` 权重与归一化，过 P1 等变检查）→ 小规模基准问题集上的
+   425	D(family) 筛选 → 进菜单。**禁止**跳过三项前置检查直接加位。执行机制
+   426	（round-2 起生效）：菜单的边界分类由 `actions/boundary_registry.py`
+   427	注册表承载，`tests/test_boundary_registry.py` 同步校验注册表 ↔
+   428	ActionType 菜单 ↔ 本文档 §2.4 表格——三处任一不同步即红（校验范围：
+   429	菜单成员、边界分类、子菜单列；备注列为自由文本不校验；factory 的
+   430	ALL_CANDIDATE_SPECS 与注册表的双向覆盖亦在测试中强制）。
+   431	
+   432	### 6.2 新增/修改状态特征
+   433	
+   434	流程：特征定义（须为观测数据的确定函数，保持 adaptedness）→
+   435	版本号递增 → 新旧版本标签 A/B（同数据）→ 文档记录。
+   436	**必须**保持 15 维特征向量与数据集版本戳同步演化（版本戳机制见
+   437	§4.5；A 类修改须递增 HARNESS_VERSION）。
+   438	
+   439	### 6.3 模型族/核/代理的常见修改意向与规范处置
+   440	
+   441	| 修改意向 | 规范处置 |
+   442	|---|---|
+   443	| 认为核函数表达能力不足 | 在设计期更换为组合核（和/积核），并开启新 harness 版本 |
+   444	| 认为运行中拟合质量不佳 | 执行族内 RETRAIN_SURROGATE（B1）；或经元层重启更换族 + warm start |
+   445	| 希望引入 LLM/专家先验 | 进入决策层（状态/prompt/动作），**禁止**进入后验；语义先验仅允许在元层配置选择或设计期核选择中使用 |
+   510	
+   511	## 7. 文献锚点对照（主张 → 来源映射；✓ = `docs/ref_papers/pdfs/` 有本地全文，✗ = 仅按引文格式引用）
+   512	
+   513	| 主张（正文承载处） | 锚点 |
+   514	|---|---|
+   515	| AF 组合调度脉络（B2 层先例，§2.2） | GP-Hedge（Hoffman 2011，✗）→ No-PASt-BO（Vasconcelos 2019，✗）→ SETUP-BO（ESWA 188:115847, 2022，✗）→ ESP（Shahriari 2014，✗）→ LMABO（`arxiv_2602.07904`，✓） |
+   516	| AF 参数自调（§2.2 B2） | SAWEI（PMLR v224，✓）、PI-is-back（`arxiv_2211.01455`，✓） |
+   517	| 停止理论（B1，§2.2） | Dai et al. ICML 2019（`pmlr_v97_dai19a`，✓）；probabilistic-regret stopping（`arxiv_2402.16811`，✓） |
+   518	| EI 收敛分析对超参估计敏感、序贯 MLE 反例（§2.2 B1 注记、§3.1） | Bull 2011, JMLR（✗，按引文格式；特征表述经 JMLR 官方摘要核实，round-1 评审） |
+   519	| 探索频率下界型 regret bound（§3.1 β_t） | GP-UCB（Srinivas, Krause, Kakade & Seeger, ICML 2010，✗） |
+   520	| 摊销/元学习 BO——"换载体"的合法版（§2.3 合法邻近物） | PFN（`arxiv_2112.10510`，✓）、Rothfuss meta-priors（PMLR v205，✓） |
+   521	| C 类反面教材（§2.3） | LLAMBO（`arxiv_2402.03921`，✓，LLM 兼代理）、LLMP（Requeima 2024，✗） |
+   522	| 元层框架（§1.2/§4/§5.2） | Rice 1976（✗，算法选择）；F-Race/irace、Hyperband（✗，racing/预算分配）；options/SMDP（Sutton, Precup & Singh 1999，✗）；SMAC（Hutter 2011，✗，镜像问题） |
+   523	| agent harness 术语（§1.3） | Reflexion（Shinn 2023，✗）、Voyager（Wang 2023，✗）——episodic memory/skill library |
+   524	| 教科书锚（§1.1 "BO = 序贯决策"表述） | Garnett, *Bayesian Optimization*, 2023（`garnett_bayesoptbook`，✓） |
+   525	| LMABO 实测锚（引用数字时用） | 50 问题（30 COCO/BoTorch 合成 + 20 Bayesmark HPO）×10 种子；RP 1.21；对最好静态 AF/元策略/组合/LLM 基线 AUC 分别 −9.7%/−14.8%/−16.6%/−54.7%；温度 0；兜底率 0.11%；50 轮 ≈6000 tokens、每轮 ≈1s、Gemini 臂 50 轮平均 7.42 min（部分 benchmark 预算更长；GP-Hedge 109 min——组合法每轮需优化全部 12 个 AF）。数字已对本地 PDF 核实（round-1 评审） |
+   526	
+   527	---
+   528	
+   529	## 8. 开放问题（研究边界上的未决问题；round-2 按证据强度重排，E3）
+   530	
+   531	1. **Locked transfer evaluation（最高优先）**：BT 臂跨 family 迁移
+   532	   （两条独立流 5/5 folds CI 排零，pooled +0.140/+0.188）是唯一两次
+   533	   复现的正面结果——在 backend allowlist 扩围（新增 BOCoDe family，
+   534	   冻结决定需单独评审）后做锁定族确认，优先于一切新方向。
+   535	2. **Schedule/continuation 级标注**（§5.2 决策点）：把"价值在延续里"
+   536	   变成标注单位（schedule 段级 U / TD 式目标），配匹配闭环检验——
+   537	   直接回应 8.6F 不可加与 Gate-4 首动作 ≈0。
+   538	3. **元层监督构造**：n_init 轴两阶段筛选完成——剂量网格已检出条件性
+   539	   （§5.2、`runs/EXP_META_CONFIG_GRID.md`）。**下一步为签名特征与
+   540	   held-out 预测**（跨族 LOFO + 维度/多峰代理特征；oracle 选择价值
+   541	   已确立，可学性未测）；通过后才进入配置级反事实监督的构造（同一
+   542	   问题、同预算切分下不同配置的 episode 对比、跨问题标签迁移的签名
+   543	   匹配准则；维度归一化特征 n_init/(2d+1) 优先于裸 n_init）。
+   544	4. **闭环可加性**：Phase 8.6F 已证首动作与延续效应不可加；闭环
+   545	   价值只能整程评估——反事实监督的短视程近似何时失真？
+   546	5. **重启动作建模**：把"换族重启 + warm start"建成元层动作位后，
+   547	   其三项前置检查（§3.4）在元层如何具体化？
+   548	6. **System-2 优势抬正**：rich-state A/B（exp/lenz-state-jev-presentation）
+   549	   已完成且为负结果（§6.5）。A(s)≤0 的诊断在哪些 state 族/
+   550	   基准问题集上反转？反转条件本身是否可学（元层特征）？
+   551	7. **多目标标签**：Δopt → 超体积改进后的 P1 等变条件形式。
+   552	
+   553	---
+   554	
+   555	## 9. 术语表
+   556	
+   557	| 术语 | 英文 | 定义（本文档口径） |
+   558	|---|---|---|
+   559	| 采集函数 | acquisition function (AF) | 由代理后验构造的打分函数 α(x;D_t)，决定下一个评估点；经 argmax 转化为采样行动 |
+   560	| 信念 | (posterior) belief | 贝叶斯意义：对未知量（黑盒 f）的概率分布认识；GP 后验 = μ（猜测）+ σ（不确定度）。其核心在于量化并保留不确定性，而非绝对确信 |
+   561	| 可测性（两层） | measurability | ①数学层：决策是观测历史的可测（adapted）函数；②监督层：每个决策有可从数据算出的监督目标。本项目"create the measurability"指② |
+   562	| adaptedness | adaptedness | 同上①；随机化策略（随机性并入决策时信息）同样 adapted——温度 0 是可复现性约定，非本不变量的条件 |
+   563	| 遗憾 | (simple) regret | 最小化约定下 r_T = min_t f(x_t) − f(x*) ≥ 0（f* 为全局最优值）。本仓库 backend 内部按最大化实现（目标取负），文档口径统一用最小化约定。收敛性理论承诺其趋于零的速率，前提是决策规则固定且满足各定理条件 |
+   564	| episode | episode | 一次完整优化运行：初始设计 → [拟合→决策→采点→评估→更新]×T → 输出。模型构建在设计期，不属于 episode |
+   565	| 设计期 | design phase | episode 之前：选模型族/核/动作菜单/预算结构。冻结发生在这里 |
+   566	| 元层 | meta-level / configuration layer | episode 边界之上的配置决策层；SMDP 语义下选择 option；反馈为 outcome 级 |
+   567	| 内层 | inner level | episode 内部的策略层决策（8 动作）；反馈为 per-decision 级 |
+   568	| 元轨迹 | meta-trajectory | config₁ → outcome₁ → config₂ → … 的序列 |
+   569	| 暖启动 | warm start | 重启的新 episode 全量带入历史观测 {(x,y)}；数据是真值记录，不依附模型，故合法 |
+   570	| 选项/半马尔可夫 | options / SMDP | 分层 RL 框架（Sutton et al. 1999）：时间上扩展的动作；一个 option ≙ 一个 episode |
+   571	| 配置上的老虎机 | bandit over configurations | 元层的理论形态；有独立 regret 理论，不依赖 BO 收敛定理 |
+   572	| 改核 | kernel surgery（C 类） | 运行中更换核函数 = 更换先验假设体系；episode 内禁止 |
+   573	| 改后验 | posterior tampering（C 类） | 绕过数据更新通道直接篡改 μ/σ（手改超参、钳制 σ、注入非概率预测）；episode 内禁止 |
+   574	| 换代理 | surrogate replacement（C 类） | 以无概率语义的预测器（如 LLM 直预测）替代 GP；破坏理论可陈述性 |
+   575	| 摊销推断 | amortized inference | PFN/meta-priors 路线：预训练预测器输出校准的后验近似——"换载体"的合法版，判据是输出仍为良定义的概率信念 |
+   576	| 族内重估 | in-family MLE refit | 核不变、超参由边际似然重估；拟合遵循惰性生命周期（按需/显式重拟合），频率属 B3 可调 |
+   577	| episode 内模型规范冻结 | intra-episode model-specification freeze | 模型族（核函数）与超参估计规则在 episode 启动前确定、运行中不变；跨 episode 比较与经验累积以该不变性为前提（C 类与 §4.1 的形式基础） |
+   578	| 反事实 rollout | counterfactual rollout | 从状态 s 执行候选动作 a + 固定延续的短视程分支，构造 U(a,s) 监督 |
+   579	| 决策实用度 | U(a, s) | THEORY.md §0 定义的标签量，共**六**项：w_opt·Δopt/σ_opt + w_sur·Δsur + w_cov·Δcov − w_eval·n_new/σ_eval − w_fit·n_fit/σ_fit − w_stop_opportunity·剩余预算比·1[a=STOP]。代码默认 w_stop_opportunity=0.75（STOP 项默认激活，`rollout/utility.py`） |
+   580	| gold 概率 | gold_probs | softmax(U(·,s)/T)，在**实际 rollout 的候选集**上计算——该候选集可能为配额采样的动作子集（quota k<8 时，`dataset/generator.py`） |
+     1	"""EXP-META-CONFIG-GRID — dose-response extension of the config screen.
+     2	
+     3	Motivation. The two-level screen (exp_meta_config_screen.py; runs/
+     4	EXP_META_CONFIG_SCREEN.md) left the family x config interaction
+     5	unresolved: chi^2_4 = 8.71, p = 0.069, one confirmed family (Rastrigin,
+     6	d_z = 0.52), directional mechanistic agreement 5/5 — and identified the
+     7	two cheapest escalations: more seeds and more config levels. This script
+     8	executes both, predeclared below.
+     9	
+    10	Estimands (declared before running).
+    11	
+    12	  Model:  y_{f,s,L} = mu + alpha_f + beta_{c(f,L)} + error, where
+    13	          L in LEVELS = {5, 8, 12, 18} (raw n_init) and
+    14	          c(f,L) = L / (2 d_f + 1)  is the dimension-relative design size
+    15	          (the axis recommended by the screen report: raw n_init means
+    16	          different things at different d).
+    17	  Reference level: L0 = 5 (harness default).
+    18	  Per-family contrast:      Delta_{f,L} = E_s[y_{f,s,L} - y_{f,s,L0}].
+    19	  Per-family dose slope:    b_f = E_s[b_{f,s}], where b_{f,s} is the OLS
+    20	                            slope of y_{f,s,·} on c over the 4 levels
+    21	                            (seed-paired; levels share the Sobol prefix).
+    22	  H0_slope : the REFERENCE-STANDARDIZED slopes b_f / sd_ref(f) are equal
+    23	             across families (common dose response — no family x dose
+    24	             interaction). PRIMARY test. Standardization by each family's
+    25	             reference-level sd makes the test invariant to per-family
+    26	             objective rescaling (scale-stable; codex round-3 D1); the SEs
+    27	             come from joint seed resampling so the sd_ref estimation
+    28	             uncertainty is included (codex round-4 B1). Raw-unit slopes
+    29	             are reported secondarily.
+    30	  H0_pair  : Delta_{f,12} identical across families (direct comparability
+    31	             with the screen). SECONDARY.
+    32	  Mechanistic (directional, predeclared): multimodal families (Rastrigin,
+    33	  Ackley) have b_f > 0; smooth families (Branin, Hartmann, SixHumpCamel)
+    34	  have b_f < 0.
+    35	
+    36	Design.
+    37	
+    38	  - LEVELS = {5, 8, 12, 18}; budget 30 evaluations (design + BO) for all
+    39	    levels; pinned AlwaysSurrogate policy; same family + seed -> same
+    40	    scrambled Sobol stream with the prefix property across levels.
+    41	  - Seeds 0..59 (60): seeds 0-19 replicate the screen's sample exactly
+    42	    (nested), 20-59 are NEW — the replication/confirmation split is
+    43	    seeds 0-19 (discovery, prior sample) vs 20-59 (confirmation, fresh).
+    44	  - 5 families x 4 levels x 60 seeds = 1200 trajectories.
+    45	
+    46	Inference.
+    47	
+    48	  1. Per family x level (vs reference): paired mean, seed bootstrap CI,
+    49	     d_z, paired t, MDD_80 = 2.80 se, precision vs 0.25 sd floor.
+    50	  2. Dose slope per family: mean of seed-level OLS slopes, se, t, CI.
+    51	  3. PRIMARY: slope homogeneity Wald chi^2 (continuous Cochran's Q) with
+    52	     df = F-1; heterogeneity I^2.
+    53	  4. SECONDARY: Delta_{f,12} homogeneity chi^2 (the screen's statistic,
+    54	     recomputed at n=60 and on the fresh subset 20-59 alone).
+    55	  5. Mechanistic sign test on b_f (exact one-sided binomial).
+    56	  6. Descriptive: per-family best level; LOFO argmax prediction
+    57	     (majority of other families' best levels, tie -> reference).
+    58	
+    59	Predeclared decision rules.
+    60	
+    61	  - CONDITIONALITY_DETECTED iff slope-homogeneity p < 0.05.
+    62	  - FUTILE iff not detected AND every family's best-vs-reference CI
+    63	    half-width < 0.25 sd (precise null).
+    64	  - Otherwise INCONCLUSIVE.
+    65	"""
+    66	from __future__ import annotations
+    67	
+    68	import argparse
+    69	import json
+    70	import math
+    71	import random
+    72	import statistics
+    73	import sys
+    74	import time
+    75	from pathlib import Path
+    76	
+    77	ROOT = Path(__file__).resolve().parents[1]
+    78	sys.path.insert(0, str(ROOT / "src"))
+    79	
+    80	from scipy import stats as scipy_stats
+    81	
+    82	from opt_agent.actions import candidate_actions_for_state
+    83	from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
+    84	from opt_agent.loop.decision_loop import DecisionLoop
+    85	
+    86	LEVELS = [5, 8, 12, 18]
+    87	REFERENCE = 5
+    88	MISE = 0.25          # minimal-interesting standardized effect
+    89	MDD_FACTOR = 2.80    # ~80% power, two-sided alpha=.05
+    90	MECH_SIGN = {"Rastrigin": +1, "Ackley": +1,
+    91	             "Branin": -1, "Hartmann": -1, "SixHumpCamel": -1}
+    92	
+    93	
+    94	def _worker_init() -> None:
+    95	    import torch
+    96	
+    97	    torch.set_num_threads(1)
+    98	
+    99	
+   100	class AlwaysSurrogatePolicy:
+   101	    def __init__(self, seed: int = 0) -> None:
+   102	        self.seed = seed
+   103	
+   104	    def select_action(self, state, backend=None):
+   105	        choices = candidate_actions_for_state(state, seed=self.seed)
+   106	        if "surrogate_acquisition" in choices:
+   107	            return choices["surrogate_acquisition"]
+   108	        return next(iter(choices.values()))
+   109	
+   110	
+   111	def run_one_trajectory(family: str, n_init: int, budget: int, seed: int) -> dict:
+   112	    backend = BocodeBotorchBackend()
+   113	    backend.initialize(BackendConfig(problem_id=family, seed=seed, n_init=n_init))
+   114	    loop = DecisionLoop(backend, total_budget=budget)
+   115	    loop.run(AlwaysSurrogatePolicy(seed=0), max_rounds=budget + 5)
+   116	    history = backend.get_history()
+   117	    return {
+   118	        "family": family, "seed": seed, "n_init": n_init,
+   119	        "best": float(history.objectives[:, 0].max().item()),
+   120	        "n_evals": len(history),
+   121	        "dimension": int(history.X.shape[1]),
+   122	        "termination": (loop.termination_reason.value
+   123	                        if loop.termination_reason else None),
+   124	    }
+   125	
+   126	
+   127	def paired_bootstrap_ci(diffs: list[float], n_boot: int, seed: int = 0) -> list[float]:
+   128	    rng = random.Random(seed)
+   129	    n = len(diffs)
+   130	    means = sorted(statistics.fmean(
+   131	        [diffs[rng.randrange(n)] for _ in range(n)]) for _ in range(n_boot))
+   132	    return [means[int(0.025 * n_boot)], means[int(0.975 * n_boot) - 1]]
+   133	
+   134	
+   135	def ols_slope(xs: list[float], ys: list[float]) -> float:
+   136	    mx, my = statistics.fmean(xs), statistics.fmean(ys)
+   137	    num = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+   138	    den = sum((x - mx) ** 2 for x in xs)
+   139	    return num / den if den else float("nan")
+   140	
+   141	
+   142	def analyze_contrast(diffs: list[float], n_boot: int,
+   143	                     disc_idx: list[int], conf_idx: list[int]) -> dict:
+   144	    n = len(diffs)
+   145	    mean = statistics.fmean(diffs)
+   146	    sd = statistics.stdev(diffs)
+   147	    se = sd / math.sqrt(n)
+   148	    ci = paired_bootstrap_ci(diffs, n_boot)
+   149	    t_stat = mean / se if se > 0 else float("nan")
+   150	    p_t = (2.0 * (1.0 - scipy_stats.t.cdf(abs(t_stat), df=n - 1))
+   151	           if se > 0 else float("nan"))
+   152	
+   153	    def half(idxs: list[int]) -> dict:
+   154	        d = [diffs[i] for i in idxs]
+   155	        m = statistics.fmean(d)
+   156	        s = statistics.stdev(d)
+   157	        c = paired_bootstrap_ci(d, max(1000, n_boot // 2), seed=1)
+   158	        return {"mean": m, "sd": s, "ci95": c,
+   159	                "ci_excludes_zero": (c[0] > 0) or (c[1] < 0)}
+   160	
+   161	    disc, conf = half(disc_idx), half(conf_idx)
+   162	    return {
+   163	        "n_pairs": n, "mean": mean, "sd": sd, "se": se,
+   164	        "ci95": ci, "ci_excludes_zero": (ci[0] > 0) or (ci[1] < 0),
+   165	        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+   166	        "paired_t": {"t": t_stat, "df": n - 1, "p_two_sided": p_t},
+   167	        "cohens_dz": mean / sd if sd > 0 else float("nan"),
+   168	        "mdd80": MDD_FACTOR * se,
+   169	        # Equivalence bound (codex round-3 E2): a precise null requires the
+   170	        # CI to lie ENTIRELY within +/- MISE*sd, not merely to be narrow
+   171	        # (a narrow CI centered on a large effect is not a null).
+   172	        "precise_enough_for_null": (ci[0] > -MISE * sd and ci[1] < MISE * sd)
+   173	        if sd > 0 else False,
+   174	        "discovery_half": disc, "confirmation_half": conf,
+   175	        "confirmed": (disc["mean"] > 0) == (conf["mean"] > 0)
+   176	                     and conf["ci_excludes_zero"],
+   177	    }
+   178	
+   179	
+   180	def homogeneity(means: dict[str, float], variances: dict[str, float]) -> dict:
+   181	    ms, vs = list(means.values()), list(variances.values())
+   182	    fixed = (sum(m / v for m, v in zip(ms, vs))
+   183	             / sum(1.0 / v for v in vs))
+   184	    chi2 = sum((m - fixed) ** 2 / v for m, v in zip(ms, vs))
+   185	    df = len(ms) - 1
+   186	    return {"statistic": chi2, "df": df,
+   187	            "p_value": 1.0 - scipy_stats.chi2.cdf(chi2, df=df),
+   188	            "pooled": fixed,
+   189	            "i2": max(0.0, (chi2 - df) / chi2) if chi2 > 0 else 0.0}
+   190	
+   191	
+   192	def main() -> int:
+   193	    parser = argparse.ArgumentParser()
+   194	    parser.add_argument("--families", nargs="+",
+   195	                        default=["Branin", "Hartmann", "Ackley",
+   196	                                 "SixHumpCamel", "Rastrigin"])
+   197	    parser.add_argument("--seeds", type=int, default=60)
+   198	    parser.add_argument("--budget", type=int, default=30)
+   199	    parser.add_argument("--workers", type=int, default=24)
+   200	    parser.add_argument("--n-boot", type=int, default=5000)
+   201	    parser.add_argument("--output", type=Path,
+   202	                        default=ROOT / "runs" / "exp_meta_config_grid.json")
+   203	    args = parser.parse_args()
+   204	
+   205	    n_disc = args.seeds // 3           # discovery = prior screen's sample size
+   206	    disc_idx = list(range(0, n_disc))
+   207	    conf_idx = list(range(n_disc, args.seeds))
+   208	
+   209	    jobs = [(fam, L, args.budget, seed)
+   210	            for fam in args.families for seed in range(args.seeds)
+   211	            for L in LEVELS]
+   212	    print(f"Jobs: {len(jobs)} = {len(args.families)} families x "
+   213	          f"{args.seeds} seeds x {len(LEVELS)} levels {LEVELS}; "
+   214	          f"budget {args.budget}; AlwaysSurrogate pinned; "
+   215	          f"discovery seeds 0-{n_disc - 1}, confirmation {n_disc}-{args.seeds - 1}")
+   216	
+   217	    import multiprocessing as mp
+   218	    t0 = time.monotonic()
+   219	    with mp.Pool(args.workers, initializer=_worker_init) as pool:
+   220	        results = pool.starmap(run_one_trajectory, jobs)
+   221	    elapsed = time.monotonic() - t0
+   222	    print(f"Done in {elapsed:.1f}s ({len(jobs)/elapsed:.1f} trajectories/s)")
+   223	
+   224	    by_key = {(r["family"], r["seed"], r["n_init"]): r for r in results}
+   225	    dims = {r["family"]: r["dimension"] for r in results}
+   226	    n_evals = {r["n_evals"] for r in results}
+   227	    print(f"n_evals observed: {sorted(n_evals)}; dims: {dims}")
+   228	
+   229	    per_family: dict[str, dict] = {}
+   230	    for fam in args.families:
+   231	        cvals = [L / (2 * dims[fam] + 1) for L in LEVELS]
+   232	        # contrasts vs reference
+   233	        contrasts = {}
+   234	        for L in LEVELS:
+   235	            if L == REFERENCE:
+   236	                continue
+   237	            diffs = [by_key[(fam, s, L)]["best"] - by_key[(fam, s, REFERENCE)]["best"]
+   238	                     for s in range(args.seeds)]
+   239	            contrasts[L] = analyze_contrast(diffs, args.n_boot, disc_idx, conf_idx)
+   240	        # seed-paired dose slopes in c-space
+   241	        slopes = [ols_slope(cvals, [by_key[(fam, s, L)]["best"] for L in LEVELS])
+   242	                  for s in range(args.seeds)]
+   243	        ref_best = [by_key[(fam, s, REFERENCE)]["best"]
+   244	                    for s in range(args.seeds)]
+   245	        sd_ref = statistics.pstdev(ref_best) or 1.0
+   246	        # Reference-standardized slopes (PRIMARY estimand, scale-stable):
+   247	        # dividing by the family's reference-level sd makes the slope
+   248	        # invariant to affine rescaling of that family's objective, so the
+   249	        # cross-family homogeneity test does not depend on raw units
+   250	        # (codex round-3 D1). Raw-unit slopes are retained for reporting.
+   251	        std_slopes = [b / sd_ref for b in slopes]
+   252	        # SE of the standardized-slope mean by JOINT seed resampling: each
+   253	        # replicate re-estimates sd_ref from the resampled reference
+   254	        # outcomes, so the uncertainty of the standardizing sd enters the
+   255	        # SE (codex round-4 B1; treating sd_ref as fixed understates it).
+   256	        rng = random.Random(3)
+   257	        n_seeds = args.seeds
+   258	        boot_means = []
+   259	        for _ in range(args.n_boot):
+   260	            idx = [rng.randrange(n_seeds) for _ in range(n_seeds)]
+   261	            sd_star = statistics.pstdev([ref_best[i] for i in idx]) or 1.0
+   262	            boot_means.append(
+   263	                statistics.fmean([slopes[i] for i in idx]) / sd_star)
+   264	        boot_means.sort()
+   265	        slope = {
+   266	            "c_values": cvals,
+   267	            "mean": statistics.fmean(slopes),
+   268	            "sd": statistics.stdev(slopes),
+   269	            "se": statistics.stdev(slopes) / math.sqrt(n_seeds),
+   270	            "std_mean": statistics.fmean(std_slopes),
+   271	            "std_se": statistics.stdev(std_slopes) / math.sqrt(n_seeds),
+   272	            "std_se_joint_boot": statistics.pstdev(boot_means),
+   273	            "std_ci95_boot": [boot_means[int(0.025 * args.n_boot)],
+   274	                              boot_means[int(0.975 * args.n_boot) - 1]],
+   275	        }
+   276	        slope["ci95"] = paired_bootstrap_ci(slopes, args.n_boot, seed=2)
+   277	        slope["t"] = slope["mean"] / slope["se"] if slope["se"] > 0 else float("nan")
+   278	        slope["p_two_sided"] = (
+   279	            2.0 * (1.0 - scipy_stats.t.cdf(abs(slope["t"]), df=args.seeds - 1))
+   280	            if slope["se"] > 0 else float("nan"))
+   281	        slope["per_sd_ref"] = slope["mean"] / sd_ref
+   282	        best_level = max(
+   283	            LEVELS, key=lambda L: statistics.fmean(
+   284	                by_key[(fam, s, L)]["best"] for s in range(args.seeds)))
+   285	        per_family[fam] = {
+   286	            "dimension": dims[fam],
+   287	            "c_values": cvals,
+   288	            "contrasts_vs_reference": contrasts,
+   289	            "dose_slope": slope,
+   290	            "best_level": best_level,
+   291	            "best_vs_reference": contrasts.get(best_level)
+   292	            if best_level != REFERENCE else None,
+   293	            "level_means": {L: statistics.fmean(
+   294	                by_key[(fam, s, L)]["best"] for s in range(args.seeds))
+   295	                for L in LEVELS},
+   296	        }
+   297	
+   298	    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable),
+   299	    # with SEs from joint seed resampling (sd_ref uncertainty included).
+   300	    slope_homog = homogeneity(
+   301	        {fam: row["dose_slope"]["std_mean"] for fam, row in per_family.items()},
+   302	        {fam: row["dose_slope"]["std_se_joint_boot"] ** 2
+   303	         for fam, row in per_family.items()})
+   304	    slope_homog["se_method"] = (
+   305	        "joint seed bootstrap (sd_ref re-estimated per replicate; "
+   306	        "codex round-4 B1)")
+   307	    # SECONDARY: Delta_{.,12} homogeneity (the screen's statistic, n=60)
+   308	    pair12_homog = homogeneity(
+   309	        {fam: per_family[fam]["contrasts_vs_reference"][12]["mean"]
+   310	         for fam in args.families},
+   311	        {fam: per_family[fam]["contrasts_vs_reference"][12]["se"] ** 2
+   312	         for fam in args.families})
+   313	    # SECONDARY on fresh seeds only (20-59): Delta_{.,12}
+   314	    def subset_delta12(fam: str) -> tuple[float, float]:
+   315	        d = [by_key[(fam, s, 12)]["best"] - by_key[(fam, s, REFERENCE)]["best"]
+   316	             for s in conf_idx]
+   317	        return statistics.fmean(d), statistics.stdev(d) ** 2 / len(d)
+   318	    fresh12 = {fam: subset_delta12(fam) for fam in args.families}
+   319	    fresh12_homog = homogeneity({f: m for f, (m, _) in fresh12.items()},
+   320	                                {f: v for f, (_, v) in fresh12.items()})
+   321	
+   322	    # Mechanistic sign test on slopes
+   323	    agreement = {fam: (1 if (per_family[fam]["dose_slope"]["mean"] > 0) else -1)
+   324	                 == MECH_SIGN.get(fam, 0) for fam in args.families if fam in MECH_SIGN}
+   325	    k_ok = sum(agreement.values())
+   326	    n_pred = len(agreement)
+   327	    sign_p = sum(math.comb(n_pred, i)
+   328	                 for i in range(k_ok, n_pred + 1)) / 2 ** n_pred
+   329	
+   330	    # Descriptive LOFO on best level (undefined for single-family runs)
+   331	    lofo = []
+   332	    if len(args.families) > 1:
+   333	        for held in args.families:
+   334	            others = [f for f in args.families if f != held]
+   335	            counts: dict[int, int] = {}
+   336	            for f in others:
+   337	                counts[per_family[f]["best_level"]] = counts.get(
+   338	                    per_family[f]["best_level"], 0) + 1
+   339	            pred = max(counts, key=lambda L: (counts[L], -L))  # tie -> smaller level
+   340	            lofo.append({"held_out": held, "predicted": pred,
+   341	                         "actual": per_family[held]["best_level"],
+   342	                         "correct": pred == per_family[held]["best_level"]})
+   343	    lofo_acc = (sum(1 for r in lofo if r["correct"]) / len(lofo)) if lofo else None
+   344	
+   345	    # Predeclared rules (cross-family; single-family arms have no such rule)
+   346	    detected = slope_homog["p_value"] < 0.05
+   347	    # Futility requires the equivalence bound on EVERY level contrast vs
+   348	    # the reference (not only the selected best; codex round-4 E2b) — a
+   349	    # reference-winning family is futile only if all its contrasts are
+   350	    # equivalence-bounded.
+   351	    precise_null = all(
+   352	        all(c["precise_enough_for_null"]
+   353	            for c in row["contrasts_vs_reference"].values())
+   354	        for row in per_family.values())
+   355	    if len(args.families) < 2:
+   356	        verdict = "SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate " \
+   357	                  "the predeclared per-family question directly)"
+   358	    elif detected:
+   359	        verdict = "CONDITIONALITY_DETECTED"
+   360	    elif precise_null:
+   361	        verdict = "FUTILE"
+   362	    else:
+   363	        verdict = "INCONCLUSIVE"
+   364	    confirmed = [f for f in args.families
+   365	                 if per_family[f]["best_vs_reference"]
+   366	                 and per_family[f]["best_vs_reference"]["confirmed"]]
+   367	
+   368	    payload = {
+   369	        "experiment": "exp_meta_config_grid",
+   370	        "relation_to_screen": "dose-response extension of "
+   371	                              "exp_meta_config_screen (levels 5/12 nested)",
+   372	        "estimands": {
+   373	            "contrast": f"Delta_fL = E[y(n_init=L) - y(n_init={REFERENCE})]",
+   374	            "dose_slope": "b_f = mean seed-paired OLS slope of y on "
+   375	                          "c = n_init/(2d+1) over levels",
+   376	            "primary_null": "b_f identical across families "
+   377	                            "(no family x dose interaction)",
+   378	        },
+   379	        "predeclared_rules": {
+   380	            "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
+   381	            "futile": "not detected AND every level-vs-reference CI lies "
+   382	                      f"entirely within +/- {MISE} sd (equivalence bound)",
+   383	            "otherwise": "INCONCLUSIVE",
+   384	        },
+   385	        "families": args.families, "dimensions": dims, "levels": LEVELS,
+   386	        "reference_level": REFERENCE, "seeds": args.seeds,
+   387	        "discovery_seeds": disc_idx, "confirmation_seeds": conf_idx,
+   388	        "budget": args.budget, "policy": "AlwaysSurrogate (pinned)",
+   389	        "n_evals_observed": sorted(n_evals), "wall_seconds": elapsed,
+   390	        "per_family": per_family,
+   391	        "slope_homogeneity_primary": slope_homog,
+   392	        "delta12_homogeneity_n60": pair12_homog,
+   393	        "delta12_homogeneity_fresh_seeds": fresh12_homog,
+   394	        "mechanistic_sign_test": {
+   395	            "predicted_signs": MECH_SIGN, "agreement": agreement,
+   396	            "k_of_n": f"{k_ok}/{n_pred}", "exact_one_sided_p": sign_p},
+   397	        "lofo_best_level": {"folds": lofo, "accuracy": lofo_acc},
+   398	        "confirmed_families": confirmed,
+   399	        "verdict": verdict,
+   400	        "trajectories": [
+   401	            {k: r[k] for k in ("family", "seed", "n_init", "best",
+   402	                               "n_evals", "dimension", "termination")}
+   403	            for r in results],
+   404	    }
+   405	    args.output.parent.mkdir(parents=True, exist_ok=True)
+   406	    args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+   407	
+   408	    print(json.dumps({
+   409	        "level_means": {f: {L: round(v, 3) for L, v in row["level_means"].items()}
+   410	                        for f, row in per_family.items()},
+   411	        "slopes": {f: {"b": round(row["dose_slope"]["mean"], 4),
+   412	                       "p": round(row["dose_slope"]["p_two_sided"], 4),
+   413	                       "per_sd": round(row["dose_slope"]["per_sd_ref"], 4)}
+   414	                   for f, row in per_family.items()},
+   415	        "slope_homogeneity_primary": {k2: (round(v, 4) if isinstance(v, float) else v)
+   416	                                      for k2, v in slope_homog.items()},
+   417	        "delta12_homogeneity_n60": {k2: (round(v, 4) if isinstance(v, float) else v)
+   418	                                    for k2, v in pair12_homog.items()},
+   419	        "delta12_homogeneity_fresh": {k2: (round(v, 4) if isinstance(v, float) else v)
+   420	                                      for k2, v in fresh12_homog.items()},
+   421	        "sign_test": f"{k_ok}/{n_pred} p={sign_p:.4f}",
+   422	        "best_levels": {f: per_family[f]["best_level"] for f in args.families},
+   423	        "confirmed": confirmed, "lofo": lofo_acc, "verdict": verdict,
+   424	    }, indent=2))
+   425	    print(f"\nVERDICT: {verdict}  (artifact: {args.output})")
+   426	    return 0
+   427	
+   428	
+   429	if __name__ == "__main__":
+   430	    raise SystemExit(main())
+     1	"""Boundary registry sync tests — enforce RESEARCH_BOUNDARY_GUIDE.md §2.4/§6.1.
+     2	
+     3	The point of these tests is that the action menu CANNOT drift from its
+     4	boundary classification: adding/removing/reclassifying an action without
+     5	touching both the registry and the guide §2.4 table turns the suite red.
+     6	
+     7	Verified columns (guide §2.4 schema): ActionType | 归类 | 子菜单 | 备注 —
+     8	menu membership, boundary class, and submenu are compared strictly; the
+     9	备注 column is free text and is only required to be non-empty. The parser
+    10	fails closed on malformed tables (bad header, short rows, duplicate or
+    11	unknown action rows).
+    12	"""
+    13	
+    14	from __future__ import annotations
+    15	
+    16	import sys
+    17	from pathlib import Path
+    18	
+    19	import pytest
+    20	
+    21	sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    22	
+    23	from opt_agent.actions.boundary_registry import (
+    24	    BOUNDARY_CLASSES,
+    25	    BOUNDARY_REGISTRY,
+    26	    SUBMENUS,
+    27	    RegistrySyncError,
+    28	    boundary_class_of,
+    29	    submenu_of,
+    30	    verify_registry_sync,
+    31	)
+    32	from opt_agent.actions.models import ActionType
+    33	
+    34	GUIDE_PATH = (
+    35	    Path(__file__).resolve().parents[1] / "docs" / "RESEARCH_BOUNDARY_GUIDE.md"
+    36	)
+    37	
+    38	EXPECTED_HEADER = ("ActionType", "归类", "子菜单", "备注")
+    39	
+    40	
+    41	def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
+    42	    """Strictly parse a §2.4-style markdown table.
+    43	
+    44	    Returns {action_value: (boundary_class, submenu, note)}. Raises
+    45	    AssertionError on schema violations — the sync test must fail closed,
+    46	    not skip quietly.
+    47	    """
+    48	    lines = section_text.splitlines()
+    49	    header_hits = [i for i, ln in enumerate(lines)
+    50	                   if ln.strip().startswith("| ActionType |")]
+    51	    assert len(header_hits) == 1, (
+    52	        f"expected exactly one §2.4 table, found {len(header_hits)}")
+    53	    header_idx = header_hits[0]
+    54	    header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
+    55	    assert len(header_cells) == 4 and tuple(header_cells) == EXPECTED_HEADER, (
+    56	        f"unexpected §2.4 table header: {header_cells!r} "
+    57	        f"(expected exactly {EXPECTED_HEADER})"
+    58	    )
+    59	    rows: dict[str, tuple[str, str, str]] = {}
+    60	    table_ended = False
+    61	    for line in lines[header_idx + 1:]:
+    62	        stripped = line.strip()
+    63	        if not stripped.startswith("|"):
+    64	            if stripped:
+    65	                table_ended = True
+    66	            continue  # allow blank lines inside; any later '|' row is a
+    67	            # SECOND table in the section -> fail closed
+    68	        assert not table_ended, (
+    69	            "found a second markdown table inside section 2.4 — the sync "
+    70	            "check covers exactly one table")
+    71	        cells = [c.strip() for c in stripped.strip("|").split("|")]
+    72	        if cells and cells[0].startswith("-"):
+    73	            continue  # separator row
+    74	        assert len(cells) == 4, (
+    75	            f"malformed §2.4 row (needs exactly 4 cells, got {len(cells)}): "
+    76	            f"{line!r}")
+    77	        name, cls, submenu, note = cells
+    78	        try:
+    79	            action_value = ActionType[name].value
+    80	        except KeyError:
+    81	            raise AssertionError(
+    82	                f"§2.4 row names unknown action {name!r}: {line!r}")
+    83	        assert action_value not in rows, (
+    84	            f"duplicate §2.4 row for {action_value!r}")
+    85	        assert note, f"§2.4 row for {name} has an empty 备注 cell"
+    86	        rows[action_value] = (cls, submenu, note)
+    87	    return rows
+    88	
+    89	
+    90	def _guide_section_2_4_rows() -> dict[str, tuple[str, str, str]]:
+    91	    """Parse the guide's §2.4 table (reads the rendered document, so a doc
+    92	    edit alone cannot desynchronize code from spec)."""
+    93	    text = GUIDE_PATH.read_text(encoding="utf-8")
+    94	    start = text.index("### 2.4")
+    95	    end = text.index("\n## ", start)
+    96	    return _parse_section_rows(text[start:end])
+    97	
+    98	
+    99	# ---------------------------------------------------------------------------
+   100	# Registry <-> menu
+   101	# ---------------------------------------------------------------------------
+   102	
+   103	
+   104	def test_registry_matches_action_type_menu_exactly():
+   105	    verify_registry_sync()  # raises RegistrySyncError on any drift
+   106	    assert set(BOUNDARY_REGISTRY) == set(ActionType)
+   107	
+   108	
+   109	def test_registry_error_names_missing_action():
+   110	    registry_entries = dict(BOUNDARY_REGISTRY)
+   111	    missing = ActionType.STOP
+   112	    del registry_entries[missing]
+   113	    import opt_agent.actions.boundary_registry as mod
+   114	
+   115	    original = mod.BOUNDARY_REGISTRY
+   116	    mod.BOUNDARY_REGISTRY = registry_entries
+   117	    try:
+   118	        with pytest.raises(RegistrySyncError) as exc:
+   119	            verify_registry_sync()
+   120	        assert missing.value in str(exc.value)
+   121	    finally:
+   122	        mod.BOUNDARY_REGISTRY = original
+   123	
+   124	
+   125	def test_query_accessors():
+   126	    assert boundary_class_of(ActionType.RETRAIN_SURROGATE) == "B1"
+   127	    assert submenu_of(ActionType.RETRAIN_SURROGATE) == "A_flow"
+   128	    assert submenu_of(ActionType.GLOBAL_EXPLORATION) == "A_pt"
+   129	
+   130	
+   131	def test_submenus_partition_the_menu():
+   132	    """Every action is in exactly one submenu; both submenus are used."""
+   133	    submenus_used = {entry.submenu for entry in BOUNDARY_REGISTRY.values()}
+   134	    assert submenus_used == set(SUBMENUS)
+   135	
+   136	
+   137	def test_classifications_use_guide_vocabulary():
+   138	    for action, entry in BOUNDARY_REGISTRY.items():
+   139	        assert entry.boundary_class in BOUNDARY_CLASSES, action
+   140	
+   141	
+   142	def test_factory_candidates_match_registry():
+   143	    """The runtime menu source (ALL_CANDIDATE_SPECS) and the boundary
+   144	    registry must cover exactly the same actions — the registry is the
+   145	    classification side of the factory's generation side."""
+   146	    from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
+   147	
+   148	    spec_actions = {action_type for _, action_type, _ in ALL_CANDIDATE_SPECS}
+   149	    assert spec_actions == set(BOUNDARY_REGISTRY), (
+   150	        "factory/registry drift: factory-only="
+
+exec
+/bin/bash -lc "nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '285,325p;465,505p' && nl -ba scripts/exp_meta_config_grid.py | sed -n '60,200p' && rg -n '38\\.69|30\\.87|20\\.06|0\\.0005|5.?10.?⁻⁴|5e-4|80%|90%|87%|FUTILE|half.width|半宽|池|pooling_note' docs/RESEARCH_BOUNDARY_GUIDE.md runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md PROGRESS_BRANCH.md scripts/exp_meta_config_grid.py src/opt_agent/dataset/versioning.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+   285	3. **A(s) 是否可能恒非正？** 对照 P3（前提是逐态、匹配延续的一步
+   286	   模型）与 P2（D 是固定 ρ 与 U 下的一步上界）：若该动作位对最优
+   287	   常动作的逐态优势非正，一步模型下任何路由/学习设计在该基准问题集上
+   288	   必输——动作位整体无价值时，先做 D(family) 筛选（P2）再谈学习。
+   289	   本关是**筛选性检验**（结论须带不确定度陈述），不是闭环定论；
+   290	   价值声明仍需整程闭环评估。
+   291	
+   292	---
+   293	
+   294	## 4. 接口契约（层级结构的成立条件）
+   295	
+   296	1. **元动作只在 episode 边界触发。** 配置在 episode 启动前确定，
+   297	   运行中不可变更。"更换模型" = 终止当前 episode + 以新配置启动新
+   298	   episode（option 切换，非运行中变异）。
+   299	2. **观测数据可在 episode 间复用（warm start）。** 观测 {(x,y)} 是黑盒
+   300	   真值记录，不依附模型；重启时全量带入，新 episode 对全部数据
+   301	   重新拟合，内部自洽，且避免浪费昂贵评估。定理适用性注意：带入的
+   302	   数据是**自适应选择**的（非 i.i.d. 设计），预算记账需包含初始数据，
+   303	   且所引定理须对容许初始历史一致成立——"照常适用"要按这些条件
+   304	   逐条核对，不是自动继承。
+   305	3. **元层反馈是 outcome 级**，故元层是 bandit over configurations
+   306	   （严格说是有状态、跨臂共享观测、受剩余预算约束的非平稳 bandit，
+   307	   其估计量按实际的历史/预算模型陈述），分析不依赖 BO 收敛定理——
+   308	   这是 C 类动作外置的主要好处。
+   309	4. **P2/P3 层级不变。** 元层优势函数 A(s) = "换配置 vs 继续跑"的
+   310	   净优势，同样可能恒非正（问题签名区分度不足时）；筛选工具箱
+   311	   在两层原样复用。
+   312	5. **Harness 版本冻结。** 同一版本内，观测格式、动作菜单、标签管线
+   313	   一致；数据带版本戳。机制（round-2 落地）：`dataset/versioning.py`
+   314	   定义 HARNESS_VERSION / UTILITY_VERSION，generator 经 `stamp_metadata`
+   315	   为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
+   316	   分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
+   317	   **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+   318	   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+   319	   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+   320	   显式豁免）；`iter_jsonl` 为无校验的原始访问，仅限单一冻结工件的
+   321	   回放分析。任何 A/S 类修改**必须**递增对应戳
+   322	   并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
+   323	   走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
+   324	   轨迹库跨版本不可比，RF/微调吸收污染。
+   325	
+   465	  always-LLM 三族显著落败——与一步模型下 A(s)≤0 的前提**一致**
+   466	  （聚合结果不建立逐态前提，后者未测；见 THEORY P3）。rich-state
+   467	  实验（exp/lenz-state-jev-presentation）**已完成**，结论为否：更充分
+   468	  的状态未改变 gold-argmax 一致率（0.133 两态持平），token 成本
+   469	  2.1×（n=30 单模型 A/B，caveats 见 `runs/EXP_LENZ_JEV_REPORT.md`）。
+   470	  **LLM 进系统的前提是其逐态优势被证实非负**，否则按 P3
+   471	  （一步模型内）只能输。
+   472	
+   473	### 6.6 监督定义组件（S 类）
+   474	
+   475	以下组件改变标签但不改变任何动作/状态定义，此前未被分类学覆盖、
+   476	缺少修改规程（round-1 评审 D1）：utility 权重与尺度（`UtilityWeights`）、
+   477	反事实延续策略、rollout 视程、gold 温度 T、动作子集配额（quota
+   478	k<8）、rollout 复制数（teacher 噪声控制）。
+   479	
+   480	规程（**必须**遵守）：
+   481	
+   482	1. 任何 S 类修改 = `UTILITY_VERSION` 递增（`dataset/versioning.py`，
+   483	   旧值登记 `_KNOWN_PAST`；generator 经 `stamp_metadata` 自动盖戳）
+   484	   + 新旧版本**同数据** A/B + P1 等变复查（按 §3.4 第 2 项修正后
+   485	   的口径）。修改若同时触及观测格式/动作菜单，则同时递增
+   486	   `HARNESS_VERSION`。
+   487	2. S 类修改**禁止**与动作/特征修改混入同一版本（归因隔离）。
+   488	3. 标签信噪比是 S 类预算的一部分：新监督源**必须**报告可负担
+   489	   复制数下的 flip 率（参照 journal-round P1 实测链：单次 rollout
+   490	   标签 flip 0.74 → R=5 复制平均后 0.37——仍高，复制数与可接受
+   491	   flip 率须显式声明）；终止阈值见 §5.5 第 1 条。
+   492	
+   493	完整规程（round-3 形式化，取代占位）：
+   494	
+   495	4. **可靠性检查**：新标签源必须报告预宣告估计量下的 flip 率
+   496	   （2v2 split-half，指定复制预算）与标签方差；准入阈值由 §5.5.1
+   497	   承载。
+   498	5. **不变性检查**：P1 等变复查按 §3.4 第 2 项口径执行——对每个非零
+   499	   目标依赖项写出变换方程并验证整体仿射不变；抽查手段为仿射重缩放
+   500	   重放（Gate 5 机制）。
+   501	6. **结果对齐检查**：新标签与终端结果的秩相关（对齐教师式度量）
+   502	   必须报告；与现有 U(a,s) 的偏离超过预宣告阈值时，要求同数据
+   503	   平行 A/B 解读，禁止静默替换。
+   504	
+   505	自动化现状：加载边界版本策略已落地（`dataset/decision_record.read_jsonl`
+    60	
+    61	  - CONDITIONALITY_DETECTED iff slope-homogeneity p < 0.05.
+    62	  - FUTILE iff not detected AND every family's best-vs-reference CI
+    63	    half-width < 0.25 sd (precise null).
+    64	  - Otherwise INCONCLUSIVE.
+    65	"""
+    66	from __future__ import annotations
+    67	
+    68	import argparse
+    69	import json
+    70	import math
+    71	import random
+    72	import statistics
+    73	import sys
+    74	import time
+    75	from pathlib import Path
+    76	
+    77	ROOT = Path(__file__).resolve().parents[1]
+    78	sys.path.insert(0, str(ROOT / "src"))
+    79	
+    80	from scipy import stats as scipy_stats
+    81	
+    82	from opt_agent.actions import candidate_actions_for_state
+    83	from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
+    84	from opt_agent.loop.decision_loop import DecisionLoop
+    85	
+    86	LEVELS = [5, 8, 12, 18]
+    87	REFERENCE = 5
+    88	MISE = 0.25          # minimal-interesting standardized effect
+    89	MDD_FACTOR = 2.80    # ~80% power, two-sided alpha=.05
+    90	MECH_SIGN = {"Rastrigin": +1, "Ackley": +1,
+    91	             "Branin": -1, "Hartmann": -1, "SixHumpCamel": -1}
+    92	
+    93	
+    94	def _worker_init() -> None:
+    95	    import torch
+    96	
+    97	    torch.set_num_threads(1)
+    98	
+    99	
+   100	class AlwaysSurrogatePolicy:
+   101	    def __init__(self, seed: int = 0) -> None:
+   102	        self.seed = seed
+   103	
+   104	    def select_action(self, state, backend=None):
+   105	        choices = candidate_actions_for_state(state, seed=self.seed)
+   106	        if "surrogate_acquisition" in choices:
+   107	            return choices["surrogate_acquisition"]
+   108	        return next(iter(choices.values()))
+   109	
+   110	
+   111	def run_one_trajectory(family: str, n_init: int, budget: int, seed: int) -> dict:
+   112	    backend = BocodeBotorchBackend()
+   113	    backend.initialize(BackendConfig(problem_id=family, seed=seed, n_init=n_init))
+   114	    loop = DecisionLoop(backend, total_budget=budget)
+   115	    loop.run(AlwaysSurrogatePolicy(seed=0), max_rounds=budget + 5)
+   116	    history = backend.get_history()
+   117	    return {
+   118	        "family": family, "seed": seed, "n_init": n_init,
+   119	        "best": float(history.objectives[:, 0].max().item()),
+   120	        "n_evals": len(history),
+   121	        "dimension": int(history.X.shape[1]),
+   122	        "termination": (loop.termination_reason.value
+   123	                        if loop.termination_reason else None),
+   124	    }
+   125	
+   126	
+   127	def paired_bootstrap_ci(diffs: list[float], n_boot: int, seed: int = 0) -> list[float]:
+   128	    rng = random.Random(seed)
+   129	    n = len(diffs)
+   130	    means = sorted(statistics.fmean(
+   131	        [diffs[rng.randrange(n)] for _ in range(n)]) for _ in range(n_boot))
+   132	    return [means[int(0.025 * n_boot)], means[int(0.975 * n_boot) - 1]]
+   133	
+   134	
+   135	def ols_slope(xs: list[float], ys: list[float]) -> float:
+   136	    mx, my = statistics.fmean(xs), statistics.fmean(ys)
+   137	    num = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+   138	    den = sum((x - mx) ** 2 for x in xs)
+   139	    return num / den if den else float("nan")
+   140	
+   141	
+   142	def analyze_contrast(diffs: list[float], n_boot: int,
+   143	                     disc_idx: list[int], conf_idx: list[int]) -> dict:
+   144	    n = len(diffs)
+   145	    mean = statistics.fmean(diffs)
+   146	    sd = statistics.stdev(diffs)
+   147	    se = sd / math.sqrt(n)
+   148	    ci = paired_bootstrap_ci(diffs, n_boot)
+   149	    t_stat = mean / se if se > 0 else float("nan")
+   150	    p_t = (2.0 * (1.0 - scipy_stats.t.cdf(abs(t_stat), df=n - 1))
+   151	           if se > 0 else float("nan"))
+   152	
+   153	    def half(idxs: list[int]) -> dict:
+   154	        d = [diffs[i] for i in idxs]
+   155	        m = statistics.fmean(d)
+   156	        s = statistics.stdev(d)
+   157	        c = paired_bootstrap_ci(d, max(1000, n_boot // 2), seed=1)
+   158	        return {"mean": m, "sd": s, "ci95": c,
+   159	                "ci_excludes_zero": (c[0] > 0) or (c[1] < 0)}
+   160	
+   161	    disc, conf = half(disc_idx), half(conf_idx)
+   162	    return {
+   163	        "n_pairs": n, "mean": mean, "sd": sd, "se": se,
+   164	        "ci95": ci, "ci_excludes_zero": (ci[0] > 0) or (ci[1] < 0),
+   165	        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+   166	        "paired_t": {"t": t_stat, "df": n - 1, "p_two_sided": p_t},
+   167	        "cohens_dz": mean / sd if sd > 0 else float("nan"),
+   168	        "mdd80": MDD_FACTOR * se,
+   169	        # Equivalence bound (codex round-3 E2): a precise null requires the
+   170	        # CI to lie ENTIRELY within +/- MISE*sd, not merely to be narrow
+   171	        # (a narrow CI centered on a large effect is not a null).
+   172	        "precise_enough_for_null": (ci[0] > -MISE * sd and ci[1] < MISE * sd)
+   173	        if sd > 0 else False,
+   174	        "discovery_half": disc, "confirmation_half": conf,
+   175	        "confirmed": (disc["mean"] > 0) == (conf["mean"] > 0)
+   176	                     and conf["ci_excludes_zero"],
+   177	    }
+   178	
+   179	
+   180	def homogeneity(means: dict[str, float], variances: dict[str, float]) -> dict:
+   181	    ms, vs = list(means.values()), list(variances.values())
+   182	    fixed = (sum(m / v for m, v in zip(ms, vs))
+   183	             / sum(1.0 / v for v in vs))
+   184	    chi2 = sum((m - fixed) ** 2 / v for m, v in zip(ms, vs))
+   185	    df = len(ms) - 1
+   186	    return {"statistic": chi2, "df": df,
+   187	            "p_value": 1.0 - scipy_stats.chi2.cdf(chi2, df=df),
+   188	            "pooled": fixed,
+   189	            "i2": max(0.0, (chi2 - df) / chi2) if chi2 > 0 else 0.0}
+   190	
+   191	
+   192	def main() -> int:
+   193	    parser = argparse.ArgumentParser()
+   194	    parser.add_argument("--families", nargs="+",
+   195	                        default=["Branin", "Hartmann", "Ackley",
+   196	                                 "SixHumpCamel", "Rastrigin"])
+   197	    parser.add_argument("--seeds", type=int, default=60)
+   198	    parser.add_argument("--budget", type=int, default=30)
+   199	    parser.add_argument("--workers", type=int, default=24)
+   200	    parser.add_argument("--n-boot", type=int, default=5000)
+src/opt_agent/dataset/versioning.py:127:    pooling_note: str = "",
+src/opt_agent/dataset/versioning.py:136:    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+src/opt_agent/dataset/versioning.py:147:        if not pooling_note.strip():
+src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+src/opt_agent/dataset/versioning.py:153:            {"source": source, "note": pooling_note})
+src/opt_agent/dataset/versioning.py:165:                   f"a pooling_note to record that decision")
+scripts/exp_meta_config_grid.py:62:  - FUTILE iff not detected AND every family's best-vs-reference CI
+scripts/exp_meta_config_grid.py:63:    half-width < 0.25 sd (precise null).
+scripts/exp_meta_config_grid.py:89:MDD_FACTOR = 2.80    # ~80% power, two-sided alpha=.05
+scripts/exp_meta_config_grid.py:165:        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+scripts/exp_meta_config_grid.py:361:        verdict = "FUTILE"
+PROGRESS_BRANCH.md:636:  the standardized estimand, see section 22/23): chi^2_4 = 30.87,
+PROGRESS_BRANCH.md:637:  p < 1e-4, I^2 = 87% -> CONDITIONALITY_
+PROGRESS_BRANCH.md:719:  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
+PROGRESS_BRANCH.md:753:  the primary homogeneity now uses these SEs — chi^2_4 = 20.06,
+PROGRESS_BRANCH.md:754:  p = 5e-4, I^2 = 80% (matches codex's jackknife Q~20.8 / p~3.5e-4;
+PROGRESS_BRANCH.md:761:  pool_legacy=True now REQUIRES a pooling_note and records the decision
+PROGRESS_BRANCH.md:769:  (20.06 / 5e-4 / 80%) with the raw-unit version labeled secondary and
+runs/EXP_META_CONFIG_GRID.md:17:**配置条件性被检出**：χ²₄ = 20.06，p = 5×10⁻⁴，I² = 80%（原始单位
+runs/EXP_META_CONFIG_GRID.md:18:斜率的次要版本：χ²₄ = 30.87，同判）。结构为：三个光滑族的负斜率逐族
+runs/EXP_META_CONFIG_GRID.md:75:档位预测（描述性）。预宣告判定：检出 ⇔ 主检验 p < 0.05；FUTILE ⇔
+runs/EXP_META_CONFIG_GRID.md:96:χ²₄ = 20.06，**p = 5×10⁻⁴**，I² = 0.80，合并标准化斜率 −0.140。
+runs/EXP_META_CONFIG_GRID.md:98:χ²₄ = 30.87，I² = 0.87。**判定：CONDITIONALITY_DETECTED。**
+runs/EXP_META_CONFIG_GRID.md:122:   检出（联合 bootstrap SE 下 p = 5×10⁻⁴，I² = 80%）。初始设计规模
+docs/RESEARCH_BOUNDARY_GUIDE.md:317:   **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+docs/RESEARCH_BOUNDARY_GUIDE.md:318:   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+docs/RESEARCH_BOUNDARY_GUIDE.md:319:   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+docs/RESEARCH_BOUNDARY_GUIDE.md:354:  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+docs/RESEARCH_BOUNDARY_GUIDE.md:355:  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+docs/RESEARCH_BOUNDARY_GUIDE.md:409:4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+docs/RESEARCH_BOUNDARY_GUIDE.md:413:   不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+docs/RESEARCH_BOUNDARY_GUIDE.md:588:| legacy / mismatch | stamp statuses | `check_record_versions` 的分类：legacy = 旧值或缺戳（可读、禁止与当前版本静默混池）；mismatch = 未知值（拒绝混池） |
+docs/RESEARCH_BOUNDARY_GUIDE.md:625:   DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
+docs/RESEARCH_BOUNDARY_GUIDE.md:626:  I² = 80%，联合 bootstrap SE）；并撤回
+docs/RESEARCH_BOUNDARY_GUIDE.md:642:   legacy 告警提示禁止静默混池，mismatch 在 strict 下拒绝）；
+docs/RESEARCH_BOUNDARY_GUIDE.md:650:   "一致"；iter_jsonl 文档化为原始访问、混池消费方走 read_jsonl
+docs/RESEARCH_BOUNDARY_GUIDE.md:651:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+docs/RESEARCH_BOUNDARY_GUIDE.md:655:   χ²₄ = 20.06、p = 5×10⁻⁴，判定不变，原始单位版降为次要）；筛选
+runs/EXP_META_CONFIG_SCREEN.md:22:**INCONCLUSIVE**：交互未被检出，且各族 CI 半宽均未达到 0.25·sd 的精确
+runs/EXP_META_CONFIG_SCREEN.md:77:   配对 t、效应量 d_z = Δ̂_f / sd(d_fs)、80% 把握度最小可检差异
+runs/EXP_META_CONFIG_SCREEN.md:84:5. **精确零界（futility）**：CI 半宽 < 0.25·sd_f（宣告的最小有意义
+runs/EXP_META_CONFIG_SCREEN.md:86:6. **预宣告判定**：检出 ⇔ p < 0.05；FUTILE ⇔ 未检出 且 全族精确零；
+runs/EXP_META_CONFIG_SCREEN.md:110:**精度**：无族达到精确零界（CI 半宽 ≈ 0.4–0.7 × 0.25·sd 门槛的
+runs/EXP_META_CONFIG_SCREEN.md:164:  检验力有限——这是 INCONCLUSIVE（而非 FUTILE）的直接原因。
+
+exec
+/bin/bash -lc "nl -ba runs/EXP_META_CONFIG_GRID.md | sed -n '65,85p' && nl -ba scripts/exp_meta_config_grid.py | sed -n '22,67p' && nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '635,665p' && python - <<'PY'
+import json
+for p in ['runs/exp_meta_config_grid.json','runs/exp_meta_config_grid_rastrigin240.json']:
+ d=json.load(open(p))
+ print(p)
+ print('primary',d.get('slope_homogeneity_primary'))
+ print('estimands',d.get('estimands'))
+ print('rules',d.get('predeclared_rules'))
+ print('verdict',d.get('verdict'))
+ for f,r in d['per_family'].items():
+  print(f, {k:r['dose_slope'].get(k) for k in ['std_mean','std_se','std_se_joint_boot','std_ci95_boot']})
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    65	| 端点 | terminal best objective（backend 最大化约定） |
+    66	| 计算量 | 主网格 1200 条轨迹 106.8 s；深采样臂 960 条 32.8 s（24 workers） |
+    67	
+    68	## 4. 方法
+    69	
+    70	与筛选实验相同的推断框架：各族对比的种子级 percentile bootstrap CI
+    71	（5000）、配对 t、d_z、MDD₈₀ = 2.80·se、0.25·sd 精确零界；斜率以
+    72	种子级 OLS 斜率的均值 ± se 进入同质性 Wald χ²（连续 Cochran's Q，
+    73	df = F − 1）；机理符号的精确单侧二项检验；发现区（0–19，主网格按
+    74	种子三等分取 0–19 对齐筛选样本）/ 确认区（20–59）划分；LOFO 最优
+    75	档位预测（描述性）。预宣告判定：检出 ⇔ 主检验 p < 0.05；FUTILE ⇔
+    76	未检出且全族最优-对-参照对比达精确零界；否则 INCONCLUSIVE。
+    77	
+    78	## 5. 结果
+    79	
+    80	**各族水平均值与剂量斜率**（原始单位；per-sd 为斜率按参照档 sd
+    81	标准化的每单位 c 变化）：
+    82	
+    83	| family | d | c 范围 | 水平均值 (L=5/8/12/18) | b_f | per-sd | p_slope | 最优档 |
+    84	|---|---|---|---|---:|---:|---:|---|
+    85	| Branin | 2 | 1.0–3.6 | −0.414 / −0.421 / −0.439 / −0.511 | −0.038 | −1.56 | 0.0023 | 5 |
+    22	  H0_slope : the REFERENCE-STANDARDIZED slopes b_f / sd_ref(f) are equal
+    23	             across families (common dose response — no family x dose
+    24	             interaction). PRIMARY test. Standardization by each family's
+    25	             reference-level sd makes the test invariant to per-family
+    26	             objective rescaling (scale-stable; codex round-3 D1); the SEs
+    27	             come from joint seed resampling so the sd_ref estimation
+    28	             uncertainty is included (codex round-4 B1). Raw-unit slopes
+    29	             are reported secondarily.
+    30	  H0_pair  : Delta_{f,12} identical across families (direct comparability
+    31	             with the screen). SECONDARY.
+    32	  Mechanistic (directional, predeclared): multimodal families (Rastrigin,
+    33	  Ackley) have b_f > 0; smooth families (Branin, Hartmann, SixHumpCamel)
+    34	  have b_f < 0.
+    35	
+    36	Design.
+    37	
+    38	  - LEVELS = {5, 8, 12, 18}; budget 30 evaluations (design + BO) for all
+    39	    levels; pinned AlwaysSurrogate policy; same family + seed -> same
+    40	    scrambled Sobol stream with the prefix property across levels.
+    41	  - Seeds 0..59 (60): seeds 0-19 replicate the screen's sample exactly
+    42	    (nested), 20-59 are NEW — the replication/confirmation split is
+    43	    seeds 0-19 (discovery, prior sample) vs 20-59 (confirmation, fresh).
+    44	  - 5 families x 4 levels x 60 seeds = 1200 trajectories.
+    45	
+    46	Inference.
+    47	
+    48	  1. Per family x level (vs reference): paired mean, seed bootstrap CI,
+    49	     d_z, paired t, MDD_80 = 2.80 se, precision vs 0.25 sd floor.
+    50	  2. Dose slope per family: mean of seed-level OLS slopes, se, t, CI.
+    51	  3. PRIMARY: slope homogeneity Wald chi^2 (continuous Cochran's Q) with
+    52	     df = F-1; heterogeneity I^2.
+    53	  4. SECONDARY: Delta_{f,12} homogeneity chi^2 (the screen's statistic,
+    54	     recomputed at n=60 and on the fresh subset 20-59 alone).
+    55	  5. Mechanistic sign test on b_f (exact one-sided binomial).
+    56	  6. Descriptive: per-family best level; LOFO argmax prediction
+    57	     (majority of other families' best levels, tie -> reference).
+    58	
+    59	Predeclared decision rules.
+    60	
+    61	  - CONDITIONALITY_DETECTED iff slope-homogeneity p < 0.05.
+    62	  - FUTILE iff not detected AND every family's best-vs-reference CI
+    63	    half-width < 0.25 sd (precise null).
+    64	  - Otherwise INCONCLUSIVE.
+    65	"""
+    66	from __future__ import annotations
+    67	
+   635	   `stamp_metadata`/`check_record_versions` + `tests/test_versioning.py`。
+   636	   Round-3 处置（2026-09-29，codex round-2 遗留收尾）：注册表查询
+   637	   API（boundary_class_of/submenu_of）+ factory 联动测试
+   638	   （ALL_CANDIDATE_SPECS ↔ 注册表双向覆盖强制）；同步测试解析器
+   639	   加固（表头 schema、畸形行/重复行/未知动作行报错、子菜单列比对，
+   640	   §2.4 表新增子菜单列）；加载边界版本策略落地（read_jsonl 的
+   641	   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+   642	   legacy 告警提示禁止静默混池，mismatch 在 strict 下拒绝）；
+   643	   §5.5.1 flip 估计量钉死（2v2 split-half，现值 0.359）、§5.5.2
+   644	   成功/终止规则改写（含 MDD₈₀ 把握度与 0.25 sd 效应下限）、§5.5.3
+   645	   成本分母定义、§6.6 完整规程形式化（第 4–6 项）、§0.2 周期重拟合
+   646	   标注为预留未实现、THEORY P3 pointwise 前提措辞修正。余项：§6.6
+   647	   第 4–6 项检查的机械化。
+   648	   Round-3 评审处置（同日，`runs/codex_boundary_round3_review.log`，
+   649	   0 BLOCKER / 9 MAJOR / 4 MINOR，全部处理）：§6.5"签名"措辞改
+   650	   "一致"；iter_jsonl 文档化为原始访问、混池消费方走 read_jsonl
+   651	   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+   652	   §5.5.2 成功改为 CI 下界 > 0、终止改等价界（CI 完整落在
+   653	   ±0.25 sd 内）；§5.5.1 补复制数细节；§4.5 执行边界与规范对齐；
+   654	   网格主检验改为参照标准化斜率（尺度稳定，联合 bootstrap SE 下
+   655	   χ²₄ = 20.06、p = 5×10⁻⁴，判定不变，原始单位版降为次要）；筛选
+   656	   报告 Rastrigin 陈述加撤回
+   657	   标注；解析器恰 4 列/单表/指南必须在场。
+runs/exp_meta_config_grid.json
+primary {'statistic': 20.058712694859675, 'df': 4, 'p_value': 0.00048624600909208393, 'pooled': -0.13956318955231672, 'i2': 0.800585408403349, 'se_method': 'joint seed bootstrap (sd_ref re-estimated per replicate; codex round-4 B1)'}
+estimands {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'}
+rules {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound)', 'otherwise': 'INCONCLUSIVE'}
+verdict CONDITIONALITY_DETECTED
+Branin {'std_mean': -1.5615459715876936, 'std_se': 0.4908205372528658, 'std_se_joint_boot': 1.1389736811551334, 'std_ci95_boot': [-4.9088757735197746, -0.609003914846433]}
+Hartmann {'std_mean': -0.8388845842435582, 'std_se': 0.16652285156423843, 'std_se_joint_boot': 0.2646469524043958, 'std_ci95_boot': [-1.4850428485736096, -0.44237665375984]}
+Ackley {'std_mean': 0.4474561148485066, 'std_se': 0.19935518339376526, 'std_se_joint_boot': 0.23453133041956994, 'std_ci95_boot': [0.0685245901992498, 0.9923039894286408]}
+SixHumpCamel {'std_mean': -0.298072315496402, 'std_se': 0.08378394395083609, 'std_se_joint_boot': 0.14784056653427155, 'std_ci95_boot': [-0.681620811971507, -0.11840350284669036]}
+Rastrigin {'std_mean': 0.39601554771473335, 'std_se': 0.25108444831270693, 'std_se_joint_boot': 0.26440348797618374, 'std_ci95_boot': [-0.08030303343971316, 0.938736319995403]}
+runs/exp_meta_config_grid_rastrigin240.json
+primary {'statistic': 4.3708490235361654e-32, 'df': 0, 'p_value': nan, 'pooled': 0.21027386361421713, 'i2': 1.0, 'se_method': 'joint seed bootstrap (sd_ref re-estimated per replicate; codex round-4 B1)'}
+estimands {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'}
+rules {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound)', 'otherwise': 'INCONCLUSIVE'}
+verdict SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate the predeclared per-family question directly)
+Rastrigin {'std_mean': 0.21027386361421715, 'std_se': 0.12674499502589298, 'std_se_joint_boot': 0.13276002812371246, 'std_ci95_boot': [-0.0374715278528799, 0.484064474560519]}
+
+exec
+/bin/bash -lc "rg -n 'B1|B2|B3|B4|B5|E2a|E2b|MINOR|MAJOR|VERDICT|pooling|parser' runs/codex_boundary_round4_review.log | tail -90 && nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '500,511p' && nl -ba runs/EXP_META_CONFIG_SCREEN.md | sed -n '77,89p;152,168p' && nl -ba tests/test_versioning.py | sed -n '160,245p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+3530:**B2 [MAJOR]** [versioning.py:54](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:54) allows legacy and current records together even under `strict`; a warning does not enforce the guide’s required same-data A/B note. **Fix:** make mixed-version pooling an explicit opt-in decision, separate from permission to read legacy records.
+3532:**B3 [MINOR]** [test_boundary_registry.py:49](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) accepts extra header and row cells, parses only the first matching table, and skips the live-document checks if the guide is absent. The synthetic duplicate, unknown-action, short-row, and bad-header cases are meaningful, but “fail closed” is broader than the parser achieves. **Fix:** require exactly four cells, a single table, and the guide’s presence.
+3538:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+3540:**C2 [MAJOR]** [THEORY P3:157–169](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md:157) says the unmeasured pointwise premise is the “parsimonious reading,” that a schedule result reinforces it, and that P3 predicts outcomes for untested routers. These claims exceed the aggregate sweep. **Fix:** keep the conditional theorem separate from its empirical illustration and remove the untested-router prediction.
+3542:**C3 [MINOR]** [Guide §5.5.1](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:388) pins “2v2, R=5” but does not say that the artifact uses replicas 0–3 and leaves replica 4 unused, or how comparable pairs will be chosen after label redesign. **Fix:** specify both details before using `0.359` as a threshold.
+3548:**D1 [MAJOR]** [Grid script:263](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:263) applies its primary homogeneity test to slopes in different families’ raw objective units. Equality of those slopes changes if one objective is rescaled, so the reported χ² and I² do not test a scale-stable interaction. A read-only recomputation using the artifact’s reference-standardized slopes gives χ²₄≈38.69, p≈8.1×10⁻⁸, so the signal appears robust, but that was not the declared primary test. **Fix:** define a scale-stable primary estimand and report the standardized check as a subsequent analysis.
+3550:**D2 [MAJOR]** [Screen report:16](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:16) and [§6.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:120) still call Rastrigin a confirmed, robust family finding. [PROGRESS §19](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:586) repeats “individually confirmed”; §20 retracts it. **Fix:** mark those earlier statements as historical within-block results and point directly to the failed cross-block replication.
+3552:**D3 [MINOR]** [Grid report §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:159) presents family-specific settings as an immediately usable baseline, although winner selection used the same data and Rastrigin’s effect did not replicate. **Fix:** label it a candidate baseline pending held-out comparison.
+3558:**E1 [MAJOR]** [Guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:312) says mixed legacy data are prohibited from silent pooling and unknown stamps are refused, while the available default loader and policy permit both. **Fix:** align the normative claim with enforced behavior, or make enforcement match the claim.
+3560:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+3564:VERDICT: REVISE
+3571:| A1 fitting contract | ADDRESSED | A2 adaptedness/P3 | PARTIAL | B1 glossary | ADDRESSED |
+3572:| B2 sync scope | ADDRESSED | B3 round-1 count | ADDRESSED | C1 table parser | PARTIAL |
+3578:**A1 [MAJOR]** [Guide §6.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:455) still calls aggregate losses a “signature” of pointwise `A(s)≤0`, undoing the narrower reading in THEORY P3. **Fix:** state that pointwise advantage remains unmeasured.
+3582:**B1 [MAJOR]** [decision_record.py:99](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:99) leaves `iter_jsonl` unchecked and publicly exported; [read_jsonl:115](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:115) defaults to `allow`, while numerous training and analysis scripts still use `iter_jsonl`. They can silently pool mixed versions. **Fix:** document `iter_jsonl` as raw access and route pooling consumers through a checked loader with an explicit policy.
+3584:**B2 [MAJOR]** [versioning.py:54](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:54) allows legacy and current records together even under `strict`; a warning does not enforce the guide’s required same-data A/B note. **Fix:** make mixed-version pooling an explicit opt-in decision, separate from permission to read legacy records.
+3586:**B3 [MINOR]** [test_boundary_registry.py:49](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) accepts extra header and row cells, parses only the first matching table, and skips the live-document checks if the guide is absent. The synthetic duplicate, unknown-action, short-row, and bad-header cases are meaningful, but “fail closed” is broader than the parser achieves. **Fix:** require exactly four cells, a single table, and the guide’s presence.
+3592:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+3594:**C2 [MAJOR]** [THEORY P3:157–169](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md:157) says the unmeasured pointwise premise is the “parsimonious reading,” that a schedule result reinforces it, and that P3 predicts outcomes for untested routers. These claims exceed the aggregate sweep. **Fix:** keep the conditional theorem separate from its empirical illustration and remove the untested-router prediction.
+3596:**C3 [MINOR]** [Guide §5.5.1](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:388) pins “2v2, R=5” but does not say that the artifact uses replicas 0–3 and leaves replica 4 unused, or how comparable pairs will be chosen after label redesign. **Fix:** specify both details before using `0.359` as a threshold.
+3602:**D1 [MAJOR]** [Grid script:263](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:263) applies its primary homogeneity test to slopes in different families’ raw objective units. Equality of those slopes changes if one objective is rescaled, so the reported χ² and I² do not test a scale-stable interaction. A read-only recomputation using the artifact’s reference-standardized slopes gives χ²₄≈38.69, p≈8.1×10⁻⁸, so the signal appears robust, but that was not the declared primary test. **Fix:** define a scale-stable primary estimand and report the standardized check as a subsequent analysis.
+3604:**D2 [MAJOR]** [Screen report:16](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:16) and [§6.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:120) still call Rastrigin a confirmed, robust family finding. [PROGRESS §19](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:586) repeats “individually confirmed”; §20 retracts it. **Fix:** mark those earlier statements as historical within-block results and point directly to the failed cross-block replication.
+3606:**D3 [MINOR]** [Grid report §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:159) presents family-specific settings as an immediately usable baseline, although winner selection used the same data and Rastrigin’s effect did not replicate. **Fix:** label it a candidate baseline pending held-out comparison.
+3612:**E1 [MAJOR]** [Guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:312) says mixed legacy data are prohibited from silent pooling and unknown stamps are refused, while the available default loader and policy permit both. **Fix:** align the normative claim with enforced behavior, or make enforcement match the claim.
+3614:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+3618:VERDICT: REVISE
+3621:/bin/bash -lc "rg -n '"'^'"\\*\\*[A-E][0-9]+ \\[(MAJOR|MINOR|BLOCKER)\\]' runs/codex_boundary_round3_review.log | tail -30; rg -n '"'^VERDICT: REVISE|0 BLOCKER / 9 MAJOR / 4 MINOR|13 new'"' runs/codex_boundary_round3_review.log | tail -15" in /home/lcy/Documents/projects/opt_agent_v3
+3623:9826:**A1 [MAJOR]** [Guide §6.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:455) still calls aggregate losses a “signature” of pointwise `A(s)≤0`, undoing the narrower reading in THEORY P3. **Fix:** state that pointwise advantage remains unmeasured.
+3624:9830:**B1 [MAJOR]** [decision_record.py:99](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:99) leaves `iter_jsonl` unchecked and publicly exported; [read_jsonl:115](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:115) defaults to `allow`, while numerous training and analysis scripts still use `iter_jsonl`. They can silently pool mixed versions. **Fix:** document `iter_jsonl` as raw access and route pooling consumers through a checked loader with an explicit policy.
+3625:9832:**B2 [MAJOR]** [versioning.py:54](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:54) allows legacy and current records together even under `strict`; a warning does not enforce the guide’s required same-data A/B note. **Fix:** make mixed-version pooling an explicit opt-in decision, separate from permission to read legacy records.
+3626:9834:**B3 [MINOR]** [test_boundary_registry.py:49](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) accepts extra header and row cells, parses only the first matching table, and skips the live-document checks if the guide is absent. The synthetic duplicate, unknown-action, short-row, and bad-header cases are meaningful, but “fail closed” is broader than the parser achieves. **Fix:** require exactly four cells, a single table, and the guide’s presence.
+3627:9840:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+3628:9842:**C2 [MAJOR]** [THEORY P3:157–169](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md:157) says the unmeasured pointwise premise is the “parsimonious reading,” that a schedule result reinforces it, and that P3 predicts outcomes for untested routers. These claims exceed the aggregate sweep. **Fix:** keep the conditional theorem separate from its empirical illustration and remove the untested-router prediction.
+3629:9844:**C3 [MINOR]** [Guide §5.5.1](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:388) pins “2v2, R=5” but does not say that the artifact uses replicas 0–3 and leaves replica 4 unused, or how comparable pairs will be chosen after label redesign. **Fix:** specify both details before using `0.359` as a threshold.
+3630:9850:**D1 [MAJOR]** [Grid script:263](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:263) applies its primary homogeneity test to slopes in different families’ raw objective units. Equality of those slopes changes if one objective is rescaled, so the reported χ² and I² do not test a scale-stable interaction. A read-only recomputation using the artifact’s reference-standardized slopes gives χ²₄≈38.69, p≈8.1×10⁻⁸, so the signal appears robust, but that was not the declared primary test. **Fix:** define a scale-stable primary estimand and report the standardized check as a subsequent analysis.
+3631:9852:**D2 [MAJOR]** [Screen report:16](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:16) and [§6.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:120) still call Rastrigin a confirmed, robust family finding. [PROGRESS §19](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:586) repeats “individually confirmed”; §20 retracts it. **Fix:** mark those earlier statements as historical within-block results and point directly to the failed cross-block replication.
+3632:9854:**D3 [MINOR]** [Grid report §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:159) presents family-specific settings as an immediately usable baseline, although winner selection used the same data and Rastrigin’s effect did not replicate. **Fix:** label it a candidate baseline pending held-out comparison.
+3633:9860:**E1 [MAJOR]** [Guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:312) says mixed legacy data are prohibited from silent pooling and unknown stamps are refused, while the available default loader and policy permit both. **Fix:** align the normative claim with enforced behavior, or make enforcement match the claim.
+3634:9862:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+3635:9880:**A1 [MAJOR]** [Guide §6.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:455) still calls aggregate losses a “signature” of pointwise `A(s)≤0`, undoing the narrower reading in THEORY P3. **Fix:** state that pointwise advantage remains unmeasured.
+3636:9884:**B1 [MAJOR]** [decision_record.py:99](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:99) leaves `iter_jsonl` unchecked and publicly exported; [read_jsonl:115](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:115) defaults to `allow`, while numerous training and analysis scripts still use `iter_jsonl`. They can silently pool mixed versions. **Fix:** document `iter_jsonl` as raw access and route pooling consumers through a checked loader with an explicit policy.
+3637:9886:**B2 [MAJOR]** [versioning.py:54](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:54) allows legacy and current records together even under `strict`; a warning does not enforce the guide’s required same-data A/B note. **Fix:** make mixed-version pooling an explicit opt-in decision, separate from permission to read legacy records.
+3638:9888:**B3 [MINOR]** [test_boundary_registry.py:49](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) accepts extra header and row cells, parses only the first matching table, and skips the live-document checks if the guide is absent. The synthetic duplicate, unknown-action, short-row, and bad-header cases are meaningful, but “fail closed” is broader than the parser achieves. **Fix:** require exactly four cells, a single table, and the guide’s presence.
+3639:9894:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+3640:9896:**C2 [MAJOR]** [THEORY P3:157–169](/home/lcy/Documents/projects/opt_agent_v3/docs/THEORY.md:157) says the unmeasured pointwise premise is the “parsimonious reading,” that a schedule result reinforces it, and that P3 predicts outcomes for untested routers. These claims exceed the aggregate sweep. **Fix:** keep the conditional theorem separate from its empirical illustration and remove the untested-router prediction.
+3641:9898:**C3 [MINOR]** [Guide §5.5.1](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:388) pins “2v2, R=5” but does not say that the artifact uses replicas 0–3 and leaves replica 4 unused, or how comparable pairs will be chosen after label redesign. **Fix:** specify both details before using `0.359` as a threshold.
+3642:9904:**D1 [MAJOR]** [Grid script:263](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:263) applies its primary homogeneity test to slopes in different families’ raw objective units. Equality of those slopes changes if one objective is rescaled, so the reported χ² and I² do not test a scale-stable interaction. A read-only recomputation using the artifact’s reference-standardized slopes gives χ²₄≈38.69, p≈8.1×10⁻⁸, so the signal appears robust, but that was not the declared primary test. **Fix:** define a scale-stable primary estimand and report the standardized check as a subsequent analysis.
+3643:9906:**D2 [MAJOR]** [Screen report:16](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:16) and [§6.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:120) still call Rastrigin a confirmed, robust family finding. [PROGRESS §19](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:586) repeats “individually confirmed”; §20 retracts it. **Fix:** mark those earlier statements as historical within-block results and point directly to the failed cross-block replication.
+3644:9908:**D3 [MINOR]** [Grid report §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:159) presents family-specific settings as an immediately usable baseline, although winner selection used the same data and Rastrigin’s effect did not replicate. **Fix:** label it a candidate baseline pending held-out comparison.
+3645:9914:**E1 [MAJOR]** [Guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:312) says mixed legacy data are prohibited from silent pooling and unknown stamps are refused, while the available default loader and policy permit both. **Fix:** align the normative claim with enforced behavior, or make enforcement match the claim.
+3646:9916:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+3647:4952:VERDICT: REVISE
+3648:5010:VERDICT: REVISE
+3649:5631:VERDICT: REVISE
+3650:5689:VERDICT: REVISE
+3651:9866:VERDICT: REVISE
+3652:9920:VERDICT: REVISE
+3655:The prior round-3 log names 12 finding IDs, despite the stated count of 13. Its E2 finding contains two separate requirements, so I’ll report those as E2a and E2b. The saved grid JSON confirms 38.69 and 0.90, but its embedded estimand and futility descriptions still describe the old rules.
+3728:| B1 | PARTIAL | `iter_jsonl` is documented as raw access, but training consumers still use it; `train_system1_compare` calls `read_jsonl` with its unchecked default. |
+3729:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+3730:| B3 | PARTIAL | Live table has four cells per row; the parser still accepts extra header cells and can miss a second table with a different header. |
+3737:| E1 | PARTIAL | §4.5 states the boundary, but unchecked loading remains possible in pooling consumers. |
+3738:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+3739:| E2b — all contrasts | UNADDRESSED | FUTILE still checks only each family’s selected best-versus-reference contrast and skips a family when reference wins. |
+3743:The live §2.4 table matches the parser’s four-column shape by inspection. The saved grid artifact contains **38.69 / 0.90**; **30.87 / 0.87** is the raw-unit secondary result. The following issues prevent a PASS:
+3747:| MAJOR | [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:241): the primary test treats estimated `sd_ref` as fixed when computing slope SEs. A read-only jackknife from saved trajectories gives exploratory Q≈20.8, p≈3.5×10⁻⁴, versus reported Q=38.69, p≈8.1×10⁻⁸. | Include reference-SD uncertainty through joint seed resampling or a suitable variance estimate, then refresh the statistic and reports. |
+3748:| MAJOR | [training call](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_system1_compare.py:74) uses `read_jsonl`’s `"allow"` default; [another training consumer](/home/lcy/Documents/projects/opt_agent_v3/scripts/phase9_baselines.py:180) still uses unchecked `iter_jsonl`. | Give every pooling consumer an explicit enforcing policy and migrate remaining training and labeling paths. |
+3749:| MAJOR | [pooling check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:135) sees one file and coarse status values: two separately loaded files, or two different known-past stamps, can still be combined silently; the boolean opt-in does not store an A/B note. | Check raw stamps across the complete combined pool and record the stated exception. |
+3750:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+3751:| MAJOR | [grid null](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:46), [grid interpretation](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:119), [PROGRESS §20](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:635), and [JSON payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:348) retain raw-slope primary wording or 87% I². | State the standardized null and corrected primary numbers throughout; label 30.87/0.87 secondary. |
+3752:| MINOR | [grid §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:162) still recommends an immediately usable baseline; [screen §6.3](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:128) leaves a Rastrigin significance statement unqualified. | Mark the baseline as a held-out candidate and the screen statement as a retracted within-block result. |
+3753:| MINOR | [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) counts only matching headers and checks only the first four header cells. | Require exactly four header cells and detect any second table in §2.4. |
+3754:| MINOR | [guide §5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:377) still describes closed-loop success as a CI excluding zero, which admits a negative result despite §5.5.2. | Say the CI lower bound must exceed zero. |
+3760:VERDICT: REVISE
+3770:| B1 | PARTIAL | `iter_jsonl` is documented as raw access, but training consumers still use it; `train_system1_compare` calls `read_jsonl` with its unchecked default. |
+3771:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+3772:| B3 | PARTIAL | Live table has four cells per row; the parser still accepts extra header cells and can miss a second table with a different header. |
+3779:| E1 | PARTIAL | §4.5 states the boundary, but unchecked loading remains possible in pooling consumers. |
+3780:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+3781:| E2b — all contrasts | UNADDRESSED | FUTILE still checks only each family’s selected best-versus-reference contrast and skips a family when reference wins. |
+3785:The live §2.4 table matches the parser’s four-column shape by inspection. The saved grid artifact contains **38.69 / 0.90**; **30.87 / 0.87** is the raw-unit secondary result. The following issues prevent a PASS:
+3789:| MAJOR | [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:241): the primary test treats estimated `sd_ref` as fixed when computing slope SEs. A read-only jackknife from saved trajectories gives exploratory Q≈20.8, p≈3.5×10⁻⁴, versus reported Q=38.69, p≈8.1×10⁻⁸. | Include reference-SD uncertainty through joint seed resampling or a suitable variance estimate, then refresh the statistic and reports. |
+3790:| MAJOR | [training call](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_system1_compare.py:74) uses `read_jsonl`’s `"allow"` default; [another training consumer](/home/lcy/Documents/projects/opt_agent_v3/scripts/phase9_baselines.py:180) still uses unchecked `iter_jsonl`. | Give every pooling consumer an explicit enforcing policy and migrate remaining training and labeling paths. |
+3791:| MAJOR | [pooling check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:135) sees one file and coarse status values: two separately loaded files, or two different known-past stamps, can still be combined silently; the boolean opt-in does not store an A/B note. | Check raw stamps across the complete combined pool and record the stated exception. |
+3792:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+3793:| MAJOR | [grid null](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:46), [grid interpretation](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:119), [PROGRESS §20](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:635), and [JSON payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:348) retain raw-slope primary wording or 87% I². | State the standardized null and corrected primary numbers throughout; label 30.87/0.87 secondary. |
+3794:| MINOR | [grid §8.2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:162) still recommends an immediately usable baseline; [screen §6.3](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:128) leaves a Rastrigin significance statement unqualified. | Mark the baseline as a held-out candidate and the screen statement as a retracted within-block result. |
+3795:| MINOR | [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:49) counts only matching headers and checks only the first four header cells. | Require exactly four header cells and detect any second table in §2.4. |
+3796:| MINOR | [guide §5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:377) still describes closed-loop success as a CI excluding zero, which admits a negative result despite §5.5.2. | Say the CI lower bound must exceed zero. |
+3802:VERDICT: REVISE
+   500	   重放（Gate 5 机制）。
+   501	6. **结果对齐检查**：新标签与终端结果的秩相关（对齐教师式度量）
+   502	   必须报告；与现有 U(a,s) 的偏离超过预宣告阈值时，要求同数据
+   503	   平行 A/B 解读，禁止静默替换。
+   504	
+   505	自动化现状：加载边界版本策略已落地（`dataset/decision_record.read_jsonl`
+   506	的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+   507	第 4–6 项检查目前按人工纪律执行，机械化属 §10.5 余项。
+   508	
+   509	---
+   510	
+   511	## 7. 文献锚点对照（主张 → 来源映射；✓ = `docs/ref_papers/pdfs/` 有本地全文，✗ = 仅按引文格式引用）
+    77	   配对 t、效应量 d_z = Δ̂_f / sd(d_fs)、80% 把握度最小可检差异
+    78	   MDD_f ≈ 2.80·se_f。
+    79	2. **交互（主检验）**：同质性 Wald 检验 X² = Σ_f (Δ̂_f − Δ̂_w)²/Var(Δ̂_f)
+    80	   （逆方差加权共同均值），参照 χ²_{F−1}——连续版 Cochran's Q，容受
+    81	   族间尺度异质性。异质性份额 I² = max(0, (X²−df)/X²)。
+    82	3. **个体确认**：发现/确认半区符号一致 且 确认半区 CI 排零。
+    83	4. **机理符号检验**：5 个预宣告方向符号的一致数 k，精确单侧二项 p。
+    84	5. **精确零界（futility）**：CI 半宽 < 0.25·sd_f（宣告的最小有意义
+    85	   标准化效应）视为"精确零"。
+    86	6. **预宣告判定**：检出 ⇔ p < 0.05；FUTILE ⇔ 未检出 且 全族精确零；
+    87	   否则 INCONCLUSIVE。meta-D 与 LOFO 不进入规则。
+    88	
+    89	## 5. 结果
+   152	评审 D1 指出）。替换为标准同质性检验后判定降为 INCONCLUSIVE；数值
+   153	本身（族级 Δ̂、CI）不变。首版报告中"赢家身份 3:2 分裂 ⇒ 条件性
+   154	存在"的推理同样被降级为描述量。此更正在同日完成，未影响任何下游
+   155	决策。
+   156	
+   157	## 8. 局限
+   158	
+   159	- 单轴（n_init）× 两档；两档在多数族上位于启发式同侧。
+   160	- 内层策略固定为 AlwaysSurrogate：配置效应在该策略下度量，策略 × 配置
+   161	  交互未测。
+   162	- 基准问题集共 5 族，维度与族绑定（混杂）：无法区分"族效应"与"维度效应"。
+   163	- 20 种子/族；除 Branin 外各族 MDD₈₀ 均大于观测 |Δ̂| 的一半以上，
+   164	  检验力有限——这是 INCONCLUSIVE（而非 FUTILE）的直接原因。
+   165	- 配对 t 与 bootstrap CI 假设种子级独立同分布；Sobol 嵌套配对控制了
+   166	  设计点流但未控制 GP 拟合的随机性来源（同 seed 下一致）。
+   167	
+   168	## 9. 复现
+   160	                           "utility_version": ver.UTILITY_VERSION}),
+   161	        # mismatch: future utility stamp
+   162	        _make_record_line({"harness_version": ver.HARNESS_VERSION,
+   163	                           "utility_version": "phase99.z"}),
+   164	    ]
+   165	    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+   166	
+   167	    # allow: historical behavior, no enforcement
+   168	    assert len(read_jsonl(path)) == 3
+   169	
+   170	    # warn: legacy summarized once, mismatch warned, still readable
+   171	    with _w.catch_warnings(record=True) as caught:
+   172	        _w.simplefilter("always")
+   173	        records = read_jsonl(path, version_policy="warn")
+   174	    assert len(records) == 3
+   175	    assert any("legacy" in str(w.message) for w in caught)
+   176	    assert any("phase99.z" in str(w.message) for w in caught)
+   177	
+   178	    # strict: mismatch raises
+   179	    import pytest as _pytest
+   180	    from opt_agent.dataset.versioning import VersionPolicyError
+   181	    with _pytest.raises(VersionPolicyError):
+   182	        read_jsonl(path, version_policy="strict")
+   183	
+   184	
+   185	def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
+   186	    """A source mixing legacy and current stamps must not pool silently:
+   187	    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+   188	    import warnings as _w
+   189	
+   190	    import opt_agent.dataset.versioning as ver
+   191	    from opt_agent.dataset.decision_record import read_jsonl
+   192	
+   193	    monkeypatch.setattr(ver, "_legacy_warned", set())
+   194	    path = tmp_path / "mixed_pool.jsonl"
+   195	    lines = [
+   196	        _make_record_line({"utility_version": ver.UTILITY_VERSION}),  # legacy
+   197	        _make_record_line({"harness_version": ver.HARNESS_VERSION,
+   198	                           "utility_version": ver.UTILITY_VERSION}),  # current
+   199	    ]
+   200	    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+   201	
+   202	    with _w.catch_warnings(record=True) as caught:
+   203	        _w.simplefilter("always")
+   204	        read_jsonl(path, version_policy="warn")
+   205	    assert any("mixes" in str(w.message) for w in caught)
+   206	
+   207	    import pytest as _pytest
+   208	    from opt_agent.dataset.versioning import VersionPolicyError
+   209	    with _pytest.raises(VersionPolicyError):
+   210	        read_jsonl(path, version_policy="strict")
+   211	    # explicit opt-in REQUIRES a note; without it, strict raises
+   212	    with _pytest.raises(VersionPolicyError):
+   213	        read_jsonl(path, version_policy="strict", pool_legacy=True)
+   214	    # with a note, the decision is recorded and readable
+   215	    ver._recorded_pooling_decisions.clear()
+   216	    with _w.catch_warnings(record=True) as caught:
+   217	        _w.simplefilter("always")
+   218	        records = read_jsonl(path, version_policy="strict",
+   219	                             pool_legacy=True,
+   220	                             pooling_note="A/B: same seeds, utility v2")
+   221	    assert len(records) == 2
+   222	    assert not any("mixes" in str(w.message) for w in caught)
+   223	    decisions = ver.pooling_decisions()
+   224	    assert len(decisions) == 1
+   225	    assert "A/B" in decisions[0]["note"]
+
+codex
+The saved primary result matches the report: χ²₄ = 20.0587, p = 0.000486, and I² = 0.8006. I found older rule wording in the grid script and report, and I’m checking how much it conflicts with the executable rule.
+exec
+/bin/bash -lc "rg -n 'best.vs.reference|best-vs-reference|最优.对.参照|half.width|半宽|b_f identical|b_f / sd_ref|斜率的均值|Wald|38\\.69|30\\.87|20\\.06|I.?=.?87|I.?=.?90' scripts/exp_meta_config_grid.py runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md docs/RESEARCH_BOUNDARY_GUIDE.md PROGRESS_BRANCH.md runs/exp_meta_config_grid.json runs/exp_meta_config_grid_rastrigin240.json | head -145 && rg -n 'read_jsonl\\(|iter_jsonl\\(' scripts src | head -160 && rg -n 'pool_legacy|pooling_decisions|pooling_note' . --glob '"'!runs/codex_boundary_round*.log'"' --glob '"'!runs/exp_meta_config_grid*.json'"' --glob '"'!.git/**'"' | head -120" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+PROGRESS_BRANCH.md:584:   predeclared in the script. PRIMARY test = homogeneity Wald χ² on
+PROGRESS_BRANCH.md:633:PRIMARY test = slope homogeneity (Wald chi^2, Cochran's-Q form).
+PROGRESS_BRANCH.md:636:  the standardized estimand, see section 22/23): chi^2_4 = 30.87,
+PROGRESS_BRANCH.md:719:  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
+PROGRESS_BRANCH.md:753:  the primary homogeneity now uses these SEs — chi^2_4 = 20.06,
+PROGRESS_BRANCH.md:769:  (20.06 / 5e-4 / 80%) with the raw-unit version labeled secondary and
+runs/exp_meta_config_grid_rastrigin240.json:7:    "primary_null": "b_f identical across families (no family x dose interaction)"
+runs/exp_meta_config_grid_rastrigin240.json:298:          "ci_half_width": 2.188799440260269,
+runs/exp_meta_config_grid_rastrigin240.json:337:          "ci_half_width": 2.366071624595413,
+runs/exp_meta_config_grid_rastrigin240.json:376:          "ci_half_width": 2.6464025660705817,
+runs/exp_meta_config_grid_rastrigin240.json:432:      "best_vs_reference": {
+runs/exp_meta_config_grid_rastrigin240.json:442:        "ci_half_width": 2.6464025660705817,
+runs/EXP_META_CONFIG_SCREEN.md:15:同质性 Wald 检验——得 χ²₄ = 8.71，**p = 0.069**，未在 α = 0.05 下检出
+runs/EXP_META_CONFIG_SCREEN.md:22:**INCONCLUSIVE**：交互未被检出，且各族 CI 半宽均未达到 0.25·sd 的精确
+runs/EXP_META_CONFIG_SCREEN.md:79:2. **交互（主检验）**：同质性 Wald 检验 X² = Σ_f (Δ̂_f − Δ̂_w)²/Var(Δ̂_f)
+runs/EXP_META_CONFIG_SCREEN.md:84:5. **精确零界（futility）**：CI 半宽 < 0.25·sd_f（宣告的最小有意义
+runs/EXP_META_CONFIG_SCREEN.md:110:**精度**：无族达到精确零界（CI 半宽 ≈ 0.4–0.7 × 0.25·sd 门槛的
+docs/RESEARCH_BOUNDARY_GUIDE.md:354:  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+docs/RESEARCH_BOUNDARY_GUIDE.md:355:  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+docs/RESEARCH_BOUNDARY_GUIDE.md:619:   同质性 Wald χ²，meta-D 降为描述量）→ **INCONCLUSIVE**（χ²₄ = 8.71、
+docs/RESEARCH_BOUNDARY_GUIDE.md:625:   DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
+docs/RESEARCH_BOUNDARY_GUIDE.md:655:   χ²₄ = 20.06、p = 5×10⁻⁴，判定不变，原始单位版降为次要）；筛选
+runs/EXP_META_CONFIG_GRID.md:15:中，以各族**参照标准化**剂量-反应斜率（b_f / sd_ref，尺度稳定）的
+runs/EXP_META_CONFIG_GRID.md:17:**配置条件性被检出**：χ²₄ = 20.06，p = 5×10⁻⁴，I² = 80%（原始单位
+runs/EXP_META_CONFIG_GRID.md:18:斜率的次要版本：χ²₄ = 30.87，同判）。结构为：三个光滑族的负斜率逐族
+runs/EXP_META_CONFIG_GRID.md:72:种子级 OLS 斜率的均值 ± se 进入同质性 Wald χ²（连续 Cochran's Q，
+runs/EXP_META_CONFIG_GRID.md:76:未检出且全族最优-对-参照对比达精确零界；否则 INCONCLUSIVE。
+runs/EXP_META_CONFIG_GRID.md:96:χ²₄ = 20.06，**p = 5×10⁻⁴**，I² = 0.80，合并标准化斜率 −0.140。
+runs/EXP_META_CONFIG_GRID.md:98:χ²₄ = 30.87，I² = 0.87。**判定：CONDITIONALITY_DETECTED。**
+scripts/exp_meta_config_grid.py:22:  H0_slope : the REFERENCE-STANDARDIZED slopes b_f / sd_ref(f) are equal
+scripts/exp_meta_config_grid.py:51:  3. PRIMARY: slope homogeneity Wald chi^2 (continuous Cochran's Q) with
+scripts/exp_meta_config_grid.py:62:  - FUTILE iff not detected AND every family's best-vs-reference CI
+scripts/exp_meta_config_grid.py:63:    half-width < 0.25 sd (precise null).
+scripts/exp_meta_config_grid.py:165:        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+scripts/exp_meta_config_grid.py:291:            "best_vs_reference": contrasts.get(best_level)
+scripts/exp_meta_config_grid.py:365:                 if per_family[f]["best_vs_reference"]
+scripts/exp_meta_config_grid.py:366:                 and per_family[f]["best_vs_reference"]["confirmed"]]
+scripts/exp_meta_config_grid.py:376:            "primary_null": "b_f identical across families "
+runs/exp_meta_config_grid.json:7:    "primary_null": "b_f identical across families (no family x dose interaction)"
+runs/exp_meta_config_grid.json:126:          "ci_half_width": 0.008790547212665301,
+runs/exp_meta_config_grid.json:165:          "ci_half_width": 0.021144883387922746,
+runs/exp_meta_config_grid.json:204:          "ci_half_width": 0.059302779007948475,
+runs/exp_meta_config_grid.json:260:      "best_vs_reference": null,
+runs/exp_meta_config_grid.json:287:          "ci_half_width": 0.1372302755514865,
+runs/exp_meta_config_grid.json:326:          "ci_half_width": 0.19627328600138744,
+runs/exp_meta_config_grid.json:365:          "ci_half_width": 0.18199495917319886,
+runs/exp_meta_config_grid.json:421:      "best_vs_reference": null,
+runs/exp_meta_config_grid.json:448:          "ci_half_width": 0.04920449322913389,
+runs/exp_meta_config_grid.json:487:          "ci_half_width": 0.05651307192185149,
+runs/exp_meta_config_grid.json:526:          "ci_half_width": 0.1293179905374365,
+runs/exp_meta_config_grid.json:582:      "best_vs_reference": {
+runs/exp_meta_config_grid.json:592:        "ci_half_width": 0.1293179905374365,
+runs/exp_meta_config_grid.json:647:          "ci_half_width": 0.06283568096283074,
+runs/exp_meta_config_grid.json:686:          "ci_half_width": 0.06751609107471104,
+runs/exp_meta_config_grid.json:725:          "ci_half_width": 0.08121785359556268,
+runs/exp_meta_config_grid.json:781:      "best_vs_reference": null,
+runs/exp_meta_config_grid.json:808:          "ci_half_width": 4.5087090058128485,
+runs/exp_meta_config_grid.json:847:          "ci_half_width": 4.743239720339019,
+runs/exp_meta_config_grid.json:886:          "ci_half_width": 4.871900889767228,
+runs/exp_meta_config_grid.json:942:      "best_vs_reference": {
+runs/exp_meta_config_grid.json:952:        "ci_half_width": 4.871900889767228,
+runs/exp_meta_config_grid.json:5589:      "best": -20.066343897101174,
+runs/exp_meta_config_grid.json:5598:      "best": -20.061112980084705,
+runs/exp_meta_config_grid.json:5922:      "best": -20.066030509924754,
+scripts/exp_rlcd_calibration_ablation.py:144:    records = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+scripts/diagnose_continuation_effect.py:127:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq1_3_rf_probe.py:175:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq1_3_decision_landscape.py:98:    records = list(iter_jsonl(args.dataset))
+scripts/validate_phase8_6b.py:47:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq0_5_prompt_controls.py:40:    for r in iter_jsonl(dataset_path):
+scripts/exp_rq0_5_prompt_controls.py:139:    for r in iter_jsonl(args.dataset):
+scripts/exp_rlcd_router_panel.py:76:        r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+scripts/exp_rq2_1_cross_family_transfer.py:319:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rlcd_loo_transfer.py:123:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/exp_rlcd_loo_transfer.py:160:    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
+scripts/exp_lenz_gate2_probe.py:103:    records = [r for r in iter_jsonl(args.dataset)]
+scripts/sweep_rlcd.py:37:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/diagnose_qs5.py:507:    records = list(iter_jsonl(args.dataset))
+scripts/generate_dataset_longhorizon.py:69:    for rec in iter_jsonl(path):
+scripts/evaluate_no_fit_student.py:225:    records = list(iter_jsonl(args.dataset))
+scripts/train_system1_compare.py:74:    records = read_jsonl(args.input, version_policy="warn")
+scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+src/opt_agent/dataset/analysis.py:92:    for record in iter_jsonl(path):
+scripts/exp_rq2_ioh_closed_loop.py:154:    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+src/opt_agent/dataset/decision_record.py:99:def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+src/opt_agent/dataset/decision_record.py:120:def read_jsonl(
+src/opt_agent/dataset/decision_record.py:136:    records = list(iter_jsonl(path))
+scripts/exp_rq1_rq2_closed_loop.py:244:    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+scripts/verify_theory_propositions.py:119:    records = [r.__dict__ for r in iter_jsonl(DATASET)]
+scripts/phase9_baselines.py:180:    records = read_jsonl(args.dataset, version_policy="warn")
+scripts/exp_teacher_noise_diagnostic.py:169:    records = list(iter_jsonl(args.dataset))
+scripts/ablate_phase8_6d_utility.py:144:    records = [r for r in iter_jsonl(args.dataset) if r.metadata["step"] == 0]
+scripts/analyze_rlcd_ci.py:72:    train_records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) < 16]
+scripts/analyze_rlcd_ci.py:73:    records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) >= 16]
+scripts/exp_lenz_vs_frozen_llm.py:57:    records = [r for r in iter_jsonl(args.dataset)]
+scripts/exp_geartrain_transfer_probe.py:98:    test = list(iter_jsonl(Path("runs/geartrain_h3_10seed.jsonl")))
+scripts/exp_geartrain_transfer_probe.py:99:    train = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))]
+scripts/run_oracle_gate.py:29:    records = list(iter_jsonl(path))
+scripts/exp_rlcd_loo_confirmatory.py:90:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/exp_rlcd_loo_confirmatory.py:162:    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
+scripts/exp_rq1_3_scale_sensitivity.py:273:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq3_router_sweep.py:107:    records = [r.__dict__ for r in iter_jsonl(dataset)]
+./tests/test_versioning.py:187:    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./tests/test_versioning.py:213:        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./tests/test_versioning.py:215:    ver._recorded_pooling_decisions.clear()
+./tests/test_versioning.py:219:                             pool_legacy=True,
+./tests/test_versioning.py:220:                             pooling_note="A/B: same seeds, utility v2")
+./tests/test_versioning.py:223:    decisions = ver.pooling_decisions()
+./PROGRESS_BRANCH.md:729:  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./PROGRESS_BRANCH.md:761:  pool_legacy=True now REQUIRES a pooling_note and records the decision
+./PROGRESS_BRANCH.md:762:  in an audit trail (pooling_decisions()); the one-source boundary
+./src/opt_agent/dataset/versioning.py:113:_recorded_pooling_decisions: list[dict] = []
+./src/opt_agent/dataset/versioning.py:116:def pooling_decisions() -> list[dict]:
+./src/opt_agent/dataset/versioning.py:118:    return list(_recorded_pooling_decisions)
+./src/opt_agent/dataset/versioning.py:126:    pool_legacy: bool = False,
+./src/opt_agent/dataset/versioning.py:127:    pooling_note: str = "",
+./src/opt_agent/dataset/versioning.py:135:    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+./src/opt_agent/dataset/versioning.py:136:    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./src/opt_agent/dataset/versioning.py:137:    the decision in the audit trail (pooling_decisions()), and proceeds.
+./src/opt_agent/dataset/versioning.py:146:    if pool_legacy:
+./src/opt_agent/dataset/versioning.py:147:        if not pooling_note.strip():
+./src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+./src/opt_agent/dataset/versioning.py:152:        _recorded_pooling_decisions.append(
+./src/opt_agent/dataset/versioning.py:153:            {"source": source, "note": pooling_note})
+./src/opt_agent/dataset/versioning.py:164:                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+./src/opt_agent/dataset/versioning.py:165:                   f"a pooling_note to record that decision")
+./src/opt_agent/dataset/decision_record.py:121:    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+./src/opt_agent/dataset/decision_record.py:122:    pooling_note: str = "",
+./src/opt_agent/dataset/decision_record.py:150:        source=str(path), pool_legacy=pool_legacy,
+./src/opt_agent/dataset/decision_record.py:151:        pooling_note=pooling_note)
+./docs/RESEARCH_BOUNDARY_GUIDE.md:319:   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./docs/RESEARCH_BOUNDARY_GUIDE.md:651:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+
+exec
+/bin/bash -lc "nl -ba scripts/exp_geartrain_transfer_probe.py | sed -n '84,108p' && nl -ba scripts/exp_rlcd_loo_transfer.py | sed -n '112,135p' && nl -ba scripts/exp_rlcd_loo_confirmatory.py | sed -n '78,101p' && nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '70,95p' && nl -ba runs/EXP_META_CONFIG_SCREEN.md | sed -n '1,28p;116,137p' && nl -ba PROGRESS_BRANCH.md | sed -n '700,730p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    84	            continue
+    85	        pred = dict(zip(ACTIONS_T, rf.predict([feats(r)])[0]))
+    86	        c, tt, m = rf_pairwise_and_top1(pred, gold)
+    87	        n += 1
+    88	        n_top1 += m
+    89	        n_pairs += tt
+    90	        n_correct += c
+    91	    return {"records": n, "pairs": n_pairs,
+    92	            "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
+    93	            "top1_agreement": n_top1 / n if n else 0.0}
+    94	
+    95	
+    96	def main() -> int:
+    97	    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    98	    test = list(iter_jsonl(Path("runs/geartrain_h3_10seed.jsonl")))
+    99	    train = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))]
+   100	    print(f"geartrain records: {len(test)}", flush=True)
+   101	
+   102	    out: dict = {}
+   103	    model, tok, _cfg, _ = load_laya_for_training("/home/lcy/.cache/opt_agent_v3/laya")
+   104	    out["zero_shot"] = _laya_arm(model, tok, test, device)
+   105	    del model
+   106	    torch.cuda.empty_cache()
+   107	    for name, path in (("proper_h3", "runs/rlcd_laya_proper_v1"),
+   108	                       ("bt_h3", "runs/rlcd_laya_bt_v1")):
+   112	
+   113	
+   114	def _run_fold(task: dict) -> dict:
+   115	    """Train both arms on 4 families; evaluate on the held-out family."""
+   116	    import shutil
+   117	
+   118	    import torch
+   119	
+   120	    torch.set_num_threads(4)
+   121	    from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
+   122	
+   123	    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+   124	    held_out = task["family"]
+   125	    train_pool = [r for r in records if r.problem["family"] != held_out]
+   126	    test = [r for r in records if r.problem["family"] == held_out]
+   127	    # Early-stopping slice from the TRAIN families (seeds >= 16 of pool).
+   128	    tr = [r for r in train_pool if int(r.problem["seed"]) < 16]
+   129	    va = [r for r in train_pool if int(r.problem["seed"]) >= 16]
+   130	
+   131	    out = {"family": held_out, "test_records": len(test)}
+   132	    for objective in ("proper_score", "bt_pairs"):
+   133	        tmp_dir = Path(f"runs/.rlcd_loo_tmp/{held_out}_{objective}")
+   134	        cfg = RLCDConfig(
+   135	            output_dir=str(tmp_dir), objective=objective,
+    78	        out[r.id] = (correct, total, top1, None)
+    79	    return out
+    80	
+    81	
+    82	def _run_fold(task: dict) -> dict:
+    83	    import shutil
+    84	
+    85	    import torch
+    86	
+    87	    torch.set_num_threads(4)
+    88	    from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
+    89	
+    90	    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    91	    held_out = task["family"]
+    92	    train_pool = [r for r in records if r.problem["family"] != held_out]
+    93	    test = [r for r in records if r.problem["family"] == held_out]
+    94	    # Split the 20-seed pool by seed RANK (16 smallest -> train, rest ->
+    95	    # early-stop val) so seed-offset datasets (e.g. the s100-119
+    96	    # replication stream) split the same way; on the original seeds 0-19
+    97	    # this is exactly `< 16` / `>= 16`.
+    98	    pool_seeds = sorted({int(r.problem["seed"]) for r in train_pool})
+    99	    cut = pool_seeds[15] if len(pool_seeds) >= 16 else pool_seeds[-1]
+   100	    tr = [r for r in train_pool if int(r.problem["seed"]) <= cut]
+   101	    va = [r for r in train_pool if int(r.problem["seed"]) > cut]
+    70	│    停滞步数——本项目 15 维 RF 特征与 LMABO 状态摘要同属此类
+    71	│
+    72	├─ 策略层  π: s_t → a_t，动作空间分为两个子集：
+    73	│    A_pt（点选择动作：决定下一个评估点的位置——AF 选择/AF 参数/批量 q；
+    74	│         抽象槽位。当前实现 = 5 个采样模式 + surrogate_acquisition，
+    75	│         见 §2.4；"AF 选择/参数/批量"为预留的扩张方向，尚未实现）
+    76	│    A_flow（流程控制动作：控制优化流程的推进——stop/retrain/切换
+    77	│         采样模式。重启不属于内层动作集：它是元层动作（§1.2/§4.1），
+    78	│         内层仅能以终止型动作触发 episode 边界）
+    79	│
+    80	├─ 执行与维护层（标准 BO 迭代循环，episode 内逐轮执行）
+    81	│    a_t → x_t → y_t = f(x_t)+ε → D_{t+1} → 按需族内重拟合代理（MLE，惰性生命周期）
+    82	│
+    83	└─ 输出算子 O: D_T → 结果
+    84	     单目标：incumbent；多目标：非支配过滤 + 超体积（hypervolume）
+    85	```
+    86	
+    87	**多目标扩展在抽象架构层面仅涉及两个组件的替换**：点选择 AF 族
+    88	（EI/JES → MO-JES 类，本地锚 `arxiv_2210.02905`）与输出算子
+    89	（incumbent → Pareto 过滤）。状态结构、策略分层、执行循环、双层
+    90	架构**不变**；实现面的完整改动清单见 §6.4（backend 向量值模型、
+    91	状态抽取、效用项、参考点、校验均需变更）。注意区分：可调的是
+    92	"何时输出"（STOP 是动作位），不可调的是"什么算最优"（支配关系
+    93	是数学定义）。
+    94	
+    95	**A_flow 是人工流程控制决策的形式化对应物**：人工执行优化时的
+     1	# EXP-META-CONFIG-SCREEN — 配置条件性的配对筛选与推断分析
+     2	
+     3	**日期**：2026-09-29（分支 `exp/boundary-scheme-round2`；本文为同日严谨化
+     4	重写版，取代首版报告——判定由 POSITIVE 修正为 INCONCLUSIVE，见 §7）
+     5	**工件**：`runs/exp_meta_config_screen.json`（含全部 200 条逐轨迹记录，可
+     6	独立复算）｜**脚本**：`scripts/exp_meta_config_screen.py`（估计量、假设与
+     7	判定规则均内嵌预宣告）
+     8	
+     9	## 摘要
+    10	
+    11	在铺设元层（配置级）监督管线之前，我们用一个配对筛选实验检验：**设计期
+    12	配置的优势是否依赖问题族**（family × config 交互）。在 5 族 × 20 种子 ×
+    13	2 配置（初始设计规模 n_init ∈ {5, 12}，总预算同为 30 次评估，内层策略钉
+    14	死 AlwaysSurrogate，配对嵌套 Sobol 流）下：主检验——各族优势 Δ_f 的
+    15	同质性 Wald 检验——得 χ²₄ = 8.71，**p = 0.069**，未在 α = 0.05 下检出
+    16	交互（I² = 54%，中等异质性）。个体层面 Rastrigin 在种子区段 0–19 内"确认"获益（Δ = +8.36
+    17	原始单位，d_z = 0.52，p = 0.032）——**该结论后被同日网格实验撤回**
+    18	（跨种子区块不复制，n = 240 效应至多 d_z ≈ 0.11；见
+    19	`EXP_META_CONFIG_GRID.md`），此处按历史结果保留。预宣告
+    20	的方向性机理假设获 5/5 符号支持（精确单侧二项 p = 0.031）：多峰族受益
+    21	于更大空间填充设计、光滑族受损（轻度）。按预宣告规则，本筛选判定为
+    22	**INCONCLUSIVE**：交互未被检出，且各族 CI 半宽均未达到 0.25·sd 的精确
+    23	零界——**该轴暂缓决策（pending）：不启动管线建设，亦不终止该轴**。
+    24	
+    25	## 1. 研究问题与决策语境
+    26	
+    27	guide §4.4 指出元层优势函数可能恒非正；round-1 评审（E2）要求在管线
+    28	投入前先做便宜的前置筛选。本实验回答一个可判定的统计问题——
+   116	## 6. 推断与解读
+   117	
+   118	1. **主问题未决，但非零信号**：交互未在 α = 0.05 检出（p = 0.069），
+   119	   然而 I² = 54% 的异质性份额与点估计模式（一个大正效应、一个中等
+   120	   负倾向、三个小效应）表明"全族同一 Δ"并非良好近似——更接近
+   121	   "一个强异质源 + 噪声"的结构。
+   122	2. **（历史陈述，同日撤回）种子区段内的 Rastrigin 发现**：
+   123	   Rastrigin（强多峰、d = 10、两臂设计均低于启发式）在种子 0–19 内
+   124	   显示 d_z = 0.52 的获益——网格实验证明其未跨种子区块复制（新增
+   125	   种子 20–59 均值 −3.30；n = 240 效应至多 d_z ≈ 0.11）。本节按发现
+   126	   当时的陈述保留并加撤回标记；跨区块复制是族级结论的必要确认
+   127	   标准（网格报告 §6.3、§8.3）。
+   128	3. **机理假设获方向性支持但幅度分化**：5/5 符号符合预宣告方向
+   129	   （p = 0.031）；幅度上仅多峰-高维的 Rastrigin 显著（**该个体结论
+   130	   同日被网格实验撤回**——跨种子区块不复制，见 §6.2 标注与网格
+   131	   报告），同为多峰的
+   132	   Ackley 只有 d_z = 0.14 的趋势。d = 2 的光滑族负效应（超配设计）
+   133	   与 H-mech-2 一致但均不显著（|d_z| ≤ 0.35）。
+   134	4. **维度是理解本轴的前提**：同一 n_init 档位在 d = 2 与 d = 10 族上
+   135	   的语义截然不同（超配 vs 不足）。任何后续元层特征工程都应携带
+   136	   n_init/(2d+1) 而非裸 n_init。
+   137	5. **oracle ≠ 可学**：meta-D ≈ 0.12（标准化单位）是"已知族标签"
+   700	  implemented; 0.4 + 6.1 state the exact verification scope of the sync
+   701	  tests; 10.5 updated with round-3 dispositions.
+   702	- THEORY.md P3 empirical reading corrected: aggregate nonsignificance is
+   703	  CONSISTENT WITH but does not establish the pointwise A(s) <= 0 premise;
+   704	  the premise is explicitly unmeasured (codex round-1 C6 / round-2 A2).
+   705	
+   706	New/changed tests: 23 in test_boundary_registry + test_versioning
+   707	(was 12). Suite at commit: 439 (excl. test_rlcd) + 15 (test_rlcd) = 454 passed; was 443 before round-3 (12 new tests: parser hardening, enforcement, factory link).
+   708	
+   709	## 22. Round-3 review verdict + full disposition (2026-09-29)
+   710	
+   711	Codex round-3 (`runs/codex_boundary_round3_review.log`, 103k tokens):
+   712	VERDICT: REVISE — 0 BLOCKER / 9 MAJOR / 4 MINOR (trajectory: 7 BLOCKER
+   713	-> 0/14 -> 0/9). Round-2 items: 12 ADDRESSED / 7 PARTIAL / 0 UNADDRESSED.
+   714	All 13 new findings fixed in the same session:
+   715	
+   716	- D1 (real statistical catch): the grid PRIMARY test ran on raw-unit
+   717	  slopes — not scale-stable. Primary re-declared as reference-
+   718	  standardized slopes (b_f/sd_ref, sd_ref treated as fixed): chi^2_4
+   719	  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
+   720	  version, see section 23]
+   721	  — matches codex's own recomputation; verdict unchanged
+   722	  (CONDITIONALITY_DETECTED). Raw-unit version demoted to secondary.
+   723	- E2/C1: "precise null" now an equivalence bound (CI entirely within
+   724	  +/- 0.25 sd) in the grid script and guide 5.5.4/5.5.2; success rule
+   725	  requires CI lower bound > 0 on >= 3 families.
+   726	- B1/B2/E1: iter_jsonl documented as raw unenforced access (replay
+   727	  only); pooling consumers must use read_jsonl with an explicit
+   728	  version_policy; train_system1_compare.py migrated; mixed legacy+
+   729	  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+   730	  records the explicit opt-in; guide 4.5 aligned with enforcement.
+
+exec
+/bin/bash -lc "rg -n '分别|多.*文件|跨文件|每个源|同一.*note|same.*note|separately|source' docs/RESEARCH_BOUNDARY_GUIDE.md PROGRESS_BRANCH.md src/opt_agent/dataset/versioning.py && git status --short --branch && git rev-parse HEAD" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+src/opt_agent/dataset/versioning.py:18:  records without an explicit same-data A/B note (§6.6 rule 1).
+src/opt_agent/dataset/versioning.py:52:    WARN   - summarize LEGACY once per source (do-not-pool reminder) and warn
+src/opt_agent/dataset/versioning.py:76:    source: str = "",
+src/opt_agent/dataset/versioning.py:81:    LEGACY warns at most once per (source, axis) to avoid spam on large
+src/opt_agent/dataset/versioning.py:91:        key = f"{source}:{axis}"
+src/opt_agent/dataset/versioning.py:95:                f"{source}: {axis} stamp is legacy/absent (record "
+src/opt_agent/dataset/versioning.py:103:            msg = (f"{source}: record {record_id!r} has unrecognized "
+src/opt_agent/dataset/versioning.py:125:    source: str = "",
+src/opt_agent/dataset/versioning.py:129:    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+src/opt_agent/dataset/versioning.py:134:    requires an explicit decision with a recorded same-data A/B note.
+src/opt_agent/dataset/versioning.py:140:    source; combining multiple separately loaded files must pass each
+src/opt_agent/dataset/versioning.py:141:    through read_jsonl and cite the same pooling note.
+src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+src/opt_agent/dataset/versioning.py:153:            {"source": source, "note": pooling_note})
+src/opt_agent/dataset/versioning.py:162:            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+PROGRESS_BRANCH.md:551:- §7 rebuilt as a claim→source map with per-item local-PDF status
+PROGRESS_BRANCH.md:675:  summarizes once per source with a do-not-pool reminder; unknown stamps
+PROGRESS_BRANCH.md:687:  honestly (CI-consistency artifact + query API; runtime menu source is
+PROGRESS_BRANCH.md:762:  in an audit trail (pooling_decisions()); the one-source boundary
+docs/RESEARCH_BOUNDARY_GUIDE.md:525:| LMABO 实测锚（引用数字时用） | 50 问题（30 COCO/BoTorch 合成 + 20 Bayesmark HPO）×10 种子；RP 1.21；对最好静态 AF/元策略/组合/LLM 基线 AUC 分别 −9.7%/−14.8%/−16.6%/−54.7%；温度 0；兜底率 0.11%；50 轮 ≈6000 tokens、每轮 ≈1s、Gemini 臂 50 轮平均 7.42 min（部分 benchmark 预算更长；GP-Hedge 109 min——组合法每轮需优化全部 12 个 AF）。数字已对本地 PDF 核实（round-1 评审） |
+## exp/boundary-scheme-round2
+?? runs/codex_boundary_round5_review.log
+e3aa72cd0113445fd0101811f0df0202ccc0176b
+
+exec
+/bin/bash -lc "python - <<'PY'
+import json,math,statistics
+p=json.load(open('runs/exp_meta_config_grid.json'))
+F=p['families']; ls=p['levels']; d=p['dimensions']; vals={(r['family'],r['seed'],r['n_init']):r['best'] for r in p['trajectories']}
+ifn={}
+for f in F:
+ x=[v/(2*d[f]+1) for v in ls]; mx=statistics.fmean(x); den=sum((a-mx)**2 for a in x)
+ slopes=[]; refs=[]
+ for s in range(p['seeds']):
+  y=[vals[(f,s,l)] for l in ls]; my=statistics.fmean(y)
+  slopes.append(sum((a-mx)*(b-my) for a,b in zip(x,y))/den)
+  refs.append(y[0])
+ mb=statistics.fmean(slopes); mr=statistics.fmean(refs); sd=statistics.pstdev(refs)
+ ifn[f]=[(b-mb)/sd-mb*(r-mr)/(sd**3)*((r-mr)**2-sd**2)/(2*sd) for b,r in zip(slopes,refs)]
+ print(f,'slope_sd',round(statistics.pstdev(slopes),3),'ref_sd',round(sd,3))
+print('raw slope correlations:')
+for i,f in enumerate(F):
+ print(f,[(g,round(statistics.correlation(ifn[f],ifn[g]),2)) for g in F[i+1:]])
+PY" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+Branin slope_sd 0.091 ref_sd 0.024
+Hartmann slope_sd 0.716 ref_sd 0.56
+Ackley slope_sd 0.854 ref_sd 0.558
+SixHumpCamel slope_sd 0.112 ref_sd 0.173
+Rastrigin slope_sd 27.635 ref_sd 14.329
+raw slope correlations:
+Branin [('Hartmann', -0.04), ('Ackley', -0.02), ('SixHumpCamel', -0.03), ('Rastrigin', -0.24)]
+Hartmann [('Ackley', -0.11), ('SixHumpCamel', -0.02), ('Rastrigin', 0.09)]
+Ackley [('SixHumpCamel', -0.06), ('Rastrigin', 0.19)]
+SixHumpCamel [('Rastrigin', -0.16)]
+Rastrigin []
+
+codex
+### A. Round-4 dispositions
+
+| Finding | Status | Verification |
+|---|---|---|
+| B1 — joint-bootstrap SE | ADDRESSED | Slopes and reference outcomes are resampled by the same seed indices. The saved primary result is χ²₄ = 20.0587, p = 0.000486, I² = 0.8006. The Wald p-value remains an asymptotic approximation. |
+| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+| B3 — pooling | PARTIAL | Within-file checks compare raw stamps and require a note for explicit opt-in. Cross-file pooling remains unchecked; the audit exists only in process memory. |
+| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+| B5 — primary wording and numbers | PARTIAL | Guide, report, and PROGRESS give the corrected numbers; both JSON artifacts still declare the raw-slope null as primary. |
+| Screen retraction; candidate baseline; guide success rule | ADDRESSED | The requested wording is present. |
+| §2.4 parser | PARTIAL | It requires four header cells, but a blank line does not end the table for second-table detection. |
+
+### B. Issues
+
+The joint seed bootstrap is coherent for estimating each standardized slope’s SE, and the bootstrap-SE Wald test is a reasonable approximation. A legitimately stamped single-version file has one raw stamp value per axis, so the revised pooling comparison does not falsely flag it.
+
+- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+- **MAJOR** — [grid payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) serializes “`b_f identical`” as the primary null, and both refreshed JSON artifacts retain it. **Fix:** serialize equality of `b_f / sd_ref(f)` and refresh both artifacts.
+- **MAJOR** — [loader](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:137) returns unchecked under `allow`; [pooling audit](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:113) is memory-only. A pooling consumer can therefore leave no recorded note. **Fix:** require a checked policy at pooling boundaries and persist opt-in notes with the resulting artifact.
+- **MAJOR** — [guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:316) does not contain the claimed same-note-per-source cross-file requirement, while [the check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:157) covers one source. **Fix:** add that rule to the guide and validate stamps across the combined pool. Existing RLCD training consumers also still use unchecked `iter_jsonl`, for example [this loader](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123).
+- **MINOR** — [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:61) treats rows after a blank line as part of the first table. **Fix:** end the table at a blank line and reject subsequent table rows in §2.4.
+- **MINOR** — [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:97) says the raw-unit secondary test treats `sd_ref` as fixed, although that test does not use `sd_ref`. **Fix:** reserve that description for the superseded standardized-SE calculation.
+
+### C. Standing-spec judgment
+
+The corrected primary result supports the reported conditionality finding, and most round-4 fixes are present. The package is **not yet fit** as the standing modification specification: its declared and serialized rules still conflict with execution, and its required pooling decision can be bypassed or lost. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE
+tokens used
+70,512
+### A. Round-4 dispositions
+
+| Finding | Status | Verification |
+|---|---|---|
+| B1 — joint-bootstrap SE | ADDRESSED | Slopes and reference outcomes are resampled by the same seed indices. The saved primary result is χ²₄ = 20.0587, p = 0.000486, I² = 0.8006. The Wald p-value remains an asymptotic approximation. |
+| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+| B3 — pooling | PARTIAL | Within-file checks compare raw stamps and require a note for explicit opt-in. Cross-file pooling remains unchecked; the audit exists only in process memory. |
+| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+| B5 — primary wording and numbers | PARTIAL | Guide, report, and PROGRESS give the corrected numbers; both JSON artifacts still declare the raw-slope null as primary. |
+| Screen retraction; candidate baseline; guide success rule | ADDRESSED | The requested wording is present. |
+| §2.4 parser | PARTIAL | It requires four header cells, but a blank line does not end the table for second-table detection. |
+
+### B. Issues
+
+The joint seed bootstrap is coherent for estimating each standardized slope’s SE, and the bootstrap-SE Wald test is a reasonable approximation. A legitimately stamped single-version file has one raw stamp value per axis, so the revised pooling comparison does not falsely flag it.
+
+- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+- **MAJOR** — [grid payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) serializes “`b_f identical`” as the primary null, and both refreshed JSON artifacts retain it. **Fix:** serialize equality of `b_f / sd_ref(f)` and refresh both artifacts.
+- **MAJOR** — [loader](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:137) returns unchecked under `allow`; [pooling audit](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:113) is memory-only. A pooling consumer can therefore leave no recorded note. **Fix:** require a checked policy at pooling boundaries and persist opt-in notes with the resulting artifact.
+- **MAJOR** — [guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:316) does not contain the claimed same-note-per-source cross-file requirement, while [the check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:157) covers one source. **Fix:** add that rule to the guide and validate stamps across the combined pool. Existing RLCD training consumers also still use unchecked `iter_jsonl`, for example [this loader](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123).
+- **MINOR** — [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:61) treats rows after a blank line as part of the first table. **Fix:** end the table at a blank line and reject subsequent table rows in §2.4.
+- **MINOR** — [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:97) says the raw-unit secondary test treats `sd_ref` as fixed, although that test does not use `sd_ref`. **Fix:** reserve that description for the superseded standardized-SE calculation.
+
+### C. Standing-spec judgment
+
+The corrected primary result supports the reported conditionality finding, and most round-4 fixes are present. The package is **not yet fit** as the standing modification specification: its declared and serialized rules still conflict with execution, and its required pooling decision can be bypassed or lost. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE

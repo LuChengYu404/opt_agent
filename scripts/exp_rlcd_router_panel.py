@@ -64,7 +64,7 @@ def _confidence_percentiles() -> dict[str, dict[float, float]]:
     """
     import torch
 
-    from opt_agent.dataset import iter_jsonl
+    from opt_agent.dataset import read_jsonl
     from opt_agent.system1.rlcd import (
         RLCDConfig,
         _collate,
