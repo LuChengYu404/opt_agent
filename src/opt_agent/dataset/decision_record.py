@@ -109,3 +109,27 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
                 raise ValueError(
                     f"{path}:{line_number}: invalid DecisionRecord"
                 ) from exc
+
+
+def read_jsonl(
+    path: Path, *, version_policy: str = "allow"
+) -> list[DecisionRecord]:
+    """Materialize records from JSONL, enforcing a version-pooling policy.
+
+    The version policy (guide 4.5/6.6) is the explicit pooling decision at
+    the loading boundary: "allow" (default, historical behavior), "warn"
+    (summarize legacy, warn on unrecognized stamps), or "strict" (raise on
+    unrecognized stamps). See opt_agent.dataset.versioning for semantics.
+    """
+    from opt_agent.dataset.versioning import enforce_record_versions
+
+    records = list(iter_jsonl(path))
+    if version_policy != "allow":
+        for record in records:
+            enforce_record_versions(
+                record.metadata,
+                version_policy,
+                record_id=record.id,
+                source=str(path),
+            )
+    return records

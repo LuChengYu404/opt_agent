@@ -3,11 +3,16 @@
 The point of these tests is that the action menu CANNOT drift from its
 boundary classification: adding/removing/reclassifying an action without
 touching both the registry and the guide §2.4 table turns the suite red.
+
+Verified columns (guide §2.4 schema): ActionType | 归类 | 子菜单 | 备注 —
+menu membership, boundary class, and submenu are compared strictly; the
+备注 column is free text and is only required to be non-empty. The parser
+fails closed on malformed tables (bad header, short rows, duplicate or
+unknown action rows).
 """
 
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
@@ -20,6 +25,8 @@ from opt_agent.actions.boundary_registry import (
     BOUNDARY_REGISTRY,
     SUBMENUS,
     RegistrySyncError,
+    boundary_class_of,
+    submenu_of,
     verify_registry_sync,
 )
 from opt_agent.actions.models import ActionType
@@ -28,6 +35,61 @@ GUIDE_PATH = (
     Path(__file__).resolve().parents[1] / "docs" / "RESEARCH_BOUNDARY_GUIDE.md"
 )
 
+EXPECTED_HEADER = ("ActionType", "归类", "子菜单", "备注")
+
+
+def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
+    """Strictly parse a §2.4-style markdown table.
+
+    Returns {action_value: (boundary_class, submenu, note)}. Raises
+    AssertionError on schema violations — the sync test must fail closed,
+    not skip quietly.
+    """
+    lines = section_text.splitlines()
+    header_idx = next(
+        (i for i, ln in enumerate(lines)
+         if ln.strip().startswith("| ActionType |")), None)
+    assert header_idx is not None, "guide §2.4 table header not found"
+    header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
+    assert tuple(header_cells[:4]) == EXPECTED_HEADER, (
+        f"unexpected §2.4 table header: {header_cells!r} "
+        f"(expected {EXPECTED_HEADER})"
+    )
+    rows: dict[str, tuple[str, str, str]] = {}
+    for line in lines[header_idx + 1:]:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            break  # table ended
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if cells and cells[0].startswith("-"):
+            continue  # separator row
+        assert len(cells) >= 4, f"malformed §2.4 row (needs 4 cells): {line!r}"
+        name, cls, submenu, note = cells[0], cells[1], cells[2], cells[3]
+        try:
+            action_value = ActionType[name].value
+        except KeyError:
+            raise AssertionError(
+                f"§2.4 row names unknown action {name!r}: {line!r}")
+        assert action_value not in rows, (
+            f"duplicate §2.4 row for {action_value!r}")
+        assert note, f"§2.4 row for {name} has an empty 备注 cell"
+        rows[action_value] = (cls, submenu, note)
+    return rows
+
+
+def _guide_section_2_4_rows() -> dict[str, tuple[str, str, str]]:
+    """Parse the guide's §2.4 table (reads the rendered document, so a doc
+    edit alone cannot desynchronize code from spec)."""
+    text = GUIDE_PATH.read_text(encoding="utf-8")
+    start = text.index("### 2.4")
+    end = text.index("\n## ", start)
+    return _parse_section_rows(text[start:end])
+
+
+# ---------------------------------------------------------------------------
+# Registry <-> menu
+# ---------------------------------------------------------------------------
+
 
 def test_registry_matches_action_type_menu_exactly():
     verify_registry_sync()  # raises RegistrySyncError on any drift
@@ -35,10 +97,6 @@ def test_registry_matches_action_type_menu_exactly():
 
 
 def test_registry_error_names_missing_action():
-    class Fake:
-        pass
-
-    # Simulate a menu extension the registry does not know about.
     registry_entries = dict(BOUNDARY_REGISTRY)
     missing = ActionType.STOP
     del registry_entries[missing]
@@ -54,10 +112,14 @@ def test_registry_error_names_missing_action():
         mod.BOUNDARY_REGISTRY = original
 
 
+def test_query_accessors():
+    assert boundary_class_of(ActionType.RETRAIN_SURROGATE) == "B1"
+    assert submenu_of(ActionType.RETRAIN_SURROGATE) == "A_flow"
+    assert submenu_of(ActionType.GLOBAL_EXPLORATION) == "A_pt"
+
+
 def test_submenus_partition_the_menu():
     """Every action is in exactly one submenu; both submenus are used."""
-    for action, entry in BOUNDARY_REGISTRY.items():
-        assert entry.submenu in SUBMENUS
     submenus_used = {entry.submenu for entry in BOUNDARY_REGISTRY.values()}
     assert submenus_used == set(SUBMENUS)
 
@@ -67,57 +129,94 @@ def test_classifications_use_guide_vocabulary():
         assert entry.boundary_class in BOUNDARY_CLASSES, action
 
 
-def _guide_section_2_4_rows() -> dict[str, tuple[str, str, str]]:
-    """Parse the guide §2.4 markdown table -> {action_value: (class, submenu-ish, row)}.
+def test_factory_candidates_match_registry():
+    """The runtime menu source (ALL_CANDIDATE_SPECS) and the boundary
+    registry must cover exactly the same actions — the registry is the
+    classification side of the factory's generation side."""
+    from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
 
-    The table columns are: ActionType | 归类 | 备注. This deliberately parses
-    the rendered document rather than importing constants, so a doc edit
-    alone cannot desynchronize code from spec.
-    """
-    text = GUIDE_PATH.read_text(encoding="utf-8")
-    start = text.index("### 2.4")
-    end = text.index("\n## ", start)
-    section = text[start:end]
-    lines = section.splitlines()
-    header_idx = next(
-        i for i, ln in enumerate(lines) if ln.strip().startswith("| ActionType |")
+    spec_actions = {action_type for _, action_type, _ in ALL_CANDIDATE_SPECS}
+    assert spec_actions == set(BOUNDARY_REGISTRY), (
+        "factory/registry drift: factory-only="
+        f"{sorted(a.value for a in spec_actions - set(BOUNDARY_REGISTRY))}, "
+        "registry-only="
+        f"{sorted(a.value for a in set(BOUNDARY_REGISTRY) - spec_actions)}"
     )
-    rows: dict[str, tuple[str, str, str]] = {}
-    for line in lines[header_idx + 1:]:
-        stripped = line.strip()
-        if not stripped.startswith("|"):
-            break  # table ended
-        cells = [c.strip() for c in stripped.strip("|").split("|")]
-        if len(cells) < 2 or cells[0].startswith("-"):
-            continue  # separator row
-        # The guide table names enum MEMBERS (GLOBAL_EXPLORATION); normalize
-        # to values (global_exploration) for comparison with ActionType.
-        try:
-            action_value = ActionType[cells[0]].value
-        except KeyError:
-            action_value = cells[0]
-        rows[action_value] = (cells[1], cells[2] if len(cells) > 2 else "", line)
-    return rows
+
+
+# ---------------------------------------------------------------------------
+# Guide table parser (unit tests on synthetic tables)
+# ---------------------------------------------------------------------------
+
+_GOOD_SECTION = """
+### 2.4 表
+
+| ActionType | 归类 | 子菜单 | 备注 |
+|---|---|---|---|
+| GLOBAL_EXPLORATION | B2 | A_pt | 采样模式位 |
+| STOP | B1 | A_flow | 终止型动作 |
+"""
+
+_DUPLICATE_SECTION = _GOOD_SECTION.replace(
+    "| STOP | B1 | A_flow | 终止型动作 |",
+    "| GLOBAL_EXPLORATION | B2 | A_pt | 重复行 |")
+
+_UNKNOWN_SECTION = _GOOD_SECTION + "| NEW_SHINY_ACTION | B2 | A_pt | 未注册 |\n"
+
+_SHORT_ROW_SECTION = _GOOD_SECTION + "| UNCERTAINTY_SAMPLING | B2 |\n"
+
+_BAD_HEADER_SECTION = _GOOD_SECTION.replace("| 子菜单 |", "| 菜单 |")
+
+
+def test_parser_accepts_well_formed_table():
+    rows = _parse_section_rows(_GOOD_SECTION)
+    assert rows == {"global_exploration": ("B2", "A_pt", "采样模式位"),
+                    "stop": ("B1", "A_flow", "终止型动作")}
+
+
+@pytest.mark.parametrize("section,fragment", [
+    (_DUPLICATE_SECTION, "duplicate"),
+    (_UNKNOWN_SECTION, "unknown action"),
+    (_SHORT_ROW_SECTION, "malformed"),
+    (_BAD_HEADER_SECTION, "header"),
+])
+def test_parser_fails_closed(section, fragment):
+    with pytest.raises(AssertionError) as exc:
+        _parse_section_rows(section)
+    assert fragment in str(exc.value).lower()
+
+
+# ---------------------------------------------------------------------------
+# Guide <-> registry (live document)
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.skipif(not GUIDE_PATH.exists(), reason="guide doc not present")
 def test_guide_table_rows_match_registry():
-    """Guide §2.4 table and BOUNDARY_REGISTRY must classify identically."""
+    """Guide §2.4 table and BOUNDARY_REGISTRY must classify identically
+    (class AND submenu columns)."""
     rows = _guide_section_2_4_rows()
     assert set(rows) == {a.value for a in ActionType}, (
-        f"guide §2.4 rows {sorted(rows)} != menu {sorted(a.value for a in ActionType)}"
+        f"guide §2.4 rows {sorted(rows)} != menu "
+        f"{sorted(a.value for a in ActionType)}"
     )
     for action, entry in BOUNDARY_REGISTRY.items():
-        guide_class, _, line = rows[action.value]
+        guide_class, guide_submenu, _ = rows[action.value]
         assert guide_class == entry.boundary_class, (
-            f"{action.value}: guide says {guide_class!r}, registry says "
-            f"{entry.boundary_class!r} (row: {line!r})"
+            f"{action.value}: guide class {guide_class!r} != registry "
+            f"{entry.boundary_class!r}"
+        )
+        assert guide_submenu == entry.submenu, (
+            f"{action.value}: guide submenu {guide_submenu!r} != registry "
+            f"{entry.submenu!r}"
         )
 
 
 @pytest.mark.skipif(not GUIDE_PATH.exists(), reason="guide doc not present")
 def test_guide_mentions_current_menu_size():
     """The guide's normative text must not claim a menu size the code lacks."""
+    import re
+
     text = GUIDE_PATH.read_text(encoding="utf-8")
     claimed = {int(m) for m in re.findall(r"现 (\d+) 个 ActionType", text)}
     actual = len(ActionType)

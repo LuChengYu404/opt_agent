@@ -1,11 +1,18 @@
 """Action-menu boundary registry — machine-readable twin of the guide §2.4.
 
 `docs/RESEARCH_BOUNDARY_GUIDE.md` §6.1 requires that adding an action slot
-passes the three-gate check and lands in BOTH the guide table and the code
-menu. This module is the code-side half of that contract:
+passes the three-item preflight check and lands in BOTH the guide table and
+the code menu. This module is the code-side half of that contract:
 `tests/test_boundary_registry.py` fails whenever the ActionType menu and
 this registry (or the guide §2.4 table) diverge, so no action can be added,
 removed, or reclassified silently.
+
+Scope note (codex round-2 C2, honest description): this registry is a
+CI-consistency artifact plus a classification query API
+(`boundary_class_of` / `submenu_of`). No runtime dispatch or candidate-
+generation path consumes the classifications yet; the runtime menu source
+is `actions.factory.ALL_CANDIDATE_SPECS`, whose sync with this registry is
+asserted by test_factory_candidates_match_registry.
 
 Classification vocabulary mirrors the guide's taxonomy (§2):
   A : definitional / exogenous-frozen (not used by any current action)
@@ -83,6 +90,16 @@ class RegistrySyncError(ValueError):
     """ActionType menu and boundary registry are out of sync."""
 
 
+def boundary_class_of(action: ActionType) -> str:
+    """Query the guide-taxonomy class (A/B1/B2/B3/C) of an action."""
+    return BOUNDARY_REGISTRY[action].boundary_class
+
+
+def submenu_of(action: ActionType) -> str:
+    """Query the guide submenu (A_pt point-selection / A_flow process)."""
+    return BOUNDARY_REGISTRY[action].submenu
+
+
 def verify_registry_sync() -> None:
     """Raise RegistrySyncError unless registry and menu agree 1:1.
 
@@ -99,7 +116,8 @@ def verify_registry_sync() -> None:
         names = sorted(a.value for a in unregistered)
         problems.append(
             "actions present in ActionType but missing a boundary "
-            f"classification (pass guide §3.4 three-gate check, then add a "
+            f"classification (pass guide §3.4 three-item preflight check, "
+            f"then add a "
             f"BOUNDARY_REGISTRY entry + guide §2.4 row): {names}"
         )
     unknown = registered - menu

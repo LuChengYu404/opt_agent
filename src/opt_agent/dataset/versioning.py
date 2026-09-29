@@ -45,6 +45,71 @@ class VersionStatus(str, Enum):
     MISMATCH = "mismatch"
 
 
+class VersionPolicy(str, Enum):
+    """Pooling policy enforced at a dataset loading boundary (guide 4.5/6.6).
+
+    ALLOW  - no check (back-compat; implicit pooling decision is "unchecked").
+    WARN   - summarize LEGACY once per source (do-not-pool reminder) and warn
+             on MISMATCH, but keep reading.
+    STRICT - raise VersionPolicyError on the first MISMATCH; LEGACY still only
+             warns (legacy records are the repo's history, the policy makes
+             the pooling decision EXPLICIT rather than forbidding reads).
+    """
+
+    ALLOW = "allow"
+    WARN = "warn"
+    STRICT = "strict"
+
+
+class VersionPolicyError(ValueError):
+    """A record carries an unrecognized version stamp under STRICT policy."""
+
+
+_legacy_warned: set[str] = set()
+
+
+def enforce_record_versions(
+    record_metadata: Mapping[str, Any],
+    policy: str | VersionPolicy,
+    *,
+    record_id: str = "",
+    source: str = "",
+) -> dict[str, VersionStatus]:
+    """Apply a pooling policy to one record's metadata.
+
+    Returns the per-axis status (same shape as check_record_versions).
+    LEGACY warns at most once per (source, axis) to avoid spam on large
+    legacy datasets; MISMATCH raises under STRICT.
+    """
+    policy = VersionPolicy(policy)
+    status = check_record_versions(record_metadata)
+    if policy is VersionPolicy.ALLOW:
+        return status
+    import warnings
+
+    for axis, st in status.items():
+        key = f"{source}:{axis}"
+        if st is VersionStatus.LEGACY and key not in _legacy_warned:
+            _legacy_warned.add(key)
+            warnings.warn(
+                f"{source}: {axis} stamp is legacy/absent (record "
+                f"{record_id!r} first seen); pooling legacy records with "
+                f"current-version records requires an explicit same-data "
+                f"A/B note (guide 6.6 rule 1)",
+                stacklevel=2,
+            )
+        if st is VersionStatus.MISMATCH:
+            stamp = record_metadata.get(f"{axis}_version")
+            msg = (f"{source}: record {record_id!r} has unrecognized "
+                   f"{axis} stamp {stamp!r} (current: "
+                   f"{HARNESS_VERSION if axis == 'harness' else UTILITY_VERSION}); "
+                   f"refusing to pool under STRICT policy")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+    return status
+
+
 def stamp_metadata(
     metadata: Mapping[str, Any] | None,
     *,

@@ -4,6 +4,7 @@ from opt_agent.dataset.analysis import DatasetStats, analyze_dataset, validate_r
 from opt_agent.dataset.decision_record import (
     DecisionRecord,
     iter_jsonl,
+    read_jsonl,
     write_jsonl,
 )
 from opt_agent.dataset.generator import (
@@ -57,6 +58,7 @@ __all__ = [
     "gate2_stability",
     "gold_probs_kind",
     "iter_jsonl",
+    "read_jsonl",
     "oracle_test",
     "oracle_test_from_record",
     "phase_of",

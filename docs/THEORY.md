@@ -150,9 +150,11 @@ such a panel can only lose.
 LLM-calling arms (always-LLM, four confidence thresholds, three random
 rates); none beat `rf` with a CI excluding zero on any family, and
 always-LLM lost detectably on three families. Under the one-step model
-this is the signature of `A(s) ≤ 0` across visited states — i.e., the
-routing failure is a property of the LLM's decisions on this panel, not
-of the routing heuristic. Two supplementary observations fit: (a) the
+this pattern is CONSISTENT WITH `A(s) ≤ 0` across visited states — but
+the sweep measures aggregate routing outcomes and cannot establish the
+pointwise premise directly; `A(s) ≤ 0` remains an unmeasured premise
+that, if true, explains the outcomes (the deterministic schedule control
+makes it the parsimonious reading), not a quantity the sweep estimated. Two supplementary observations fit: (a) the
 calibrated RF softmax maximum rarely exceeds 0.25 with m = 8 (near the
 uniform 0.125), so confidence thresholds τ ≥ 0.25 all induce the *same*
 router (route-always); the tested router family collapses to its two

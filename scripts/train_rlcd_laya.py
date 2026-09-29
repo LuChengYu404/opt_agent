@@ -42,7 +42,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from _rlcd_common import rf_pairwise_and_top1 as _rf_pairwise_and_top1  # noqa: E402,F401
 
-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
+from opt_agent.dataset import phase_of_ratio, read_jsonl  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
     evaluate_ranking,
@@ -138,9 +138,12 @@ def main() -> int:
     parser.add_argument("--skip-rf", action="store_true")
     parser.add_argument("--json-out", type=Path, default=Path("runs/exp_rlcd_report.json"))
     parser.add_argument("--report-out", type=Path, default=Path("runs/EXP_RLCD_REPORT.md"))
+    parser.add_argument("--version-policy", choices=["allow", "warn", "strict"],
+                        default="warn",
+                        help="Dataset version pooling policy at the loading boundary (guide 4.5/6.6)")
     args = parser.parse_args()
 
-    records = list(iter_jsonl(args.dataset))
+    records = read_jsonl(args.dataset, version_policy=args.version_policy)
     train_records = [
         r for r in records if int(r.problem["seed"]) < args.train_seed_max
     ]

@@ -658,3 +658,44 @@ PRIMARY test = slope homogeneity (Wald chi^2, Cochran's-Q form).
 Report: `runs/EXP_META_CONFIG_GRID.md` (paper-style, formal register).
 Guide synced (5.2 two-stage reading, 5.5.4 not triggered, 8.3 next step
 = signature prediction, 10.3 updated).
+
+## 21. Round-3 closure: codex round-2 leftovers landed (2026-09-29)
+
+All remaining review-class items from codex round-2 (14 MAJOR / 4 MINOR)
+addressed on exp/boundary-scheme-round2:
+
+- C3 (version enforcement at the loading boundary): versioning.py gains
+  VersionPolicy (allow/warn/strict) + enforce_record_versions (legacy
+  summarizes once per source with a do-not-pool reminder; unknown stamps
+  raise under strict); decision_record.read_jsonl(path,
+  version_policy=...) materializes + enforces; exported from the package;
+  train_rlcd_laya.py reads via read_jsonl with --version-policy (default
+  warn). Tests: warn/strict/legacy/mismatch + read_jsonl roundtrip.
+- C1 (parser hardening): guide 2.4 table gained a submenu column (and
+  proper per-row notes instead of ditto marks); the sync-test parser is
+  a pure function with strict schema checks (header ActionType/归类/
+  子菜单/备注; malformed short rows, duplicate rows, unknown action
+  rows all raise) and now compares class AND submenu columns; unit
+  tests feed synthetic broken tables and assert fail-closed behavior.
+- C2 (registry scope): boundary_registry docstring states its scope
+  honestly (CI-consistency artifact + query API; runtime menu source is
+  the factory); added boundary_class_of/submenu_of accessors; new
+  test_factory_candidates_match_registry enforces two-way coverage
+  between ALL_CANDIDATE_SPECS and the registry (the specs contain all 8
+  actions incl. stop, so the invariant is exact equality).
+- Doc/judgment fixes: 5.5.1 flip estimator pinned (2v2 split-half, R=5,
+  current 0.359 per exp_teacher_noise_diagnostic_r5.json); 5.5.2
+  rewritten as paired success + futility rules (fixed 5-family set,
+  declared seed counts, MDD_80 power, 0.25 sd effect floor); 5.5.3 cost
+  denominator defined (per-label rollout vs one budget-30 trajectory,
+  same hardware); 6.6 full procedure formalized (items 4-6:
+  reliability / invariance / outcome-alignment checks) with automation
+  status noted; 0.2 + 2.2-B1 + B3 mark periodic refit as proposed-not-
+  implemented; 0.4 + 6.1 state the exact verification scope of the sync
+  tests; 10.5 updated with round-3 dispositions.
+- THEORY.md P3 empirical reading corrected: aggregate nonsignificance is
+  CONSISTENT WITH but does not establish the pointwise A(s) <= 0 premise;
+  the premise is explicitly unmeasured (codex round-1 C6 / round-2 A2).
+
+New/changed tests: 23 in test_boundary_registry + test_versioning
+(was 12). Suite at commit: 439 (excl. test_rlcd) + 15 (test_rlcd) = 454 passed; was 443 before round-3 (12 new tests: parser hardening, enforcement, factory link).
