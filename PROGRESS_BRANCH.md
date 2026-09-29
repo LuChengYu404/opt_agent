@@ -809,3 +809,33 @@ fixed same session:
 
 Tests: 40 across registry/versioning/RLCD (persistence + combinable
 added).
+
+## 25. Round-6 review verdict + full disposition (2026-09-29)
+
+Codex round-6 (`runs/codex_boundary_round6_review.log`): VERDICT REVISE —
+**1 BLOCKER** / 4 MAJOR / 2-partials table (14 -> 9 -> 5 -> 4 -> 1). The
+BLOCKER was OUR regression: the round-5 regex migration replaced imports
+but missed comprehension/multiline call sites, leaving four scripts
+calling an undefined name (exp_rlcd_calibration_ablation, loo_confirmatory,
+loo_transfer, router_panel). All findings fixed same session:
+
+- BLOCKER: four broken call sites rewritten to
+  read_jsonl(..., version_policy="warn"); ALL 13 touched scripts now pass
+  a runtime smoke (python script --help), not just syntax checks — the
+  regression class (import replaced, call missed) is only catchable at
+  runtime.
+- B2: assert_combinable validates note CONSISTENCY — per-source
+  source_notes must be non-empty and identical (and agree with
+  pooling_note when both given) before the combined pool is permitted.
+- B3: the pooling audit append now FAILS the opt-in on OSError (wrapped
+  as VersionPolicyError) instead of silently losing the record.
+- B4: sweep_rlcd.py and exp_rq2_1_cross_family_transfer.py (the named
+  training/pooling consumers) migrated off raw iter_jsonl.
+- B5: the screen's half-width "precise null" rule explicitly marked
+  SUPERSEDED in both the script docstring (with the reason: a narrow CI
+  centred on a large effect passes half-width but not the equivalence
+  bound; committed artifact retained as historical record, reruns
+  reproduce it) and the report's methods section.
+
+Tests: 40 across registry/versioning/RLCD (note-consistency and
+audit-failure paths added).

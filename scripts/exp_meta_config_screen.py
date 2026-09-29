@@ -69,6 +69,14 @@ Inference (all primary tests predeclared).
      report the 80%-power minimum detectable difference MDD_f ~ 2.80 *
      se_f and the CI half-width relative to 0.25 * sd_f (a declared
      minimal-interesting standardized effect).
+     [SUPERSEDED 2026-09-29, same day: a half-width-only criterion can
+     pass with a narrow CI centred on a large effect. The valid criterion
+     is the EQUIVALENCE BOUND — the CI lying entirely within
+     +/- 0.25 sd — which the grid experiment (exp_meta_config_grid.py)
+     implements and guide 5.5.4 now states. This screen's committed
+     artifact was produced under the half-width rule and is retained as a
+     historical record; reruns of this script reproduce that artifact
+     only because `precise_enough_for_null` below is left unchanged.]
 
 Predeclared decision rules.
 

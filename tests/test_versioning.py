@@ -259,3 +259,26 @@ def test_pooling_note_persists_and_combinable(tmp_path, monkeypatch):
     assert len(lines) == 1
     entry = __import__("json").loads(lines[0])
     assert "A/B" in entry["note"]
+
+    # per-source notes must be non-empty and identical (round-6 B2)
+    with _pytest.raises(ver.VersionPolicyError):
+        ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b},
+                              "strict", source_notes={"a.jsonl": "n1",
+                                                       "b.jsonl": "n2"})
+    with _pytest.raises(ver.VersionPolicyError):
+        ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b},
+                              "strict", source_notes={"a.jsonl": ""})
+    ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b}, "strict",
+                          source_notes={"a.jsonl": "n1", "b.jsonl": "n1"})
+
+    # an opt-in whose audit entry cannot be written FAILS (round-6 B3)
+    unwritable = tmp_path / "no-such-dir" / "x" / "audit.jsonl"
+    unwritable.parent.mkdir(parents=True)
+    # make the audit path a DIRECTORY -> open() raises OSError
+    (tmp_path / "dir-audit.jsonl").mkdir()
+    monkeypatch.setattr(ver, "POOLING_AUDIT_PATH", tmp_path / "dir-audit.jsonl")
+    with _pytest.raises(ver.VersionPolicyError):
+        ver.enforce_record_pooling(
+            [{"harness_version": "h1"}, {"harness_version": "h2"}],
+            "warn", source="s.jsonl", pool_legacy=True,
+            pooling_note="must persist or fail")

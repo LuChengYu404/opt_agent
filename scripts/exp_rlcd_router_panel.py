@@ -73,7 +73,9 @@ def _confidence_percentiles() -> dict[str, dict[float, float]]:
     )
 
     records = [
-        r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+        r for r in read_jsonl(
+            Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+            version_policy="warn")
         if 16 <= int(r.problem["seed"]) < 18
     ]
     out: dict[str, dict[float, float]] = {}

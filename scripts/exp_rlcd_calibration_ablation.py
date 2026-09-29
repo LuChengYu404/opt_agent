@@ -141,7 +141,9 @@ def _fit_temperature(pairs) -> float:
 
 def main() -> int:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    records = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+    records = [r for r in read_jsonl(
+        Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+        version_policy="warn")
                if int(r.problem["seed"]) >= 16]
     calib = [r for r in records if int(r.problem["seed"]) < 18]
     held = [r for r in records if int(r.problem["seed"]) >= 18]

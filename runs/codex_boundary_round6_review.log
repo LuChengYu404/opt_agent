@@ -1,0 +1,2282 @@
+OpenAI Codex v0.156.1
+--------
+workdir: /home/lcy/Documents/projects/opt_agent_v3
+model: gpt-6-sol
+provider: openai
+approval: on-request
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0edc6-8c84-79e2-b8d3-8b11814abe46
+--------
+user
+Boundary-guide review round 6 (convergence check). Branch: exp/boundary-scheme-round2, commit 2043673. Verdict trajectory: R1 REVISE (7 BLOCKER) -> R2 REVISE (0/14) -> R3 REVISE (0/9) -> R4 REVISE (0/5) -> R5 REVISE (0 BLOCKER / 4 MAJOR / 2 MINOR). All round-5 findings were fixed in 2043673. At round-5 you endorsed the joint-bootstrap SE as coherent and verified the primary numbers bit-for-bit; your remaining findings were declared-vs-executed rule conflicts, memory-only pooling audit, and loader defaults. Their dispositions (verify against the tree):
+
+- Declared/executed/serialized rule sync: grid docstring decision rule and the report's methods section now state the executed every-contrast equivalence futility rule; the serialized primary_null is "b_f / sd_ref(f) identical across families (no family x dose interaction)" and predeclared_rules.futile is the equivalence wording — both grid artifacts refreshed with these strings (trajectories deterministic, statistics identical).
+- Loader default: read_jsonl now defaults to version_policy="warn" (docstring states that a pooling boundary must not silently default to unchecked).
+- Persistent audit: every pool_legacy=True opt-in (with its required pooling_note) appends to runs/POOLING_DECISIONS.jsonl (best-effort, env-overridable via OPT_AGENT_POOLING_AUDIT); in-memory trail retained; unit-tested including the persisted file contents.
+- Cross-file rule: new versioning.assert_combinable(stamps_by_source, policy, pooling_note) unions raw stamps across the combined pool and applies the same no-silent-mixing rule (raise under strict, note required for opt-in); guide 4.5 now states the same-note-per-source requirement explicitly.
+- Remaining iter_jsonl pooling consumers migrated to read_jsonl(version_policy="warn"): exp_rlcd_calibration_ablation, exp_rlcd_loo_confirmatory, exp_rlcd_loo_transfer, exp_rlcd_router_panel, analyze_rlcd_ci, exp_lenz_vs_frozen_llm, exp_lenz_gate2_probe, evaluate_no_fit_student.
+- Minors: the guide-table parser now ends the table at ANY non-table line (blank included) so a second table in section 2.4 fails closed; the report's raw-unit secondary line no longer mislabels sd_ref involvement (the fixed-sd_ref description attaches only to the superseded 38.69 version).
+
+Review tasks:
+
+A. Verify each round-5 disposition (ADDRESSED / PARTIAL / UNADDRESSED).
+B. New-issue check on the fixes (assert_combinable semantics incl. its pool_legacy bool coercion from a note string; the audit file append semantics; the migrated call sites — e.g. any regex-mangled loader call among the 8 scripts; the parser's blank-line ending vs the live guide table's actual shape).
+C. Final standing-spec judgment: is the package (guide + THEORY + both experiment reports + enforcement code + tests + audit trail) fit to serve as the project's standing modification specification?
+
+Answer format: A compact verdict table; B PASS or issues [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs. Tests: 40 across registry/versioning/RLCD green; quick suite green.
+
+warning: Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+codex
+I’ll review commit `2043673` read-only, trace each round-5 fix through the code and artifacts, then check the new call sites and decide whether the package is ready as the standing spec.
+exec
+/bin/bash -lc "rg -n \"assert_combinable|POOLING_DECISIONS|OPT_AGENT_POOLING_AUDIT|def read_jsonl|version_policy|pool_legacy|predeclared_rules|primary_null|every.contrast|equivalence\" . --glob '"'!runs/*.json'"' --glob '"'!runs/*.jsonl'"'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+./tests/test_backend_checkpoint.py:108:    non-reproducible); we test history equivalence instead of step equivalence.
+./tests/test_versioning.py:173:        records = read_jsonl(path, version_policy="warn")
+./tests/test_versioning.py:182:        read_jsonl(path, version_policy="strict")
+./tests/test_versioning.py:187:    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./tests/test_versioning.py:204:        read_jsonl(path, version_policy="warn")
+./tests/test_versioning.py:210:        read_jsonl(path, version_policy="strict")
+./tests/test_versioning.py:213:        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./tests/test_versioning.py:218:        records = read_jsonl(path, version_policy="strict",
+./tests/test_versioning.py:219:                             pool_legacy=True,
+./tests/test_versioning.py:252:        ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b},
+./tests/test_versioning.py:255:    ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b}, "strict",
+./tests/test_objective_transform.py:271:# Replay — Phase 9 Gate 5 round-trip + replay equivalence
+./PROGRESS_BRANCH.md:677:  version_policy=...) materializes + enforces; exported from the package;
+./PROGRESS_BRANCH.md:723:- E2/C1: "precise null" now an equivalence bound (CI entirely within
+./PROGRESS_BRANCH.md:728:  version_policy; train_system1_compare.py migrated; mixed legacy+
+./PROGRESS_BRANCH.md:729:  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./PROGRESS_BRANCH.md:756:- B2: train_system1_compare.py now passes version_policy="warn"
+./PROGRESS_BRANCH.md:758:  read_jsonl(version_policy="warn").
+./PROGRESS_BRANCH.md:761:  pool_legacy=True now REQUIRES a pooling_note and records the decision
+./PROGRESS_BRANCH.md:764:- B4/E2: futility now requires the equivalence bound on EVERY
+./PROGRESS_BRANCH.md:767:  equivalence wording.
+./PROGRESS_BRANCH.md:786:  report's methods section now state the executed every-contrast
+./PROGRESS_BRANCH.md:787:  equivalence rule (no best-vs-reference/half-width remnants).
+./PROGRESS_BRANCH.md:794:  pool_legacy decision (with its pooling_note) to
+./PROGRESS_BRANCH.md:795:  runs/POOLING_DECISIONS.jsonl (best effort; env-overridable
+./PROGRESS_BRANCH.md:796:  OPT_AGENT_POOLING_AUDIT); in-memory trail retained.
+./PROGRESS_BRANCH.md:797:- Cross-file rule: new versioning.assert_combinable(stamps_by_source,
+./PROGRESS_BRANCH.md:802:  read_jsonl(version_policy="warn"): exp_rlcd_{calibration_ablation,
+./src/opt_agent/dataset/splits.py:198:    a full-history equivalence proof. Use it to dedup records that share
+./src/opt_agent/dataset/versioning.py:122:    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
+./src/opt_agent/dataset/versioning.py:140:def assert_combinable(
+./src/opt_agent/dataset/versioning.py:160:        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
+./src/opt_agent/dataset/versioning.py:168:    pool_legacy: bool = False,
+./src/opt_agent/dataset/versioning.py:177:    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+./src/opt_agent/dataset/versioning.py:178:    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./src/opt_agent/dataset/versioning.py:188:    if pool_legacy:
+./src/opt_agent/dataset/versioning.py:191:                f"{source}: pool_legacy=True requires a pooling_note "
+./src/opt_agent/dataset/versioning.py:207:                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+./src/opt_agent/dataset/decision_record.py:105:    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./src/opt_agent/dataset/decision_record.py:120:def read_jsonl(
+./src/opt_agent/dataset/decision_record.py:121:    path: Path, *, version_policy: str = "warn", pool_legacy: bool = False,
+./src/opt_agent/dataset/decision_record.py:131:    mixes (pool_legacy=True + pooling_note records the explicit opt-in,
+./src/opt_agent/dataset/decision_record.py:141:    if version_policy == "allow":
+./src/opt_agent/dataset/decision_record.py:146:            version_policy,
+./src/opt_agent/dataset/decision_record.py:153:        [record.metadata for record in records], version_policy,
+./src/opt_agent/dataset/decision_record.py:154:        source=str(path), pool_legacy=pool_legacy,
+./runs/codex_paper_rereview6.log:1506:   283	  equivalence: our sweep measures routing outcomes, not the per-state
+./runs/codex_boundary_round6_review.log:15:- Declared/executed/serialized rule sync: grid docstring decision rule and the report's methods section now state the executed every-contrast equivalence futility rule; the serialized primary_null is "b_f / sd_ref(f) identical across families (no family x dose interaction)" and predeclared_rules.futile is the equivalence wording — both grid artifacts refreshed with these strings (trajectories deterministic, statistics identical).
+./runs/codex_boundary_round6_review.log:16:- Loader default: read_jsonl now defaults to version_policy="warn" (docstring states that a pooling boundary must not silently default to unchecked).
+./runs/codex_boundary_round6_review.log:17:- Persistent audit: every pool_legacy=True opt-in (with its required pooling_note) appends to runs/POOLING_DECISIONS.jsonl (best-effort, env-overridable via OPT_AGENT_POOLING_AUDIT); in-memory trail retained; unit-tested including the persisted file contents.
+./runs/codex_boundary_round6_review.log:18:- Cross-file rule: new versioning.assert_combinable(stamps_by_source, policy, pooling_note) unions raw stamps across the combined pool and applies the same no-silent-mixing rule (raise under strict, note required for opt-in); guide 4.5 now states the same-note-per-source requirement explicitly.
+./runs/codex_boundary_round6_review.log:19:- Remaining iter_jsonl pooling consumers migrated to read_jsonl(version_policy="warn"): exp_rlcd_calibration_ablation, exp_rlcd_loo_confirmatory, exp_rlcd_loo_transfer, exp_rlcd_router_panel, analyze_rlcd_ci, exp_lenz_vs_frozen_llm, exp_lenz_gate2_probe, evaluate_no_fit_student.
+./runs/codex_boundary_round6_review.log:25:B. New-issue check on the fixes (assert_combinable semantics incl. its pool_legacy bool coercion from a note string; the audit file append semantics; the migrated call sites — e.g. any regex-mangled loader call among the 8 scripts; the parser's blank-line ending vs the live guide table's actual shape).
+./runs/EXP_RQ1_2_REPORT.md:129:> The CI excludes zero, so the effect is detectable. The practical importance is unclear; a smallest-meaningful-effect δ test is needed to claim equivalence. We do **not** claim "no measurable difference."
+./runs/codex_boundary_round2_review.log:833:   290	  equivalence: our sweep measures routing outcomes, not the per-state
+./runs/codex_boundary_guide_review.log:2365:    65	### 3.2 Argmax equivalence is **preserved in every bucket** (17/17 buckets ≥ 0.83)
+./docs/THEORY.md:296:  equivalence: our sweep measures routing outcomes, not the per-state
+./runs/codex_boundary_round4_review.log:18:- B1 (iter_jsonl unchecked/exported; scripts silently pool): iter_jsonl docstring now RAW ACCESS (replay of a single frozen artifact only); pooling consumers must use read_jsonl with explicit version_policy; train_system1_compare.py migrated to read_jsonl; remaining iter_jsonl users are replay/analysis scripts on their own frozen artifacts — the normative rule + boundary is stated in guide 4.5 and 6.6.
+./runs/codex_boundary_round4_review.log:19:- B2 (strict still pools legacy+current; warning != enforcement): new enforce_record_pooling — a source mixing CURRENT and LEGACY stamps on one axis warns under WARN and RAISES under STRICT unless pool_legacy=True records the explicit opt-in; wired into read_jsonl; unit-tested including the opt-in path.
+./runs/codex_boundary_round4_review.log:21:- C1 (5.5.2 success admits negative CI; futility via MDD is not equivalence): success = CI LOWER BOUND > 0 on >= 3 families (significantly negative = failure); termination = equivalence bound, all relevant contrasts' CIs entirely within +/- 0.25 sd.
+./runs/codex_boundary_round4_review.log:27:- E1 (guide 4.5 normative claim vs enforced behavior): 4.5 now states the enforcement boundary precisely — pooling consumers must go through read_jsonl with an explicit policy; warn/strict semantics including mixed-pool raise and pool_legacy opt-in; iter_jsonl documented as raw access for replay only.
+./runs/codex_boundary_round4_review.log:28:- E2 (precise-null by half-width alone): both the grid script and guide 5.5.4/5.5.2 now use the equivalence bound (CI entirely within +/- 0.25 sd); the script's precise_enough_for_null implements exactly that and the FUTILE rule requires it for every family's best-vs-reference contrast.
+./runs/codex_boundary_round4_review.log:33:B. Check the fixes introduced no NEW issues (code: enforce_record_pooling semantics, read_jsonl/pool_legacy wiring, parser strictness breaking on the actual guide table; docs: internal consistency of 5.5.1-5.5.4 with 5.2/5.4 and the grid numbers; report number consistency: 38.69/30.87/0.90/0.87 across report, guide, PROGRESS).
+./runs/codex_boundary_round4_review.log:130:    - E2/C1: precise null -> equivalence bound (CI entirely within
+./runs/codex_boundary_round4_review.log:134:      via read_jsonl with explicit version_policy; train_system1_compare
+./runs/codex_boundary_round4_review.log:136:      pool_legacy=True opt-in; guide 4.5 aligned with enforced behavior
+./runs/codex_boundary_round4_review.log:180:+- E2/C1: "precise null" now an equivalence bound (CI entirely within
+./runs/codex_boundary_round4_review.log:185:+  version_policy; train_system1_compare.py migrated; mixed legacy+
+./runs/codex_boundary_round4_review.log:186:+  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./runs/codex_boundary_round4_review.log:214:+   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round4_review.log:215:+   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round4_review.log:283:+   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round4_review.log:489:+    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./runs/codex_boundary_round4_review.log:497: def read_jsonl(
+./runs/codex_boundary_round4_review.log:498:-    path: Path, *, version_policy: str = "allow"
+./runs/codex_boundary_round4_review.log:499:+    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
+./runs/codex_boundary_round4_review.log:503:@@ -121,15 +127,23 @@ def read_jsonl(
+./runs/codex_boundary_round4_review.log:514:-    if version_policy != "allow":
+./runs/codex_boundary_round4_review.log:518:-                version_policy,
+./runs/codex_boundary_round4_review.log:522:+    if version_policy == "allow":
+./runs/codex_boundary_round4_review.log:527:+            version_policy,
+./runs/codex_boundary_round4_review.log:533:+    enforce_record_pooling(statuses, version_policy,
+./runs/codex_boundary_round4_review.log:534:+                           source=str(path), pool_legacy=pool_legacy)
+./runs/codex_boundary_round4_review.log:549:+    pool_legacy: bool = False,
+./runs/codex_boundary_round4_review.log:556:+    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+./runs/codex_boundary_round4_review.log:562:+    if policy is VersionPolicy.ALLOW or pool_legacy:
+./runs/codex_boundary_round4_review.log:573:+                     f"rule 1) — pass pool_legacy=True to record that "
+./runs/codex_boundary_round4_review.log:639:         read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:644:+    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./runs/codex_boundary_round4_review.log:661:+        read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round4_review.log:667:+        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:671:+        records = read_jsonl(path, version_policy="strict",
+./runs/codex_boundary_round4_review.log:672:+                             pool_legacy=True)
+./runs/codex_boundary_round4_review.log:677:I found an immediate code-path concern: `train_system1_compare.py` now calls `read_jsonl`, but omits `version_policy`, whose default is `"allow"`. I’m checking the other consumers and the guide wording before assigning its severity.
+./runs/codex_boundary_round4_review.log:679:/bin/bash -lc "rg -n 'iter_jsonl|read_jsonl|enforce_record_pooling|version_policy|pool_legacy' src scripts tests docs/RESEARCH_BOUNDARY_GUIDE.md" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round4_review.log:682:docs/RESEARCH_BOUNDARY_GUIDE.md:318:   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round4_review.log:683:docs/RESEARCH_BOUNDARY_GUIDE.md:319:   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round4_review.log:686:docs/RESEARCH_BOUNDARY_GUIDE.md:504:的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round4_review.log:688:docs/RESEARCH_BOUNDARY_GUIDE.md:639:   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./runs/codex_boundary_round4_review.log:690:docs/RESEARCH_BOUNDARY_GUIDE.md:649:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round4_review.log:695:tests/test_versioning.py:173:        records = read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round4_review.log:696:tests/test_versioning.py:182:        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:698:tests/test_versioning.py:187:    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./runs/codex_boundary_round4_review.log:700:tests/test_versioning.py:204:        read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round4_review.log:701:tests/test_versioning.py:210:        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:702:tests/test_versioning.py:214:        records = read_jsonl(path, version_policy="strict",
+./runs/codex_boundary_round4_review.log:703:tests/test_versioning.py:215:                             pool_legacy=True)
+./runs/codex_boundary_round4_review.log:774:scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round4_review.log:776:src/opt_agent/dataset/decision_record.py:105:    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./runs/codex_boundary_round4_review.log:777:src/opt_agent/dataset/decision_record.py:120:def read_jsonl(
+./runs/codex_boundary_round4_review.log:778:src/opt_agent/dataset/decision_record.py:121:    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
+./runs/codex_boundary_round4_review.log:781:src/opt_agent/dataset/decision_record.py:136:    if version_policy == "allow":
+./runs/codex_boundary_round4_review.log:782:src/opt_agent/dataset/decision_record.py:141:            version_policy,
+./runs/codex_boundary_round4_review.log:783:src/opt_agent/dataset/decision_record.py:147:    enforce_record_pooling(statuses, version_policy,
+./runs/codex_boundary_round4_review.log:784:src/opt_agent/dataset/decision_record.py:148:                           source=str(path), pool_legacy=pool_legacy)
+./runs/codex_boundary_round4_review.log:788:src/opt_agent/dataset/versioning.py:118:    pool_legacy: bool = False,
+./runs/codex_boundary_round4_review.log:789:src/opt_agent/dataset/versioning.py:125:    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+./runs/codex_boundary_round4_review.log:790:src/opt_agent/dataset/versioning.py:131:    if policy is VersionPolicy.ALLOW or pool_legacy:
+./runs/codex_boundary_round4_review.log:791:src/opt_agent/dataset/versioning.py:142:                     f"rule 1) — pass pool_legacy=True to record that "
+./runs/codex_boundary_round4_review.log:917:   118	    pool_legacy: bool = False,
+./runs/codex_boundary_round4_review.log:924:   125	    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+./runs/codex_boundary_round4_review.log:930:   131	    if policy is VersionPolicy.ALLOW or pool_legacy:
+./runs/codex_boundary_round4_review.log:941:   142	                     f"rule 1) — pass pool_legacy=True to record that "
+./runs/codex_boundary_round4_review.log:990:   105	    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./runs/codex_boundary_round4_review.log:1005:   120	def read_jsonl(
+./runs/codex_boundary_round4_review.log:1006:   121	    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
+./runs/codex_boundary_round4_review.log:1021:   136	    if version_policy == "allow":
+./runs/codex_boundary_round4_review.log:1026:   141	            version_policy,
+./runs/codex_boundary_round4_review.log:1032:   147	    enforce_record_pooling(statuses, version_policy,
+./runs/codex_boundary_round4_review.log:1033:   148	                           source=str(path), pool_legacy=pool_legacy)
+./runs/codex_boundary_round4_review.log:1124:   146	    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round4_review.log:1182:   318	   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round4_review.log:1183:   319	   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round4_review.log:1300:   504	的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round4_review.log:1928:   348	            "primary_null": "b_f identical across families "
+./runs/codex_boundary_round4_review.log:1931:   351	        "predeclared_rules": {
+./runs/codex_boundary_round4_review.log:2264:/bin/bash -lc "python -c 'import json; from pathlib import Path; p=Path(\"runs/exp_meta_config_grid.json\"); d=json.loads(p.read_text()); print(\"grid\",d[\"estimands\"],d[\"predeclared_rules\"],d[\"slope_homogeneity_primary\"]); p=Path(\"runs/exp_meta_config_grid_rastrigin240.json\"); d=json.loads(p.read_text()); print(\"deep\",d[\"estimands\"],d[\"predeclared_rules\"],d[\"slope_homogeneity_primary\"])'; nl -ba PROGRESS_BRANCH.md | sed -n '575,655p;680,740p'; nl -ba runs/EXP_META_CONFIG_SCREEN.md | sed -n '118,168p'" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round4_review.log:2266:grid {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'} {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND all best-vs-reference CI half-widths < 0.25 sd', 'otherwise': 'INCONCLUSIVE'} {'statistic': 38.68827436849248, 'df': 4, 'p_value': 8.079551239159599e-08, 'pooled': -0.2756259960536443, 'i2': 0.896609500803748}
+./runs/codex_boundary_round4_review.log:2267:deep {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'} {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND all best-vs-reference CI half-widths < 0.25 sd', 'otherwise': 'INCONCLUSIVE'} {'statistic': 0.0, 'df': 0, 'p_value': nan, 'pooled': 0.21027386361421715, 'i2': 0.0}
+./runs/codex_boundary_round4_review.log:2388:   719	- E2/C1: "precise null" now an equivalence bound (CI entirely within
+./runs/codex_boundary_round4_review.log:2393:   724	  version_policy; train_system1_compare.py migrated; mixed legacy+
+./runs/codex_boundary_round4_review.log:2394:   725	  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./runs/codex_boundary_round4_review.log:2972:   173	        records = read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round4_review.log:2981:   182	        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:2986:   187	    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./runs/codex_boundary_round4_review.log:3003:   204	        read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round4_review.log:3009:   210	        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round4_review.log:3013:   214	        records = read_jsonl(path, version_policy="strict",
+./runs/codex_boundary_round4_review.log:3014:   215	                             pool_legacy=True)
+./runs/codex_boundary_round4_review.log:3325:   348	            "primary_null": "b_f identical across families "
+./runs/codex_boundary_round4_review.log:3328:   351	        "predeclared_rules": {
+./runs/codex_boundary_round4_review.log:3420:/bin/bash -lc "rg -n 'A\\(s\\)|A ≤|A≤|signature|signatur|pointwise|逐态|签名|必输|cannot|predicts' docs/THEORY.md docs/RESEARCH_BOUNDARY_GUIDE.md | tail -90; nl -ba PROGRESS_BRANCH.md | sed -n '686,715p'; nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '260,288p'; rg -n 'legacy|mismatch|version_policy|version-policy|read_jsonl' docs/RESEARCH_BOUNDARY_GUIDE.md" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round4_review.log:3506:496:的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round4_review.log:3509:630:   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./runs/codex_boundary_round4_review.log:3538:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round4_review.log:3560:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round4_review.log:3592:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round4_review.log:3614:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round4_review.log:3627:9840:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round4_review.log:3634:9862:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round4_review.log:3639:9894:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round4_review.log:3646:9916:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round4_review.log:3729:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+./runs/codex_boundary_round4_review.log:3731:| C1 | ADDRESSED | §5.5.2 requires a positive CI lower bound and states an equivalence bound for termination. |
+./runs/codex_boundary_round4_review.log:3738:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+./runs/codex_boundary_round4_review.log:3750:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+./runs/codex_boundary_round4_review.log:3771:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+./runs/codex_boundary_round4_review.log:3773:| C1 | ADDRESSED | §5.5.2 requires a positive CI lower bound and states an equivalence bound for termination. |
+./runs/codex_boundary_round4_review.log:3780:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+./runs/codex_boundary_round4_review.log:3792:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+./runs/codex_boundary_round5_review.log:18:- B2 (train_system1_compare unchecked default; phase9_baselines on iter_jsonl): both now read via read_jsonl with explicit version_policy="warn".
+./runs/codex_boundary_round5_review.log:19:- B3 (pooling check coarse; no A/B note stored): enforce_record_pooling now compares RAW stamp values — absent-vs-present and two-different-known-past mixes both count; pool_legacy=True REQUIRES a non-empty pooling_note and records the decision to an audit trail (versioning.pooling_decisions()); the one-source boundary limitation (combining multiple separately loaded files) is documented in guide 4.5 with the normative requirement to cite the same note per source.
+./runs/codex_boundary_round5_review.log:20:- B4/E2a/E2b (futility inconsistencies; only best-vs-reference checked; half-width wording remnants): the FUTILE rule now requires the equivalence bound on EVERY level-vs-reference contrast per family; guide 5.5.4 uses the equivalence wording; the script's declared and serialized rule strings synchronized; guide 5.4 closed-loop success now "CI lower bound > 0".
+./runs/codex_boundary_round5_review.log:49:e3aa72c Round-4 review dispositions: joint-bootstrap SE; honest p; pooling audit; equivalence everywhere
+./runs/codex_boundary_round5_review.log:92:e3aa72c Round-4 review dispositions: joint-bootstrap SE; honest p; pooling audit; equivalence everywhere
+./runs/codex_boundary_round5_review.log:243:+    # Futility requires the equivalence bound on EVERY level contrast vs
+./runs/codex_boundary_round5_review.log:246:+    # equivalence-bounded.
+./runs/codex_boundary_round5_review.log:257:         "predeclared_rules": {
+./runs/codex_boundary_round5_review.log:262:+                      f"entirely within +/- {MISE} sd (equivalence bound)",
+./runs/codex_boundary_round5_review.log:284:+    records = read_jsonl(args.dataset, version_policy="warn")
+./runs/codex_boundary_round5_review.log:297:+    records = read_jsonl(args.input, version_policy="warn")
+./runs/codex_boundary_round5_review.log:308: def read_jsonl(
+./runs/codex_boundary_round5_review.log:309:-    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
+./runs/codex_boundary_round5_review.log:310:+    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:315:@@ -144,6 +145,8 @@ def read_jsonl(
+./runs/codex_boundary_round5_review.log:319:-    enforce_record_pooling(statuses, version_policy,
+./runs/codex_boundary_round5_review.log:320:-                           source=str(path), pool_legacy=pool_legacy)
+./runs/codex_boundary_round5_review.log:322:+        [record.metadata for record in records], version_policy,
+./runs/codex_boundary_round5_review.log:323:+        source=str(path), pool_legacy=pool_legacy,
+./runs/codex_boundary_round5_review.log:348:     pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:356:-    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+./runs/codex_boundary_round5_review.log:364:+    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+./runs/codex_boundary_round5_review.log:365:+    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./runs/codex_boundary_round5_review.log:373:-    if policy is VersionPolicy.ALLOW or pool_legacy:
+./runs/codex_boundary_round5_review.log:376:+    if pool_legacy:
+./runs/codex_boundary_round5_review.log:379:+                f"{source}: pool_legacy=True requires a pooling_note "
+./runs/codex_boundary_round5_review.log:394:-                     f"rule 1) — pass pool_legacy=True to record that "
+./runs/codex_boundary_round5_review.log:402:+                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+./runs/codex_boundary_round5_review.log:444:         read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round5_review.log:448:+        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./runs/codex_boundary_round5_review.log:453:         records = read_jsonl(path, version_policy="strict",
+./runs/codex_boundary_round5_review.log:454:-                             pool_legacy=True)
+./runs/codex_boundary_round5_review.log:455:+                             pool_legacy=True,
+./runs/codex_boundary_round5_review.log:493: - E2/C1: "precise null" now an equivalence bound (CI entirely within
+./runs/codex_boundary_round5_review.log:513:+- B2: train_system1_compare.py now passes version_policy="warn"
+./runs/codex_boundary_round5_review.log:515:+  read_jsonl(version_policy="warn").
+./runs/codex_boundary_round5_review.log:518:+  pool_legacy=True now REQUIRES a pooling_note and records the decision
+./runs/codex_boundary_round5_review.log:521:+- B4/E2: futility now requires the equivalence bound on EVERY
+./runs/codex_boundary_round5_review.log:524:+  equivalence wording.
+./runs/codex_boundary_round5_review.log:582:    （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round5_review.log:783:   126	    pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:792:   135	    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+./runs/codex_boundary_round5_review.log:793:   136	    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./runs/codex_boundary_round5_review.log:803:   146	    if pool_legacy:
+./runs/codex_boundary_round5_review.log:806:   149	                f"{source}: pool_legacy=True requires a pooling_note "
+./runs/codex_boundary_round5_review.log:821:   164	                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+./runs/codex_boundary_round5_review.log:872:   105	    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./runs/codex_boundary_round5_review.log:887:   120	def read_jsonl(
+./runs/codex_boundary_round5_review.log:888:   121	    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:904:   137	    if version_policy == "allow":
+./runs/codex_boundary_round5_review.log:909:   142	            version_policy,
+./runs/codex_boundary_round5_review.log:916:   149	        [record.metadata for record in records], version_policy,
+./runs/codex_boundary_round5_review.log:917:   150	        source=str(path), pool_legacy=pool_legacy,
+./runs/codex_boundary_round5_review.log:930:   318	   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round5_review.log:931:   319	   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round5_review.log:1475:   347	    # Futility requires the equivalence bound on EVERY level contrast vs
+./runs/codex_boundary_round5_review.log:1478:   350	    # equivalence-bounded.
+./runs/codex_boundary_round5_review.log:1504:   376	            "primary_null": "b_f identical across families "
+./runs/codex_boundary_round5_review.log:1507:   379	        "predeclared_rules": {
+./runs/codex_boundary_round5_review.log:1510:   382	                      f"entirely within +/- {MISE} sd (equivalence bound)",
+./runs/codex_boundary_round5_review.log:1746:   318	   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round5_review.log:1747:   319	   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round5_review.log:1937:src/opt_agent/dataset/versioning.py:136:    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./runs/codex_boundary_round5_review.log:1939:src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+./runs/codex_boundary_round5_review.log:1952:PROGRESS_BRANCH.md:761:  pool_legacy=True now REQUIRES a pooling_note and records the decision
+./runs/codex_boundary_round5_review.log:1961:docs/RESEARCH_BOUNDARY_GUIDE.md:318:   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+./runs/codex_boundary_round5_review.log:1962:docs/RESEARCH_BOUNDARY_GUIDE.md:319:   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round5_review.log:1972:docs/RESEARCH_BOUNDARY_GUIDE.md:651:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round5_review.log:1989: print('rules',d.get('predeclared_rules'))
+./runs/codex_boundary_round5_review.log:2068:   641	   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./runs/codex_boundary_round5_review.log:2078:   651	   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round5_review.log:2087:estimands {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'}
+./runs/codex_boundary_round5_review.log:2088:rules {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound)', 'otherwise': 'INCONCLUSIVE'}
+./runs/codex_boundary_round5_review.log:2097:estimands {'contrast': 'Delta_fL = E[y(n_init=L) - y(n_init=5)]', 'dose_slope': 'b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels', 'primary_null': 'b_f identical across families (no family x dose interaction)'}
+./runs/codex_boundary_round5_review.log:2098:rules {'conditionality': 'slope-homogeneity p < 0.05 (chi^2_{F-1})', 'futile': 'not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound)', 'otherwise': 'INCONCLUSIVE'}
+./runs/codex_boundary_round5_review.log:2107:3538:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round5_review.log:2114:3560:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round5_review.log:2122:3592:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round5_review.log:2129:3614:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round5_review.log:2136:3627:9840:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round5_review.log:2143:3634:9862:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round5_review.log:2148:3639:9894:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round5_review.log:2155:3646:9916:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round5_review.log:2164:3729:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+./runs/codex_boundary_round5_review.log:2167:3738:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+./runs/codex_boundary_round5_review.log:2173:3750:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+./runs/codex_boundary_round5_review.log:2180:3771:| B2 | ADDRESSED | `strict` rejects current-plus-legacy stamps within one source unless `pool_legacy=True`. |
+./runs/codex_boundary_round5_review.log:2183:3780:| E2a — equivalence bound | PARTIAL | The calculation changed; guide §5.5.4 and the script’s declared and serialized rules still say CI half-width. |
+./runs/codex_boundary_round5_review.log:2189:3792:| MAJOR | [guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:408), [grid rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:321), and [serialized rule](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) disagree on futility and omit alternatives when reference wins. | Require equivalence CIs for every relevant contrast and synchronize the declarations and artifacts. |
+./runs/codex_boundary_round5_review.log:2201:   506	的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round5_review.log:2250:   173	        records = read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round5_review.log:2259:   182	        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round5_review.log:2264:   187	    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./runs/codex_boundary_round5_review.log:2281:   204	        read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round5_review.log:2287:   210	        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round5_review.log:2290:   213	        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./runs/codex_boundary_round5_review.log:2295:   218	        records = read_jsonl(path, version_policy="strict",
+./runs/codex_boundary_round5_review.log:2296:   219	                             pool_legacy=True,
+./runs/codex_boundary_round5_review.log:2307:/bin/bash -lc "rg -n 'best.vs.reference|best-vs-reference|最优.对.参照|half.width|半宽|b_f identical|b_f / sd_ref|斜率的均值|Wald|38\\.69|30\\.87|20\\.06|I.?=.?87|I.?=.?90' scripts/exp_meta_config_grid.py runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md docs/RESEARCH_BOUNDARY_GUIDE.md PROGRESS_BRANCH.md runs/exp_meta_config_grid.json runs/exp_meta_config_grid_rastrigin240.json | head -145 && rg -n 'read_jsonl\\(|iter_jsonl\\(' scripts src | head -160 && rg -n 'pool_legacy|pooling_decisions|pooling_note' . --glob '"'!runs/codex_boundary_round*.log'"' --glob '"'!runs/exp_meta_config_grid*.json'"' --glob '"'!.git/**'"' | head -120" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round5_review.log:2315:runs/exp_meta_config_grid_rastrigin240.json:7:    "primary_null": "b_f identical across families (no family x dose interaction)"
+./runs/codex_boundary_round5_review.log:2346:scripts/exp_meta_config_grid.py:376:            "primary_null": "b_f identical across families "
+./runs/codex_boundary_round5_review.log:2347:runs/exp_meta_config_grid.json:7:    "primary_null": "b_f identical across families (no family x dose interaction)"
+./runs/codex_boundary_round5_review.log:2389:scripts/train_system1_compare.py:74:    records = read_jsonl(args.input, version_policy="warn")
+./runs/codex_boundary_round5_review.log:2390:scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round5_review.log:2394:src/opt_agent/dataset/decision_record.py:120:def read_jsonl(
+./runs/codex_boundary_round5_review.log:2398:scripts/phase9_baselines.py:180:    records = read_jsonl(args.dataset, version_policy="warn")
+./runs/codex_boundary_round5_review.log:2411:./tests/test_versioning.py:187:    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+./runs/codex_boundary_round5_review.log:2412:./tests/test_versioning.py:213:        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./runs/codex_boundary_round5_review.log:2414:./tests/test_versioning.py:219:                             pool_legacy=True,
+./runs/codex_boundary_round5_review.log:2417:./PROGRESS_BRANCH.md:729:  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./runs/codex_boundary_round5_review.log:2418:./PROGRESS_BRANCH.md:761:  pool_legacy=True now REQUIRES a pooling_note and records the decision
+./runs/codex_boundary_round5_review.log:2423:./src/opt_agent/dataset/versioning.py:126:    pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:2425:./src/opt_agent/dataset/versioning.py:135:    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+./runs/codex_boundary_round5_review.log:2426:./src/opt_agent/dataset/versioning.py:136:    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+./runs/codex_boundary_round5_review.log:2428:./src/opt_agent/dataset/versioning.py:146:    if pool_legacy:
+./runs/codex_boundary_round5_review.log:2430:./src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+./runs/codex_boundary_round5_review.log:2433:./src/opt_agent/dataset/versioning.py:164:                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+./runs/codex_boundary_round5_review.log:2435:./src/opt_agent/dataset/decision_record.py:121:    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+./runs/codex_boundary_round5_review.log:2437:./src/opt_agent/dataset/decision_record.py:150:        source=str(path), pool_legacy=pool_legacy,
+./runs/codex_boundary_round5_review.log:2439:./docs/RESEARCH_BOUNDARY_GUIDE.md:319:   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+./runs/codex_boundary_round5_review.log:2440:./docs/RESEARCH_BOUNDARY_GUIDE.md:651:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./runs/codex_boundary_round5_review.log:2617:   723	- E2/C1: "precise null" now an equivalence bound (CI entirely within
+./runs/codex_boundary_round5_review.log:2622:   728	  version_policy; train_system1_compare.py migrated; mixed legacy+
+./runs/codex_boundary_round5_review.log:2623:   729	  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+./runs/codex_boundary_round5_review.log:2641:src/opt_agent/dataset/versioning.py:149:                f"{source}: pool_legacy=True requires a pooling_note "
+./runs/codex_boundary_round5_review.log:2692:| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+./runs/codex_boundary_round5_review.log:2694:| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+./runs/codex_boundary_round5_review.log:2695:| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+./runs/codex_boundary_round5_review.log:2704:- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+./runs/codex_boundary_round5_review.log:2723:| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+./runs/codex_boundary_round5_review.log:2725:| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+./runs/codex_boundary_round5_review.log:2726:| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+./runs/codex_boundary_round5_review.log:2735:- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+./docs/RESEARCH_BOUNDARY_GUIDE.md:318:   version_policy 读取（默认 warn）**——warn 策略对 legacy 与混池发出
+./docs/RESEARCH_BOUNDARY_GUIDE.md:319:   警告、strict 对 mismatch 与跨版本混池直接拒绝（`pool_legacy=True`
+./docs/RESEARCH_BOUNDARY_GUIDE.md:321:   `runs/POOLING_DECISIONS.jsonl` 审计日志）；**合并多个来源时必须经
+./docs/RESEARCH_BOUNDARY_GUIDE.md:322:   `versioning.assert_combinable` 对合并后全池校验、并引用同一
+./docs/RESEARCH_BOUNDARY_GUIDE.md:509:的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./docs/RESEARCH_BOUNDARY_GUIDE.md:644:   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./docs/RESEARCH_BOUNDARY_GUIDE.md:654:   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+./scripts/exp_rlcd_loo_confirmatory.py:162:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+./runs/EXP_AFFINE_REPORT.md:65:### 3.2 Argmax equivalence is **preserved in every bucket** (17/17 buckets ≥ 0.83)
+./scripts/exp_meta_config_screen.py:375:        "predeclared_rules": {
+./scripts/exp_lenz_vs_frozen_llm.py:57:    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_audit_review.log:3531:65 ### 3.2 Argmax equivalence is **mostly preserved** (15/17 buckets ≥ 0.8)
+./scripts/exp_rlcd_loo_transfer.py:160:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+./scripts/phase9_baselines.py:180:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/exp_meta_config_grid.py:63:    contrast CI lies entirely within +/- 0.25 sd (equivalence bound).
+./scripts/exp_meta_config_grid.py:347:    # Futility requires the equivalence bound on EVERY level contrast vs
+./scripts/exp_meta_config_grid.py:350:    # equivalence-bounded.
+./scripts/exp_meta_config_grid.py:376:            "primary_null": "b_f / sd_ref(f) identical across families "
+./scripts/exp_meta_config_grid.py:379:        "predeclared_rules": {
+./scripts/exp_meta_config_grid.py:382:                      f"entirely within +/- {MISE} sd (equivalence bound)",
+./scripts/exp_lenz_gate2_probe.py:103:    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/analyze_rlcd_ci.py:72:    train_records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) < 16]
+./scripts/analyze_rlcd_ci.py:73:    records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) >= 16]
+./scripts/evaluate_no_fit_student.py:225:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/train_system1_compare.py:74:    records = read_jsonl(args.input, version_policy="warn")
+./runs/codex_boundary_round3_review.log:22:- C3: versioning.py gains VersionPolicy (allow/warn/strict) + enforce_record_versions (legacy warns once per source with a do-not-pool reminder; unknown stamps raise under strict); decision_record.read_jsonl(path, version_policy=...) enforces at the loading boundary; train_rlcd_laya.py reads via read_jsonl with --version-policy (default warn). Tests added.
+./runs/codex_boundary_round3_review.log:140:- C3: versioning.py gains VersionPolicy (allow/warn/strict) + enforce_record_versions (legacy warns once per source with a do-not-pool reminder; unknown stamps raise under strict); decision_record.read_jsonl(path, version_policy=...) enforces at the loading boundary; train_rlcd_laya.py reads via read_jsonl with --version-policy (default warn). Tests added.
+./runs/codex_boundary_round3_review.log:1072:   290	  equivalence: our sweep measures routing outcomes, not the per-state
+./runs/codex_boundary_round3_review.log:5956:   114	def read_jsonl(
+./runs/codex_boundary_round3_review.log:5957:   115	    path: Path, *, version_policy: str = "allow"
+./runs/codex_boundary_round3_review.log:5969:   127	    if version_policy != "allow":
+./runs/codex_boundary_round3_review.log:5973:   131	                version_policy,
+./runs/codex_boundary_round3_review.log:6123:   146	    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round3_review.log:6212:/bin/bash -lc "nl -ba scripts/train_rlcd_laya.py | sed -n '1,190p'; rg -n 'iter_jsonl|read_jsonl|check_record_versions|enforce_record_versions|version_policy|version-policy' src scripts tests | head -150" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round3_review.log:6505:   173	        records = read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round3_review.log:6514:   182	        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round3_review.log:6781:   114	def read_jsonl(
+./runs/codex_boundary_round3_review.log:6782:   115	    path: Path, *, version_policy: str = "allow"
+./runs/codex_boundary_round3_review.log:6794:   127	    if version_policy != "allow":
+./runs/codex_boundary_round3_review.log:6798:   131	                version_policy,
+./runs/codex_boundary_round3_review.log:7021:   146	    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round3_review.log:7081:tests/test_versioning.py:173:        records = read_jsonl(path, version_policy="warn")
+./runs/codex_boundary_round3_review.log:7082:tests/test_versioning.py:182:        read_jsonl(path, version_policy="strict")
+./runs/codex_boundary_round3_review.log:7154:scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round3_review.log:7156:src/opt_agent/dataset/decision_record.py:114:def read_jsonl(
+./runs/codex_boundary_round3_review.log:7157:src/opt_agent/dataset/decision_record.py:115:    path: Path, *, version_policy: str = "allow"
+./runs/codex_boundary_round3_review.log:7160:src/opt_agent/dataset/decision_record.py:127:    if version_policy != "allow":
+./runs/codex_boundary_round3_review.log:7162:src/opt_agent/dataset/decision_record.py:131:                version_policy,
+./runs/codex_boundary_round3_review.log:7439:   496	的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round3_review.log:7890:   630	   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./runs/codex_boundary_round3_review.log:8272:   496	的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round3_review.log:8745:   332	            "primary_null": "b_f identical across families "
+./runs/codex_boundary_round3_review.log:8748:   335	        "predeclared_rules": {
+./runs/codex_boundary_round3_review.log:9080:   146	    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round3_review.log:9155:      under strict); decision_record.read_jsonl(path, version_policy=...);
+./runs/codex_boundary_round3_review.log:9196:+    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./runs/codex_boundary_round3_review.log:9210:+def read_jsonl(
+./runs/codex_boundary_round3_review.log:9211:+    path: Path, *, version_policy: str = "allow"
+./runs/codex_boundary_round3_review.log:9223:+    if version_policy != "allow":
+./runs/codex_boundary_round3_review.log:9227:+                version_policy,
+./runs/codex_boundary_round3_review.log:9240:runs/exp_meta_config_screen.json ['experiment', 'estimands', 'mechanistic_hypotheses', 'predeclared_rules', 'families', 'dimensions', 'n_init_over_2dp1', 'seeds', 'discovery_seeds', 'confirmation_seeds', 'budget', 'configs', 'policy', 'n_evals_observed', 'wall_seconds', 'per_family', 'interaction', 'meta_d', 'lofo_sign_prediction', 'mechanistic_sign_test', 'confirmed_families', 'verdict', 'trajectories']
+./runs/codex_boundary_round3_review.log:9245:runs/exp_meta_config_grid.json ['experiment', 'relation_to_screen', 'estimands', 'predeclared_rules', 'families', 'dimensions', 'levels', 'reference_level', 'seeds', 'discovery_seeds', 'confirmation_seeds', 'budget', 'policy', 'n_evals_observed', 'wall_seconds', 'per_family', 'slope_homogeneity_primary', 'delta12_homogeneity_n60', 'delta12_homogeneity_fresh_seeds', 'mechanistic_sign_test', 'lofo_best_level', 'confirmed_families', 'verdict', 'trajectories']
+./runs/codex_boundary_round3_review.log:9250:runs/exp_meta_config_grid_rastrigin240.json ['experiment', 'relation_to_screen', 'estimands', 'predeclared_rules', 'families', 'dimensions', 'levels', 'reference_level', 'seeds', 'discovery_seeds', 'confirmation_seeds', 'budget', 'policy', 'n_evals_observed', 'wall_seconds', 'per_family', 'slope_homogeneity_primary', 'delta12_homogeneity_n60', 'delta12_homogeneity_fresh_seeds', 'mechanistic_sign_test', 'lofo_best_level', 'confirmed_families', 'verdict', 'trajectories']
+./runs/codex_boundary_round3_review.log:9507:   671	  version_policy=...) materializes + enforces; exported from the package;
+./runs/codex_boundary_round3_review.log:9722:/bin/bash -lc "rg -n 'A\\(s\\)|A ≤|A≤|signature|signatur|pointwise|逐态|签名|必输|cannot|predicts' docs/THEORY.md docs/RESEARCH_BOUNDARY_GUIDE.md | tail -90; nl -ba PROGRESS_BRANCH.md | sed -n '686,715p'; nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '260,288p'; rg -n 'legacy|mismatch|version_policy|version-policy|read_jsonl' docs/RESEARCH_BOUNDARY_GUIDE.md" in /home/lcy/Documents/projects/opt_agent_v3
+./runs/codex_boundary_round3_review.log:9808:496:的 `version_policy` 参数，allow/warn/strict；RLCD 训练脚本默认 warn）；
+./runs/codex_boundary_round3_review.log:9811:630:   version_policy：allow/warn/strict，RLCD 训练脚本默认 warn——
+./runs/codex_boundary_round3_review.log:9840:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round3_review.log:9862:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+./runs/codex_boundary_round3_review.log:9894:**C1 [MAJOR]** [Guide §5.5.2](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:393) says success requires a CI that excludes zero, which also admits a significantly *negative* increment. Its termination rule treats failure to detect a `0.25 sd` effect as futility; `MDD₈₀` does not establish equivalence. **Fix:** require a positive CI lower bound for success and an upper confidence bound below the effect floor for futility.
+./runs/codex_boundary_round3_review.log:9916:**E2 [MAJOR]** [Guide §5.5.4](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) defines “precise zero” by CI half-width alone. A narrow CI centered on a meaningful effect would satisfy that condition; the [grid script also treats a reference winner as precise without checking alternatives](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:305). **Fix:** use equivalence bounds on every relevant contrast, including alternatives to the reference.
+
+exec
+/bin/bash -lc "rg --files -g AGENTS.md -g '"'!runs/**'"'; sed -n '1,230p' src/opt_agent/dataset/versioning.py; sed -n '95,165p' src/opt_agent/dataset/decision_record.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Dataset / harness version stamps — code-side half of guide §4.5 + §6.6.
+
+Discipline (RESEARCH_BOUNDARY_GUIDE.md):
+
+- ``HARNESS_VERSION`` freezes the measurement system: observation format
+  (state features), action menu, and label pipeline. Any change to state
+  features, the ActionType menu, or any S-class supervision-defining
+  component (§6.6) REQUIRES a bump.
+- ``UTILITY_VERSION`` is the finer stamp: it tracks the S-class label
+  definition only (utility weights/scales, continuation policy, rollout
+  horizon, gold temperature, action-subset quota, replicate count).
+
+Reading rule (:func:`check_record_versions`):
+
+- ``OK``       — record carries the current stamps; poolable.
+- ``LEGACY``   — stamp missing (records predate the mechanism) or holds a
+  known-past value: readable, but must not be pooled with current-version
+  records without an explicit same-data A/B note (§6.6 rule 1).
+- ``MISMATCH`` — stamp is not a recognized value (e.g. a future version
+  read by older code): refuse to pool.
+
+Known-past values are listed in ``_KNOWN_PAST``; extend it when bumping
+either constant so old data reads as LEGACY rather than MISMATCH.
+"""
+
+from __future__ import annotations
+
+import json
+from enum import Enum
+from pathlib import Path
+from typing import Any, Mapping
+
+HARNESS_VERSION = "h1"
+UTILITY_VERSION = "phase8.6b"
+
+# Stamps that may appear in historical records. "phase8.6b" doubles as the
+# current UTILITY_VERSION; harness_version was simply absent before h1.
+_KNOWN_PAST: dict[str, set[str]] = {
+    "harness": set(),  # h1 is the first stamped harness version
+    "utility": set(),  # phase8.6b is the first formalized utility version
+}
+
+
+class VersionStatus(str, Enum):
+    OK = "ok"
+    LEGACY = "legacy"
+    MISMATCH = "mismatch"
+
+
+class VersionPolicy(str, Enum):
+    """Pooling policy enforced at a dataset loading boundary (guide 4.5/6.6).
+
+    ALLOW  - no check (back-compat; implicit pooling decision is "unchecked").
+    WARN   - summarize LEGACY once per source (do-not-pool reminder) and warn
+             on MISMATCH, but keep reading.
+    STRICT - raise VersionPolicyError on the first MISMATCH; LEGACY still only
+             warns (legacy records are the repo's history, the policy makes
+             the pooling decision EXPLICIT rather than forbidding reads).
+    """
+
+    ALLOW = "allow"
+    WARN = "warn"
+    STRICT = "strict"
+
+
+class VersionPolicyError(ValueError):
+    """A record carries an unrecognized version stamp under STRICT policy."""
+
+
+_legacy_warned: set[str] = set()
+
+
+def enforce_record_versions(
+    record_metadata: Mapping[str, Any],
+    policy: str | VersionPolicy,
+    *,
+    record_id: str = "",
+    source: str = "",
+) -> dict[str, VersionStatus]:
+    """Apply a pooling policy to one record's metadata.
+
+    Returns the per-axis status (same shape as check_record_versions).
+    LEGACY warns at most once per (source, axis) to avoid spam on large
+    legacy datasets; MISMATCH raises under STRICT.
+    """
+    policy = VersionPolicy(policy)
+    status = check_record_versions(record_metadata)
+    if policy is VersionPolicy.ALLOW:
+        return status
+    import warnings
+
+    for axis, st in status.items():
+        key = f"{source}:{axis}"
+        if st is VersionStatus.LEGACY and key not in _legacy_warned:
+            _legacy_warned.add(key)
+            warnings.warn(
+                f"{source}: {axis} stamp is legacy/absent (record "
+                f"{record_id!r} first seen); pooling legacy records with "
+                f"current-version records requires an explicit same-data "
+                f"A/B note (guide 6.6 rule 1)",
+                stacklevel=2,
+            )
+        if st is VersionStatus.MISMATCH:
+            stamp = record_metadata.get(f"{axis}_version")
+            msg = (f"{source}: record {record_id!r} has unrecognized "
+                   f"{axis} stamp {stamp!r} (current: "
+                   f"{HARNESS_VERSION if axis == 'harness' else UTILITY_VERSION}); "
+                   f"refusing to pool under STRICT policy")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+    return status
+
+
+import os
+
+_recorded_pooling_decisions: list[dict] = []
+
+# Pooling opt-ins are persisted here (best effort) so the decision survives
+# the process that made it (codex round-5 B3). Override for tests/other CWDs.
+POOLING_AUDIT_PATH = Path(
+    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
+
+
+def pooling_decisions() -> list[dict]:
+    """Audit trail of explicit cross-version pooling decisions."""
+    return list(_recorded_pooling_decisions)
+
+
+def _persist_pooling_decision(entry: dict) -> None:
+    try:
+        POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(entry, ensure_ascii=False,
+                                    sort_keys=True) + "\n")
+    except OSError:
+        pass  # read-only FS / no permission: in-memory trail only
+
+
+def assert_combinable(
+    stamps_by_source: dict[str, list[dict]],
+    policy: str | VersionPolicy,
+    *,
+    pooling_note: str = "",
+) -> None:
+    """Cross-file companion to enforce_record_pooling (guide 4.5).
+
+    Any consumer combining records from SEVERAL loaded sources must pass
+    each source's raw metadata dicts here: the check unions the stamps
+    across the complete combined pool and applies the same no-silent-
+    mixing rule (warn/raise under non-allow policies; pooling_note
+    required for the explicit opt-in, identical across sources).
+    """
+    combined: list[dict] = []
+    for source, stamps in stamps_by_source.items():
+        for s in stamps:
+            combined.append({**s, "_source": source})
+    enforce_record_pooling(
+        combined, policy, source="+".join(stamps_by_source),
+        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
+
+
+def enforce_record_pooling(
+    stamps: list[dict],
+    policy: str | VersionPolicy,
+    *,
+    source: str = "",
+    pool_legacy: bool = False,
+    pooling_note: str = "",
+) -> None:
+    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+
+    Compares RAW stamp values (not status classes), so two DIFFERENT
+    known-past stamps also count as a mix (codex round-4 B3). A mix of
+    distinct stamps on one axis is a cross-version pool; the guide
+    requires an explicit decision with a recorded same-data A/B note.
+    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+    the decision in the audit trail (pooling_decisions()), and proceeds.
+
+    Boundary limitation (documented in guide 4.5): this checks ONE loaded
+    source; combining multiple separately loaded files must pass each
+    through read_jsonl and cite the same pooling note.
+    """
+    policy = VersionPolicy(policy)
+    if policy is VersionPolicy.ALLOW:
+        return
+    if pool_legacy:
+        if not pooling_note.strip():
+            raise VersionPolicyError(
+                f"{source}: pool_legacy=True requires a pooling_note "
+                f"describing the same-data A/B justification (guide 6.6 "
+                f"rule 1)")
+        entry = {"source": source, "note": pooling_note}
+        _recorded_pooling_decisions.append(entry)
+        _persist_pooling_decision(entry)
+        return
+    import warnings
+
+    for axis in ("harness", "utility"):
+        # An absent stamp counts as its own value: records that predate the
+        # stamp mechanism pool with stamped records only by explicit note.
+        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
+        if len(values) > 1:
+            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+                   f"across versions requires an explicit same-data A/B "
+                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+                   f"a pooling_note to record that decision")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+
+
+def stamp_metadata(
+    metadata: Mapping[str, Any] | None,
+    *,
+    harness_version: str = HARNESS_VERSION,
+    utility_version: str = UTILITY_VERSION,
+) -> dict[str, Any]:
+    """Return a copy of ``metadata`` with both version stamps applied.
+
+    Existing stamp keys are overwritten (the caller is generating records
+    with the current code, whose stamps ARE the current constants).
+    """
+    out = dict(metadata) if metadata else {}
+    out["harness_version"] = harness_version
+    out["utility_version"] = utility_version
+    return out
+
+
+            )
+            stream.write("\n")
+
+
+def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+    """Read DecisionRecords from JSONL. Skips blank lines.
+
+    RAW ACCESS: no version enforcement. Replay/analysis scripts that walk a
+    single frozen artifact end-to-end may use this. Any consumer that POOLS
+    records (training, labeling, cross-dataset merging) must use
+    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+    """
+    path = Path(path)
+    with path.open("r", encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            if not line.strip():
+                continue
+            try:
+                yield DecisionRecord(**json.loads(line))
+            except Exception as exc:
+                raise ValueError(
+                    f"{path}:{line_number}: invalid DecisionRecord"
+                ) from exc
+
+
+def read_jsonl(
+    path: Path, *, version_policy: str = "warn", pool_legacy: bool = False,
+    pooling_note: str = "",
+) -> list[DecisionRecord]:
+    """Materialize records from JSONL, enforcing a version-pooling policy.
+
+    The version policy (guide 4.5/6.6) is the explicit pooling decision at
+    the loading boundary. DEFAULT IS "warn" (codex round-5 B3: a pooling
+    boundary must not silently default to unchecked): legacy stamps are
+    summarized once with a do-not-pool reminder, unrecognized stamps and
+    cross-version mixes warn; "strict" raises on unrecognized stamps and
+    mixes (pool_legacy=True + pooling_note records the explicit opt-in,
+    persisted to the pooling audit log); "allow" is the explicit
+    unchecked escape hatch. See opt_agent.dataset.versioning.
+    """
+    from opt_agent.dataset.versioning import (
+        enforce_record_pooling,
+        enforce_record_versions,
+    )
+
+    records = list(iter_jsonl(path))
+    if version_policy == "allow":
+        return records
+    statuses = [
+        enforce_record_versions(
+            record.metadata,
+            version_policy,
+            record_id=record.id,
+            source=str(path),
+        )
+        for record in records
+    ]
+    enforce_record_pooling(
+        [record.metadata for record in records], version_policy,
+        source=str(path), pool_legacy=pool_legacy,
+        pooling_note=pooling_note)
+    return records
+
+codex
+The loader now defaults to `warn`, and the pooling opt-in writes an audit entry. I’m checking whether the cross-file helper verifies the per-source conditions the guide requires, and whether all eight migrated scripts still call the loader correctly.
+exec
+/bin/bash -lc pwd in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+/home/lcy/Documents/projects/opt_agent_v3
+
+exec
+/bin/bash -lc 'git status --short' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+?? runs/codex_boundary_round6_review.log
+
+exec
+/bin/bash -lc "rg --files -g AGENTS.md -g '"'!runs/**'"'" in /home/lcy/Documents/projects/opt_agent_v3
+ exited 1 in 0ms:
+exec
+/bin/bash -lc 'git show --format= --name-only 2043673' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+PROGRESS_BRANCH.md
+docs/RESEARCH_BOUNDARY_GUIDE.md
+runs/EXP_META_CONFIG_GRID.md
+runs/codex_boundary_round5_review.log
+runs/exp_meta_config_grid.json
+runs/exp_meta_config_grid_rastrigin240.json
+scripts/analyze_rlcd_ci.py
+scripts/evaluate_no_fit_student.py
+scripts/exp_lenz_gate2_probe.py
+scripts/exp_lenz_vs_frozen_llm.py
+scripts/exp_meta_config_grid.py
+scripts/exp_rlcd_calibration_ablation.py
+scripts/exp_rlcd_loo_confirmatory.py
+scripts/exp_rlcd_loo_transfer.py
+scripts/exp_rlcd_router_panel.py
+src/opt_agent/dataset/decision_record.py
+src/opt_agent/dataset/versioning.py
+tests/test_boundary_registry.py
+tests/test_versioning.py
+
+exec
+/bin/bash -lc 'git show --format= -- src/opt_agent/dataset/versioning.py src/opt_agent/dataset/decision_record.py tests/test_versioning.py docs/RESEARCH_BOUNDARY_GUIDE.md scripts/exp_meta_config_grid.py runs/EXP_META_CONFIG_GRID.md tests/test_boundary_registry.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/docs/RESEARCH_BOUNDARY_GUIDE.md b/docs/RESEARCH_BOUNDARY_GUIDE.md
+index 8170e70..6ff03a2 100644
+--- a/docs/RESEARCH_BOUNDARY_GUIDE.md
++++ b/docs/RESEARCH_BOUNDARY_GUIDE.md
+@@ -315,10 +315,13 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项
+    为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
+    分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
+    **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+-   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+-   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+-   显式豁免）；`iter_jsonl` 为无校验的原始访问，仅限单一冻结工件的
+-   回放分析。任何 A/S 类修改**必须**递增对应戳
++   version_policy 读取（默认 warn）**——warn 策略对 legacy 与混池发出
++   警告、strict 对 mismatch 与跨版本混池直接拒绝（`pool_legacy=True`
++   + `pooling_note` 记录显式豁免并**持久化**到
++   `runs/POOLING_DECISIONS.jsonl` 审计日志）；**合并多个来源时必须经
++   `versioning.assert_combinable` 对合并后全池校验、并引用同一
++   pooling_note**；`iter_jsonl` 为无校验的原始访问，仅限单一冻结
++   工件的回放分析。任何 A/S 类修改**必须**递增对应戳
+    并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
+    走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
+    轨迹库跨版本不可比，RF/微调吸收污染。
+diff --git a/runs/EXP_META_CONFIG_GRID.md b/runs/EXP_META_CONFIG_GRID.md
+index 751a5d4..2ad487e 100644
+--- a/runs/EXP_META_CONFIG_GRID.md
++++ b/runs/EXP_META_CONFIG_GRID.md
+@@ -68,12 +68,13 @@ d_z = 0.11；斜率单侧 p = 0.049）。(ii) 两档对比（12 vs 5）在同质
+ ## 4. 方法
+ 
+ 与筛选实验相同的推断框架：各族对比的种子级 percentile bootstrap CI
+-（5000）、配对 t、d_z、MDD₈₀ = 2.80·se、0.25·sd 精确零界；斜率以
++（5000）、配对 t、d_z、MDD₈₀ = 2.80·se；斜率以
+ 种子级 OLS 斜率的均值 ± se 进入同质性 Wald χ²（连续 Cochran's Q，
+ df = F − 1）；机理符号的精确单侧二项检验；发现区（0–19，主网格按
+ 种子三等分取 0–19 对齐筛选样本）/ 确认区（20–59）划分；LOFO 最优
+-档位预测（描述性）。预宣告判定：检出 ⇔ 主检验 p < 0.05；FUTILE ⇔
+-未检出且全族最优-对-参照对比达精确零界；否则 INCONCLUSIVE。
++档位预测（描述性）。预宣告判定：检出 ⇔ 主检验 p < 0.05；FUTILE ⇔ 未检出且每个族的
++**全部**档位-对-参照对比 CI 均完整落在 ±0.25·sd 等价界内；否则
++INCONCLUSIVE。
+ 
+ ## 5. 结果
+ 
+@@ -94,8 +95,9 @@ df = F − 1）；机理符号的精确单侧二项检验；发现区（0–19
+ **主检验（参照标准化斜率同质性，尺度稳定；SE 取自联合种子
+ bootstrap——每个重抽样重复内 sd_ref 重新估计，其不确定性进入 SE）**：
+ χ²₄ = 20.06，**p = 5×10⁻⁴**，I² = 0.80，合并标准化斜率 −0.140。
+-原始单位斜率的次要版本（非尺度稳定、sd_ref 视为固定，仅作参考）：
+-χ²₄ = 30.87，I² = 0.87。**判定：CONDITIONALITY_DETECTED。**
++原始单位斜率的次要版本（非尺度稳定，仅作参考）：χ²₄ = 30.87，
++I² = 0.87；早期把 sd_ref 视为固定的标准化版本（χ²₄ = 38.69）已被
++联合 bootstrap 版取代。**判定：CONDITIONALITY_DETECTED。**
+ 
+ **次要检验（Δ₁₂ 同质性，与筛选可比）**：n = 60 时 χ²₄ = 9.07，
+ p = 0.059；仅新种子 20–59 时 p = 0.114——两档单对比保持边缘，
+diff --git a/scripts/exp_meta_config_grid.py b/scripts/exp_meta_config_grid.py
+index b44277a..5eee4c3 100644
+--- a/scripts/exp_meta_config_grid.py
++++ b/scripts/exp_meta_config_grid.py
+@@ -59,8 +59,8 @@ Inference.
+ Predeclared decision rules.
+ 
+   - CONDITIONALITY_DETECTED iff slope-homogeneity p < 0.05.
+-  - FUTILE iff not detected AND every family's best-vs-reference CI
+-    half-width < 0.25 sd (precise null).
++  - FUTILE iff not detected AND, for every family, EVERY level-vs-reference
++    contrast CI lies entirely within +/- 0.25 sd (equivalence bound).
+   - Otherwise INCONCLUSIVE.
+ """
+ from __future__ import annotations
+@@ -373,7 +373,7 @@ def main() -> int:
+             "contrast": f"Delta_fL = E[y(n_init=L) - y(n_init={REFERENCE})]",
+             "dose_slope": "b_f = mean seed-paired OLS slope of y on "
+                           "c = n_init/(2d+1) over levels",
+-            "primary_null": "b_f identical across families "
++            "primary_null": "b_f / sd_ref(f) identical across families "
+                             "(no family x dose interaction)",
+         },
+         "predeclared_rules": {
+diff --git a/src/opt_agent/dataset/decision_record.py b/src/opt_agent/dataset/decision_record.py
+index d538b55..baed4f1 100644
+--- a/src/opt_agent/dataset/decision_record.py
++++ b/src/opt_agent/dataset/decision_record.py
+@@ -118,15 +118,19 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+ 
+ 
+ def read_jsonl(
+-    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
++    path: Path, *, version_policy: str = "warn", pool_legacy: bool = False,
+     pooling_note: str = "",
+ ) -> list[DecisionRecord]:
+     """Materialize records from JSONL, enforcing a version-pooling policy.
+ 
+     The version policy (guide 4.5/6.6) is the explicit pooling decision at
+-    the loading boundary: "allow" (default, historical behavior), "warn"
+-    (summarize legacy, warn on unrecognized stamps), or "strict" (raise on
+-    unrecognized stamps). See opt_agent.dataset.versioning for semantics.
++    the loading boundary. DEFAULT IS "warn" (codex round-5 B3: a pooling
++    boundary must not silently default to unchecked): legacy stamps are
++    summarized once with a do-not-pool reminder, unrecognized stamps and
++    cross-version mixes warn; "strict" raises on unrecognized stamps and
++    mixes (pool_legacy=True + pooling_note records the explicit opt-in,
++    persisted to the pooling audit log); "allow" is the explicit
++    unchecked escape hatch. See opt_agent.dataset.versioning.
+     """
+     from opt_agent.dataset.versioning import (
+         enforce_record_pooling,
+diff --git a/src/opt_agent/dataset/versioning.py b/src/opt_agent/dataset/versioning.py
+index bd314fd..8ed915a 100644
+--- a/src/opt_agent/dataset/versioning.py
++++ b/src/opt_agent/dataset/versioning.py
+@@ -25,7 +25,9 @@ either constant so old data reads as LEGACY rather than MISMATCH.
+ 
+ from __future__ import annotations
+ 
++import json
+ from enum import Enum
++from pathlib import Path
+ from typing import Any, Mapping
+ 
+ HARNESS_VERSION = "h1"
+@@ -110,14 +112,54 @@ def enforce_record_versions(
+     return status
+ 
+ 
++import os
++
+ _recorded_pooling_decisions: list[dict] = []
+ 
++# Pooling opt-ins are persisted here (best effort) so the decision survives
++# the process that made it (codex round-5 B3). Override for tests/other CWDs.
++POOLING_AUDIT_PATH = Path(
++    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
++
+ 
+ def pooling_decisions() -> list[dict]:
+     """Audit trail of explicit cross-version pooling decisions."""
+     return list(_recorded_pooling_decisions)
+ 
+ 
++def _persist_pooling_decision(entry: dict) -> None:
++    try:
++        POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
++        with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
++            stream.write(json.dumps(entry, ensure_ascii=False,
++                                    sort_keys=True) + "\n")
++    except OSError:
++        pass  # read-only FS / no permission: in-memory trail only
++
++
++def assert_combinable(
++    stamps_by_source: dict[str, list[dict]],
++    policy: str | VersionPolicy,
++    *,
++    pooling_note: str = "",
++) -> None:
++    """Cross-file companion to enforce_record_pooling (guide 4.5).
++
++    Any consumer combining records from SEVERAL loaded sources must pass
++    each source's raw metadata dicts here: the check unions the stamps
++    across the complete combined pool and applies the same no-silent-
++    mixing rule (warn/raise under non-allow policies; pooling_note
++    required for the explicit opt-in, identical across sources).
++    """
++    combined: list[dict] = []
++    for source, stamps in stamps_by_source.items():
++        for s in stamps:
++            combined.append({**s, "_source": source})
++    enforce_record_pooling(
++        combined, policy, source="+".join(stamps_by_source),
++        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
++
++
+ def enforce_record_pooling(
+     stamps: list[dict],
+     policy: str | VersionPolicy,
+@@ -149,8 +191,9 @@ def enforce_record_pooling(
+                 f"{source}: pool_legacy=True requires a pooling_note "
+                 f"describing the same-data A/B justification (guide 6.6 "
+                 f"rule 1)")
+-        _recorded_pooling_decisions.append(
+-            {"source": source, "note": pooling_note})
++        entry = {"source": source, "note": pooling_note}
++        _recorded_pooling_decisions.append(entry)
++        _persist_pooling_decision(entry)
+         return
+     import warnings
+ 
+diff --git a/tests/test_boundary_registry.py b/tests/test_boundary_registry.py
+index fc10a3d..fe0ba5e 100644
+--- a/tests/test_boundary_registry.py
++++ b/tests/test_boundary_registry.py
+@@ -58,17 +58,21 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
+     )
+     rows: dict[str, tuple[str, str, str]] = {}
+     table_ended = False
++    saw_row = False
+     for line in lines[header_idx + 1:]:
+         stripped = line.strip()
+         if not stripped.startswith("|"):
+-            if stripped:
++            # ANY non-table line — blank included — ends the first table
++            # once a data row was seen; later '|' rows are a second table.
++            if saw_row:
+                 table_ended = True
+-            continue  # allow blank lines inside; any later '|' row is a
+-            # SECOND table in the section -> fail closed
++            continue
+         assert not table_ended, (
+             "found a second markdown table inside section 2.4 — the sync "
+             "check covers exactly one table")
+         cells = [c.strip() for c in stripped.strip("|").split("|")]
++        if not (cells and cells[0].startswith("-")):
++            saw_row = True
+         if cells and cells[0].startswith("-"):
+             continue  # separator row
+         assert len(cells) == 4, (
+diff --git a/tests/test_versioning.py b/tests/test_versioning.py
+index e3d9fe1..3352913 100644
+--- a/tests/test_versioning.py
++++ b/tests/test_versioning.py
+@@ -223,3 +223,39 @@ def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
+     decisions = ver.pooling_decisions()
+     assert len(decisions) == 1
+     assert "A/B" in decisions[0]["note"]
++
++
++def test_pooling_note_persists_and_combinable(tmp_path, monkeypatch):
++    """Opt-in notes persist to the audit file; cross-file combination is
++    checked over the union of stamps (codex round-5 B3/B4)."""
++    import warnings as _w
++
++    import opt_agent.dataset.versioning as ver
++
++    audit = tmp_path / "audit.jsonl"
++    monkeypatch.setattr(ver, "POOLING_AUDIT_PATH", audit)
++    monkeypatch.setattr(ver, "_legacy_warned", set())
++    monkeypatch.setattr(ver, "_recorded_pooling_decisions", [])
++
++    # one source current-only, one source legacy-only: individually fine,
++    # combined they are a cross-version pool
++    src_a = [{"harness_version": ver.HARNESS_VERSION,
++              "utility_version": ver.UTILITY_VERSION}]
++    src_b = [{"utility_version": ver.UTILITY_VERSION}]  # pre-h1 record
++    with _w.catch_warnings(record=True):
++        _w.simplefilter("always")
++        ver.enforce_record_pooling(src_a, "warn", source="a.jsonl")
++        ver.enforce_record_pooling(src_b, "warn", source="b.jsonl")
++
++    import pytest as _pytest
++    with _pytest.raises(ver.VersionPolicyError):
++        ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b},
++                              "strict")
++    # with a note the combination is recorded and persisted
++    ver.assert_combinable({"a.jsonl": src_a, "b.jsonl": src_b}, "strict",
++                          pooling_note="A/B: same seeds across both files")
++    assert audit.exists()
++    lines = [l for l in audit.read_text(encoding="utf-8").splitlines() if l]
++    assert len(lines) == 1
++    entry = __import__("json").loads(lines[0])
++    assert "A/B" in entry["note"]
+
+exec
+/bin/bash -lc 'git show --format= -- scripts/analyze_rlcd_ci.py scripts/evaluate_no_fit_student.py scripts/exp_lenz_gate2_probe.py scripts/exp_lenz_vs_frozen_llm.py scripts/exp_rlcd_calibration_ablation.py scripts/exp_rlcd_loo_confirmatory.py scripts/exp_rlcd_loo_transfer.py scripts/exp_rlcd_router_panel.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/scripts/analyze_rlcd_ci.py b/scripts/analyze_rlcd_ci.py
+index 3d125c0..6d06639 100644
+--- a/scripts/analyze_rlcd_ci.py
++++ b/scripts/analyze_rlcd_ci.py
+@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
+ 
+ from _rlcd_common import per_record_laya  # noqa: E402
+ 
+-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
++from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+ from opt_agent.system1.rlcd import (  # noqa: E402
+     RLCDConfig,
+     build_item,
+@@ -69,8 +69,8 @@ def paired_bootstrap(
+ 
+ def main() -> int:
+     dataset = Path("runs/phase8_6d_h3_20seed_5family.jsonl")
+-    train_records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) < 16]
+-    records = [r for r in iter_jsonl(dataset) if int(r.problem["seed"]) >= 16]
++    train_records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) < 16]
++    records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) >= 16]
+ 
+     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+     eval_cfg = RLCDConfig(device=str(device), batch_size=8)
+diff --git a/scripts/evaluate_no_fit_student.py b/scripts/evaluate_no_fit_student.py
+index 532d81a..b190202 100644
+--- a/scripts/evaluate_no_fit_student.py
++++ b/scripts/evaluate_no_fit_student.py
+@@ -31,7 +31,7 @@ from opt_agent.actions.factory import (  # noqa: E402
+     ALL_CANDIDATE_SPECS, candidate_actions_for_state,
+ )
+ from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
+-from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
++from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
+ from opt_agent.loop import DecisionLoop  # noqa: E402
+ from opt_agent.loop.policies import RulePolicy  # noqa: E402
+ from opt_agent.rollout.utility import UtilityWeights  # noqa: E402
+@@ -222,7 +222,7 @@ def main() -> None:
+     if min(args.budgets) <= 5:
+         parser.error("budgets must exceed the five initial evaluations")
+     torch.set_num_threads(1)
+-    records = list(iter_jsonl(args.dataset))
++    records = read_jsonl(args.dataset, version_policy="warn")
+     models = {}
+     training = {}
+     for name, weights in WEIGHTS.items():
+diff --git a/scripts/exp_lenz_gate2_probe.py b/scripts/exp_lenz_gate2_probe.py
+index 52d1b39..6449f27 100644
+--- a/scripts/exp_lenz_gate2_probe.py
++++ b/scripts/exp_lenz_gate2_probe.py
+@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT / "src"))
+ sys.path.insert(0, str(ROOT / "scripts"))
+ 
+ from _shared_rq_features import ACTIONS, extract_features  # noqa: E402
+-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
++from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+ 
+ FAMILIES = ("ackley", "branin", "hartmann", "rastrigin", "sixhumpcamel")
+ 
+@@ -100,7 +100,7 @@ def main() -> int:
+                         default=Path("runs/exp_lenz_gate2_probe.json"))
+     args = parser.parse_args()
+ 
+-    records = [r for r in iter_jsonl(args.dataset)]
++    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+     out = {"dataset": str(args.dataset), "families": {}}
+ 
+     for fam in FAMILIES:
+diff --git a/scripts/exp_lenz_vs_frozen_llm.py b/scripts/exp_lenz_vs_frozen_llm.py
+index a2cdc26..3d9bb52 100644
+--- a/scripts/exp_lenz_vs_frozen_llm.py
++++ b/scripts/exp_lenz_vs_frozen_llm.py
+@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT / "src"))
+ sys.path.insert(0, str(ROOT / "scripts"))
+ 
+-from opt_agent.dataset import iter_jsonl, phase_of_ratio  # noqa: E402
++from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+ from opt_agent.state import lenz_state_from_record  # noqa: E402
+ from opt_agent.system1.llm_system1_policy import LLMSystem1Policy  # noqa: E402
+ from opt_agent.system1.lenz_prompt import build_lenz_choice_request  # noqa: E402
+@@ -54,7 +54,7 @@ def main() -> int:
+     args = parser.parse_args()
+ 
+     api_key = _load_env()
+-    records = [r for r in iter_jsonl(args.dataset)]
++    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+ 
+     # Stratified sample: per family, spread across seeds and phases.
+     by_family: dict[str, list] = defaultdict(list)
+diff --git a/scripts/exp_rlcd_calibration_ablation.py b/scripts/exp_rlcd_calibration_ablation.py
+index 0d8c4d1..421d8f0 100644
+--- a/scripts/exp_rlcd_calibration_ablation.py
++++ b/scripts/exp_rlcd_calibration_ablation.py
+@@ -30,7 +30,7 @@ import torch
+ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT / "src"))
+ 
+-from opt_agent.dataset import iter_jsonl  # noqa: E402
++from opt_agent.dataset import read_jsonl  # noqa: E402
+ from opt_agent.system1.rlcd import (  # noqa: E402
+     RLCDConfig,
+     _collate,
+diff --git a/scripts/exp_rlcd_loo_confirmatory.py b/scripts/exp_rlcd_loo_confirmatory.py
+index 446fda8..6c94461 100644
+--- a/scripts/exp_rlcd_loo_confirmatory.py
++++ b/scripts/exp_rlcd_loo_confirmatory.py
+@@ -36,7 +36,7 @@ from _rlcd_common import (  # noqa: E402
+     rf_pairwise_and_top1,
+ )
+ 
+-from opt_agent.dataset import iter_jsonl  # noqa: E402
++from opt_agent.dataset import read_jsonl  # noqa: E402
+ 
+ def _per_record_laya_compat(model, tok, records, device_str):
+     from _rlcd_common import per_record_laya
+@@ -159,7 +159,7 @@ def main() -> int:
+                         default=Path("runs/exp_rlcd_loo_confirmatory.json"))
+     args = parser.parse_args()
+ 
+-    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
++    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+     tasks = [{"family": f, "dataset": str(args.dataset),
+               "epochs": args.epochs, "train_seeds": args.train_seeds}
+              for f in families]
+diff --git a/scripts/exp_rlcd_loo_transfer.py b/scripts/exp_rlcd_loo_transfer.py
+index 7b10161..7737849 100644
+--- a/scripts/exp_rlcd_loo_transfer.py
++++ b/scripts/exp_rlcd_loo_transfer.py
+@@ -36,7 +36,7 @@ from _rlcd_common import (  # noqa: E402
+     rf_pairwise_and_top1 as _rf_pairwise_and_top1,
+ )
+ 
+-from opt_agent.dataset import iter_jsonl  # noqa: E402
++from opt_agent.dataset import read_jsonl  # noqa: E402
+ 
+ 
+ def _eval_arm(model, tok, records) -> dict:
+@@ -157,7 +157,7 @@ def main() -> int:
+                         default=Path("runs/exp_rlcd_loo_transfer.json"))
+     args = parser.parse_args()
+ 
+-    families = sorted({r.problem["family"] for r in iter_jsonl(args.dataset)})
++    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+     tasks = [
+         {"family": f, "dataset": str(args.dataset), "epochs": args.epochs}
+         for f in families
+diff --git a/scripts/exp_rlcd_router_panel.py b/scripts/exp_rlcd_router_panel.py
+index f5124f6..cc78610 100644
+--- a/scripts/exp_rlcd_router_panel.py
++++ b/scripts/exp_rlcd_router_panel.py
+@@ -64,7 +64,7 @@ def _confidence_percentiles() -> dict[str, dict[float, float]]:
+     """
+     import torch
+ 
+-    from opt_agent.dataset import iter_jsonl
++    from opt_agent.dataset import read_jsonl
+     from opt_agent.system1.rlcd import (
+         RLCDConfig,
+         _collate,
+
+exec
+/bin/bash -lc "rg -n 'iter_jsonl|read_jsonl' scripts/exp_rlcd_calibration_ablation.py scripts/exp_rlcd_router_panel.py scripts/exp_rlcd_loo_confirmatory.py scripts/exp_rlcd_loo_transfer.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_rlcd_loo_transfer.py:39:from opt_agent.dataset import read_jsonl  # noqa: E402
+scripts/exp_rlcd_loo_transfer.py:123:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/exp_rlcd_loo_transfer.py:160:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+scripts/exp_rlcd_loo_confirmatory.py:39:from opt_agent.dataset import read_jsonl  # noqa: E402
+scripts/exp_rlcd_loo_confirmatory.py:90:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/exp_rlcd_loo_confirmatory.py:162:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+scripts/exp_rlcd_router_panel.py:67:    from opt_agent.dataset import read_jsonl
+scripts/exp_rlcd_router_panel.py:76:        r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+scripts/exp_rlcd_calibration_ablation.py:33:from opt_agent.dataset import read_jsonl  # noqa: E402
+scripts/exp_rlcd_calibration_ablation.py:144:    records = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+
+codex
+Four migrated scripts still call `iter_jsonl` after replacing its import with `read_jsonl`; those execution paths will raise `NameError`. I’ll finish the rule and artifact checks before assigning the final severity.
+exec
+/bin/bash -lc "sed -n '2680,2755p' runs/codex_boundary_round5_review.log; nl -ba tests/test_boundary_registry.py | sed -n '30,130p'; nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '150,220p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+Branin [('Hartmann', -0.04), ('Ackley', -0.02), ('SixHumpCamel', -0.03), ('Rastrigin', -0.24)]
+Hartmann [('Ackley', -0.11), ('SixHumpCamel', -0.02), ('Rastrigin', 0.09)]
+Ackley [('SixHumpCamel', -0.06), ('Rastrigin', 0.19)]
+SixHumpCamel [('Rastrigin', -0.16)]
+Rastrigin []
+
+codex
+### A. Round-4 dispositions
+
+| Finding | Status | Verification |
+|---|---|---|
+| B1 — joint-bootstrap SE | ADDRESSED | Slopes and reference outcomes are resampled by the same seed indices. The saved primary result is χ²₄ = 20.0587, p = 0.000486, I² = 0.8006. The Wald p-value remains an asymptotic approximation. |
+| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+| B3 — pooling | PARTIAL | Within-file checks compare raw stamps and require a note for explicit opt-in. Cross-file pooling remains unchecked; the audit exists only in process memory. |
+| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+| B5 — primary wording and numbers | PARTIAL | Guide, report, and PROGRESS give the corrected numbers; both JSON artifacts still declare the raw-slope null as primary. |
+| Screen retraction; candidate baseline; guide success rule | ADDRESSED | The requested wording is present. |
+| §2.4 parser | PARTIAL | It requires four header cells, but a blank line does not end the table for second-table detection. |
+
+### B. Issues
+
+The joint seed bootstrap is coherent for estimating each standardized slope’s SE, and the bootstrap-SE Wald test is a reasonable approximation. A legitimately stamped single-version file has one raw stamp value per axis, so the revised pooling comparison does not falsely flag it.
+
+- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+- **MAJOR** — [grid payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) serializes “`b_f identical`” as the primary null, and both refreshed JSON artifacts retain it. **Fix:** serialize equality of `b_f / sd_ref(f)` and refresh both artifacts.
+- **MAJOR** — [loader](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:137) returns unchecked under `allow`; [pooling audit](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:113) is memory-only. A pooling consumer can therefore leave no recorded note. **Fix:** require a checked policy at pooling boundaries and persist opt-in notes with the resulting artifact.
+- **MAJOR** — [guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:316) does not contain the claimed same-note-per-source cross-file requirement, while [the check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:157) covers one source. **Fix:** add that rule to the guide and validate stamps across the combined pool. Existing RLCD training consumers also still use unchecked `iter_jsonl`, for example [this loader](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123).
+- **MINOR** — [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:61) treats rows after a blank line as part of the first table. **Fix:** end the table at a blank line and reject subsequent table rows in §2.4.
+- **MINOR** — [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:97) says the raw-unit secondary test treats `sd_ref` as fixed, although that test does not use `sd_ref`. **Fix:** reserve that description for the superseded standardized-SE calculation.
+
+### C. Standing-spec judgment
+
+The corrected primary result supports the reported conditionality finding, and most round-4 fixes are present. The package is **not yet fit** as the standing modification specification: its declared and serialized rules still conflict with execution, and its required pooling decision can be bypassed or lost. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE
+tokens used
+70,512
+### A. Round-4 dispositions
+
+| Finding | Status | Verification |
+|---|---|---|
+| B1 — joint-bootstrap SE | ADDRESSED | Slopes and reference outcomes are resampled by the same seed indices. The saved primary result is χ²₄ = 20.0587, p = 0.000486, I² = 0.8006. The Wald p-value remains an asymptotic approximation. |
+| B2 — two named training loaders | ADDRESSED | Both now call `read_jsonl(..., version_policy="warn")`. |
+| B3 — pooling | PARTIAL | Within-file checks compare raw stamps and require a note for explicit opt-in. Cross-file pooling remains unchecked; the audit exists only in process memory. |
+| B4/E2a — futility wording | PARTIAL | The executable and serialized rules use equivalence bounds, but the script’s declared rule and grid report still state the older rule. |
+| E2b — every contrast | ADDRESSED | The executable FUTILE check covers every level-versus-reference contrast. |
+| B5 — primary wording and numbers | PARTIAL | Guide, report, and PROGRESS give the corrected numbers; both JSON artifacts still declare the raw-slope null as primary. |
+| Screen retraction; candidate baseline; guide success rule | ADDRESSED | The requested wording is present. |
+| §2.4 parser | PARTIAL | It requires four header cells, but a blank line does not end the table for second-table detection. |
+
+### B. Issues
+
+The joint seed bootstrap is coherent for estimating each standardized slope’s SE, and the bootstrap-SE Wald test is a reasonable approximation. A legitimately stamped single-version file has one raw stamp value per axis, so the revised pooling comparison does not falsely flag it.
+
+- **MAJOR** — [grid script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:62) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:75) still declare best-versus-reference or half-width futility rules. **Fix:** state the executed every-contrast equivalence rule in both places.
+- **MAJOR** — [grid payload definition](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) serializes “`b_f identical`” as the primary null, and both refreshed JSON artifacts retain it. **Fix:** serialize equality of `b_f / sd_ref(f)` and refresh both artifacts.
+- **MAJOR** — [loader](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:137) returns unchecked under `allow`; [pooling audit](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:113) is memory-only. A pooling consumer can therefore leave no recorded note. **Fix:** require a checked policy at pooling boundaries and persist opt-in notes with the resulting artifact.
+- **MAJOR** — [guide §4.5](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:316) does not contain the claimed same-note-per-source cross-file requirement, while [the check](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:157) covers one source. **Fix:** add that rule to the guide and validate stamps across the combined pool. Existing RLCD training consumers also still use unchecked `iter_jsonl`, for example [this loader](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123).
+- **MINOR** — [table parser](/home/lcy/Documents/projects/opt_agent_v3/tests/test_boundary_registry.py:61) treats rows after a blank line as part of the first table. **Fix:** end the table at a blank line and reject subsequent table rows in §2.4.
+- **MINOR** — [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:97) says the raw-unit secondary test treats `sd_ref` as fixed, although that test does not use `sd_ref`. **Fix:** reserve that description for the superseded standardized-SE calculation.
+
+### C. Standing-spec judgment
+
+The corrected primary result supports the reported conditionality finding, and most round-4 fixes are present. The package is **not yet fit** as the standing modification specification: its declared and serialized rules still conflict with execution, and its required pooling decision can be bypassed or lost. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE
+    30	    verify_registry_sync,
+    31	)
+    32	from opt_agent.actions.models import ActionType
+    33	
+    34	GUIDE_PATH = (
+    35	    Path(__file__).resolve().parents[1] / "docs" / "RESEARCH_BOUNDARY_GUIDE.md"
+    36	)
+    37	
+    38	EXPECTED_HEADER = ("ActionType", "归类", "子菜单", "备注")
+    39	
+    40	
+    41	def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
+    42	    """Strictly parse a §2.4-style markdown table.
+    43	
+    44	    Returns {action_value: (boundary_class, submenu, note)}. Raises
+    45	    AssertionError on schema violations — the sync test must fail closed,
+    46	    not skip quietly.
+    47	    """
+    48	    lines = section_text.splitlines()
+    49	    header_hits = [i for i, ln in enumerate(lines)
+    50	                   if ln.strip().startswith("| ActionType |")]
+    51	    assert len(header_hits) == 1, (
+    52	        f"expected exactly one §2.4 table, found {len(header_hits)}")
+    53	    header_idx = header_hits[0]
+    54	    header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
+    55	    assert len(header_cells) == 4 and tuple(header_cells) == EXPECTED_HEADER, (
+    56	        f"unexpected §2.4 table header: {header_cells!r} "
+    57	        f"(expected exactly {EXPECTED_HEADER})"
+    58	    )
+    59	    rows: dict[str, tuple[str, str, str]] = {}
+    60	    table_ended = False
+    61	    saw_row = False
+    62	    for line in lines[header_idx + 1:]:
+    63	        stripped = line.strip()
+    64	        if not stripped.startswith("|"):
+    65	            # ANY non-table line — blank included — ends the first table
+    66	            # once a data row was seen; later '|' rows are a second table.
+    67	            if saw_row:
+    68	                table_ended = True
+    69	            continue
+    70	        assert not table_ended, (
+    71	            "found a second markdown table inside section 2.4 — the sync "
+    72	            "check covers exactly one table")
+    73	        cells = [c.strip() for c in stripped.strip("|").split("|")]
+    74	        if not (cells and cells[0].startswith("-")):
+    75	            saw_row = True
+    76	        if cells and cells[0].startswith("-"):
+    77	            continue  # separator row
+    78	        assert len(cells) == 4, (
+    79	            f"malformed §2.4 row (needs exactly 4 cells, got {len(cells)}): "
+    80	            f"{line!r}")
+    81	        name, cls, submenu, note = cells
+    82	        try:
+    83	            action_value = ActionType[name].value
+    84	        except KeyError:
+    85	            raise AssertionError(
+    86	                f"§2.4 row names unknown action {name!r}: {line!r}")
+    87	        assert action_value not in rows, (
+    88	            f"duplicate §2.4 row for {action_value!r}")
+    89	        assert note, f"§2.4 row for {name} has an empty 备注 cell"
+    90	        rows[action_value] = (cls, submenu, note)
+    91	    return rows
+    92	
+    93	
+    94	def _guide_section_2_4_rows() -> dict[str, tuple[str, str, str]]:
+    95	    """Parse the guide's §2.4 table (reads the rendered document, so a doc
+    96	    edit alone cannot desynchronize code from spec)."""
+    97	    text = GUIDE_PATH.read_text(encoding="utf-8")
+    98	    start = text.index("### 2.4")
+    99	    end = text.index("\n## ", start)
+   100	    return _parse_section_rows(text[start:end])
+   101	
+   102	
+   103	# ---------------------------------------------------------------------------
+   104	# Registry <-> menu
+   105	# ---------------------------------------------------------------------------
+   106	
+   107	
+   108	def test_registry_matches_action_type_menu_exactly():
+   109	    verify_registry_sync()  # raises RegistrySyncError on any drift
+   110	    assert set(BOUNDARY_REGISTRY) == set(ActionType)
+   111	
+   112	
+   113	def test_registry_error_names_missing_action():
+   114	    registry_entries = dict(BOUNDARY_REGISTRY)
+   115	    missing = ActionType.STOP
+   116	    del registry_entries[missing]
+   117	    import opt_agent.actions.boundary_registry as mod
+   118	
+   119	    original = mod.BOUNDARY_REGISTRY
+   120	    mod.BOUNDARY_REGISTRY = registry_entries
+   121	    try:
+   122	        with pytest.raises(RegistrySyncError) as exc:
+   123	            verify_registry_sync()
+   124	        assert missing.value in str(exc.value)
+   125	    finally:
+   126	        mod.BOUNDARY_REGISTRY = original
+   127	
+   128	
+   129	def test_query_accessors():
+   130	    assert boundary_class_of(ActionType.RETRAIN_SURROGATE) == "B1"
+   150	| 预算 T | 资源约束，外生 |
+   151	| 输出算子的**定义**（argmin / Pareto 支配 / 超体积的测度） | 数学定义，不随运行改变 |
+   152	| 策略的 adaptedness（可测性第一层） | 决策必须是观测历史的可测函数——随机化策略只要把自身随机性并入决策时信息即满足（§3.2），确定性/温度 0 是可复现性约定而非本不变量条件；违反则运行评估失效。**架构不变量**，任何设计不得触碰 |
+   153	
+   154	### 2.2 B 类：episode 内允许调整（按证据强度分档）
+   155	
+   156	**B1 · 有理论背书**
+   157	- STOP（Bayesian optimal stopping, Dai et al., ICML 2019；
+   158	  probabilistic-regret stopping 带正确性保证，本地锚
+   159	  `arxiv_2402.16811`）。
+   160	- 族内 MLE 超参重估：允许且是默认工程惯例。理论注记（引文须准确）：
+   161	  Bull 2011（JMLR，EI 收敛分析）在超参固定或经特定一致估计的假设下
+   162	  成立，并给出**序贯 MLE 超参估计不收敛的反例**与替代估计量——超参
+   163	  估计策略是理论敏感点：必须设计期选定、episode 内语义不变。重拟合
+   164	  重拟合频率属 B3，**不是**定理强制的（当前 harness 无周期重拟合
+   165	  机制，该档位为预留设计、未实现）。
+   166	
+   167	**B2 · 经验充分、理论真空（替换使用的风险有限：每步决策仍是标准
+   168	   采集函数计算）**
+   169	- AF 选择：GP-Hedge（Hoffman et al., 2011）→ No-PASt-BO
+   170	  （Vasconcelos et al., 2019）→ SETUP-BO（ESWA 188:115847, 2022）→
+   171	  ESP（Shahriari et al., 2014）→ LMABO（零样本 LLM 选择器）整条脉络。
+   172	- AF 内部参数：SAWEI（自调权重 λ，AutoML 2023 / PMLR v224）、
+   173	  PI-is-back（按数据质量切 PI/EI，`arxiv_2211.01455`）。
+   174	- 本项目 8 动作中的采样模式位（global_exploration、
+   175	  local_exploitation、uncertainty_sampling、error_guided_sampling、
+   176	  boundary_sampling）与 surrogate_acquisition 占此生态位。
+   177	
+   178	**B3 · 可调但文献覆盖有限（工程常用，理论保证缺乏）**
+   179	- 批量 q、重拟合频率（周期重拟合：预留设计、未实现）、初始点数 2D+1。
+   180	
+   181	### 2.3 C 类：episode 内禁止（外置为元层动作）
+   182	
+   183	> C 类是**本项目协议**，不是数学禁令：带日志的运行中切换在原则上仍是
+   184	> 可定义、可分析的 adaptive algorithm，受控比较也可以做。禁止的理由是
+   185	> 保护本项目的估计量——归因、可比、以及与所引定理前提的一致性
+   186	> （§3.3）。违反者产出的数据在本项目测量体系内不可用。
+   187	
+   188	| 动作 | 破坏什么 |
+   189	|---|---|
+   190	| 运行中更换核/模型族 | 破坏超参一致性前提（估计量序列不再是该族的 MLE 序列）；先前证据在新假设下的权重无定义；切换时点构成未记录的隐藏状态，破坏可比性 |
+   191	| 手改超参/钳制 σ/向 μ 注入非概率信息（修改后验） | 后验不再是贝叶斯更新规则的输出：EI 的"期望"仅相对于被修改后的非贝叶斯后验成立；σ 钳小将导致欠探索与线性遗憾，且不再受定理上界约束；监督信号无法归因 |
+   192	| 替换代理为无概率语义的预测器（换代理） | 在 GP 后验上陈述的 regret bound 不再适用；替换载体必须自行给出与其输出语义匹配的保证——校准的后验近似也**不自动继承** GP 型 bound（§3.3）。LLAMBO（`arxiv_2402.03921`）/LLMP 占此位，与 BO 理论断开 |
+   193	
+   194	**相邻但不属于 C 类的设计（避免过度禁止）**：
+   195	- 摊销推断（PFN `arxiv_2112.10510`、meta-learned priors PMLR v205）
+   196	  绕开手工 GP 但输出**校准的后验近似**——判据不在"是不是 GP"，
+   197	  在"输出是不是定义良好的概率信念"（注意：校准后验不自动继承
+   198	  GP 型 regret bound，该路线需自证其保证）。
+   199	- 设计期核选择/组合核（通过核的和/积组合获得所需表达能力）、贝叶斯
+   200	  模型平均：自始至终保持单一一致的概率模型语义，**允许**。
+   201	- SMAC（Hutter et al., 2011）以序贯模型配置算法为工具；本项目与其实
+   202	  结构同构、对象互补——**配置对象是 BO 自身**。这是元层的文献支点。
+   203	
+   204	### 2.4 本项目 8 动作菜单的归类（`src/opt_agent/actions/models.py`；机器可读版：`actions/boundary_registry.py`，三方同步测试强制一致）
+   205	
+   206	| ActionType | 归类 | 子菜单 | 备注 |
+   207	|---|---|---|---|
+   208	| GLOBAL_EXPLORATION | B2 | A_pt | 采样模式位（Sobol）；经验充分、理论真空档 |
+   209	| LOCAL_EXPLOITATION | B2 | A_pt | 采样模式位（当前最优邻域扰动） |
+   210	| UNCERTAINTY_SAMPLING | B2 | A_pt | 采样模式位（后验 std 引导） |
+   211	| ERROR_GUIDED_SAMPLING | B2 | A_pt | 采样模式位（留一误差引导） |
+   212	| BOUNDARY_SAMPLING | B2 | A_pt | 采样模式位（边界覆盖） |
+   213	| SURROGATE_ACQUISITION | B2 | A_pt | 标准 AF 求点（LogEI，按需拟合） |
+   214	| RETRAIN_SURROGATE | B1 | A_flow | 惰性生命周期中的显式重拟合位（重估语义受 B1 约束，频率属 B3）；**必须**限定为族内 MLE 重估；**禁止**将其扩展为换族/换核——那属于元层重启动作（§4.1） |
+   215	| STOP | B1 | A_flow | 终止型动作；理论对应 Bayesian optimal stopping / probabilistic-regret stopping；Gate-4 stop-gain 是其数据侧对应 |
+   216	
+   217	---
+   218	
+   219	## 3. 研究边界的形式化
+   220	
+
+exec
+/bin/bash -lc "nl -ba scripts/exp_rlcd_calibration_ablation.py | sed -n '135,153p'; nl -ba scripts/exp_rlcd_loo_confirmatory.py | sed -n '82,96p'; nl -ba scripts/exp_rlcd_loo_transfer.py | sed -n '116,128p'; nl -ba scripts/exp_rlcd_router_panel.py | sed -n '64,82p'; nl -ba src/opt_agent/dataset/versioning.py | sed -n '115,215p'; nl -ba scripts/exp_meta_config_grid.py | sed -n '340,392p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+   135	        if nll(m1) < nll(m2):
+   136	            hi = m2
+   137	        else:
+   138	            lo = m1
+   139	    return (lo + hi) / 2
+   140	
+   141	
+   142	def main() -> int:
+   143	    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+   144	    records = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+   145	               if int(r.problem["seed"]) >= 16]
+   146	    calib = [r for r in records if int(r.problem["seed"]) < 18]
+   147	    held = [r for r in records if int(r.problem["seed"]) >= 18]
+   148	    print(f"calib={len(calib)} held={len(held)}", flush=True)
+   149	
+   150	    arms = {}
+   151	    for name, path in (("bt", "runs/rlcd_laya_bt_v1"),
+   152	                       ("proper", "runs/rlcd_laya_proper_v1")):
+   153	        model, tok, _cfg, _ = load_laya_for_training(path)
+    82	def _run_fold(task: dict) -> dict:
+    83	    import shutil
+    84	
+    85	    import torch
+    86	
+    87	    torch.set_num_threads(4)
+    88	    from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
+    89	
+    90	    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    91	    held_out = task["family"]
+    92	    train_pool = [r for r in records if r.problem["family"] != held_out]
+    93	    test = [r for r in records if r.problem["family"] == held_out]
+    94	    # Split the 20-seed pool by seed RANK (16 smallest -> train, rest ->
+    95	    # early-stop val) so seed-offset datasets (e.g. the s100-119
+    96	    # replication stream) split the same way; on the original seeds 0-19
+   116	    import shutil
+   117	
+   118	    import torch
+   119	
+   120	    torch.set_num_threads(4)
+   121	    from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
+   122	
+   123	    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+   124	    held_out = task["family"]
+   125	    train_pool = [r for r in records if r.problem["family"] != held_out]
+   126	    test = [r for r in records if r.problem["family"] == held_out]
+   127	    # Early-stopping slice from the TRAIN families (seeds >= 16 of pool).
+   128	    tr = [r for r in train_pool if int(r.problem["seed"]) < 16]
+    64	    """
+    65	    import torch
+    66	
+    67	    from opt_agent.dataset import read_jsonl
+    68	    from opt_agent.system1.rlcd import (
+    69	        RLCDConfig,
+    70	        _collate,
+    71	        build_item,
+    72	        load_laya_for_training,
+    73	    )
+    74	
+    75	    records = [
+    76	        r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+    77	        if 16 <= int(r.problem["seed"]) < 18
+    78	    ]
+    79	    out: dict[str, dict[float, float]] = {}
+    80	    for arm, path in CHECKPOINTS.items():
+    81	        model, tok, _cfg, _ = load_laya_for_training(path)
+    82	        model.eval()
+   115	import os
+   116	
+   117	_recorded_pooling_decisions: list[dict] = []
+   118	
+   119	# Pooling opt-ins are persisted here (best effort) so the decision survives
+   120	# the process that made it (codex round-5 B3). Override for tests/other CWDs.
+   121	POOLING_AUDIT_PATH = Path(
+   122	    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
+   123	
+   124	
+   125	def pooling_decisions() -> list[dict]:
+   126	    """Audit trail of explicit cross-version pooling decisions."""
+   127	    return list(_recorded_pooling_decisions)
+   128	
+   129	
+   130	def _persist_pooling_decision(entry: dict) -> None:
+   131	    try:
+   132	        POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+   133	        with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
+   134	            stream.write(json.dumps(entry, ensure_ascii=False,
+   135	                                    sort_keys=True) + "\n")
+   136	    except OSError:
+   137	        pass  # read-only FS / no permission: in-memory trail only
+   138	
+   139	
+   140	def assert_combinable(
+   141	    stamps_by_source: dict[str, list[dict]],
+   142	    policy: str | VersionPolicy,
+   143	    *,
+   144	    pooling_note: str = "",
+   145	) -> None:
+   146	    """Cross-file companion to enforce_record_pooling (guide 4.5).
+   147	
+   148	    Any consumer combining records from SEVERAL loaded sources must pass
+   149	    each source's raw metadata dicts here: the check unions the stamps
+   150	    across the complete combined pool and applies the same no-silent-
+   151	    mixing rule (warn/raise under non-allow policies; pooling_note
+   152	    required for the explicit opt-in, identical across sources).
+   153	    """
+   154	    combined: list[dict] = []
+   155	    for source, stamps in stamps_by_source.items():
+   156	        for s in stamps:
+   157	            combined.append({**s, "_source": source})
+   158	    enforce_record_pooling(
+   159	        combined, policy, source="+".join(stamps_by_source),
+   160	        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
+   161	
+   162	
+   163	def enforce_record_pooling(
+   164	    stamps: list[dict],
+   165	    policy: str | VersionPolicy,
+   166	    *,
+   167	    source: str = "",
+   168	    pool_legacy: bool = False,
+   169	    pooling_note: str = "",
+   170	) -> None:
+   171	    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+   172	
+   173	    Compares RAW stamp values (not status classes), so two DIFFERENT
+   174	    known-past stamps also count as a mix (codex round-4 B3). A mix of
+   175	    distinct stamps on one axis is a cross-version pool; the guide
+   176	    requires an explicit decision with a recorded same-data A/B note.
+   177	    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+   178	    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+   179	    the decision in the audit trail (pooling_decisions()), and proceeds.
+   180	
+   181	    Boundary limitation (documented in guide 4.5): this checks ONE loaded
+   182	    source; combining multiple separately loaded files must pass each
+   183	    through read_jsonl and cite the same pooling note.
+   184	    """
+   185	    policy = VersionPolicy(policy)
+   186	    if policy is VersionPolicy.ALLOW:
+   187	        return
+   188	    if pool_legacy:
+   189	        if not pooling_note.strip():
+   190	            raise VersionPolicyError(
+   191	                f"{source}: pool_legacy=True requires a pooling_note "
+   192	                f"describing the same-data A/B justification (guide 6.6 "
+   193	                f"rule 1)")
+   194	        entry = {"source": source, "note": pooling_note}
+   195	        _recorded_pooling_decisions.append(entry)
+   196	        _persist_pooling_decision(entry)
+   197	        return
+   198	    import warnings
+   199	
+   200	    for axis in ("harness", "utility"):
+   201	        # An absent stamp counts as its own value: records that predate the
+   202	        # stamp mechanism pool with stamped records only by explicit note.
+   203	        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
+   204	        if len(values) > 1:
+   205	            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+   206	                   f"across versions requires an explicit same-data A/B "
+   207	                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+   208	                   f"a pooling_note to record that decision")
+   209	            if policy is VersionPolicy.STRICT:
+   210	                raise VersionPolicyError(msg)
+   211	            warnings.warn(msg, stacklevel=2)
+   212	
+   213	
+   214	def stamp_metadata(
+   215	    metadata: Mapping[str, Any] | None,
+   340	            lofo.append({"held_out": held, "predicted": pred,
+   341	                         "actual": per_family[held]["best_level"],
+   342	                         "correct": pred == per_family[held]["best_level"]})
+   343	    lofo_acc = (sum(1 for r in lofo if r["correct"]) / len(lofo)) if lofo else None
+   344	
+   345	    # Predeclared rules (cross-family; single-family arms have no such rule)
+   346	    detected = slope_homog["p_value"] < 0.05
+   347	    # Futility requires the equivalence bound on EVERY level contrast vs
+   348	    # the reference (not only the selected best; codex round-4 E2b) — a
+   349	    # reference-winning family is futile only if all its contrasts are
+   350	    # equivalence-bounded.
+   351	    precise_null = all(
+   352	        all(c["precise_enough_for_null"]
+   353	            for c in row["contrasts_vs_reference"].values())
+   354	        for row in per_family.values())
+   355	    if len(args.families) < 2:
+   356	        verdict = "SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate " \
+   357	                  "the predeclared per-family question directly)"
+   358	    elif detected:
+   359	        verdict = "CONDITIONALITY_DETECTED"
+   360	    elif precise_null:
+   361	        verdict = "FUTILE"
+   362	    else:
+   363	        verdict = "INCONCLUSIVE"
+   364	    confirmed = [f for f in args.families
+   365	                 if per_family[f]["best_vs_reference"]
+   366	                 and per_family[f]["best_vs_reference"]["confirmed"]]
+   367	
+   368	    payload = {
+   369	        "experiment": "exp_meta_config_grid",
+   370	        "relation_to_screen": "dose-response extension of "
+   371	                              "exp_meta_config_screen (levels 5/12 nested)",
+   372	        "estimands": {
+   373	            "contrast": f"Delta_fL = E[y(n_init=L) - y(n_init={REFERENCE})]",
+   374	            "dose_slope": "b_f = mean seed-paired OLS slope of y on "
+   375	                          "c = n_init/(2d+1) over levels",
+   376	            "primary_null": "b_f / sd_ref(f) identical across families "
+   377	                            "(no family x dose interaction)",
+   378	        },
+   379	        "predeclared_rules": {
+   380	            "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
+   381	            "futile": "not detected AND every level-vs-reference CI lies "
+   382	                      f"entirely within +/- {MISE} sd (equivalence bound)",
+   383	            "otherwise": "INCONCLUSIVE",
+   384	        },
+   385	        "families": args.families, "dimensions": dims, "levels": LEVELS,
+   386	        "reference_level": REFERENCE, "seeds": args.seeds,
+   387	        "discovery_seeds": disc_idx, "confirmation_seeds": conf_idx,
+   388	        "budget": args.budget, "policy": "AlwaysSurrogate (pinned)",
+   389	        "n_evals_observed": sorted(n_evals), "wall_seconds": elapsed,
+   390	        "per_family": per_family,
+   391	        "slope_homogeneity_primary": slope_homog,
+   392	        "delta12_homogeneity_n60": pair12_homog,
+
+exec
+/bin/bash -lc "python -c 'import json,pathlib; fs=[pathlib.Path(\"runs/exp_meta_config_grid.json\"),pathlib.Path(\"runs/exp_meta_config_grid_rastrigin240.json\")]; [(lambda d:print(str(p),d[\"estimands\"][\"primary_null\"],d[\"predeclared_rules\"][\"futile\"],d[\"slope_homogeneity_primary\"].get(\"chi2\"),d[\"slope_homogeneity_primary\"].get(\"p_value\"),d[\"verdict\"]))(json.loads(p.read_text())) for p in fs]'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+runs/exp_meta_config_grid.json b_f / sd_ref(f) identical across families (no family x dose interaction) not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound) None 0.00048624600909208393 CONDITIONALITY_DETECTED
+runs/exp_meta_config_grid_rastrigin240.json b_f / sd_ref(f) identical across families (no family x dose interaction) not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound) None nan SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate the predeclared per-family question directly)
+
+exec
+/bin/bash -lc 'git diff 2043673''^ 2043673 -- runs/exp_meta_config_grid.json runs/exp_meta_config_grid_rastrigin240.json | head -100; rg -n '"'38\\.69|30\\.87|20\\.06|0\\.000486|0\\.25|FUTILE|primary_null|sd_ref' docs/RESEARCH_BOUNDARY_GUIDE.md docs/THEORY.md runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md PROGRESS_BRANCH.md | head -100" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/runs/exp_meta_config_grid.json b/runs/exp_meta_config_grid.json
+index 07a1cbc..aed2506 100644
+--- a/runs/exp_meta_config_grid.json
++++ b/runs/exp_meta_config_grid.json
+@@ -4,7 +4,7 @@
+   "estimands": {
+     "contrast": "Delta_fL = E[y(n_init=L) - y(n_init=5)]",
+     "dose_slope": "b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels",
+-    "primary_null": "b_f identical across families (no family x dose interaction)"
++    "primary_null": "b_f / sd_ref(f) identical across families (no family x dose interaction)"
+   },
+   "predeclared_rules": {
+     "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
+@@ -102,7 +102,7 @@
+   "n_evals_observed": [
+     30
+   ],
+-  "wall_seconds": 107.39560253103264,
++  "wall_seconds": 108.5304240619298,
+   "per_family": {
+     "Branin": {
+       "dimension": 2,
+diff --git a/runs/exp_meta_config_grid_rastrigin240.json b/runs/exp_meta_config_grid_rastrigin240.json
+index 0520e40..e28eed0 100644
+--- a/runs/exp_meta_config_grid_rastrigin240.json
++++ b/runs/exp_meta_config_grid_rastrigin240.json
+@@ -4,7 +4,7 @@
+   "estimands": {
+     "contrast": "Delta_fL = E[y(n_init=L) - y(n_init=5)]",
+     "dose_slope": "b_f = mean seed-paired OLS slope of y on c = n_init/(2d+1) over levels",
+-    "primary_null": "b_f identical across families (no family x dose interaction)"
++    "primary_null": "b_f / sd_ref(f) identical across families (no family x dose interaction)"
+   },
+   "predeclared_rules": {
+     "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
+@@ -274,7 +274,7 @@
+   "n_evals_observed": [
+     30
+   ],
+-  "wall_seconds": 33.701504478929564,
++  "wall_seconds": 33.04372409498319,
+   "per_family": {
+     "Rastrigin": {
+       "dimension": 10,
+PROGRESS_BRANCH.md:85:| **RLCD proper-score** | 0.800 | 0.252 | **−2.07** |
+PROGRESS_BRANCH.md:96:top-1 bt 0.365 / proper 0.252 — same ordering, not directly comparable;
+PROGRESS_BRANCH.md:109:  router failure traced to a never-above-0.25 RF softmax. The RLCD-proper
+PROGRESS_BRANCH.md:590:   family reaches the 0.25·sd precision floor) → axis PARKED (no
+PROGRESS_BRANCH.md:636:  the standardized estimand, see section 22/23): chi^2_4 = 30.87,
+PROGRESS_BRANCH.md:695:  declared seed counts, MDD_80 power, 0.25 sd effect floor); 5.5.3 cost
+PROGRESS_BRANCH.md:718:  standardized slopes (b_f/sd_ref, sd_ref treated as fixed): chi^2_4
+PROGRESS_BRANCH.md:719:  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
+PROGRESS_BRANCH.md:724:  +/- 0.25 sd) in the grid script and guide 5.5.4/5.5.2; success rule
+PROGRESS_BRANCH.md:751:  sd_ref as fixed. Fixed with JOINT SEED RESAMPLING: every bootstrap
+PROGRESS_BRANCH.md:752:  replicate re-estimates sd_ref from the resampled reference outcomes;
+PROGRESS_BRANCH.md:753:  the primary homogeneity now uses these SEs — chi^2_4 = 20.06,
+PROGRESS_BRANCH.md:769:  (20.06 / 5e-4 / 80%) with the raw-unit version labeled secondary and
+PROGRESS_BRANCH.md:788:- Serialized primary null corrected to "b_f / sd_ref(f) identical across
+PROGRESS_BRANCH.md:807:  longer mislabels sd_ref involvement (the fixed-sd_ref description now
+PROGRESS_BRANCH.md:808:  attaches only to the superseded 38.69 version).
+runs/EXP_META_CONFIG_SCREEN.md:22:**INCONCLUSIVE**：交互未被检出，且各族 CI 半宽均未达到 0.25·sd 的精确
+runs/EXP_META_CONFIG_SCREEN.md:84:5. **精确零界（futility）**：CI 半宽 < 0.25·sd_f（宣告的最小有意义
+runs/EXP_META_CONFIG_SCREEN.md:86:6. **预宣告判定**：检出 ⇔ p < 0.05；FUTILE ⇔ 未检出 且 全族精确零；
+runs/EXP_META_CONFIG_SCREEN.md:110:**精度**：无族达到精确零界（CI 半宽 ≈ 0.4–0.7 × 0.25·sd 门槛的
+runs/EXP_META_CONFIG_SCREEN.md:164:  检验力有限——这是 INCONCLUSIVE（而非 FUTILE）的直接原因。
+docs/THEORY.md:159:calibrated RF softmax maximum rarely exceeds 0.25 with m = 8 (near the
+docs/THEORY.md:160:uniform 0.125), so confidence thresholds τ ≥ 0.25 all induce the *same*
+docs/RESEARCH_BOUNDARY_GUIDE.md:357:  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+docs/RESEARCH_BOUNDARY_GUIDE.md:358:  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+docs/RESEARCH_BOUNDARY_GUIDE.md:407:   相关对比的 CI 完整落在 ±0.25 sd 之内（不仅是"未检出"——窄而
+docs/RESEARCH_BOUNDARY_GUIDE.md:412:4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+docs/RESEARCH_BOUNDARY_GUIDE.md:413:   等价界：全部相关对比的 CI 完整落在 ±0.25·sd 内）→ 该轴元层管线
+docs/RESEARCH_BOUNDARY_GUIDE.md:416:   不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+docs/RESEARCH_BOUNDARY_GUIDE.md:628:   DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
+docs/RESEARCH_BOUNDARY_GUIDE.md:647:   成功/终止规则改写（含 MDD₈₀ 把握度与 0.25 sd 效应下限）、§5.5.3
+docs/RESEARCH_BOUNDARY_GUIDE.md:656:   ±0.25 sd 内）；§5.5.1 补复制数细节；§4.5 执行边界与规范对齐；
+docs/RESEARCH_BOUNDARY_GUIDE.md:658:   χ²₄ = 20.06、p = 5×10⁻⁴，判定不变，原始单位版降为次要）；筛选
+runs/EXP_META_CONFIG_GRID.md:15:中，以各族**参照标准化**剂量-反应斜率（b_f / sd_ref，尺度稳定）的
+runs/EXP_META_CONFIG_GRID.md:16:同质性为主检验（联合种子重抽样 SE，含 sd_ref 估计不确定性），
+runs/EXP_META_CONFIG_GRID.md:17:**配置条件性被检出**：χ²₄ = 20.06，p = 5×10⁻⁴，I² = 80%（原始单位
+runs/EXP_META_CONFIG_GRID.md:18:斜率的次要版本：χ²₄ = 30.87，同判）。结构为：三个光滑族的负斜率逐族
+runs/EXP_META_CONFIG_GRID.md:75:档位预测（描述性）。预宣告判定：检出 ⇔ 主检验 p < 0.05；FUTILE ⇔ 未检出且每个族的
+runs/EXP_META_CONFIG_GRID.md:76:**全部**档位-对-参照对比 CI 均完整落在 ±0.25·sd 等价界内；否则
+runs/EXP_META_CONFIG_GRID.md:88:| Ackley | 10 | 0.24–0.86 | −20.042 / −20.023 / −20.020 / −19.883 | +0.250 | +0.45 | 0.029 | 18 |
+runs/EXP_META_CONFIG_GRID.md:96:bootstrap——每个重抽样重复内 sd_ref 重新估计，其不确定性进入 SE）**：
+runs/EXP_META_CONFIG_GRID.md:97:χ²₄ = 20.06，**p = 5×10⁻⁴**，I² = 0.80，合并标准化斜率 −0.140。
+runs/EXP_META_CONFIG_GRID.md:98:原始单位斜率的次要版本（非尺度稳定，仅作参考）：χ²₄ = 30.87，
+runs/EXP_META_CONFIG_GRID.md:99:I² = 0.87；早期把 sd_ref 视为固定的标准化版本（χ²₄ = 38.69）已被
+
+exec
+/bin/bash -lc "nl -ba runs/EXP_META_CONFIG_SCREEN.md | sed -n '1,35p;72,95p;150,170p'; nl -ba docs/RESEARCH_BOUNDARY_GUIDE.md | sed -n '348,368p;395,425p;620,635p'; nl -ba scripts/exp_meta_config_screen.py | sed -n '360,386p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+     1	# EXP-META-CONFIG-SCREEN — 配置条件性的配对筛选与推断分析
+     2	
+     3	**日期**：2026-09-29（分支 `exp/boundary-scheme-round2`；本文为同日严谨化
+     4	重写版，取代首版报告——判定由 POSITIVE 修正为 INCONCLUSIVE，见 §7）
+     5	**工件**：`runs/exp_meta_config_screen.json`（含全部 200 条逐轨迹记录，可
+     6	独立复算）｜**脚本**：`scripts/exp_meta_config_screen.py`（估计量、假设与
+     7	判定规则均内嵌预宣告）
+     8	
+     9	## 摘要
+    10	
+    11	在铺设元层（配置级）监督管线之前，我们用一个配对筛选实验检验：**设计期
+    12	配置的优势是否依赖问题族**（family × config 交互）。在 5 族 × 20 种子 ×
+    13	2 配置（初始设计规模 n_init ∈ {5, 12}，总预算同为 30 次评估，内层策略钉
+    14	死 AlwaysSurrogate，配对嵌套 Sobol 流）下：主检验——各族优势 Δ_f 的
+    15	同质性 Wald 检验——得 χ²₄ = 8.71，**p = 0.069**，未在 α = 0.05 下检出
+    16	交互（I² = 54%，中等异质性）。个体层面 Rastrigin 在种子区段 0–19 内"确认"获益（Δ = +8.36
+    17	原始单位，d_z = 0.52，p = 0.032）——**该结论后被同日网格实验撤回**
+    18	（跨种子区块不复制，n = 240 效应至多 d_z ≈ 0.11；见
+    19	`EXP_META_CONFIG_GRID.md`），此处按历史结果保留。预宣告
+    20	的方向性机理假设获 5/5 符号支持（精确单侧二项 p = 0.031）：多峰族受益
+    21	于更大空间填充设计、光滑族受损（轻度）。按预宣告规则，本筛选判定为
+    22	**INCONCLUSIVE**：交互未被检出，且各族 CI 半宽均未达到 0.25·sd 的精确
+    23	零界——**该轴暂缓决策（pending）：不启动管线建设，亦不终止该轴**。
+    24	
+    25	## 1. 研究问题与决策语境
+    26	
+    27	guide §4.4 指出元层优势函数可能恒非正；round-1 评审（E2）要求在管线
+    28	投入前先做便宜的前置筛选。本实验回答一个可判定的统计问题——
+    29	
+    30	> **Q**：在当前基准问题集上，配置优势 Δ_f = E_seed[y_large − y_small] 是否
+    31	> 存在族间异质性（即"最优配置因族而异"）？
+    32	
+    33	该问题的答案决定元层研究的下一步：检出交互 ⇒ 配置选择有条件性、
+    34	签名→配置映射存在超越任何固定配置的空间；精确零 ⇒ 按 §5.5.4 终止
+    35	该轴；两者皆非 ⇒ 增加种子、增加配置档位或改进分析方法，而非建设
+    72	预算取舍"。
+    73	
+    74	## 4. 统计方法
+    75	
+    76	1. **族内**：配对均值 Δ̂_f、种子级 percentile bootstrap CI（5000）、
+    77	   配对 t、效应量 d_z = Δ̂_f / sd(d_fs)、80% 把握度最小可检差异
+    78	   MDD_f ≈ 2.80·se_f。
+    79	2. **交互（主检验）**：同质性 Wald 检验 X² = Σ_f (Δ̂_f − Δ̂_w)²/Var(Δ̂_f)
+    80	   （逆方差加权共同均值），参照 χ²_{F−1}——连续版 Cochran's Q，容受
+    81	   族间尺度异质性。异质性份额 I² = max(0, (X²−df)/X²)。
+    82	3. **个体确认**：发现/确认半区符号一致 且 确认半区 CI 排零。
+    83	4. **机理符号检验**：5 个预宣告方向符号的一致数 k，精确单侧二项 p。
+    84	5. **精确零界（futility）**：CI 半宽 < 0.25·sd_f（宣告的最小有意义
+    85	   标准化效应）视为"精确零"。
+    86	6. **预宣告判定**：检出 ⇔ p < 0.05；FUTILE ⇔ 未检出 且 全族精确零；
+    87	   否则 INCONCLUSIVE。meta-D 与 LOFO 不进入规则。
+    88	
+    89	## 5. 结果
+    90	
+    91	**族内配对优势**（原始单位；CI 为种子级 bootstrap 95%）：
+    92	
+    93	| family | d | n_init/(2d+1) small→large | Δ̂_f | 95% CI | d_z | p_t | 确认 |
+    94	|---|---|---|---:|---|---:|---:|---|
+    95	| Branin | 2 | 1.0× → 2.4× | −0.005 | [−0.024, 0.019] | −0.10 | 0.65 | 否 |
+   150	首版以 meta-D 的 percentile bootstrap CI 排零判定 POSITIVE。该统计量
+   151	**非负且零假设位于参数边界**，普通 bootstrap 对此类量偏高（round-2
+   152	评审 D1 指出）。替换为标准同质性检验后判定降为 INCONCLUSIVE；数值
+   153	本身（族级 Δ̂、CI）不变。首版报告中"赢家身份 3:2 分裂 ⇒ 条件性
+   154	存在"的推理同样被降级为描述量。此更正在同日完成，未影响任何下游
+   155	决策。
+   156	
+   157	## 8. 局限
+   158	
+   159	- 单轴（n_init）× 两档；两档在多数族上位于启发式同侧。
+   160	- 内层策略固定为 AlwaysSurrogate：配置效应在该策略下度量，策略 × 配置
+   161	  交互未测。
+   162	- 基准问题集共 5 族，维度与族绑定（混杂）：无法区分"族效应"与"维度效应"。
+   163	- 20 种子/族；除 Branin 外各族 MDD₈₀ 均大于观测 |Δ̂| 的一半以上，
+   164	  检验力有限——这是 INCONCLUSIVE（而非 FUTILE）的直接原因。
+   165	- 配对 t 与 bootstrap CI 假设种子级独立同分布；Sobol 嵌套配对控制了
+   166	  设计点流但未控制 GP 拟合的随机性来源（同 seed 下一致）。
+   167	
+   168	## 9. 复现
+   169	
+   170	```bash
+   348	  全部首动作价值）、8.6F 不可加、微调策略闭环塌缩。**下一决策点**：
+   349	  schedule/continuation 级标注（把"价值在延续里"变成标注单位）+
+   350	  匹配的闭环检验——其结果出来前，不再扩大首动作标签投入。
+   351	- 元层（开放，研究空隙更大；**配置轴筛选已完成两阶段**）：配置级监督 =
+   352	  同一问题多 episode 结果差 + 跨问题签名匹配下的标签迁移。两阶段筛选
+   353	  （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
+   354	  p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
+   355	  （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
+   356	  ——参照标准化斜率同质性（尺度稳定，联合种子 bootstrap SE 含
+   357	  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+   358	  次要版本 30.87）；光滑族逐族显著负斜率、多峰
+   359	  高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
+   360	  更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
+   361	  臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
+   362	  下一步的正当投入对象；配置级监督管线仍不启动**（oracle 选择价值
+   363	  ≠ 签名可学性，LOFO 3/5 无分辨率）。文献现状：per-instance 配置 BO 的
+   364	  元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
+   365	  在 HPO 域有，BO-self-configuration 域近乎空白）。
+   366	
+   367	### 5.3 理论目标：层层干净 + 判据可迁移
+   368	
+   395	PROGRESS 记录条件与数据，方案回到 §10 重议：
+   396	
+   397	1. **教师可靠性**（估计量预宣告钉死：同记录配对标签的 2v2
+   398	   split-half 符号翻转率，复制数 0–3 参与、第 5 个复制未参与该
+   399	   指标；当前值 0.359，`runs/exp_teacher_noise_diagnostic_r5.json`。
+   400	   标签单位重设计后，配对采样规则须重新预宣告方可与 0.359 比较）：若标注单位重设计
+   401	   （长视程 / schedule 级）后，该估计量下 flip 率仍 ≥ 0.359 → 冻结
+   402	   "构造可测性"的强声明，降格为"噪声标签仍可训练排序模型"。
+   403	2. **闭环增量（成功与终止规则一并预宣告）**：固定 5 族基准问题集、
+   404	   预宣告种子数与各族把握度（MDD₈₀）。**成功** = 相对最优常动作或
+   405	   两段 schedule 的配对 terminal-value 增量在 ≥3 族满足 **CI 下界
+   406	   > 0**（显著为正；显著为负计为失败）；**终止（等价界）** = 全部
+   407	   相关对比的 CI 完整落在 ±0.25 sd 之内（不仅是"未检出"——窄而
+   408	   远离零的 CI 不构成终止依据）→ 该路线止步于决策级报告，不进主线。
+   409	3. **成本上限**：同一硬件上，单条标签的期望 rollout 成本（CPU·s）
+   410	   超过单条 budget-30 闭环轨迹评估成本的 10× → 重新设计标注单位
+   411	   （更长视程、更少标签），而非增加复制数。
+   412	4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+   413	   等价界：全部相关对比的 CI 完整落在 ±0.25·sd 内）→ 该轴元层管线
+   414	   停建（§4.4）；**仅未检出
+   415	   但零不精确（INCONCLUSIVE）→ 暂缓决策**（加种子/加配置档位后重筛），
+   416	   不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+   417	   本条未被触发）。
+   418	
+   419	---
+   420	
+   421	## 6. 修改指导方略（操作规程）
+   422	
+   423	### 6.1 新增动作位
+   424	
+   425	流程：写动机（覆盖哪类人工操作）→ §3.4 三项前置检查 → ActionType +
+   620	   `scripts/exp_meta_config_screen.py`（n_init 5 vs 12，5×20×2 配对嵌套
+   621	   Sobol，预算 30，估计量/机理假设/判定规则均预宣告；主检验为 Δ_f
+   622	   同质性 Wald χ²，meta-D 降为描述量）→ **INCONCLUSIVE**（χ²₄ = 8.71、
+   623	   p = 0.069、I² = 0.54）。初判以 meta-D 边界 bootstrap 判 POSITIVE，
+   624	   属检验方法错误，同日更正（round-2 评审 D1）——分析全文见
+   625	   `runs/EXP_META_CONFIG_SCREEN.md`。阶段二（按阶段一预宣告的升级
+   626	   路径）`scripts/exp_meta_config_grid.py`：n_init ∈ {5,8,12,18} 剂量
+   627	   网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
+   628	   DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
+   629	  I² = 80%，联合 bootstrap SE）；并撤回
+   630	   阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
+   631	   d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
+   632	4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
+   633	   evaluation（唯一两次复现的正面结果）与 schedule/continuation
+   634	   标注列前，元层筛选已执行，state 富化靠后。
+   635	5. **强制机制（D2）→ 已落地（最小版）**：`actions/boundary_registry.py`
+   360	        "estimands": {
+   361	            "Delta_f": "E_seed[y_large - y_small] per family (max units)",
+   362	            "interaction_null": inter["null"],
+   363	            "meta_d_descriptor": (
+   364	                "oracle-among-known-families value on standardized utilities; "
+   365	                ">0 in population iff Delta_f not all one sign; NOT a test "
+   366	                "statistic and NOT evidence of signature learnability"
+   367	            ),
+   368	        },
+   369	        "mechanistic_hypotheses": {
+   370	            "H_mech_1": "multimodal families (Rastrigin, Ackley) gain from a "
+   371	                        "larger space-filling design",
+   372	            "H_mech_2": "smooth families (Branin, Hartmann, SixHumpCamel) lose "
+   373	                        "model-guided budget to extra design points",
+   374	        },
+   375	        "predeclared_rules": {
+   376	            "conditionality": "interaction p < 0.05 (chi^2_{F-1})",
+   377	            "futile": "not detected AND all CI half-widths < "
+   378	                      f"{MISE} * sd_f (precise null)",
+   379	            "otherwise": "INCONCLUSIVE (parked, not killed)",
+   380	        },
+   381	        "families": args.families,
+   382	        "dimensions": dims,
+   383	        "n_init_over_2dp1": {
+   384	            fam: {"small": CONFIGS["small"] / (2 * dims[fam] + 1),
+   385	                  "large": CONFIGS["large"] / (2 * dims[fam] + 1)}
+   386	            for fam in args.families
+
+exec
+/bin/bash -lc "rg -n 'precise|null|futile|MISE|half_width' scripts/exp_meta_config_screen.py | head -55; rg -n 'test_.*table|second.*table|blank' tests/test_boundary_registry.py; rg -n 'iter_jsonl' scripts src --glob '*.py' | head -100; git status --short" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+77:    family's CI half-width < 0.25 * sd_f (precise null).
+108:MISE = 0.25  # in units of the family's within-pair sd
+200:        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+204:        "precise_enough_for_null": ((ci[1] - ci[0]) / 2.0) < MISE * sd,
+233:        "null": "Delta_1 == ... == Delta_F (no family x config interaction)",
+349:    precise_null = all(row["precise_enough_for_null"] for row in per_family.values())
+352:    elif precise_null:
+362:            "interaction_null": inter["null"],
+377:            "futile": "not detected AND all CI half-widths < "
+378:                      f"{MISE} * sd_f (precise null)",
+437:                "precise_null": row["precise_enough_for_null"],
+65:            # ANY non-table line — blank included — ends the first table
+66:            # once a data row was seen; later '|' rows are a second table.
+71:            "found a second markdown table inside section 2.4 — the sync "
+185:def test_parser_accepts_well_formed_table():
+208:def test_guide_table_rows_match_registry():
+scripts/exp_rlcd_calibration_ablation.py:144:    records = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+scripts/diagnose_continuation_effect.py:28:from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+scripts/diagnose_continuation_effect.py:127:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq1_3_rf_probe.py:28:from opt_agent.dataset import iter_jsonl
+scripts/exp_rq1_3_rf_probe.py:175:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq1_3_decision_landscape.py:38:from opt_agent.dataset import iter_jsonl, phase_of
+scripts/exp_rq1_3_decision_landscape.py:98:    records = list(iter_jsonl(args.dataset))
+scripts/validate_phase8_6b.py:23:    iter_jsonl,
+scripts/validate_phase8_6b.py:47:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq0_5_prompt_controls.py:35:from opt_agent.dataset import iter_jsonl
+scripts/exp_rq0_5_prompt_controls.py:40:    for r in iter_jsonl(dataset_path):
+scripts/exp_rq0_5_prompt_controls.py:139:    for r in iter_jsonl(args.dataset):
+scripts/exp_rlcd_router_panel.py:76:        r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+scripts/exp_rq2_1_cross_family_transfer.py:48:from opt_agent.dataset import iter_jsonl
+scripts/exp_rq2_1_cross_family_transfer.py:319:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rlcd_loo_transfer.py:123:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/sweep_rlcd.py:26:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/sweep_rlcd.py:37:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+src/opt_agent/dataset/analysis.py:18:from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
+src/opt_agent/dataset/analysis.py:92:    for record in iter_jsonl(path):
+scripts/diagnose_qs5.py:39:from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
+scripts/diagnose_qs5.py:507:    records = list(iter_jsonl(args.dataset))
+scripts/generate_dataset_longhorizon.py:57:    iter_jsonl,
+scripts/generate_dataset_longhorizon.py:69:    for rec in iter_jsonl(path):
+src/opt_agent/dataset/decision_record.py:99:def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+src/opt_agent/dataset/decision_record.py:140:    records = list(iter_jsonl(path))
+src/opt_agent/dataset/__init__.py:6:    iter_jsonl,
+src/opt_agent/dataset/__init__.py:60:    "iter_jsonl",
+scripts/run_oracle_gate.py:19:    iter_jsonl,
+scripts/run_oracle_gate.py:29:    records = list(iter_jsonl(path))
+scripts/exp_rq1_3_scale_sensitivity.py:33:from opt_agent.dataset import iter_jsonl
+scripts/exp_rq1_3_scale_sensitivity.py:273:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq2_ioh_closed_loop.py:37:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/exp_rq2_ioh_closed_loop.py:154:    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+scripts/exp_teacher_noise_diagnostic.py:45:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/exp_teacher_noise_diagnostic.py:169:    records = list(iter_jsonl(args.dataset))
+scripts/exp_rq1_rq2_closed_loop.py:37:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/exp_rq1_rq2_closed_loop.py:244:    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+scripts/verify_theory_propositions.py:31:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/verify_theory_propositions.py:119:    records = [r.__dict__ for r in iter_jsonl(DATASET)]
+scripts/exp_rlcd_loo_confirmatory.py:90:    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+scripts/exp_rq3_router_sweep.py:42:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/exp_rq3_router_sweep.py:107:    records = [r.__dict__ for r in iter_jsonl(dataset)]
+scripts/ablate_phase8_6d_utility.py:24:from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+scripts/ablate_phase8_6d_utility.py:144:    records = [r for r in iter_jsonl(args.dataset) if r.metadata["step"] == 0]
+scripts/exp_geartrain_transfer_probe.py:37:from opt_agent.dataset import iter_jsonl  # noqa: E402
+scripts/exp_geartrain_transfer_probe.py:98:    test = list(iter_jsonl(Path("runs/geartrain_h3_10seed.jsonl")))
+scripts/exp_geartrain_transfer_probe.py:99:    train = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))]
+?? runs/codex_boundary_round6_review.log
+
+exec
+/bin/bash -lc "nl -ba scripts/sweep_rlcd.py | sed -n '18,58p'; nl -ba scripts/exp_rq2_1_cross_family_transfer.py | sed -n '307,338p'; nl -ba scripts/exp_rq1_3_rf_probe.py | sed -n '168,193p'; nl -ba scripts/exp_rq1_3_decision_landscape.py | sed -n '90,114p'; nl -ba scripts/exp_rlcd_calibration_ablation.py | sed -n '25,38p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    18	import json
+    19	import sys
+    20	from concurrent.futures import ProcessPoolExecutor, as_completed
+    21	from pathlib import Path
+    22	
+    23	ROOT = Path(__file__).resolve().parents[1]
+    24	sys.path.insert(0, str(ROOT / "src"))
+    25	
+    26	from opt_agent.dataset import iter_jsonl  # noqa: E402
+    27	from opt_agent.system1.rlcd import RLCDConfig, train_rlcd  # noqa: E402
+    28	
+    29	
+    30	def _one(task: dict) -> dict:
+    31	    import time
+    32	
+    33	    import torch
+    34	
+    35	    torch.set_num_threads(4)
+    36	    torch.manual_seed(0)
+    37	    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    38	    train = [r for r in records if int(r.problem["seed"]) < task["train_max"]]
+    39	    val = [r for r in records if int(r.problem["seed"]) >= task["val_min"]]
+    40	    cfg = RLCDConfig(save=False, output_dir="/tmp/rlcd_sweep_unused", **task["cfg"])
+    41	    start = time.perf_counter()
+    42	    rep = train_rlcd(train, val, cfg)
+    43	    return {
+    44	        "tag": task["tag"],
+    45	        "objective": task["cfg"]["objective"],
+    46	        "overrides": task["overrides"],
+    47	        "best_val_pairwise_accuracy": rep["best_val_pairwise_accuracy"],
+    48	        "final_val": rep["final_val"],
+    49	        "train_wall_s": round(time.perf_counter() - start, 2),
+    50	    }
+    51	
+    52	
+    53	def main() -> int:
+    54	    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    55	    parser.add_argument("--dataset", type=Path,
+    56	                        default=Path("runs/phase8_6d_h3_20seed_5family.jsonl"))
+    57	    parser.add_argument("--train-max", type=int, default=16)
+    58	    parser.add_argument("--val-min", type=int, default=16)
+   307	    )
+   308	    parser.add_argument(
+   309	        "--output-json", type=Path,
+   310	        default=ROOT / "runs" / "exp_rq2_1_report.json",
+   311	    )
+   312	    parser.add_argument(
+   313	        "--output-md", type=Path,
+   314	        default=ROOT / "runs" / "EXP_RQ2_1_REPORT.md",
+   315	    )
+   316	    args = parser.parse_args()
+   317	
+   318	    print(f"Loading {args.dataset}...")
+   319	    records = list(iter_jsonl(args.dataset))
+   320	    record_dicts = [r.__dict__ if hasattr(r, "__dict__") else r for r in records]
+   321	    print(f"Loaded {len(record_dicts)} records")
+   322	
+   323	    X, Y, fam_idx, seed_idx, all_states = build_dataset(record_dicts)
+   324	    print(f"After filtering (non-terminal, non-zero): n={len(X)} "
+   325	          f"records across {len(set(fam_idx))} families, {len(set(seed_idx))} seeds")
+   326	
+   327	    # Group by family
+   328	    fam_groups = defaultdict(list)
+   329	    for i, fi in enumerate(fam_idx):
+   330	        fam_groups[fi].append(i)
+   331	    print("\nRecords per family (after filtering):")
+   332	    for fi, idxs in sorted(fam_groups.items()):
+   333	        print(f"  {FAMILIES[fi]}: n={len(idxs)}")
+   334	
+   335	    # Per-family CV
+   336	    results = {"config": {
+   337	        "dataset": str(args.dataset),
+   338	        "n_records_total": len(X),
+   168	                        help="Family to probe (default: hartmann — only one "
+   169	                             "with sufficient decision opportunity)")
+   170	    parser.add_argument("--output", type=Path,
+   171	                        default=ROOT / "runs" / "exp_rq1_3_rf_probe.json")
+   172	    args = parser.parse_args()
+   173	
+   174	    print(f"Loading {args.dataset}...")
+   175	    records = list(iter_jsonl(args.dataset))
+   176	    print(f"Loaded {len(records)} records")
+   177	
+   178	    record_dicts = [r.__dict__ for r in records]
+   179	    family_scales = compute_family_scales(record_dicts)
+   180	    print(f"Family scales: {[(k, round(v['median'], 3)) for k, v in family_scales.items()]}")
+   181	
+   182	    # Build dataset (X, Y) for the chosen family.
+   183	    X, Y, seed_idx, skipped = [], [], [], []
+   184	    for r in record_dicts:
+   185	        if r["problem"]["family"] != args.family:
+   186	            continue
+   187	        phase = phase_of_ratio(float(
+   188	            (r.get("state") or {}).get("resource", {}).get("remaining_budget_ratio", 0.0)
+   189	        ))
+   190	        if phase == "terminal":
+   191	            continue
+   192	        utils = extract_utilities(r, family_scales)
+   193	        if utils is None:
+    90	
+    91	def main() -> int:
+    92	    parser = argparse.ArgumentParser()
+    93	    parser.add_argument("dataset", type=Path)
+    94	    parser.add_argument("--output", type=Path,
+    95	                        default=ROOT / "runs" / "exp_rq1_3_landscape.json")
+    96	    args = parser.parse_args()
+    97	
+    98	    records = list(iter_jsonl(args.dataset))
+    99	    print(f"Loaded {len(records)} records from {args.dataset}")
+   100	
+   101	    # Aggregate per (family, phase).
+   102	    by_fam_phase: dict[tuple[str, str], list[dict]] = defaultdict(list)
+   103	    all_rows: list[dict] = []
+   104	    for r in records:
+   105	        u = utility_vector(r.__dict__)
+   106	        m = metrics_for_state(u)
+   107	        family = r.problem["family"]
+   108	        # Use shared phase_of from validation.py (budget-ratio based).
+   109	        phase = phase_of(r)
+   110	        row = {"family": family, "phase": phase,
+   111	               "record_id": r.id, "seed": int(r.problem["seed"])}
+   112	        row.update(m)
+   113	        all_rows.append(row)
+   114	        by_fam_phase[(family, phase)].append(row)
+    25	import sys
+    26	from pathlib import Path
+    27	
+    28	import torch
+    29	
+    30	ROOT = Path(__file__).resolve().parents[1]
+    31	sys.path.insert(0, str(ROOT / "src"))
+    32	
+    33	from opt_agent.dataset import read_jsonl  # noqa: E402
+    34	from opt_agent.system1.rlcd import (  # noqa: E402
+    35	    RLCDConfig,
+    36	    _collate,
+    37	    build_item,
+    38	    load_laya_for_training,
+
+codex
+The live §2.4 table is contiguous, so the blank-line parser change fits its current shape. The grid rule text and both JSON artifacts are aligned. I also found that `sweep_rlcd.py` still trains from raw `iter_jsonl`, leaving a separate pooling path outside the stated boundary.
+exec
+/bin/bash -lc "git rev-parse --abbrev-ref HEAD; git rev-parse --short HEAD; git status --short; nl -ba scripts/exp_meta_config_screen.py | sed -n '69,82p;194,207p;343,355p'; nl -ba tests/test_boundary_registry.py | sed -n '180,212p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+exp/boundary-scheme-round2
+2043673
+?? runs/codex_boundary_round6_review.log
+    69	     report the 80%-power minimum detectable difference MDD_f ~ 2.80 *
+    70	     se_f and the CI half-width relative to 0.25 * sd_f (a declared
+    71	     minimal-interesting standardized effect).
+    72	
+    73	Predeclared decision rules.
+    74	
+    75	  - CONDITIONALITY DETECTED iff interaction p < 0.05 (chi^2_{F-1}).
+    76	  - Axis FUTILE (stop, per guide §5.5.4) iff NOT detected AND every
+    77	    family's CI half-width < 0.25 * sd_f (precise null).
+    78	  - Otherwise: INCONCLUSIVE (not detected but underpowered) — the axis is
+    79	    parked, not killed.
+    80	  - meta-D and LOFO are reported as descriptors and do NOT enter the rule.
+    81	
+    82	Hardware: CPU-bound trajectories; F x n x 2 jobs, mp.Pool with a
+   194	        "n_pairs": n,
+   195	        "mean_diff_large_minus_small": mean,
+   196	        "sd_pair_diff": sd,
+   197	        "se": se,
+   198	        "ci95_bootstrap": ci,
+   199	        "ci_excludes_zero": (ci[0] > 0) or (ci[1] < 0),
+   200	        "ci_half_width": (ci[1] - ci[0]) / 2.0,
+   201	        "paired_t": {"t": t_stat, "df": n - 1, "p_two_sided": p_t},
+   202	        "cohens_dz": mean / sd,
+   203	        "mdd80": MDD_FACTOR * se,
+   204	        "precise_enough_for_null": ((ci[1] - ci[0]) / 2.0) < MISE * sd,
+   205	        "discovery_half": disc,
+   206	        "confirmation_half": conf,
+   207	        "sign_agree_across_halves": sign_agree,
+   343	    n_pred = len(agreement)
+   344	    sign_p = sum(
+   345	        math.comb(n_pred, i) for i in range(k, n_pred + 1)) / 2 ** n_pred
+   346	
+   347	    # Predeclared rules.
+   348	    detected = inter["p_value"] < 0.05
+   349	    precise_null = all(row["precise_enough_for_null"] for row in per_family.values())
+   350	    if detected:
+   351	        verdict = "CONDITIONALITY_DETECTED"
+   352	    elif precise_null:
+   353	        verdict = "FUTILE"
+   354	    else:
+   355	        verdict = "INCONCLUSIVE"
+   180	_SHORT_ROW_SECTION = _GOOD_SECTION + "| UNCERTAINTY_SAMPLING | B2 |\n"
+   181	
+   182	_BAD_HEADER_SECTION = _GOOD_SECTION.replace("| 子菜单 |", "| 菜单 |")
+   183	
+   184	
+   185	def test_parser_accepts_well_formed_table():
+   186	    rows = _parse_section_rows(_GOOD_SECTION)
+   187	    assert rows == {"global_exploration": ("B2", "A_pt", "采样模式位"),
+   188	                    "stop": ("B1", "A_flow", "终止型动作")}
+   189	
+   190	
+   191	@pytest.mark.parametrize("section,fragment", [
+   192	    (_DUPLICATE_SECTION, "duplicate"),
+   193	    (_UNKNOWN_SECTION, "unknown action"),
+   194	    (_SHORT_ROW_SECTION, "malformed"),
+   195	    (_BAD_HEADER_SECTION, "header"),
+   196	])
+   197	def test_parser_fails_closed(section, fragment):
+   198	    with pytest.raises(AssertionError) as exc:
+   199	        _parse_section_rows(section)
+   200	    assert fragment in str(exc.value).lower()
+   201	
+   202	
+   203	# ---------------------------------------------------------------------------
+   204	# Guide <-> registry (live document)
+   205	# ---------------------------------------------------------------------------
+   206	
+   207	
+   208	def test_guide_table_rows_match_registry():
+   209	    """Guide §2.4 table and BOUNDARY_REGISTRY must classify identically
+   210	    (class AND submenu columns)."""
+   211	    rows = _guide_section_2_4_rows()
+   212	    assert set(rows) == {a.value for a in ActionType}, (
+
+codex
+### A. Round-5 dispositions
+
+| Disposition | Status | Verification |
+|---|---|---|
+| Grid decision rule and serialized primary null | **ADDRESSED** | Script, report, and both JSON artifacts agree; saved statistics are unchanged. |
+| `read_jsonl` default | **ADDRESSED** | Default is `version_policy="warn"`. |
+| Persistent pooling audit | **PARTIAL** | Opt-ins append to JSONL when writable, but an append failure is silently ignored. |
+| Cross-file pooling rule | **PARTIAL** | The helper checks the combined stamps; it cannot verify that each source used the same note. |
+| Eight loader migrations | **PARTIAL** | Four retain calls to the removed `iter_jsonl` import; other training consumers still use raw access. |
+| §2.4 parser and raw-unit report wording | **ADDRESSED** | The parser fits the live contiguous table; the report assigns fixed `sd_ref` only to the superseded result. |
+
+### B. Issues
+
+- **BLOCKER** — [calibration](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_calibration_ablation.py:144), [LOO confirmatory](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_confirmatory.py:90), [LOO transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123), and [router panel](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_router_panel.py:76) call undefined `iter_jsonl`. **Fix:** replace each call with `read_jsonl(..., version_policy="warn")`.
+- **MAJOR** — [assert_combinable](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:140) turns any nonempty note into `pool_legacy=True` and cannot compare it with per-source opt-in notes. **Fix:** pass validated source decisions and require their notes to match before permitting the combined pool.
+- **MAJOR** — [audit append](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:130) silently fails on `OSError`, so an accepted opt-in may leave no durable trail. **Fix:** fail the opt-in when the required audit entry cannot be written.
+- **MAJOR** — [RLCD sweep](/home/lcy/Documents/projects/opt_agent_v3/scripts/sweep_rlcd.py:37) still trains through unchecked `iter_jsonl`; [cross-family transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq2_1_cross_family_transfer.py:319) also builds a pooled dataset that way. **Fix:** migrate remaining pooling consumers to the checked loader.
+- **MAJOR** — The [screen report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:84) and [screen script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_screen.py:204) still call CI half-width alone a “precise null,” conflicting with the guide’s equivalence rule. **Fix:** retain the historical rule as recorded, explicitly mark it superseded, and state the valid equivalence criterion.
+
+### C. Standing-spec judgment
+
+The grid result and its declared rule now align, but broken migrated scripts and unenforced pooling paths prevent the package from serving as the standing modification specification. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE
+tokens used
+68,330
+### A. Round-5 dispositions
+
+| Disposition | Status | Verification |
+|---|---|---|
+| Grid decision rule and serialized primary null | **ADDRESSED** | Script, report, and both JSON artifacts agree; saved statistics are unchanged. |
+| `read_jsonl` default | **ADDRESSED** | Default is `version_policy="warn"`. |
+| Persistent pooling audit | **PARTIAL** | Opt-ins append to JSONL when writable, but an append failure is silently ignored. |
+| Cross-file pooling rule | **PARTIAL** | The helper checks the combined stamps; it cannot verify that each source used the same note. |
+| Eight loader migrations | **PARTIAL** | Four retain calls to the removed `iter_jsonl` import; other training consumers still use raw access. |
+| §2.4 parser and raw-unit report wording | **ADDRESSED** | The parser fits the live contiguous table; the report assigns fixed `sd_ref` only to the superseded result. |
+
+### B. Issues
+
+- **BLOCKER** — [calibration](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_calibration_ablation.py:144), [LOO confirmatory](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_confirmatory.py:90), [LOO transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_loo_transfer.py:123), and [router panel](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rlcd_router_panel.py:76) call undefined `iter_jsonl`. **Fix:** replace each call with `read_jsonl(..., version_policy="warn")`.
+- **MAJOR** — [assert_combinable](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:140) turns any nonempty note into `pool_legacy=True` and cannot compare it with per-source opt-in notes. **Fix:** pass validated source decisions and require their notes to match before permitting the combined pool.
+- **MAJOR** — [audit append](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:130) silently fails on `OSError`, so an accepted opt-in may leave no durable trail. **Fix:** fail the opt-in when the required audit entry cannot be written.
+- **MAJOR** — [RLCD sweep](/home/lcy/Documents/projects/opt_agent_v3/scripts/sweep_rlcd.py:37) still trains through unchecked `iter_jsonl`; [cross-family transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq2_1_cross_family_transfer.py:319) also builds a pooled dataset that way. **Fix:** migrate remaining pooling consumers to the checked loader.
+- **MAJOR** — The [screen report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:84) and [screen script](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_screen.py:204) still call CI half-width alone a “precise null,” conflicting with the guide’s equivalence rule. **Fix:** retain the historical rule as recorded, explicitly mark it superseded, and state the valid equivalence criterion.
+
+### C. Standing-spec judgment
+
+The grid result and its declared rule now align, but broken migrated scripts and unenforced pooling paths prevent the package from serving as the standing modification specification. This was a read-only review; I ran no tests or training.
+
+VERDICT: REVISE

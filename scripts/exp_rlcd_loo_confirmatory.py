@@ -87,7 +87,7 @@ def _run_fold(task: dict) -> dict:
     torch.set_num_threads(4)
     from opt_agent.system1.rlcd import RLCDConfig, train_rlcd
 
-    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    records = read_jsonl(Path(task["dataset"]), version_policy="warn")
     held_out = task["family"]
     train_pool = [r for r in records if r.problem["family"] != held_out]
     test = [r for r in records if r.problem["family"] == held_out]

@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 from opt_agent.system1.rlcd import RLCDConfig, train_rlcd  # noqa: E402
 
 
@@ -34,7 +34,7 @@ def _one(task: dict) -> dict:
 
     torch.set_num_threads(4)
     torch.manual_seed(0)
-    records = [r for r in iter_jsonl(Path(task["dataset"]))]
+    records = read_jsonl(Path(task["dataset"]), version_policy="warn")
     train = [r for r in records if int(r.problem["seed"]) < task["train_max"]]
     val = [r for r in records if int(r.problem["seed"]) >= task["val_min"]]
     cfg = RLCDConfig(save=False, output_dir="/tmp/rlcd_sweep_unused", **task["cfg"])

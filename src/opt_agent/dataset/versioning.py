@@ -128,13 +128,21 @@ def pooling_decisions() -> list[dict]:
 
 
 def _persist_pooling_decision(entry: dict) -> None:
+    """Persist a pooling opt-in; an opt-in without a durable trail FAILS.
+
+    Codex round-6 B3: silently swallowing the write error would let an
+    accepted cross-version pool leave no record, defeating the audit.
+    """
     try:
         POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
         with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(entry, ensure_ascii=False,
                                     sort_keys=True) + "\n")
-    except OSError:
-        pass  # read-only FS / no permission: in-memory trail only
+    except OSError as exc:
+        raise VersionPolicyError(
+            f"pooling opt-in for {entry.get('source')!r} could not be "
+            f"persisted to {POOLING_AUDIT_PATH} ({exc}); refusing to "
+            f"proceed without a durable audit trail") from exc
 
 
 def assert_combinable(
@@ -142,15 +150,39 @@ def assert_combinable(
     policy: str | VersionPolicy,
     *,
     pooling_note: str = "",
+    source_notes: dict[str, str] | None = None,
 ) -> None:
     """Cross-file companion to enforce_record_pooling (guide 4.5).
 
     Any consumer combining records from SEVERAL loaded sources must pass
     each source's raw metadata dicts here: the check unions the stamps
     across the complete combined pool and applies the same no-silent-
-    mixing rule (warn/raise under non-allow policies; pooling_note
-    required for the explicit opt-in, identical across sources).
+    mixing rule (warn/raise under non-allow policies).
+
+    The explicit opt-in requires ONE consistent note for the whole pool:
+    either `pooling_note` (a single decision covering all sources), or
+    `source_notes` (the per-source opt-in notes recorded when each source
+    was loaded) — the latter must be non-empty for every source and all
+    identical, and must agree with `pooling_note` when both are given
+    (codex round-6 B2).
     """
+    if source_notes is not None:
+        missing = [s for s, n in source_notes.items()
+                   if not str(n).strip()]
+        if missing:
+            raise VersionPolicyError(
+                f"source_notes missing/empty for {missing}; every pooled "
+                f"source needs its recorded opt-in note")
+        distinct = {str(n).strip() for n in source_notes.values()}
+        if len(distinct) != 1:
+            raise VersionPolicyError(
+                f"per-source pooling notes disagree: {sorted(distinct)} — "
+                f"a combined pool requires ONE consistent decision")
+        if pooling_note and str(pooling_note).strip() not in distinct:
+            raise VersionPolicyError(
+                f"pooling_note {pooling_note!r} disagrees with the "
+                f"per-source notes {sorted(distinct)}")
+        pooling_note = distinct.pop()
     combined: list[dict] = []
     for source, stamps in stamps_by_source.items():
         for s in stamps:
