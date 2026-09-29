@@ -399,7 +399,7 @@ Literature spectrum survey (Sara/lenz full-text fetched; LLAMBO / GPTOpt /
 Volpp / TempoRL / FunBO search-verified) in
 `docs/ref_papers/state_action_design_survey.md` — the project sits at
 "most-compressed state + mid-level strategy actions + unique per-decision
-counterfactual supervision"; the closed menu is the expressiveness-for-
+counterfactual supervision"; the closed action space is the expressiveness-for-
 measurability trade that makes gates/cost-frontier possible.
 
 Codex adjudication (`runs/codex_design_review.log`):
@@ -408,7 +408,7 @@ the wording; (b) sidecar / (d) reconfigure-actions are journal-version
 options; (c) trajectory-level state not recommended. No lossless
 state/action change exists. Six claim-wording fixes applied to the outline
 (P2 scope, P3 conditionality, schedule sufficiency — title now "…Whose
-Value a Two-Phase Schedule Subsumes", menu closure scoped, Gate-2
+Value a Two-Phase Schedule Subsumes", action-space closure scoped, Gate-2
 granularity, Gate-4 "not established" not "unattainable").
 
 ## 15. Design A/B executed: rich state shows no decision value (2026-09-28)
@@ -426,7 +426,7 @@ then ran BOTH follow-up experiments on the untouched s100–119 stream
   features do NOT beat frozen15 on 5/5 families (traj-only clearly worse
   where signal exists: branin 0.50→0.24, sixhump 0.66→0.57).
 - **E2 LLM A/B** (`runs/exp_lenz_vs_frozen_llm.json`): deepseek-chat at
-  temperature 0, same frozen 8-action menu, 30 stratified records — rich
+  temperature 0, same frozen 8-action space, 30 stratified records — rich
   state changes 6/30 decisions — 4 of 6 global_exploration →
   surrogate_acquisition, one local_exploitation → surrogate_acquisition,
   one global_exploration → local_exploitation; concentrated in mid/late
@@ -445,7 +445,8 @@ dataset-agnostic — rerun first on any journal-version panel.
 - `docs/THEORY.md` new section "Relation to classical theory": P2 = the
   utility-unit Value of Information (Howard 1966 / Lindley 1956 lineage;
   ES/PES/MES are the nats version); 15-scalar state = projection of the GP
-  posterior sufficient statistic (E1 negative consistent); utility+menu =
+  posterior sufficient statistic (E1 negative consistent); utility+closed
+  action set =
   acquisition-function structure lifted to the strategy level; P3 = the
   degenerate case the GP-Hedge→LMABO portfolio line assumes away; L1 =
   standard tree representational behavior.
@@ -497,3 +498,59 @@ Round 6 (`codex_paper_rereview6.log`): 12/15 ADDRESSED, 3 PARTIALLY
 spec). Round 7 (`codex_paper_rereview7.log`): all three ADDRESSED —
 **VERDICT: APPROVE**. Current outline/THEORY/survey package is the
 reviewed submission baseline.
+
+## 18. Research boundary guide: drafted + codex round-1 + initial fixes (2026-09-29)
+
+New normative document `docs/RESEARCH_BOUNDARY_GUIDE.md` (research
+boundary & modification spec: abstract architecture, A/B/C component
+taxonomy, two-level decision structure, interface contracts, modification
+procedures, anchors, glossary). Codex round-1 review
+(`runs/codex_boundary_guide_review.log`, gpt-6-sol, 105k tokens):
+**VERDICT: REVISE** — 5 BLOCKER / 13 MAJOR / 1 MINOR.
+
+Error-class fixes applied same session (guide + THEORY.md):
+
+- Fitting contract contradiction (BLOCKER ×2): "per-round MLE non-optional"
+  removed; described the actual lazy-fit lifecycle (evaluation invalidates,
+  GP-dependent actions fit on demand, RETRAIN explicit). Bull 2011
+  re-characterized correctly (sequential-MLE non-convergence counterexamples
+  + alternative estimators; NOT a per-round-refit mandate).
+- C-class reframed from "no statable theorem" to a project protocol
+  (protecting attribution/comparability/theorem premises); PFN note: a
+  calibrated posterior does not automatically inherit GP bounds.
+- §3.4 gate-2 algebra fixed: an equivariant difference alone leaves a
+  global α on the term — invariance requires dividing by an α-equivariant
+  scale; THEORY.md P1 scope (ii) corrected the same way.
+- THEORY.md §0 corrected: U has SIX terms, `w_stop_opportunity=0.75`
+  default (STOP term ACTIVE — the old "w_stop = 0" claim was wrong vs
+  `rollout/utility.py`); gold_probs noted as computed over the possibly
+  quota-sampled candidate set. P1's proof itself is unaffected (STOP term
+  depends only on budget ratio).
+- Restart ownership: removed from the inner action submenu (meta-level
+  only); A_dec/A_str renamed A_pt (point-selection) / A_flow
+  (process-control) to stop colliding with layer names.
+- §5.4 success criteria re-stated per arm/seed-stream (BT > RF both
+  streams; proper ≈ RF original / +0.053 replication; closed-loop
+  collapse), Gate 5 as necessary-condition (median ρ=1, joint gate FAILED
+  2/17), Gate 4 stop-gain estimand clarified; rich-state A/B updated to
+  the completed negative result.
+- Adaptedness decoupled from determinism/temperature-0; regret glossary
+  sign fixed (repo internally maximizes — convention now explicit);
+  warm-start "theorem applies as usual" caveated (adaptive selection,
+  budget accounting, uniformity over initial histories); meta level
+  qualified as a non-stationary budgeted bandit; P2/P3 positioned as
+  screening tests; multi-objective "two plugins" scoped to the abstract
+  architecture with the real implementation surface listed.
+- NEW §6.6: supervision-defining components (S-class: utility
+  weights/scales, continuation policy, horizon, gold temperature, quota,
+  replicate count) — minimal interim procedure (utility_version bump +
+  same-data A/B + P1 recheck + flip-rate reporting); NEW §10: scheme-class
+  review leftovers (D3 failure criteria, E1 supervision-construction
+  status, E2 meta-level pre-screen, E3 open-problem ordering, D2
+  enforcement machinery) flagged for the user's manual review.
+- §7 rebuilt as a claim→source map with per-item local-PDF status
+  (verified against `docs/ref_papers/pdfs/`); non-load-bearing anchors
+  dropped; Bull 2011 + GP-UCB rows added; LMABO 7.42 min scoped to the
+  Gemini arm's 50-iteration average.
+
+Not done (deliberately, pending manual scheme review): §10 items.

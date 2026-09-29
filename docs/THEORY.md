@@ -17,17 +17,21 @@ U(a, s) = w_opt · Δopt(a, s) / σ_opt(s)
         + w_sur · Δsur(a, s) + w_cov · Δcov(a, s)
         − w_eval · n_new(a) / σ_eval
         − w_fit  · n_fit(a) / σ_fit
-        − w_stop · 1[a = STOP] · r(s)
+        − w_stop_opportunity · remaining_budget_ratio · 1[a = STOP]
 ```
 
-with project defaults `w_sur = w_cov = 0` (Phase 8.5 decision), `w_stop = 0`
-in the default `UtilityWeights`, `σ_eval = σ_fit = total_budget`, and
+with project defaults `w_sur = w_cov = 0` (Phase 8.5 decision) and
+`w_stop_opportunity = 0.75` in the default `UtilityWeights` (the STOP
+term is ACTIVE by default; `rollout/utility.py`),
+`σ_eval = σ_fit = total_budget`, and
 `σ_opt(s) = std` of the **initial** objective values of the trajectory
 (computed by the dataset generator when `optimization_scale` is `None`).
 `Δopt(a, s)` is the improvement of the best observed objective over the
 short-horizon rollout branch that executes `a` and then a fixed
 continuation — in particular it is a **difference** of two objective
-values. `gold_probs(a|s) = softmax(U(·, s) / T)`.
+values. `gold_probs(a|s) = softmax(U(·, s) / T)`, computed over the
+rolled candidate set — which may be a quota-sampled subset of the 8
+actions (`dataset/generator.py`).
 
 States are drawn from a family-specific distribution ρ_family over the
 state space induced by the rollout process. All expectations below are
@@ -63,10 +67,13 @@ budget ratio. Every term is unchanged. ∎
 **Scope conditions.** (i) The scale must be *recomputed* on the
 transformed initial values (the generator does this); a frozen σ would
 leave a global α factor that softmax cancels only if T is rescaled too.
-(ii) If `w_sur` or `w_cov` were nonzero, `Δsur`/`Δcov` would have to be
-α-equivariant (or normalized) — with unnormalized RMSE-like quantities the
-identity can break. The project runs with both weights zero, so the
-condition holds by configuration.
+(ii) If `w_sur` or `w_cov` were nonzero, the TERMS `w_sur·Δsur` /
+`w_cov·Δcov` would each have to be affine-invariant — an equivariant
+difference alone is NOT sufficient (it leaves a global α factor on that
+term); it must be divided by an α-equivariant scale, as `Δopt` is by
+`σ_opt`. With unnormalized RMSE-like quantities the identity breaks.
+The project runs with both weights zero, so the condition holds by
+configuration.
 
 **Consequence for Gate 5.** Spearman ρ = 1 across buckets is *necessary*,
 not a lucky measurement; the observed 2/17 JS breaches on Hartmann cannot
@@ -263,10 +270,10 @@ related-work framing in the outline §2):
   shows the projection is near-lossless FOR PREDICTING THE ACTION LABEL
   under the tested feature families — it does not establish losslessness
   in general.
-- **The utility-plus-menu design lifts acquisition functions to the
+- **The utility-plus-action-set design lifts acquisition functions to the
   strategy level.** EI (Mockus, 1978) and GP-UCB (Srinivas et al., 2010)
   are closed-form one-step decision rules derived from the posterior; our
-  8-action menu plus hand-specified utility is the same one-step-greedy
+  closed 8-action set plus hand-specified utility is the same one-step-greedy
   structure at the level of *which optimizer action*, where no closed-form
   rule exists — which is precisely why supervision is needed.
 - **P3 stands in an analogy relation to the portfolio/bandit line.**
@@ -281,7 +288,7 @@ related-work framing in the outline §2):
   two-arm routing model — when the expensive arm's per-state advantage is
   ≤ 0, no allocation can extract positive value. The analogy is not an
   equivalence: our sweep measures routing outcomes, not the per-state
-  premise itself (limitation 9 of the outline), and our menu (stop, refit,
+  premise itself (limitation 9 of the outline), and our action set (stop, refit,
   sampling strategies) has no per-arm nominated point, so GP-Hedge's
   reward is not directly defined over it.
 - **L1 is a representability statement plus an empirical observation.**
