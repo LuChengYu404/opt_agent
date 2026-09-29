@@ -279,7 +279,7 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
    即可污染标签。
 3. **A(s) 是否可能恒非正？** 对照 P3（前提是逐态、匹配延续的一步
    模型）与 P2（D 是固定 ρ 与 U 下的一步上界）：若该动作位对最优
-   常动作的逐态优势非正，一步模型下任何路由/学习设计在该面板上
+   常动作的逐态优势非正，一步模型下任何路由/学习设计在该基准问题集上
    必输——动作位整体无价值时，先做 D(family) 筛选（P2）再谈学习。
    本关是**筛选性检验**（结论须带不确定度陈述），不是闭环定论；
    价值声明仍需整程闭环评估。
@@ -341,7 +341,7 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
   （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
   p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
   （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
-  ——斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%；光滑族 individually
+  ——斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%；光滑族逐族
   显著负斜率、多峰高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
   更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
   臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
@@ -402,7 +402,7 @@ PROGRESS 记录条件与数据，方案回到 §10 重议：
 
 流程：写动机（覆盖哪类人工操作）→ §3.4 三项前置检查 → ActionType +
 参数 schema + 校验（`actions/models.py` 模式）→ 接入 U(a,s) 分支
-（`rollout/utility.py` 权重与归一化，过 P1 等变检查）→ 小面板
+（`rollout/utility.py` 权重与归一化，过 P1 等变检查）→ 小规模基准问题集上的
 D(family) 筛选 → 进菜单。**禁止**跳过三项前置检查直接加位。执行机制
 （round-2 起生效）：菜单的边界分类由 `actions/boundary_registry.py`
 注册表承载，`tests/test_boundary_registry.py` 同步校验注册表 ↔
@@ -512,7 +512,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
    其三项前置检查（§3.4）在元层如何具体化？
 6. **System-2 优势抬正**：rich-state A/B（exp/lenz-state-jev-presentation）
    已完成且为负结果（§6.5）。A(s)≤0 的诊断在哪些 state 族/
-   面板上反转？反转条件本身是否可学（元层特征）？
+   基准问题集上反转？反转条件本身是否可学（元层特征）？
 7. **多目标标签**：Δopt → 超体积改进后的 P1 等变条件形式。
 
 ---
@@ -555,7 +555,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 | 点选择动作 | A_pt（point-selection） | 决定下一个评估点的位置（AF 选择/参数/批量；抽象槽位，当前实现见 §2.4） |
 | 流程控制动作 | A_flow（process-control） | 控制优化流程的推进（stop/retrain/切换采样模式；重启属元层）；人工流程控制决策的形式化对应物 |
 | 问题签名 | problem signature | 元层状态特征：维度、预算、历史 episode 结果摘要等 |
-| family / 面板 | family / panel | 数据集的函数族（Hartmann、SixHumpCamel…）及其汇集；P2 的 D(family) 按族计算 |
+| 函数族 / 基准问题集 | family / panel | 数据集的函数族（Hartmann、SixHumpCamel…）及其汇集；P2 的 D(family) 按族计算。英文文献称 panel，中文行文统一用"基准问题集" |
 | D(family) | one-step state-conditionality value | E_s[max_a U] − max_a E_s[U]；状态条件化策略对最优常动作的一步上界（P2） |
 | harness | (agent) harness | 控制-观测-执行-反馈循环骨架；按版本冻结（§4.5） |
 | 语义控制器 | semantic controller | LMABO 自我定位：LLM 只做调度决策，不碰数学骨干 |
