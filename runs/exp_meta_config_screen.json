@@ -1,6 +1,19 @@
 {
   "experiment": "exp_meta_config_screen",
-  "predeclared_rule": "POSITIVE iff (>=2 families CI-significant in opposite directions) or (meta-D bootstrap CI excludes zero); else NEGATIVE",
+  "estimands": {
+    "Delta_f": "E_seed[y_large - y_small] per family (max units)",
+    "interaction_null": "Delta_1 == ... == Delta_F (no family x config interaction)",
+    "meta_d_descriptor": "oracle-among-known-families value on standardized utilities; >0 in population iff Delta_f not all one sign; NOT a test statistic and NOT evidence of signature learnability"
+  },
+  "mechanistic_hypotheses": {
+    "H_mech_1": "multimodal families (Rastrigin, Ackley) gain from a larger space-filling design",
+    "H_mech_2": "smooth families (Branin, Hartmann, SixHumpCamel) lose model-guided budget to extra design points"
+  },
+  "predeclared_rules": {
+    "conditionality": "interaction p < 0.05 (chi^2_{F-1})",
+    "futile": "not detected AND all CI half-widths < 0.25 * sd_f (precise null)",
+    "otherwise": "INCONCLUSIVE (parked, not killed)"
+  },
   "families": [
     "Branin",
     "Hartmann",
@@ -8,7 +21,60 @@
     "SixHumpCamel",
     "Rastrigin"
   ],
+  "dimensions": {
+    "Branin": 2,
+    "Hartmann": 6,
+    "Ackley": 10,
+    "SixHumpCamel": 2,
+    "Rastrigin": 10
+  },
+  "n_init_over_2dp1": {
+    "Branin": {
+      "small": 1.0,
+      "large": 2.4
+    },
+    "Hartmann": {
+      "small": 0.38461538461538464,
+      "large": 0.9230769230769231
+    },
+    "Ackley": {
+      "small": 0.23809523809523808,
+      "large": 0.5714285714285714
+    },
+    "SixHumpCamel": {
+      "small": 1.0,
+      "large": 2.4
+    },
+    "Rastrigin": {
+      "small": 0.23809523809523808,
+      "large": 0.5714285714285714
+    }
+  },
   "seeds": 20,
+  "discovery_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "confirmation_seeds": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
   "budget": 30,
   "configs": {
     "small": 5,
@@ -18,98 +84,2113 @@
   "n_evals_observed": [
     30
   ],
+  "wall_seconds": 21.01154768001288,
   "per_family": {
     "Branin": {
+      "n_pairs": 20,
       "mean_diff_large_minus_small": -0.005203669257871102,
-      "ci95": [
+      "sd_pair_diff": 0.05053430796335028,
+      "se": 0.011299814780196017,
+      "ci95_bootstrap": [
         -0.024213233163934957,
         0.018470774057707206
       ],
       "ci_excludes_zero": false,
+      "ci_half_width": 0.02134200361082108,
+      "paired_t": {
+        "t": -0.4605092525048304,
+        "df": 19,
+        "p_two_sided": 0.6503777883584196
+      },
+      "cohens_dz": -0.1029729992868416,
+      "mdd80": 0.03163948138454885,
+      "precise_enough_for_null": false,
+      "discovery_half": {
+        "mean": -0.007250111707320883,
+        "sd": 0.06819673089903731,
+        "ci95": [
+          -0.04049372100755342,
+          0.037090592509528085
+        ],
+        "ci_excludes_zero": false
+      },
+      "confirmation_half": {
+        "mean": -0.0031572268084213207,
+        "sd": 0.027038457926812823,
+        "ci95": [
+          -0.018738777690755094,
+          0.013389864779337835
+        ],
+        "ci_excludes_zero": false
+      },
+      "sign_agree_across_halves": true,
+      "confirmed_family": false,
       "best_config_by_mean": "small"
     },
     "Hartmann": {
+      "n_pairs": 20,
       "mean_diff_large_minus_small": -0.3131770978000136,
-      "ci95": [
+      "sd_pair_diff": 0.8902530082052499,
+      "se": 0.19906662435206168,
+      "ci95_bootstrap": [
         -0.6943646657418843,
         0.08003350935704254
       ],
       "ci_excludes_zero": false,
+      "ci_half_width": 0.3871990875494634,
+      "paired_t": {
+        "t": -1.573227550421212,
+        "df": 19,
+        "p_two_sided": 0.13217064937305767
+      },
+      "cohens_dz": -0.35178437468173085,
+      "mdd80": 0.5573865481857727,
+      "precise_enough_for_null": false,
+      "discovery_half": {
+        "mean": -0.22741253550217957,
+        "sd": 0.7085511112255404,
+        "ci95": [
+          -0.6353388253980321,
+          0.18843105526091816
+        ],
+        "ci_excludes_zero": false
+      },
+      "confirmation_half": {
+        "mean": -0.3989416600978477,
+        "sd": 1.0746030096871497,
+        "ci95": [
+          -1.0310027260437749,
+          0.22521180071739236
+        ],
+        "ci_excludes_zero": false
+      },
+      "sign_agree_across_halves": true,
+      "confirmed_family": false,
       "best_config_by_mean": "small"
     },
     "Ackley": {
+      "n_pairs": 20,
       "mean_diff_large_minus_small": 0.03825570698447791,
-      "ci95": [
+      "sd_pair_diff": 0.2813996705219752,
+      "se": 0.06292287921331802,
+      "ci95_bootstrap": [
         -0.07203344251739825,
         0.1683916069644269
       ],
       "ci_excludes_zero": false,
+      "ci_half_width": 0.12021252474091257,
+      "paired_t": {
+        "t": 0.6079776936904828,
+        "df": 19,
+        "p_two_sided": 0.5504012568210617
+      },
+      "cohens_dz": 0.13594794518954645,
+      "mdd80": 0.17618406179729043,
+      "precise_enough_for_null": false,
+      "discovery_half": {
+        "mean": 0.04381966250258636,
+        "sd": 0.1326965190760036,
+        "ci95": [
+          -0.019335251740145765,
+          0.13069110260112246
+        ],
+        "ci_excludes_zero": false
+      },
+      "confirmation_half": {
+        "mean": 0.03269175146636947,
+        "sd": 0.38664299772866906,
+        "ci95": [
+          -0.1733192699736282,
+          0.2926260134016815
+        ],
+        "ci_excludes_zero": false
+      },
+      "sign_agree_across_halves": true,
+      "confirmed_family": false,
       "best_config_by_mean": "large"
     },
     "SixHumpCamel": {
+      "n_pairs": 20,
       "mean_diff_large_minus_small": -0.04078710354294091,
-      "ci95": [
+      "sd_pair_diff": 0.23460489490814213,
+      "se": 0.052459249286880005,
+      "ci95_bootstrap": [
         -0.1466683567018136,
         0.05209617386539459
       ],
       "ci_excludes_zero": false,
+      "ci_half_width": 0.0993822652836041,
+      "paired_t": {
+        "t": -0.7775007095486919,
+        "df": 19,
+        "p_two_sided": 0.4464370492264007
+      },
+      "cohens_dz": -0.1738544439105195,
+      "mdd80": 0.14688589800326401,
+      "precise_enough_for_null": false,
+      "discovery_half": {
+        "mean": -0.035184367706704286,
+        "sd": 0.31793947593353106,
+        "ci95": [
+          -0.2284700386703268,
+          0.1336595715344793
+        ],
+        "ci_excludes_zero": false
+      },
+      "confirmation_half": {
+        "mean": -0.04638983937917753,
+        "sd": 0.12263417658192428,
+        "ci95": [
+          -0.13125218778515083,
+          0.010195949189743536
+        ],
+        "ci_excludes_zero": false
+      },
+      "sign_agree_across_halves": true,
+      "confirmed_family": false,
       "best_config_by_mean": "small"
     },
     "Rastrigin": {
+      "n_pairs": 20,
       "mean_diff_large_minus_small": 8.35615442997553,
-      "ci95": [
+      "sd_pair_diff": 16.102599619753224,
+      "se": 3.6006507364230473,
+      "ci95_bootstrap": [
         1.2777370253071916,
         15.495670452926948
       ],
       "ci_excludes_zero": true,
+      "ci_half_width": 7.108966713809878,
+      "paired_t": {
+        "t": 2.3207345120834155,
+        "df": 19,
+        "p_two_sided": 0.031579584305085895
+      },
+      "cohens_dz": 0.5189320126748324,
+      "mdd80": 10.081822061984532,
+      "precise_enough_for_null": false,
+      "discovery_half": {
+        "mean": 6.614668165010839,
+        "sd": 19.79752333389012,
+        "ci95": [
+          -4.8100254418655055,
+          18.509448853998546
+        ],
+        "ci_excludes_zero": false
+      },
+      "confirmation_half": {
+        "mean": 10.097640694940223,
+        "sd": 12.194933903255484,
+        "ci95": [
+          3.3324763184119037,
+          17.267302206231392
+        ],
+        "ci_excludes_zero": true
+      },
+      "sign_agree_across_halves": true,
+      "confirmed_family": true,
       "best_config_by_mean": "large"
     }
   },
+  "interaction": {
+    "statistic": 8.713399997611523,
+    "df": 4,
+    "p_value": 0.06867624727358712,
+    "pooled_common_delta": -0.006275353989596672,
+    "heterogeneity_i2": 0.540936947563929,
+    "null": "Delta_1 == ... == Delta_F (no family x config interaction)"
+  },
   "meta_d": {
     "point": 0.12408244343761332,
-    "ci95": [
+    "ci95_bootstrap": [
       0.031672417987673285,
       0.23096991141003542
     ],
-    "ci_excludes_zero": true,
     "per_family_u": {
       "Branin": {
-        "u_small": -11.993119023326502,
-        "u_large": -12.140234978420176,
-        "s_f": 0.03537120942835688
+        "small": -11.993119023326502,
+        "large": -12.140234978420176
       },
       "Hartmann": {
-        "u_small": 4.594592292487364,
-        "u_large": 4.095798134351494,
-        "s_f": 0.6278684156415192
+        "small": 4.594592292487364,
+        "large": 4.095798134351494
       },
       "Ackley": {
-        "u_small": -42.88746544031799,
-        "u_large": -42.80616965121682,
-        "s_f": 0.47057427460198237
+        "small": -42.88746544031799,
+        "large": -42.80616965121682
       },
       "SixHumpCamel": {
-        "u_small": 5.588766029652132,
-        "u_large": 5.343227384263775,
-        "s_f": 0.16611276599017616
+        "small": 5.588766029652132,
+        "large": 5.343227384263775
       },
       "Rastrigin": {
-        "u_small": -7.7616003057874865,
-        "u_large": -7.222483877700587,
-        "s_f": 15.499721386024298
+        "small": -7.7616003057874865,
+        "large": -7.222483877700587
       }
     },
-    "note": "D_meta = E_f[max_a u_af] - max_a E_f[u_af] on family-standardized terminal best; >0 iff per-family config advantage varies beyond its cross-family mean"
+    "role": "descriptor only (see estimands)"
   },
-  "significant_families": [
+  "lofo_sign_prediction": {
+    "folds": [
+      {
+        "held_out": "Branin",
+        "predicted": "small",
+        "actual": "small",
+        "correct": true
+      },
+      {
+        "held_out": "Hartmann",
+        "predicted": "small",
+        "actual": "small",
+        "correct": true
+      },
+      {
+        "held_out": "Ackley",
+        "predicted": "small",
+        "actual": "large",
+        "correct": false
+      },
+      {
+        "held_out": "SixHumpCamel",
+        "predicted": "small",
+        "actual": "small",
+        "correct": true
+      },
+      {
+        "held_out": "Rastrigin",
+        "predicted": "small",
+        "actual": "large",
+        "correct": false
+      }
+    ],
+    "accuracy": 0.6,
+    "chance": 0.5,
+    "tie_break": "predict harness default (small)",
+    "caveat": "no resolution at F=5 with a near-even split; descriptive only"
+  },
+  "mechanistic_sign_test": {
+    "predicted_signs": {
+      "Rastrigin": 1,
+      "Ackley": 1,
+      "Branin": -1,
+      "Hartmann": -1,
+      "SixHumpCamel": -1
+    },
+    "agreement": {
+      "Branin": true,
+      "Hartmann": true,
+      "Ackley": true,
+      "SixHumpCamel": true,
+      "Rastrigin": true
+    },
+    "k_of_n": "5/5",
+    "exact_one_sided_p": 0.03125,
+    "role": "secondary corroboration of the predeclared directional hypotheses; does not enter the conditionality rule"
+  },
+  "confirmed_families": [
     "Rastrigin"
   ],
-  "opposite_direction_families": {
-    "large_wins": [
-      "Rastrigin"
-    ],
-    "small_wins": []
-  },
-  "verdict": "POSITIVE",
-  "wall_seconds": 20.86514209501911
+  "verdict": "INCONCLUSIVE",
+  "trajectories": [
+    {
+      "family": "Branin",
+      "seed": 0,
+      "config": "small",
+      "best": -0.4004627189187371,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 0,
+      "config": "large",
+      "best": -0.39936801396777,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 1,
+      "config": "small",
+      "best": -0.398296999776667,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 1,
+      "config": "large",
+      "best": -0.3982279902477508,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 2,
+      "config": "small",
+      "best": -0.44620206548091446,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 2,
+      "config": "large",
+      "best": -0.48735335898270193,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 3,
+      "config": "small",
+      "best": -0.40727144637650525,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 3,
+      "config": "large",
+      "best": -0.4110230189046433,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 4,
+      "config": "small",
+      "best": -0.4069161750263621,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 4,
+      "config": "large",
+      "best": -0.41567781850229935,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 5,
+      "config": "small",
+      "best": -0.44550763210387956,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 5,
+      "config": "large",
+      "best": -0.5197684557473856,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 6,
+      "config": "small",
+      "best": -0.40163720954818594,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 6,
+      "config": "large",
+      "best": -0.449526486670317,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 7,
+      "config": "small",
+      "best": -0.5675306811346861,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 7,
+      "config": "large",
+      "best": -0.4023929524921872,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 8,
+      "config": "small",
+      "best": -0.4079488150338495,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 8,
+      "config": "large",
+      "best": -0.4814847465634937,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 9,
+      "config": "small",
+      "best": -0.4143509869176132,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 9,
+      "config": "large",
+      "best": -0.40380300531206004,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 10,
+      "config": "small",
+      "best": -0.42125199786465295,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 10,
+      "config": "large",
+      "best": -0.41427822096211564,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 11,
+      "config": "small",
+      "best": -0.415897527551607,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 11,
+      "config": "large",
+      "best": -0.4154533040356796,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 12,
+      "config": "small",
+      "best": -0.4193642176117791,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 12,
+      "config": "large",
+      "best": -0.41852274702286785,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 13,
+      "config": "small",
+      "best": -0.41420264954936137,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 13,
+      "config": "large",
+      "best": -0.4214353226891543,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 14,
+      "config": "small",
+      "best": -0.4738465519425219,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 14,
+      "config": "large",
+      "best": -0.426725855838507,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 15,
+      "config": "small",
+      "best": -0.4054778150388252,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 15,
+      "config": "large",
+      "best": -0.45785076892360976,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 16,
+      "config": "small",
+      "best": -0.40438974919743664,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 16,
+      "config": "large",
+      "best": -0.4376464637170532,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 17,
+      "config": "small",
+      "best": -0.3996221411872778,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 17,
+      "config": "large",
+      "best": -0.400687635640125,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 18,
+      "config": "small",
+      "best": -0.40882584651598997,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 18,
+      "config": "large",
+      "best": -0.4208748026931435,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 19,
+      "config": "small",
+      "best": -0.425219266689,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Branin",
+      "seed": 19,
+      "config": "large",
+      "best": -0.4061949097104094,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 0,
+      "config": "small",
+      "best": 2.5232067017503934,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 0,
+      "config": "large",
+      "best": 2.778666909322393,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 1,
+      "config": "small",
+      "best": 2.726811174150097,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 1,
+      "config": "large",
+      "best": 1.2658184548238873,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 2,
+      "config": "small",
+      "best": 3.226065986555932,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 2,
+      "config": "large",
+      "best": 2.959308433876448,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 3,
+      "config": "small",
+      "best": 3.011528182039086,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 3,
+      "config": "large",
+      "best": 3.0767114960453297,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 4,
+      "config": "small",
+      "best": 2.4208567382562065,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 4,
+      "config": "large",
+      "best": 2.3024129269477625,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 5,
+      "config": "small",
+      "best": 3.2779485177346674,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 5,
+      "config": "large",
+      "best": 2.9011839583561816,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 6,
+      "config": "small",
+      "best": 1.6162319365378064,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 6,
+      "config": "large",
+      "best": 2.8028827436509998,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 7,
+      "config": "small",
+      "best": 3.3093884659077095,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 7,
+      "config": "large",
+      "best": 3.2953987712415014,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 8,
+      "config": "small",
+      "best": 3.255534660405504,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 8,
+      "config": "large",
+      "best": 2.442150360170659,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 9,
+      "config": "small",
+      "best": 3.264718116039085,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 9,
+      "config": "large",
+      "best": 2.533631069919529,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 10,
+      "config": "small",
+      "best": 3.2015165771238845,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 10,
+      "config": "large",
+      "best": 1.5871317004456968,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 11,
+      "config": "small",
+      "best": 1.147220120045903,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 11,
+      "config": "large",
+      "best": 2.71838972693397,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 12,
+      "config": "small",
+      "best": 3.289188537035719,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 12,
+      "config": "large",
+      "best": 3.3179853021810835,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 13,
+      "config": "small",
+      "best": 2.691173556417755,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 13,
+      "config": "large",
+      "best": 3.19212728474849,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 14,
+      "config": "small",
+      "best": 3.0054452942643035,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 14,
+      "config": "large",
+      "best": 1.6685758671842161,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 15,
+      "config": "small",
+      "best": 3.2453847939086646,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 15,
+      "config": "large",
+      "best": 3.0572898636810004,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 16,
+      "config": "small",
+      "best": 3.214785434662772,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 16,
+      "config": "large",
+      "best": 2.6948673814796393,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 17,
+      "config": "small",
+      "best": 3.1334690998262693,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 17,
+      "config": "large",
+      "best": 2.745021517008827,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 18,
+      "config": "small",
+      "best": 3.1946604148996656,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 18,
+      "config": "large",
+      "best": 1.0944762594989124,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 19,
+      "config": "small",
+      "best": 2.9408533564940993,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Hartmann",
+      "seed": 19,
+      "config": "large",
+      "best": 2.998415680538723,
+      "n_evals": 30,
+      "dimension": 6,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 0,
+      "config": "small",
+      "best": -20.50180819994382,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 0,
+      "config": "large",
+      "best": -20.120729588334743,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 1,
+      "config": "small",
+      "best": -20.34250244625584,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 1,
+      "config": "large",
+      "best": -20.34250244625584,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 2,
+      "config": "small",
+      "best": -20.004437300386364,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 2,
+      "config": "large",
+      "best": -20.004437300386364,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 3,
+      "config": "small",
+      "best": -20.30460040706254,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 3,
+      "config": "large",
+      "best": -20.284838568929583,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 4,
+      "config": "small",
+      "best": -19.164198773203527,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 4,
+      "config": "large",
+      "best": -19.164198773203527,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 5,
+      "config": "small",
+      "best": -20.21025725015221,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 5,
+      "config": "large",
+      "best": -20.066343897101174,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 6,
+      "config": "small",
+      "best": -19.849919943251624,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 6,
+      "config": "large",
+      "best": -19.849919943251624,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 7,
+      "config": "small",
+      "best": -20.522269022377888,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 7,
+      "config": "large",
+      "best": -20.522269022377888,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 8,
+      "config": "small",
+      "best": -20.369165582514455,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 8,
+      "config": "large",
+      "best": -20.369165582514455,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 9,
+      "config": "small",
+      "best": -20.491654624830222,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 9,
+      "config": "large",
+      "best": -20.59821180259743,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 10,
+      "config": "small",
+      "best": -20.373681912598467,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 10,
+      "config": "large",
+      "best": -20.373681912598467,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 11,
+      "config": "small",
+      "best": -20.221502900192508,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 11,
+      "config": "large",
+      "best": -20.221502900192508,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 12,
+      "config": "small",
+      "best": -20.75303652860948,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 12,
+      "config": "large",
+      "best": -19.80026947373438,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 13,
+      "config": "small",
+      "best": -20.5408926509982,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 13,
+      "config": "large",
+      "best": -20.5408926509982,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 14,
+      "config": "small",
+      "best": -20.44539882879428,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 14,
+      "config": "large",
+      "best": -20.44539882879428,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 15,
+      "config": "small",
+      "best": -20.362711945631826,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 15,
+      "config": "large",
+      "best": -20.76036099598804,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 16,
+      "config": "small",
+      "best": -20.164597602350977,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 16,
+      "config": "large",
+      "best": -20.164597602350977,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 17,
+      "config": "small",
+      "best": -19.75797764836066,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 17,
+      "config": "large",
+      "best": -20.198557648510622,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 18,
+      "config": "small",
+      "best": -18.70508802758936,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 18,
+      "config": "large",
+      "best": -18.790692019133125,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 19,
+      "config": "small",
+      "best": -20.549057186800262,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Ackley",
+      "seed": 19,
+      "config": "large",
+      "best": -20.251073684961725,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 0,
+      "config": "small",
+      "best": 1.0217753155830047,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 0,
+      "config": "large",
+      "best": 0.7086000630960447,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 1,
+      "config": "small",
+      "best": 0.5902793123472625,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 1,
+      "config": "large",
+      "best": 1.0208457427086042,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 2,
+      "config": "small",
+      "best": 1.026125373696029,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 2,
+      "config": "large",
+      "best": 0.7762127408243706,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 3,
+      "config": "small",
+      "best": 0.706006109813097,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 3,
+      "config": "large",
+      "best": 0.9598702595489996,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 4,
+      "config": "small",
+      "best": 0.9536451235141549,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 4,
+      "config": "large",
+      "best": 0.9560503419558949,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 5,
+      "config": "small",
+      "best": 0.968541568418275,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 5,
+      "config": "large",
+      "best": 1.0278133188955083,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 6,
+      "config": "small",
+      "best": 0.8298740221715846,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 6,
+      "config": "large",
+      "best": 0.9066009270300517,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 7,
+      "config": "small",
+      "best": 0.9157984187187918,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 7,
+      "config": "large",
+      "best": 0.21856877131135188,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 8,
+      "config": "small",
+      "best": 1.0251178174565736,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 8,
+      "config": "large",
+      "best": 0.9886365347651942,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 9,
+      "config": "small",
+      "best": 0.9027981678264472,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 9,
+      "config": "large",
+      "best": 1.024918852342157,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 10,
+      "config": "small",
+      "best": 0.9967375551367178,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 10,
+      "config": "large",
+      "best": 1.0283321445480313,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 11,
+      "config": "small",
+      "best": 0.946058846459595,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 11,
+      "config": "large",
+      "best": 0.8863023708126064,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 12,
+      "config": "small",
+      "best": 1.017883296768323,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 12,
+      "config": "large",
+      "best": 0.9671003517649199,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 13,
+      "config": "small",
+      "best": 0.8582545074418044,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 13,
+      "config": "large",
+      "best": 0.48711454808881216,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 14,
+      "config": "small",
+      "best": 0.9501532078178727,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 14,
+      "config": "large",
+      "best": 1.0194627559046017,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 15,
+      "config": "small",
+      "best": 0.9930007891141641,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 15,
+      "config": "large",
+      "best": 0.9930007891141641,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 16,
+      "config": "small",
+      "best": 0.9839687998117798,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 16,
+      "config": "large",
+      "best": 1.0024844282264411,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 17,
+      "config": "small",
+      "best": 0.8526666779655866,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 17,
+      "config": "large",
+      "best": 0.7737361016854846,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 18,
+      "config": "small",
+      "best": 1.0230921192573244,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 18,
+      "config": "large",
+      "best": 0.9986021334648534,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 19,
+      "config": "small",
+      "best": 1.005530643830621,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "SixHumpCamel",
+      "seed": 19,
+      "config": "large",
+      "best": 1.0073124262020987,
+      "n_evals": 30,
+      "dimension": 2,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 0,
+      "config": "small",
+      "best": -128.93291342134216,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 0,
+      "config": "large",
+      "best": -95.77315705042305,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 1,
+      "config": "small",
+      "best": -136.5667394183376,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 1,
+      "config": "large",
+      "best": -117.39182543354565,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 2,
+      "config": "small",
+      "best": -146.09613207471907,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 2,
+      "config": "large",
+      "best": -144.76917043540027,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 3,
+      "config": "small",
+      "best": -121.707436487326,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 3,
+      "config": "large",
+      "best": -126.28701829896923,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 4,
+      "config": "small",
+      "best": -121.69468908593946,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 4,
+      "config": "large",
+      "best": -126.84488725652017,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 5,
+      "config": "small",
+      "best": -122.91320502381836,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 5,
+      "config": "large",
+      "best": -125.00578295185332,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 6,
+      "config": "small",
+      "best": -101.96141519432435,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 6,
+      "config": "large",
+      "best": -109.70447133284165,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 7,
+      "config": "small",
+      "best": -142.1093361297504,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 7,
+      "config": "large",
+      "best": -105.70107287297509,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 8,
+      "config": "small",
+      "best": -127.95786949072952,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 8,
+      "config": "large",
+      "best": -107.23349033950132,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 9,
+      "config": "small",
+      "best": -123.09752981863969,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 9,
+      "config": "large",
+      "best": -148.17970852278847,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 10,
+      "config": "small",
+      "best": -124.61141264771557,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 10,
+      "config": "large",
+      "best": -111.24624772897724,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 11,
+      "config": "small",
+      "best": -111.44602320258666,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 11,
+      "config": "large",
+      "best": -105.1471658694049,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 12,
+      "config": "small",
+      "best": -103.28227490914479,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 12,
+      "config": "large",
+      "best": -89.52413961239053,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 13,
+      "config": "small",
+      "best": -105.56840105626742,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 13,
+      "config": "large",
+      "best": -105.56840105626742,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 14,
+      "config": "small",
+      "best": -107.87703297490052,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 14,
+      "config": "large",
+      "best": -113.33280535621084,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 15,
+      "config": "small",
+      "best": -127.23168159042282,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 15,
+      "config": "large",
+      "best": -128.29693663539277,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 16,
+      "config": "small",
+      "best": -120.33650454168571,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 16,
+      "config": "large",
+      "best": -97.6079618229541,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 17,
+      "config": "small",
+      "best": -108.87139147275016,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 17,
+      "config": "large",
+      "best": -77.02601019373756,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 18,
+      "config": "small",
+      "best": -109.03374829477534,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 18,
+      "config": "large",
+      "best": -109.25089771467958,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 19,
+      "config": "small",
+      "best": -114.75710815256483,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    },
+    {
+      "family": "Rastrigin",
+      "seed": 19,
+      "config": "large",
+      "best": -95.03860590339664,
+      "n_evals": 30,
+      "dimension": 10,
+      "termination": "budget_exhausted"
+    }
+  ]
 }

@@ -137,7 +137,7 @@ option = 一次时间上扩展的执行 = 一个 episode。元层的"换模型"�
 | 目标函数 f、评估协议、单次评估成本 | 黑盒真值，问题定义而非系统部件 |
 | 预算 T | 资源约束，外生 |
 | 输出算子的**定义**（argmin / Pareto 支配 / 超体积的测度） | 数学定义，不随运行改变 |
-| 策略的 adaptedness（可测性第一层） | 决策必须是观测历史的（确定）函数；违反则运行不可复现、评估失效。**架构不变量**，任何设计不得触碰 |
+| 策略的 adaptedness（可测性第一层） | 决策必须是观测历史的可测函数——随机化策略只要把自身随机性并入决策时信息即满足（§3.2），确定性/温度 0 是可复现性约定而非本不变量条件；违反则运行评估失效。**架构不变量**，任何设计不得触碰 |
 
 ### 2.2 B 类：episode 内允许调整（按证据强度分档）
 
@@ -323,12 +323,14 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
   匹配的闭环检验——其结果出来前，不再扩大首动作标签投入。
 - 元层（开放，贡献位更空；**前置筛选已跑**）：配置级监督 = 同一问题
   多 episode 结果差 + 跨问题签名匹配下的标签迁移。n_init 轴前置筛选
-  （EXP-META-CONFIG-SCREEN，2026-09-29）：**POSITIVE**——Rastrigin 上
-  大初始设计 CI 显著占优（+8.36 [1.28, 15.50]）、赢家身份 3:2 分裂、
-  meta-D 0.124 [0.032, 0.231] 排零；由单一 family 主导，扩展配置轴时
-  先做签名可分性检验。文献现状：per-instance 配置 BO 的元学习比内层
-  策略层更少人做（Rice 1976 框架 / racing / Hyperband 在 HPO 域有，
-  BO-self-configuration 域近乎空白）。
+  （EXP-META-CONFIG-SCREEN，2026-09-29）：**INCONCLUSIVE**——交互主检验
+  χ²₄ = 8.71、p = 0.069 未达显著（I² = 0.54，中等异质性）；个体层面仅
+  Rastrigin 确认获益（d_z = 0.52，发现/确认半区稳定）；预宣告机理方向
+  假设获 5/5 符号支持（精确 p = 0.031）；零不精确（无族达 0.25·sd
+  精确零界）→ **轴停摆待议：不建管线、不杀轴**，升级路径（加种子/
+  加配置档位/层次模型）见报告 §6。文献现状：per-instance 配置 BO 的
+  元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
+  在 HPO 域有，BO-self-configuration 域近乎空白）。
 
 ### 5.3 理论目标：层层干净 + 判据可迁移
 
@@ -368,9 +370,11 @@ PROGRESS 记录条件与数据，方案回到 §10 重议：
    决策级报告，不进主线。
 3. **成本上限**：每条标签的期望 rollout 成本（CPU·s）超过闭环评估
    成本的 10× → 重新设计标注单位（更长视程、更少标签），而非加复制。
-4. **元层优势**：某配置轴前置筛选 NEGATIVE（无 family 显著且 meta-D
-   CI 含 0）→ 该轴元层管线停建（§4.4）；换轴重筛（n_init 轴现为
-   POSITIVE，未触发）。
+4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
+   半宽 < 0.25·sd 的精确零界）→ 该轴元层管线停建（§4.4）；**仅未检出
+   但零不精确（INCONCLUSIVE）→ 停摆待议**（加种子/加档位后重筛），
+   不得当 FUTILE 处理（n_init 轴现为 INCONCLUSIVE：χ²₄ = 8.71、
+   p = 0.069、零不精确，见 §5.2）。
 
 ---
 
@@ -478,11 +482,12 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 2. **Schedule/continuation 级标注**（§5.2 决策点）：把"价值在延续里"
    变成标注单位（schedule 段级 U / TD 式目标），配匹配闭环检验——
    直接回应 8.6F 不可加与 Gate-4 首动作 ≈0。
-3. **元层监督制造**：n_init 轴前置筛选已 POSITIVE（§5.2、
-   `runs/EXP_META_CONFIG_SCREEN.md`）；遗留：扩展配置轴（预算切分、
-   设计规模档位）、配置级反事实怎么造（同一问题、同预算切分下不同
-   配置的 episode 对比）、跨问题标签迁移的签名匹配准则
-   （"Rastrigin 型多峰签名"为可分性检验起点）。
+3. **元层监督制造**：n_init 轴前置筛选已跑，**INCONCLUSIVE**（§5.2、
+   `runs/EXP_META_CONFIG_SCREEN.md`）——升级路径（高变异族加种子、
+   n_init 网格档位、层次模型跨族推断）优先于铺管线；配置级反事实
+   怎么造（同一问题、同预算切分下不同配置的 episode 对比）、跨问题
+   标签迁移的签名匹配准则仍开放（维度归一化特征 n_init/(2d+1) 优先
+   于裸 n_init）。
 4. **闭环可加性**：Phase 8.6F 已证首动作与延续效应不可加；闭环
    价值只能整程评估——反事实监督的短视程近似何时失真？
 5. **重启动作建模**：把"换族重启 + warm start"建成元层动作位后，
@@ -524,6 +529,10 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 | Gate 4 / Gate 5 | gates | 项目预宣告实验门槛：Gate 4 = 终端行为增益（含 stop-gain 子项）；Gate 5 = 标签仿射不变性。定义与通过状态见 PROGRESS 记录与 THEORY.md |
 | 惰性拟合 | lazy fitting | 代理维护现状：评估使拟合失效，GP 依赖动作按需重拟合，RETRAIN 显式重拟合（`actions/executor.py`） |
 | 监督定义组件 | S 类（supervision-defining） | 改变标签而不属于动作/状态的组件：utility 权重与尺度、延续策略、视程、gold 温度、动作子集配额、rollout 复制数。规程见 §6.6 |
+| 终止判据 | kill criteria | §5.5 预宣告的投入终止条件（教师可靠性/闭环增量/成本/元层筛选）；触发即停并在 PROGRESS 记录 |
+| meta-D | configuration-conditionality descriptor | 族标准化效用上的 E_f[max_a u] − max_a E_f[u]；总体意义 >0 ⟺ 各族优势 Δ_f 符号不全同。度量"已知族标签的 oracle 选择价值"，是**描述量而非检验统计量**，且与签名可学性无关 |
+| HARNESS_VERSION / UTILITY_VERSION | version stamps | `dataset/versioning.py` 的双版本戳：前者冻结观测格式+动作菜单+标签管线整体，后者只追踪 S 类标签定义；修改对应组件必须递增并在 `_KNOWN_PAST` 登记旧值 |
+| legacy / mismatch | stamp statuses | `check_record_versions` 的分类：legacy = 旧值或缺戳（可读、禁止与当前版本静默混池）；mismatch = 未知值（拒绝混池） |
 | 动作菜单 | action menu | 类型化动作集（现 8 个 ActionType）；扩张受 §3.4 三关约束 |
 | 点选择动作 | A_pt（point-selection） | 决定下一个点在哪（AF 选择/参数/批量；抽象槽位，当前实现见 §2.4） |
 | 流程控制动作 | A_flow（process-control） | 决定流程怎么走（stop/retrain/换模式；重启属元层）；"工程师的手"的形式化 |
@@ -542,7 +551,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 ## 10. Round-1 评审遗留与 round-2 处置（分支 exp/boundary-scheme-round2）
 
 Round-1（`runs/codex_boundary_guide_review.log`，VERDICT: REVISE，
-19 项：5 BLOCKER / 13 MAJOR / 1 MINOR）中的方案取舍类问题，
+24 项：7 BLOCKER / 16 MAJOR / 1 MINOR）中的方案取舍类问题，
 round-2 处置状态（2026-09-29）：
 
 1. **失败/终止判据（D3）→ 已落地**：§5.5 预宣告四条 kill criteria
@@ -552,9 +561,12 @@ round-2 处置状态（2026-09-29）：
    实测限制升至同等地位；schedule/continuation 级标注 + 匹配闭环
    检验定为下一决策点（§8.2）。
 3. **元层前置筛选（E2）→ 已执行**：`scripts/exp_meta_config_screen.py`
-   （n_init 轴，5×20×2 配对，预算 30，预宣告判定规则）→ **POSITIVE**
-   （Rastrigin CI 显著 + 赢家 3:2 分裂 + meta-D 排零；单一 family
-   主导，caveats 见 `runs/EXP_META_CONFIG_SCREEN.md`）。
+   （n_init 轴，5×20×2 配对嵌套 Sobol，预算 30，估计量/机理假设/判定
+   规则均预宣告；主检验为 Δ_f 同质性 Wald χ²，meta-D 降为描述量）
+   → **INCONCLUSIVE**（χ²₄ = 8.71、p = 0.069、I² = 0.54；Rastrigin
+   个体确认 d_z = 0.52；机理符号 5/5，p = 0.031；零不精确）。首版以
+   meta-D 边界 bootstrap 判 POSITIVE，属检验方法错误，同日更正
+   （round-2 评审 D1）——分析全文见 `runs/EXP_META_CONFIG_SCREEN.md`。
 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
    evaluation（唯一两次复现的正面结果）与 schedule/continuation
    标注列前，元层筛选已跑，state 富化靠后。

@@ -575,19 +575,27 @@ executed, not just planned:
    contribution claim; schedule/continuation-level labeling + a matched
    closed-loop test is the declared next decision point BEFORE scaling
    first-action labels.
-3. **Meta-level pre-screen (E2) — EXECUTED, POSITIVE** —
-   `scripts/exp_meta_config_screen.py` + `runs/EXP_META_CONFIG_SCREEN.md`
-   (+ .json artifact). Config axis n_init ∈ {5, 12}, budget 30 both arms,
-   pinned AlwaysSurrogate policy, paired Sobol streams, 5 families ×
-   20 seeds × 2 configs = 200 trajectories (n_evals verified = 30 both
-   arms). Predeclared rule fired via meta-D: Rastrigin large-init wins
-   (+8.36, CI [1.28, 15.50]); winner identity splits 3 small / 2 large;
-   meta-D = 0.124, CI [0.032, 0.231] excludes zero. Honest caveats
-   recorded: single family drives significance; u = mean/s_f
-   standardization is nonstandard (the sign split is the robust part);
-   single axis × single alternative value. Worker-side
-   torch.set_num_threads(1) guard (85 s/traj → ~1 s/traj
-   oversubscription fix, longhorizon precedent).
+3. **Meta-level pre-screen (E2) — EXECUTED, INCONCLUSIVE (rigor-corrected
+   same session)** — `scripts/exp_meta_config_screen.py` +
+   `runs/EXP_META_CONFIG_SCREEN.md` (+ .json with all 200 per-trajectory
+   records). Config axis n_init ∈ {5, 12}, budget 30 both arms, pinned
+   AlwaysSurrogate, paired nested Sobol streams, 5 families × 20 seeds ×
+   2 configs. Estimands + mechanistic hypotheses + decision rules all
+   predeclared in the script. PRIMARY test = homogeneity Wald χ² on
+   per-family advantages: χ²₄ = 8.71, p = 0.069 (not detected; I² = 0.54).
+   Rastrigin individually confirmed (Δ = +8.36, d_z = 0.52, paired t
+   p = 0.032, stable across discovery/confirmation seed halves);
+   predeclared directional mechanistic hypotheses get 5/5 sign agreement
+   (exact one-sided p = 0.031); the null is imprecise everywhere (no
+   family reaches the 0.25·sd precision floor) → axis PARKED (no
+   pipeline, not killed). CORRECTION: the first-pass read (POSITIVE via
+   meta-D bootstrap CI excluding zero) tested a nonnegative statistic on
+   the boundary and was wrong (codex round-2 D1); meta-D is demoted to a
+   descriptor and the report rewritten paper-style with estimands,
+   dimension context (n_init/(2d+1): both arms starved at d=10),
+   MDD₈₀ power readouts, LOFO learnability probe (3/5, no resolution at
+   F=5), and limitations. Worker-side torch.set_num_threads(1) guard
+   (85 s/traj → ~1 s/traj oversubscription fix, longhorizon precedent).
 4. **Open-problem reordering (E3)** — guide §8: locked transfer
    evaluation (the only twice-replicated positive) first,
    schedule/continuation labeling second, meta axes third (screen already
