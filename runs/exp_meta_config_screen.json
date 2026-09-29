@@ -1,0 +1,115 @@
+{
+  "experiment": "exp_meta_config_screen",
+  "predeclared_rule": "POSITIVE iff (>=2 families CI-significant in opposite directions) or (meta-D bootstrap CI excludes zero); else NEGATIVE",
+  "families": [
+    "Branin",
+    "Hartmann",
+    "Ackley",
+    "SixHumpCamel",
+    "Rastrigin"
+  ],
+  "seeds": 20,
+  "budget": 30,
+  "configs": {
+    "small": 5,
+    "large": 12
+  },
+  "policy": "AlwaysSurrogate (pinned)",
+  "n_evals_observed": [
+    30
+  ],
+  "per_family": {
+    "Branin": {
+      "mean_diff_large_minus_small": -0.005203669257871102,
+      "ci95": [
+        -0.024213233163934957,
+        0.018470774057707206
+      ],
+      "ci_excludes_zero": false,
+      "best_config_by_mean": "small"
+    },
+    "Hartmann": {
+      "mean_diff_large_minus_small": -0.3131770978000136,
+      "ci95": [
+        -0.6943646657418843,
+        0.08003350935704254
+      ],
+      "ci_excludes_zero": false,
+      "best_config_by_mean": "small"
+    },
+    "Ackley": {
+      "mean_diff_large_minus_small": 0.03825570698447791,
+      "ci95": [
+        -0.07203344251739825,
+        0.1683916069644269
+      ],
+      "ci_excludes_zero": false,
+      "best_config_by_mean": "large"
+    },
+    "SixHumpCamel": {
+      "mean_diff_large_minus_small": -0.04078710354294091,
+      "ci95": [
+        -0.1466683567018136,
+        0.05209617386539459
+      ],
+      "ci_excludes_zero": false,
+      "best_config_by_mean": "small"
+    },
+    "Rastrigin": {
+      "mean_diff_large_minus_small": 8.35615442997553,
+      "ci95": [
+        1.2777370253071916,
+        15.495670452926948
+      ],
+      "ci_excludes_zero": true,
+      "best_config_by_mean": "large"
+    }
+  },
+  "meta_d": {
+    "point": 0.12408244343761332,
+    "ci95": [
+      0.031672417987673285,
+      0.23096991141003542
+    ],
+    "ci_excludes_zero": true,
+    "per_family_u": {
+      "Branin": {
+        "u_small": -11.993119023326502,
+        "u_large": -12.140234978420176,
+        "s_f": 0.03537120942835688
+      },
+      "Hartmann": {
+        "u_small": 4.594592292487364,
+        "u_large": 4.095798134351494,
+        "s_f": 0.6278684156415192
+      },
+      "Ackley": {
+        "u_small": -42.88746544031799,
+        "u_large": -42.80616965121682,
+        "s_f": 0.47057427460198237
+      },
+      "SixHumpCamel": {
+        "u_small": 5.588766029652132,
+        "u_large": 5.343227384263775,
+        "s_f": 0.16611276599017616
+      },
+      "Rastrigin": {
+        "u_small": -7.7616003057874865,
+        "u_large": -7.222483877700587,
+        "s_f": 15.499721386024298
+      }
+    },
+    "note": "D_meta = E_f[max_a u_af] - max_a E_f[u_af] on family-standardized terminal best; >0 iff per-family config advantage varies beyond its cross-family mean"
+  },
+  "significant_families": [
+    "Rastrigin"
+  ],
+  "opposite_direction_families": {
+    "large_wins": [
+      "Rastrigin"
+    ],
+    "small_wins": []
+  },
+  "verdict": "POSITIVE",
+  "wall_seconds": 20.86514209501911
+}

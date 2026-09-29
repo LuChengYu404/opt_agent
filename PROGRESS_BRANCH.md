@@ -554,3 +554,57 @@ Error-class fixes applied same session (guide + THEORY.md):
   Gemini arm's 50-iteration average.
 
 Not done (deliberately, pending manual scheme review): §10 items.
+
+## 19. Round-2: scheme-class items landed on exp/boundary-scheme-round2 (2026-09-29)
+
+Branch `exp/boundary-scheme-round2` (off the round-1 commit). The five
+§10 scheme-class leftovers from the boundary-guide review are now
+executed, not just planned:
+
+1. **Kill criteria (D3)** — guide §5.5: four predeclared termination
+   conditions (teacher reliability after label-unit redesign: flip must
+   drop below the current 0.37; closed-loop increment vs best
+   constant/two-phase schedule CI-positive on ≥3 families or the route
+   stops at decision-level; per-label rollout cost >10× closed-loop eval
+   → redesign the label unit; meta-axis screen NEGATIVE → no pipeline on
+   that axis).
+2. **Supervision-construction status (E1)** — guide §0.3 + §5.2: the
+   myopic-label limits (flip 0.37 @ R=5; aligned Gate-4 first-action
+   terminal advantage ≈0 with wide Ackley/Hartmann CIs; 8.6F
+   non-additivity; closed-loop collapse) now carry equal weight with the
+   contribution claim; schedule/continuation-level labeling + a matched
+   closed-loop test is the declared next decision point BEFORE scaling
+   first-action labels.
+3. **Meta-level pre-screen (E2) — EXECUTED, POSITIVE** —
+   `scripts/exp_meta_config_screen.py` + `runs/EXP_META_CONFIG_SCREEN.md`
+   (+ .json artifact). Config axis n_init ∈ {5, 12}, budget 30 both arms,
+   pinned AlwaysSurrogate policy, paired Sobol streams, 5 families ×
+   20 seeds × 2 configs = 200 trajectories (n_evals verified = 30 both
+   arms). Predeclared rule fired via meta-D: Rastrigin large-init wins
+   (+8.36, CI [1.28, 15.50]); winner identity splits 3 small / 2 large;
+   meta-D = 0.124, CI [0.032, 0.231] excludes zero. Honest caveats
+   recorded: single family drives significance; u = mean/s_f
+   standardization is nonstandard (the sign split is the robust part);
+   single axis × single alternative value. Worker-side
+   torch.set_num_threads(1) guard (85 s/traj → ~1 s/traj
+   oversubscription fix, longhorizon precedent).
+4. **Open-problem reordering (E3)** — guide §8: locked transfer
+   evaluation (the only twice-replicated positive) first,
+   schedule/continuation labeling second, meta axes third (screen already
+   run), state enrichment later.
+5. **Enforcement machinery (D2, minimal)** — new
+   `src/opt_agent/actions/boundary_registry.py` (ActionType →
+   boundary-class/submenu/note) + `tests/test_boundary_registry.py`
+   enforcing registry ↔ menu ↔ guide §2.4 table three-way sync (guide
+   table parsed, so a doc-only edit cannot desync either); new
+   `src/opt_agent/dataset/versioning.py` (HARNESS_VERSION "h1" /
+   UTILITY_VERSION "phase8.6b", stamp_metadata, check_record_versions
+   with ok/legacy/mismatch semantics) wired into the generator (replaces
+   the hardcoded utility_version) + `tests/test_versioning.py` (12 new
+   tests total, all green).
+
+Suite status at commit time: full `uv run pytest tests/` green —
+**443 passed** in 21:32 (includes the RLCD GPU tests; 431 pre-existing +
+12 new). Remaining open from round-1: §6.6 full
+procedure formalization + consumer-side hard refusal policy for
+legacy/mismatch stamps.

@@ -26,6 +26,7 @@ from opt_agent.actions import (
 )
 from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
 from opt_agent.actions.models import ActionResult
+from opt_agent.dataset.versioning import stamp_metadata
 from opt_agent.backend.bocode_botorch import BackendConfig, UnifiedBackend
 from opt_agent.backend.checkpoint import Checkpoint
 from opt_agent.dataset.decision_record import DecisionRecord, _json_safe
@@ -545,11 +546,10 @@ class DatasetGenerator:
                 for r in output.results
             },
             temperature=float(self.config.temperature),
-            metadata={
+            metadata=stamp_metadata({
                 "trajectory_id": int(trajectory_id),
                 "step": int(step),
                 "run_seed": int(run_seed),
-                "utility_version": "phase8.6b",
                 "optimization_scale": float(optimization_scale),
                 "evaluation_scale": float(evaluation_scale),
                 "fit_scale": float(fit_scale),
@@ -580,5 +580,5 @@ class DatasetGenerator:
                 # generated with rollout_action_subsample < |vocab|.
                 **({"partial_rollout": partial_rollout} if partial_rollout else {}),
                 **replay_meta,
-            },
+            }),
         )

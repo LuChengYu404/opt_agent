@@ -14,7 +14,10 @@
 > 修改本文档时必须同步更新 §9 术语表与 §7 锚点。
 >
 > 修订记录：2026-09-29 round-1（codex 评审 `runs/codex_boundary_guide_review.log`，
-> VERDICT: REVISE）后修复全部事实性/一致性错误；方案取舍类遗留挂 §10。
+> VERDICT: REVISE）后修复全部事实性/一致性错误；同日 round-2（分支
+> exp/boundary-scheme-round2）落地方案类五项：§5.5 终止判据、§0.3/§5.2
+> 监督限制同等地位、元层前置筛选实验（POSITIVE）、§8 重排、注册表 +
+> 版本戳强制机制——处置状态见 §10。
 
 ---
 
@@ -30,8 +33,14 @@
    外移为元层的重启/配置动作。
 3. 研究自由度 = **动作菜单扩张 × 每个动作位监督可测性的构造质量**。
    本项目的主贡献是第二项：用 counterfactual rollout 制造 per-decision
-   监督（"creating the measurability"）。
-4. 新增任何动作/特征/模型修改，先过 §3.4 三关检查，再按 §6 操作规程执行。
+   监督（"creating the measurability"）。同等地位的实测限制：短视程
+   首动作标签噪声高（R=5 后 flip 0.37）、对齐教师首动作终端优势 ≈0、
+   首动作与延续效应不可加（8.6F）、微调策略闭环塌缩——**schedule/
+   continuation 级标注 + 匹配闭环检验是扩大首动作标签投入前的下一
+   决策点**（§5.2、§5.5）。
+4. 新增任何动作/特征/模型修改，先过 §3.4 三关检查，再按 §6 操作规程执行
+   （动作菜单由 `actions/boundary_registry.py` 注册表 + 同步测试强制，
+   菜单变更不同步注册表与 §2.4 表格即测试红）。
 5. 跨域经验沉淀的前提是**测量体系一致**：harness 按版本冻结（§4.5），
    数据带版本戳。
 
@@ -188,7 +197,7 @@ option = 一次时间上扩展的执行 = 一个 episode。元层的"换模型"�
 | ERROR_GUIDED_SAMPLING | B2 | 同上 |
 | BOUNDARY_SAMPLING | B2 | 同上 |
 | SURROGATE_ACQUISITION | B2 | 标准 AF 求点 |
-| RETRAIN_SURROGATE | B1 邻接 | 惰性生命周期中的显式重拟合位；**必须**限定为族内 MLE 重估；**禁止**将其扩展为换族/换核——那属于元层重启动作（§4.1） |
+| RETRAIN_SURROGATE | B1 | 惰性生命周期中的显式重拟合位（B1 邻接：重估语义受 B1 约束，频率属 B3）；**必须**限定为族内 MLE 重估；**禁止**将其扩展为换族/换核——那属于元层重启动作（§4.1） |
 | STOP | B1 | 理论对应物：Bayesian optimal stopping / probabilistic-regret stopping；Gate-4 stop-gain 是其数据侧对应 |
 
 ---
@@ -280,12 +289,15 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
 4. **P2/P3 层级不变。** 元层优势函数 A(s) = "换配置 vs 继续跑"的
    净优势，同样可能恒非正（问题签名区分度不足时）；筛选工具箱
    在两层原样复用。
-5. **Harness 版本冻结（契约目标；机制待建）。** 同一版本内，观测
-   格式、动作菜单、标签管线一致；数据带版本戳。现状：记录仅有硬编码
-   `utility_version="phase8.6b"`（`dataset/generator.py`），schema/
-   harness 级版本戳与消费端校验**尚不存在**——机制落地前本条按人工
-   纪律执行（§10.5）。harness 演化发生在版本边界（与 episode 边界
-   同理）。违反则轨迹库跨版本不可比，RF/微调吸收污染。
+5. **Harness 版本冻结。** 同一版本内，观测格式、动作菜单、标签管线
+   一致；数据带版本戳。机制（round-2 落地）：`dataset/versioning.py`
+   定义 HARNESS_VERSION / UTILITY_VERSION，generator 经 `stamp_metadata`
+   为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
+   分类（legacy = 旧值或缺戳，可读但**禁止**与当前版本记录静默混池；
+   mismatch = 未知值，拒绝混池）。任何 A/S 类修改**必须**递增对应戳
+   并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
+   走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
+   轨迹库跨版本不可比，RF/微调吸收污染。
 
 ---
 
@@ -302,12 +314,21 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
 
 ### 5.2 科学目标：在两层各造一次可测性
 
-- 内层（已完成基建）：counterfactual rollout → U(a,s) → gold_probs
-  → RF/Laya 监督。
-- 元层（开放，贡献位更空）：配置级监督 = 同一问题多 episode 结果
-  差 + 跨问题签名匹配下的标签迁移。文献现状：per-instance 配置 BO
-  的元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
-  在 HPO 域有，BO-self-configuration 域近乎空白）。
+- 内层（基建完成，**升级为决策点管理**）：counterfactual rollout →
+  U(a,s) → gold_probs → RF/Laya 监督。与其实测限制并读（round-2 起
+  同等地位）：标签噪声主导（单次 flip 0.74，R=5 复制后仍 0.37）、
+  Gate-4 对齐教师首动作终端优势 ≈0（Ackley/Hartmann CI 很宽，未排除
+  全部首动作价值）、8.6F 不可加、微调策略闭环塌缩。**下一决策点**：
+  schedule/continuation 级标注（把"价值在延续里"变成标注单位）+
+  匹配的闭环检验——其结果出来前，不再扩大首动作标签投入。
+- 元层（开放，贡献位更空；**前置筛选已跑**）：配置级监督 = 同一问题
+  多 episode 结果差 + 跨问题签名匹配下的标签迁移。n_init 轴前置筛选
+  （EXP-META-CONFIG-SCREEN，2026-09-29）：**POSITIVE**——Rastrigin 上
+  大初始设计 CI 显著占优（+8.36 [1.28, 15.50]）、赢家身份 3:2 分裂、
+  meta-D 0.124 [0.032, 0.231] 排零；由单一 family 主导，扩展配置轴时
+  先做签名可分性检验。文献现状：per-instance 配置 BO 的元学习比内层
+  策略层更少人做（Rice 1976 框架 / racing / Hyperband 在 HPO 域有，
+  BO-self-configuration 域近乎空白）。
 
 ### 5.3 理论目标：层层干净 + 判据可迁移
 
@@ -331,8 +352,25 @@ P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边�
 - 停止位：Gate 4 stop-gain 为正的 family 上检验 STOP 学习——注意
   其估计量是"gold 首动作延续 vs 立即停止"的效用差，不等于"学到的
   STOP 策略有增益"，后者需另行闭环测量。
-- 元层（新增，待定义）：同问题多配置 episode 的 regret 差分布 +
+- 元层（筛选已跑，见 §5.2）：同问题多配置 episode 的 regret 差分布 +
   签名特征的可分性检验。
+
+### 5.5 预宣告终止判据（kill criteria；round-2 新增，D3）
+
+成功判据（§5.4）的配对物——**满足即停，不再扩投入**，触发时在
+PROGRESS 记录条件与数据，方案回到 §10 重议：
+
+1. **教师可靠性**：标注单位重设计（长视程 / schedule 级）后，可负担
+   复制数（≤R=5）下标签 flip 率仍不低于现有水平（0.37）→ 冻结
+   "制造可测性"的强声明，降格为"噪声标签仍可训练排序模型"。
+2. **闭环增量**：任何新监督/策略在 ≥3 个 family 上对最优常动作或
+   两段 schedule 的闭环 terminal-value 增量 CI 均含 0 → 该路线止步于
+   决策级报告，不进主线。
+3. **成本上限**：每条标签的期望 rollout 成本（CPU·s）超过闭环评估
+   成本的 10× → 重新设计标注单位（更长视程、更少标签），而非加复制。
+4. **元层优势**：某配置轴前置筛选 NEGATIVE（无 family 显著且 meta-D
+   CI 含 0）→ 该轴元层管线停建（§4.4）；换轴重筛（n_init 轴现为
+   POSITIVE，未触发）。
 
 ---
 
@@ -343,16 +381,17 @@ P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边�
 流程：写动机（覆盖哪类人工操作）→ §3.4 三关检查 → ActionType +
 参数 schema + 校验（`actions/models.py` 模式）→ 接入 U(a,s) 分支
 （`rollout/utility.py` 权重与归一化，过 P1 等变检查）→ 小面板
-D(family) 筛选 → 进菜单。**禁止**跳过三关直接加位。执行机制注：
-三关检查目前无自动校验，按人工纪律执行；配套注册表与同步测试属
-方案修订项（§10.5）。
+D(family) 筛选 → 进菜单。**禁止**跳过三关直接加位。执行机制
+（round-2 起生效）：菜单的边界分类由 `actions/boundary_registry.py`
+注册表承载，`tests/test_boundary_registry.py` 同步校验注册表 ↔
+ActionType 菜单 ↔ 本文档 §2.4 表格——三处任一不同步即红。
 
 ### 6.2 新增/修改状态特征
 
 流程：特征定义（须为观测数据的确定函数，保持 adaptedness）→
 版本号递增 → 新旧版本标签 A/B（同数据）→ 文档记录。
-**必须**保持 15 维特征向量与数据集版本戳同步演化（版本戳机制
-现状见 §4.5——待建，暂按人工纪律执行）。
+**必须**保持 15 维特征向量与数据集版本戳同步演化（版本戳机制见
+§4.5；A 类修改须递增 HARNESS_VERSION）。
 
 ### 6.3 想换模型族/核/代理时（工程冲动映射表）
 
@@ -394,19 +433,21 @@ best_f）、状态抽取（现读目标第 0 列）、U(a,s) 的 Δopt 项重定
 反事实延续策略、rollout 视程、gold 温度 T、动作子集配额（quota
 k<8）、rollout 复制数（teacher 噪声控制）。
 
-临时规程（完整规程定稿前**必须**遵守）：
+规程（**必须**遵守）：
 
-1. 任何 S 类修改 = `utility_version` 递增（现硬编码于
-   `dataset/generator.py`）+ 新旧版本**同数据** A/B + P1 等变复查
-   （按 §3.4 第 2 关修正后的口径）。
+1. 任何 S 类修改 = `UTILITY_VERSION` 递增（`dataset/versioning.py`，
+   旧值登记 `_KNOWN_PAST`；generator 经 `stamp_metadata` 自动盖戳）
+   + 新旧版本**同数据** A/B + P1 等变复查（按 §3.4 第 2 关修正后
+   的口径）。修改若同时触及观测格式/动作菜单，则同时递增
+   `HARNESS_VERSION`。
 2. S 类修改**禁止**与动作/特征修改混入同一版本（归因隔离）。
 3. 标签信噪比是 S 类预算的一部分：新监督源**必须**报告可负担
    复制数下的 flip 率（参照 journal-round P1 实测链：单次 rollout
    标签 flip 0.74 → R=5 复制平均后 0.37——仍高，复制数与可接受
-   flip 率须显式声明）。
+   flip 率须显式声明）；终止阈值见 §5.5 第 1 条。
 
-完整规程（可靠性 / 不变性 / 结果对齐三类检查的形式化）与自动
-校验机制：待方案修订后定义（§10.5）。
+完整规程（可靠性 / 不变性 / 结果对齐三类检查的形式化）：仍属
+方案修订项（§10.5）。
 
 ---
 
@@ -428,18 +469,28 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 
 ---
 
-## 8. 开放问题（研究边界上的活口）
+## 8. 开放问题（研究边界上的活口；round-2 按证据强度重排，E3）
 
-1. **元层监督制造**：配置级反事实怎么造（同一问题、同预算切分下
-   不同配置的 episode 对比）？跨问题标签迁移的签名匹配准则？
-2. **闭环可加性**：Phase 8.6F 已证首动作与延续效应不可加；闭环
+1. **Locked transfer evaluation（最高优先）**：BT 臂跨 family 迁移
+   （两条独立流 5/5 folds CI 排零，pooled +0.140/+0.188）是唯一两次
+   复现的正面结果——在 backend allowlist 扩围（新增 BOCoDe family，
+   冻结决定需单独评审）后做锁定族确认，优先于一切新方向。
+2. **Schedule/continuation 级标注**（§5.2 决策点）：把"价值在延续里"
+   变成标注单位（schedule 段级 U / TD 式目标），配匹配闭环检验——
+   直接回应 8.6F 不可加与 Gate-4 首动作 ≈0。
+3. **元层监督制造**：n_init 轴前置筛选已 POSITIVE（§5.2、
+   `runs/EXP_META_CONFIG_SCREEN.md`）；遗留：扩展配置轴（预算切分、
+   设计规模档位）、配置级反事实怎么造（同一问题、同预算切分下不同
+   配置的 episode 对比）、跨问题标签迁移的签名匹配准则
+   （"Rastrigin 型多峰签名"为可分性检验起点）。
+4. **闭环可加性**：Phase 8.6F 已证首动作与延续效应不可加；闭环
    价值只能整程评估——反事实监督的短视程近似何时失真？
-3. **System-2 优势抬正**：rich-state A/B（exp/lenz-state-jev-presentation）
-   已完成且为负结果（§6.5）。遗留问题：A(s)≤0 的诊断在哪些 state 族/
-   面板上反转？反转条件本身是否可学（元层特征）？
-4. **重启动作建模**：把"换族重启 + warm start"建成元层动作位后，
+5. **重启动作建模**：把"换族重启 + warm start"建成元层动作位后，
    其三关检查（§3.4）在元层如何具体化？
-5. **多目标标签**：Δopt → 超体积改进后的 P1 等变条件形式。
+6. **System-2 优势抬正**：rich-state A/B（exp/lenz-state-jev-presentation）
+   已完成且为负结果（§6.5）。A(s)≤0 的诊断在哪些 state 族/
+   面板上反转？反转条件本身是否可学（元层特征）？
+7. **多目标标签**：Δopt → 超体积改进后的 P1 等变条件形式。
 
 ---
 
@@ -488,25 +539,28 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 
 ---
 
-## 10. Round-1 评审遗留（方案修订待办，须人工评审后定）
+## 10. Round-1 评审遗留与 round-2 处置（分支 exp/boundary-scheme-round2）
 
-以下问题在 2026-09-29 codex round-1（`runs/codex_boundary_guide_review.log`，
-VERDICT: REVISE，19 项：5 BLOCKER / 13 MAJOR / 1 MINOR）中提出，属
-**方案取舍**而非事实错误——本轮修订只修了后者，前者挂账待定：
+Round-1（`runs/codex_boundary_guide_review.log`，VERDICT: REVISE，
+19 项：5 BLOCKER / 13 MAJOR / 1 MINOR）中的方案取舍类问题，
+round-2 处置状态（2026-09-29）：
 
-1. **失败/终止判据（D3）**：§5.4 现仅含成功判据；教师可靠性、对最优
-   常动作/schedule 的闭环增量价值、成本、元层优势的**预宣告终止条件**
-   待定义。
-2. **监督构造的地位（E1）**：短视程首动作 U(a,s) 与其实测限制（标签
-   噪声、对齐教师 Gate-4 首动作终端优势 ≈0 且 Ackley/Hartmann CI 很宽、
-   8.6F 不可加、闭环塌缩）应在 §0/§5.2 获得同等地位；schedule/
-   continuation 级标注 + 匹配闭环检验是否升为下一决策点，待定。
-3. **元层前置筛选（E2）**：铺元层监督管线前，先跑小型"换配置 vs
-   继续跑"配对筛选（固定问题签名、共享 warm-start 数据、显式成本
-   预算）；§4.4 已指出元层优势同样可能恒非正。
-4. **开放问题排序（E3）**：最强正面结果（BT 臂跨 family 迁移，两条流
-   5/5 folds CI 排零）与 schedule 价值实验是否应排在中态富化/元层
-   学习之前；locked transfer evaluation 的优先级。
-5. **强制机制（D2 余项）**：动作菜单注册表 + 同步测试（ActionType
-   变更未过注册表即红）、harness 级版本戳与消费端校验、§6.6 完整
-   规程的自动化。
+1. **失败/终止判据（D3）→ 已落地**：§5.5 预宣告四条 kill criteria
+   （教师可靠性 / 闭环增量 / 成本上限 / 元层优势）。阈值属初版
+   校准，接受人工评审调整。
+2. **监督构造的地位（E1）→ 已落地**：§0.3 与 §5.2 将短视程监督的
+   实测限制升至同等地位；schedule/continuation 级标注 + 匹配闭环
+   检验定为下一决策点（§8.2）。
+3. **元层前置筛选（E2）→ 已执行**：`scripts/exp_meta_config_screen.py`
+   （n_init 轴，5×20×2 配对，预算 30，预宣告判定规则）→ **POSITIVE**
+   （Rastrigin CI 显著 + 赢家 3:2 分裂 + meta-D 排零；单一 family
+   主导，caveats 见 `runs/EXP_META_CONFIG_SCREEN.md`）。
+4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
+   evaluation（唯一两次复现的正面结果）与 schedule/continuation
+   标注列前，元层筛选已跑，state 富化靠后。
+5. **强制机制（D2）→ 已落地（最小版）**：`actions/boundary_registry.py`
+   注册表 + `tests/test_boundary_registry.py`（菜单 ↔ 注册表 ↔ §2.4
+   表格三方同步）；`dataset/versioning.py` 双版本戳 +
+   `stamp_metadata`/`check_record_versions` + `tests/test_versioning.py`。
+   余项：§6.6 完整规程（可靠性/不变性/结果对齐检查）的形式化，
+   消费端（训练管线）对 legacy/mismatch 的硬拒绝策略。
