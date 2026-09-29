@@ -118,7 +118,8 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
 
 
 def read_jsonl(
-    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
+    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False,
+    pooling_note: str = "",
 ) -> list[DecisionRecord]:
     """Materialize records from JSONL, enforcing a version-pooling policy.
 
@@ -144,6 +145,8 @@ def read_jsonl(
         )
         for record in records
     ]
-    enforce_record_pooling(statuses, version_policy,
-                           source=str(path), pool_legacy=pool_legacy)
+    enforce_record_pooling(
+        [record.metadata for record in records], version_policy,
+        source=str(path), pool_legacy=pool_legacy,
+        pooling_note=pooling_note)
     return records

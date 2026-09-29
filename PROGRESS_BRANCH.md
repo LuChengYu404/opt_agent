@@ -632,7 +632,9 @@ predeclared in-script: per-level contrasts vs reference L0=5; per-family
 OLS dose slope in c = n_init/(2d+1) space over seed-paired levels;
 PRIMARY test = slope homogeneity (Wald chi^2, Cochran's-Q form).
 
-- PRIMARY: chi^2_4 = 30.87, p < 1e-4, I^2 = 87% -> CONDITIONALITY_
+- PRIMARY (as reported at the time, raw-unit slopes; superseded by
+  the standardized estimand, see section 22/23): chi^2_4 = 30.87,
+  p < 1e-4, I^2 = 87% -> CONDITIONALITY_
   DETECTED. The family x dose interaction is decisively present.
 - Structure: smooth families individually significant NEGATIVE slopes
   (Hartmann -0.84 sd/unit c, p<1e-4; Branin -1.56, p=0.002; SixHumpCamel
@@ -713,7 +715,9 @@ All 13 new findings fixed in the same session:
 
 - D1 (real statistical catch): the grid PRIMARY test ran on raw-unit
   slopes — not scale-stable. Primary re-declared as reference-
-  standardized slopes (b_f/sd_ref): chi^2_4 = 38.69, p < 1e-4, I^2 = 90%
+  standardized slopes (b_f/sd_ref, sd_ref treated as fixed): chi^2_4
+  = 38.69, p < 1e-4, I^2 = 90% [superseded by the joint-bootstrap SE
+  version, see section 23]
   — matches codex's own recomputation; verdict unchanged
   (CONDITIONALITY_DETECTED). Raw-unit version demoted to secondary.
 - E2/C1: "precise null" now an equivalence bound (CI entirely within
@@ -737,3 +741,36 @@ All 13 new findings fixed in the same session:
 
 Tests: 55 across affected modules (4 new). Grid + deep arm re-run under
 the corrected estimand (deterministic; artifacts refreshed).
+## 23. Round-4 review verdict + full disposition (2026-09-29)
+
+Codex round-4 (`runs/codex_boundary_round4_review.log`): VERDICT REVISE —
+0 BLOCKER / 5 MAJOR / 4 MINOR (14 -> 9 -> 5 MAJOR). All fixed same
+session:
+
+- B1 (statistical): the standardized-slope SE treated the estimated
+  sd_ref as fixed. Fixed with JOINT SEED RESAMPLING: every bootstrap
+  replicate re-estimates sd_ref from the resampled reference outcomes;
+  the primary homogeneity now uses these SEs — chi^2_4 = 20.06,
+  p = 5e-4, I^2 = 80% (matches codex's jackknife Q~20.8 / p~3.5e-4;
+  verdict unchanged). Both grid arms re-run.
+- B2: train_system1_compare.py now passes version_policy="warn"
+  explicitly; phase9_baselines.py migrated from iter_jsonl to
+  read_jsonl(version_policy="warn").
+- B3: pooling check compares RAW stamp values (two different known-past
+  stamps, and absent-vs-present stamps, both count as a mix);
+  pool_legacy=True now REQUIRES a pooling_note and records the decision
+  in an audit trail (pooling_decisions()); the one-source boundary
+  limitation (cross-file combination) documented in guide 4.5.
+- B4/E2: futility now requires the equivalence bound on EVERY
+  level-vs-reference contrast (not only the selected best); guide 5.5.4
+  and the script's declared + serialized rules synchronized to the
+  equivalence wording.
+- B5: report/guide/PROGRESS all carry the corrected primary numbers
+  (20.06 / 5e-4 / 80%) with the raw-unit version labeled secondary and
+  superseded notes in PROGRESS 20.
+- Minors: guide 5.4 closed-loop success = CI lower bound > 0; screen
+  6.3 Rastrigin statement marked retracted; grid 8.2 relabeled
+  candidate baseline pending held-out; parser header requires exactly
+  four cells and detects a second table in the section.
+
+Tests: 24 in registry/versioning (pooling-note path added).

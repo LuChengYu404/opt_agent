@@ -52,15 +52,22 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
         f"expected exactly one §2.4 table, found {len(header_hits)}")
     header_idx = header_hits[0]
     header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
-    assert tuple(header_cells[:4]) == EXPECTED_HEADER, (
+    assert len(header_cells) == 4 and tuple(header_cells) == EXPECTED_HEADER, (
         f"unexpected §2.4 table header: {header_cells!r} "
-        f"(expected {EXPECTED_HEADER})"
+        f"(expected exactly {EXPECTED_HEADER})"
     )
     rows: dict[str, tuple[str, str, str]] = {}
+    table_ended = False
     for line in lines[header_idx + 1:]:
         stripped = line.strip()
         if not stripped.startswith("|"):
-            break  # table ended
+            if stripped:
+                table_ended = True
+            continue  # allow blank lines inside; any later '|' row is a
+            # SECOND table in the section -> fail closed
+        assert not table_ended, (
+            "found a second markdown table inside section 2.4 — the sync "
+            "check covers exactly one table")
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if cells and cells[0].startswith("-"):
             continue  # separator row

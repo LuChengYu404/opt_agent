@@ -8,7 +8,7 @@
   },
   "predeclared_rules": {
     "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
-    "futile": "not detected AND all best-vs-reference CI half-widths < 0.25 sd",
+    "futile": "not detected AND every level-vs-reference CI lies entirely within +/- 0.25 sd (equivalence bound)",
     "otherwise": "INCONCLUSIVE"
   },
   "families": [
@@ -274,7 +274,7 @@
   "n_evals_observed": [
     30
   ],
-  "wall_seconds": 32.810462238965556,
+  "wall_seconds": 33.701504478929564,
   "per_family": {
     "Rastrigin": {
       "dimension": 10,
@@ -415,6 +415,11 @@
         "se": 2.0325808966351384,
         "std_mean": 0.21027386361421715,
         "std_se": 0.12674499502589298,
+        "std_se_joint_boot": 0.13276002812371246,
+        "std_ci95_boot": [
+          -0.0374715278528799,
+          0.484064474560519
+        ],
         "ci95": [
           -0.6290500597565885,
           7.318430156251399
@@ -472,11 +477,12 @@
     }
   },
   "slope_homogeneity_primary": {
-    "statistic": 0.0,
+    "statistic": 4.3708490235361654e-32,
     "df": 0,
     "p_value": NaN,
-    "pooled": 0.21027386361421715,
-    "i2": 0.0
+    "pooled": 0.21027386361421713,
+    "i2": 1.0,
+    "se_method": "joint seed bootstrap (sd_ref re-estimated per replicate; codex round-4 B1)"
   },
   "delta12_homogeneity_n60": {
     "statistic": 2.0687047271810114e-33,

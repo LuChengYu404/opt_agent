@@ -19,7 +19,7 @@ import torch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 
 
 def _rule_action(record) -> str:
@@ -177,7 +177,7 @@ def main() -> int:
     parser.add_argument("dataset", type=Path)
     parser.add_argument("--holdout-seeds", type=int, nargs="+", default=[8, 9])
     args = parser.parse_args()
-    records = list(iter_jsonl(args.dataset))
+    records = read_jsonl(args.dataset, version_policy="warn")
     heldout = set(args.holdout_seeds)
     train = [r for r in records if int(r.problem["seed"]) not in heldout]
     test = [r for r in records if int(r.problem["seed"]) in heldout]

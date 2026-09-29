@@ -208,10 +208,18 @@ def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
     from opt_agent.dataset.versioning import VersionPolicyError
     with _pytest.raises(VersionPolicyError):
         read_jsonl(path, version_policy="strict")
-    # explicit opt-in records the pooling decision
+    # explicit opt-in REQUIRES a note; without it, strict raises
+    with _pytest.raises(VersionPolicyError):
+        read_jsonl(path, version_policy="strict", pool_legacy=True)
+    # with a note, the decision is recorded and readable
+    ver._recorded_pooling_decisions.clear()
     with _w.catch_warnings(record=True) as caught:
         _w.simplefilter("always")
         records = read_jsonl(path, version_policy="strict",
-                             pool_legacy=True)
+                             pool_legacy=True,
+                             pooling_note="A/B: same seeds, utility v2")
     assert len(records) == 2
     assert not any("mixes" in str(w.message) for w in caught)
+    decisions = ver.pooling_decisions()
+    assert len(decisions) == 1
+    assert "A/B" in decisions[0]["note"]

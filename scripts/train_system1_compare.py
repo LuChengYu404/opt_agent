@@ -71,7 +71,7 @@ def main():
     torch.manual_seed(20260926)
     torch.set_num_threads(1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    records = read_jsonl(args.input)
+    records = read_jsonl(args.input, version_policy="warn")
     train = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) < 8]
     valid = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) in (8, 9)]
     if not train or not valid:

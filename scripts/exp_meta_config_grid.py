@@ -23,8 +23,10 @@ Estimands (declared before running).
              across families (common dose response — no family x dose
              interaction). PRIMARY test. Standardization by each family's
              reference-level sd makes the test invariant to per-family
-             objective rescaling (scale-stable; codex round-3 D1); raw-unit
-             slopes are reported secondarily.
+             objective rescaling (scale-stable; codex round-3 D1); the SEs
+             come from joint seed resampling so the sd_ref estimation
+             uncertainty is included (codex round-4 B1). Raw-unit slopes
+             are reported secondarily.
   H0_pair  : Delta_{f,12} identical across families (direct comparability
              with the screen). SECONDARY.
   Mechanistic (directional, predeclared): multimodal families (Rastrigin,
@@ -238,21 +240,38 @@ def main() -> int:
         # seed-paired dose slopes in c-space
         slopes = [ols_slope(cvals, [by_key[(fam, s, L)]["best"] for L in LEVELS])
                   for s in range(args.seeds)]
-        sd_ref = statistics.pstdev(
-            [by_key[(fam, s, REFERENCE)]["best"] for s in range(args.seeds)]) or 1.0
+        ref_best = [by_key[(fam, s, REFERENCE)]["best"]
+                    for s in range(args.seeds)]
+        sd_ref = statistics.pstdev(ref_best) or 1.0
         # Reference-standardized slopes (PRIMARY estimand, scale-stable):
         # dividing by the family's reference-level sd makes the slope
         # invariant to affine rescaling of that family's objective, so the
         # cross-family homogeneity test does not depend on raw units
         # (codex round-3 D1). Raw-unit slopes are retained for reporting.
         std_slopes = [b / sd_ref for b in slopes]
+        # SE of the standardized-slope mean by JOINT seed resampling: each
+        # replicate re-estimates sd_ref from the resampled reference
+        # outcomes, so the uncertainty of the standardizing sd enters the
+        # SE (codex round-4 B1; treating sd_ref as fixed understates it).
+        rng = random.Random(3)
+        n_seeds = args.seeds
+        boot_means = []
+        for _ in range(args.n_boot):
+            idx = [rng.randrange(n_seeds) for _ in range(n_seeds)]
+            sd_star = statistics.pstdev([ref_best[i] for i in idx]) or 1.0
+            boot_means.append(
+                statistics.fmean([slopes[i] for i in idx]) / sd_star)
+        boot_means.sort()
         slope = {
             "c_values": cvals,
             "mean": statistics.fmean(slopes),
             "sd": statistics.stdev(slopes),
-            "se": statistics.stdev(slopes) / math.sqrt(args.seeds),
+            "se": statistics.stdev(slopes) / math.sqrt(n_seeds),
             "std_mean": statistics.fmean(std_slopes),
-            "std_se": statistics.stdev(std_slopes) / math.sqrt(args.seeds),
+            "std_se": statistics.stdev(std_slopes) / math.sqrt(n_seeds),
+            "std_se_joint_boot": statistics.pstdev(boot_means),
+            "std_ci95_boot": [boot_means[int(0.025 * args.n_boot)],
+                              boot_means[int(0.975 * args.n_boot) - 1]],
         }
         slope["ci95"] = paired_bootstrap_ci(slopes, args.n_boot, seed=2)
         slope["t"] = slope["mean"] / slope["se"] if slope["se"] > 0 else float("nan")
@@ -276,10 +295,15 @@ def main() -> int:
                 for L in LEVELS},
         }
 
-    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable)
+    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable),
+    # with SEs from joint seed resampling (sd_ref uncertainty included).
     slope_homog = homogeneity(
         {fam: row["dose_slope"]["std_mean"] for fam, row in per_family.items()},
-        {fam: row["dose_slope"]["std_se"] ** 2 for fam, row in per_family.items()})
+        {fam: row["dose_slope"]["std_se_joint_boot"] ** 2
+         for fam, row in per_family.items()})
+    slope_homog["se_method"] = (
+        "joint seed bootstrap (sd_ref re-estimated per replicate; "
+        "codex round-4 B1)")
     # SECONDARY: Delta_{.,12} homogeneity (the screen's statistic, n=60)
     pair12_homog = homogeneity(
         {fam: per_family[fam]["contrasts_vs_reference"][12]["mean"]
@@ -320,9 +344,13 @@ def main() -> int:
 
     # Predeclared rules (cross-family; single-family arms have no such rule)
     detected = slope_homog["p_value"] < 0.05
+    # Futility requires the equivalence bound on EVERY level contrast vs
+    # the reference (not only the selected best; codex round-4 E2b) — a
+    # reference-winning family is futile only if all its contrasts are
+    # equivalence-bounded.
     precise_null = all(
-        (row["best_vs_reference"] is None)
-        or row["best_vs_reference"]["precise_enough_for_null"]
+        all(c["precise_enough_for_null"]
+            for c in row["contrasts_vs_reference"].values())
         for row in per_family.values())
     if len(args.families) < 2:
         verdict = "SINGLE_FAMILY_ARM (cross-family rule undefined; evaluate " \
@@ -350,8 +378,8 @@ def main() -> int:
         },
         "predeclared_rules": {
             "conditionality": "slope-homogeneity p < 0.05 (chi^2_{F-1})",
-            "futile": "not detected AND all best-vs-reference CI "
-                      f"half-widths < {MISE} sd",
+            "futile": "not detected AND every level-vs-reference CI lies "
+                      f"entirely within +/- {MISE} sd (equivalence bound)",
             "otherwise": "INCONCLUSIVE",
         },
         "families": args.families, "dimensions": dims, "levels": LEVELS,

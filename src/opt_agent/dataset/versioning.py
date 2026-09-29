@@ -110,37 +110,59 @@ def enforce_record_versions(
     return status
 
 
+_recorded_pooling_decisions: list[dict] = []
+
+
+def pooling_decisions() -> list[dict]:
+    """Audit trail of explicit cross-version pooling decisions."""
+    return list(_recorded_pooling_decisions)
+
+
 def enforce_record_pooling(
-    statuses: list[dict],
+    stamps: list[dict],
     policy: str | VersionPolicy,
     *,
     source: str = "",
     pool_legacy: bool = False,
+    pooling_note: str = "",
 ) -> None:
     """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
 
-    A source that mixes CURRENT and LEGACY stamps on the same axis is a
-    cross-version pool; the guide requires an explicit decision (same-data
-    A/B note) rather than a silent read. Under any non-ALLOW policy:
-    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
-    records the explicit opt-in (no enforcement). Mismatched stamps are
-    handled per-record by enforce_record_versions and are not re-checked
-    here.
+    Compares RAW stamp values (not status classes), so two DIFFERENT
+    known-past stamps also count as a mix (codex round-4 B3). A mix of
+    distinct stamps on one axis is a cross-version pool; the guide
+    requires an explicit decision with a recorded same-data A/B note.
+    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+    the decision in the audit trail (pooling_decisions()), and proceeds.
+
+    Boundary limitation (documented in guide 4.5): this checks ONE loaded
+    source; combining multiple separately loaded files must pass each
+    through read_jsonl and cite the same pooling note.
     """
     policy = VersionPolicy(policy)
-    if policy is VersionPolicy.ALLOW or pool_legacy:
+    if policy is VersionPolicy.ALLOW:
+        return
+    if pool_legacy:
+        if not pooling_note.strip():
+            raise VersionPolicyError(
+                f"{source}: pool_legacy=True requires a pooling_note "
+                f"describing the same-data A/B justification (guide 6.6 "
+                f"rule 1)")
+        _recorded_pooling_decisions.append(
+            {"source": source, "note": pooling_note})
         return
     import warnings
 
     for axis in ("harness", "utility"):
-        values = {s[axis] for s in statuses if axis in s}
-        if {type(s[axis]) for s in statuses if axis in s} and len(values) > 1:
-            msg = (f"{source}: mixes "
-                   + " and ".join(str(x.value) for x in sorted(values, key=lambda e: e.value))
-                   + f" {axis} stamps in one source; pooling across versions "
-                     f"requires an explicit same-data A/B note (guide 6.6 "
-                     f"rule 1) — pass pool_legacy=True to record that "
-                     f"decision")
+        # An absent stamp counts as its own value: records that predate the
+        # stamp mechanism pool with stamped records only by explicit note.
+        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
+        if len(values) > 1:
+            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+                   f"across versions requires an explicit same-data A/B "
+                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+                   f"a pooling_note to record that decision")
             if policy is VersionPolicy.STRICT:
                 raise VersionPolicyError(msg)
             warnings.warn(msg, stacklevel=2)
