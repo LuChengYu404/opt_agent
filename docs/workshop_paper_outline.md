@@ -91,6 +91,10 @@ baseline in closed loop on this panel.
 - This paper presents the framework + RQ1 + RQ2 partial pilot + RQ3 pilots;
   full RQ2 transfer with engineering families and a crossed (family × dimension)
   design is deferred.
+- **2026-09-28**: a full prose draft of this section now exists at
+  `docs/workshop_paper_intro.md` (numbers cross-checked against this
+  outline; citations restricted to ✅-verified ref-library entries; claim
+  wording per the codex adjudications). This skeleton remains canonical.
 
 ## §2 Background & Related Work
 
@@ -127,6 +131,23 @@ baseline in closed loop on this panel.
   unit conversion) and P3 gives the
   degenerate case the portfolio line assumes away (per-state advantage
   ≤ 0 ⇒ no allocation helps), which our cost frontier measures.
+- **Optimization-theory survey, 2022–2026 (2026-09-28; PDF-verified
+  2026-09-29)** (`docs/ref_papers/optimization_theory_survey.md`):
+  five-year sweep of top venues on the lines this paper touches —
+  acquisition theory (JES NeurIPS'22; **LogEI NeurIPS'23 — the
+  acquisition our backend runs, must-cite**), stopping theory (BO-BOS
+  ICML'19; probabilistic-regret stopping, Wilson NeurIPS'24 — the
+  closest formal counterpart of our STOP action / Gate-4 stop-gain),
+  portfolio & weight self-adjustment (PI-is-back NeurIPS'22 workshop →
+  SAWEI AutoML'23; the earlier "AAAI'23" record was a verification
+  error, corrected), GP-bandit regret density (NeurIPS'23 / JMLR'24
+  HyperBO / NeurIPS'25×2), amortized / meta-BO (PFN ICLR'22,
+  meta-priors ICML'23, MCTS space transfer NeurIPS'24), cost-aware BO
+  (cost-object delineation for RQ3), and the LLM-optimizer anchors OPRO
+  (ICLR'24) + FunSearch (Nature'23/24). GPTOpt was renamed SemanticOpt
+  in arXiv v3 — cite with the rename noted. All 26 PDFs now in
+  `docs/ref_papers/pdfs/`. A ready-to-adapt English paragraph for this
+  section is at the end of that survey.
 
 ## §3 The v3 Framework
 

@@ -22,3 +22,4 @@
 | [state_action_design_survey.md](state_action_design_survey.md) | 状态/动作设计谱系调研（Sara/lenz、LLAMBO、GPTOpt、Volpp、TempoRL、FunBO vs 本项目），供 related work 与设计调整决策使用 |
 | [model_interaction_survey.md](model_interaction_survey.md) | 大小模型交互 × 信息充分性四线调研（路由/级联、System1/2、何时求助、主动信息获取）：代表论文、叙述逻辑、本项目差异化定位 |
 | [exploration_rounds.md](exploration_rounds.md) | 2026-09-28 六轮调研探索的轮次记录 + 分优先级后续优化方向（P0: GP-Hedge 基线/LMABO 划界/codex 复审；P1/P2 期刊版路线） |
+| [optimization_theory_survey.md](optimization_theory_survey.md) | 2026-09-28 优化理论近5年（2022–2026）顶会顶刊调研：采集理论（JES/LogEI）、组合与权重自调（SAWEI）、停止理论（probabilistic-regret stopping）、GP-bandit 遗憾界、摊销/元学习 BO（PFN/meta-priors）、成本感知 BO、LLM 优化器顶会锚（OPRO/FunSearch）；含 §2 整合用英文草稿 |

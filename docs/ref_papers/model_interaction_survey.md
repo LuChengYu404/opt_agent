@@ -115,7 +115,7 @@
 | 怎么知道下一步采哪/探还是用 | **acquisition function**——从后验解析算分、argmax 即决策；EI 内含探索-利用折中，UCB 显式折中 | Mockus EI；Srinivas GP-UCB | 效用函数 + 8 动作菜单（把规则从 x 层抬到策略层） |
 | 策略切换/组合怎么做 | **GP-Hedge**：PI/EI/UCB 组成 portfolio，在线多臂老虎机（指数权重）按历史收益分配——无监督、在线自适应 | Hoffman, Brochu, Freitas, UAI 2011 (arXiv:1009.5419) ✅ | RulePolicy/路由器；**缺失的基线**（见下） |
 | 信息价值怎么度量 | **信息论采集**：采样价值 = 后验熵的减少（关于最优位置/最优值） | ES (Hennig & Schuler)✅；PES (Hernández-Lobato 2014)✅；MES (Wang & Jegelka 2017)✅ | P2 的 D（决策论的信息价值）——D≈0 ⟺ 熵降换不来效用；两视角可互引 |
-| 组合线后续 | Entropy Search Portfolio（Shahriari et al.）⚠️；Self-tuning Portfolio BO（Vasconcelos 2022）⚠️ | — | related work 串联 2011→2026 |
+| 组合线后续 | Entropy Search Portfolio（Shahriari et al.）⚠️；Self-tuning Portfolio BO（Vasconcelos et al., **Expert Systems with Applications 188:115847, 2022**——无 arXiv 版；早前记录的 2204.03846 是错误编号，2026-09-29 修正） | — | related work 串联 2011→2026 |
 
 **⚠️ 关键最近邻（必须引用并划界）：LMABO（Ngo et al., ICLR 2026）**
 "Adaptive Acquisition Selection for Bayesian Optimization"

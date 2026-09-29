@@ -60,3 +60,7 @@ runs/**/*.jsonl
 # RLCD fine-tuned Laya checkpoints (1.6 GB weights each; regenerate via scripts/train_rlcd_laya.py)
 runs/rlcd_laya_*/*
 !runs/rlcd_laya_*/rlcd_train_report.json
+
+# Reference paper PDFs (~60 MB; re-downloadable via the links in
+# docs/ref_papers/optimization_theory_survey.md)
+docs/ref_papers/pdfs/
