@@ -854,3 +854,17 @@ same session:
   (persist-then-remember ordering); unit-tested.
 
 Tests: 40 across registry/versioning/RLCD (three new assertions).
+
+## 27. Round-8: APPROVE — boundary-guide review loop closed (2026-09-29)
+
+Codex round-8 (`runs/codex_boundary_round8_review.log`): both round-7
+dispositions ADDRESSED, new-issue check PASS, standing-spec judgment
+YES — **VERDICT: APPROVE**. Full loop: R1 REVISE (24 items, 7 BLOCKER)
+-> R2 (0/14) -> R3 (0/9) -> R4 (0/5) -> R5 (0/4) -> R6 (1 BLOCKER, our
+migration regression, fixed same round) -> R7 (1 MAJOR + 1 MINOR) ->
+R8 APPROVE. The package (RESEARCH_BOUNDARY_GUIDE + THEORY + both
+config-screen reports + boundary registry + versioning/pooling
+enforcement + tests + audit trail + migrated loaders) is the reviewed
+standing modification specification. Manual-discipline backlog remains
+as stated in the guide (6.6 items 4-6 mechanization; iter_jsonl raw
+access limited to frozen-artifact replay).
