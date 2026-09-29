@@ -167,12 +167,20 @@ def assert_combinable(
     (codex round-6 B2).
     """
     if source_notes is not None:
-        missing = [s for s, n in source_notes.items()
-                   if not str(n).strip()]
-        if missing:
+        missing_note = sorted(s for s, n in source_notes.items()
+                              if not str(n).strip())
+        if missing_note:
             raise VersionPolicyError(
-                f"source_notes missing/empty for {missing}; every pooled "
-                f"source needs its recorded opt-in note")
+                f"source_notes missing/empty for {missing_note}; every "
+                f"pooled source needs its recorded opt-in note")
+        missing_source = sorted(set(stamps_by_source)
+                                 - set(source_notes))
+        extra_source = sorted(set(source_notes)
+                              - set(stamps_by_source))
+        if missing_source or extra_source:
+            raise VersionPolicyError(
+                f"source_notes keys must match the pooled sources exactly: "
+                f"missing={missing_source}, extra={extra_source}")
         distinct = {str(n).strip() for n in source_notes.values()}
         if len(distinct) != 1:
             raise VersionPolicyError(
@@ -224,8 +232,8 @@ def enforce_record_pooling(
                 f"describing the same-data A/B justification (guide 6.6 "
                 f"rule 1)")
         entry = {"source": source, "note": pooling_note}
-        _recorded_pooling_decisions.append(entry)
-        _persist_pooling_decision(entry)
+        _persist_pooling_decision(entry)  # raises on failure — only then:
+        _recorded_pooling_decisions.append(entry)  # durable before visible
         return
     import warnings
 

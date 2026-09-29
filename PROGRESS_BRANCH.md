@@ -839,3 +839,18 @@ loo_transfer, router_panel). All findings fixed same session:
 
 Tests: 40 across registry/versioning/RLCD (note-consistency and
 audit-failure paths added).
+
+## 26. Round-7 review verdict + disposition (2026-09-29)
+
+Codex round-7 (`runs/codex_boundary_round7_review.log`): VERDICT REVISE —
+0 BLOCKER / 1 MAJOR / 1 MINOR (14 -> 9 -> 5 -> 4 -> 1 -> 1). Both fixed
+same session:
+
+- MAJOR: assert_combinable now requires the source_notes keys to match
+  the pooled sources EXACTLY (missing and extra keys both rejected);
+  unit-tested both cases.
+- MINOR: a failed pooling opt-in leaves no in-memory residue — the
+  in-memory trail is appended only after the audit entry persists
+  (persist-then-remember ordering); unit-tested.
+
+Tests: 40 across registry/versioning/RLCD (three new assertions).
