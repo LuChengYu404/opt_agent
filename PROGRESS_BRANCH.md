@@ -734,7 +734,8 @@ All 13 new findings fixed in the same session:
 - D2/D3: screen-report Rastrigin statements marked historical +
   retracted; grid 8.2 relabeled candidate baseline pending held-out;
   PROGRESS 19 carries the supersession note.
-- C3: 5.5.1 records estimator details (replicas 0-3; replica 5 unused;
+- C3: 5.5.1 records estimator details (replicas 0-1 vs 2-3 split
+  half; replica 4 unused;
   pair-sampling rule re-declared after redesign).
 - B3: parser requires exactly 4 cells, exactly one table, and the
   guide's presence (skipifs removed).
@@ -868,3 +869,39 @@ enforcement + tests + audit trail + migrated loaders) is the reviewed
 standing modification specification. Manual-discipline backlog remains
 as stated in the guide (6.6 items 4-6 mechanization; iter_jsonl raw
 access limited to frozen-artifact replay).
+
+## 28. Final full-package audit: findings fixed (2026-09-29)
+
+The closing full-scope audit (`runs/codex_boundary_final_audit.log`,
+135k tokens; distinct from the narrow round-8 check) returned REVISE —
+2 BLOCKER / 4 MAJOR / 2 MINOR — catching items the incremental rounds
+had scoped out. All fixed same session:
+
+- BLOCKER (loader boundary incomplete): four TRAINING consumers still on
+  raw iter_jsonl — exp_geartrain_transfer_probe (now ALSO runs
+  assert_combinable over its two cross-dataset sources with a recorded
+  note), exp_rq3_router_sweep, exp_rq1_rq2_closed_loop,
+  exp_rq2_ioh_closed_loop (this last found by our own sweep of the same
+  class). Guide 4.5 coverage claim updated to match reality.
+- BLOCKER (unsafe resume): generate_dataset_longhorizon --resume now
+  refuses to append when the existing file mixes stamps or was written
+  under different stamps than the current code (SystemExit with
+  guidance).
+- MAJOR (NaN in JSON): homogeneity stats serialize as null for
+  single-family arms (df = 0), detected-rule guarded against None; deep
+  arm artifact refreshed (no NaN).
+- MAJOR (replica indexing): guide 5.5.1 + PROGRESS 21 corrected to
+  "replicas 0-1 vs 2-3, replica 4 unused" per the artifact.
+- MAJOR (report null wording): grid report §2 now states the
+  standardized-slope null consistently with script/artifact.
+- MAJOR (version-bump rule): versioning module docstring aligned to the
+  guide 6.6 rule (S-class -> UTILITY_VERSION; + HARNESS_VERSION iff
+  observation format or action menu also changed).
+- MAJOR (honesty): "Rastrigin effect at most d_z ~ 0.11" corrected to
+  the point estimate with CI and precision caveat; "INCONCLUSIVE was
+  power" softened (the four-level test also changed the estimand).
+- MINOR: grid report stale p (<10^-4 -> 4.9e-4); screen report
+  half-width ratios corrected to 1.65-1.77x.
+
+All five touched scripts pass runtime --help smoke; targeted tests
+green; both grid artifacts refreshed deterministically.

@@ -3,9 +3,13 @@
 Discipline (RESEARCH_BOUNDARY_GUIDE.md):
 
 - ``HARNESS_VERSION`` freezes the measurement system: observation format
-  (state features), action menu, and label pipeline. Any change to state
-  features, the ActionType menu, or any S-class supervision-defining
-  component (§6.6) REQUIRES a bump.
+  (state features), the action menu, and the harness-side record schema.
+  ``UTILITY_VERSION`` is the finer stamp tracking the S-class
+  supervision-defining components (utility weights/scales, continuation
+  policy, rollout horizon, gold temperature, action-subset quota,
+  replicate count): an S-class change bumps UTILITY_VERSION (and
+  HARNESS_VERSION too iff observation format or the action menu also
+  changed) — matching guide §6.6 rule 1.
 - ``UTILITY_VERSION`` is the finer stamp: it tracks the S-class label
   definition only (utility weights/scales, continuation policy, rollout
   horizon, gold temperature, action-subset quota, replicate count).

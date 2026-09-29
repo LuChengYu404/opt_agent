@@ -320,8 +320,9 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
    + `pooling_note` 记录显式豁免并**持久化**到
    `runs/POOLING_DECISIONS.jsonl` 审计日志）；**合并多个来源时必须经
    `versioning.assert_combinable` 对合并后全池校验、并引用同一
-   pooling_note**；`iter_jsonl` 为无校验的原始访问，仅限单一冻结
-   工件的回放分析。任何 A/S 类修改**必须**递增对应戳
+   pooling_note**（训练/合并类消费方已全部迁移至 `read_jsonl`，
+   含跨数据集传输探针经 `assert_combinable`）；`iter_jsonl` 为无校验
+   的原始访问，仅限单一冻结工件的回放分析。任何 A/S 类修改**必须**递增对应戳
    并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
    走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
    轨迹库跨版本不可比，RF/微调吸收污染。
@@ -358,7 +359,9 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
   次要版本 30.87）；光滑族逐族显著负斜率、多峰
   高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
   更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
-  臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
+  臂点估计 d_z = 0.106，95% CI [−0.47, 4.82] 原始单位——上限约为
+  配对差 SD 的 0.23 倍，精度有限，不能排除小效应，但筛选版的
+  中等效应量结论不成立）。**当前许可级别：签名特征与 held-out 预测是
   下一步的正当投入对象；配置级监督管线仍不启动**（oracle 选择价值
   ≠ 签名可学性，LOFO 3/5 无分辨率）。文献现状：per-instance 配置 BO 的
   元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
@@ -395,8 +398,9 @@ P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边�
 PROGRESS 记录条件与数据，方案回到 §10 重议：
 
 1. **教师可靠性**（估计量预宣告钉死：同记录配对标签的 2v2
-   split-half 符号翻转率，复制数 0–3 参与、第 5 个复制未参与该
-   指标；当前值 0.359，`runs/exp_teacher_noise_diagnostic_r5.json`。
+   split-half 符号翻转率——replicas 0–1 对 2–3 分半，replica 4 未
+   参与该指标；当前值 0.359，
+   `runs/exp_teacher_noise_diagnostic_r5.json`。
    标签单位重设计后，配对采样规则须重新预宣告方可与 0.359 比较）：若标注单位重设计
    （长视程 / schedule 级）后，该估计量下 flip 率仍 ≥ 0.359 → 冻结
    "构造可测性"的强声明，降格为"噪声标签仍可训练排序模型"。

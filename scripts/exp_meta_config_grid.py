@@ -183,6 +183,12 @@ def homogeneity(means: dict[str, float], variances: dict[str, float]) -> dict:
              / sum(1.0 / v for v in vs))
     chi2 = sum((m - fixed) ** 2 / v for m, v in zip(ms, vs))
     df = len(ms) - 1
+    if df < 1:
+        # Single-family arm: homogeneity is undefined; serialize nulls
+        # (NaN is not valid JSON; codex final audit B3).
+        return {"statistic": None, "df": df, "p_value": None,
+                "pooled": fixed, "i2": None,
+                "note": "undefined for a single family"}
     return {"statistic": chi2, "df": df,
             "p_value": 1.0 - scipy_stats.chi2.cdf(chi2, df=df),
             "pooled": fixed,
@@ -343,7 +349,8 @@ def main() -> int:
     lofo_acc = (sum(1 for r in lofo if r["correct"]) / len(lofo)) if lofo else None
 
     # Predeclared rules (cross-family; single-family arms have no such rule)
-    detected = slope_homog["p_value"] < 0.05
+    detected = (slope_homog["p_value"] is not None
+                and slope_homog["p_value"] < 0.05)
     # Futility requires the equivalence bound on EVERY level contrast vs
     # the reference (not only the selected best; codex round-4 E2b) — a
     # reference-winning family is futile only if all its contrasts are

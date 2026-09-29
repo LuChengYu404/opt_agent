@@ -34,7 +34,7 @@ from exp_rq1_rq2_closed_loop import (  # noqa: E402
 )
 from exp_rq2_1_cross_family_transfer import build_dataset  # noqa: E402
 from ioh_backend import IOHBackend  # noqa: E402
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 from opt_agent.loop import DecisionLoop  # noqa: E402
 
 
@@ -151,7 +151,7 @@ def main() -> None:
     if args.workers < 1:
         parser.error("workers must be positive")
     torch.set_num_threads(1)
-    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+    records = [r.__dict__ for r in read_jsonl(args.dataset, version_policy="warn")]
     X, Y, family_indices, _, _ = build_dataset(records)
     models, n_train = fit_models(X, Y, family_indices, None)
     config = {

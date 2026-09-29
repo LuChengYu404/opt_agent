@@ -62,17 +62,40 @@ PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
 
 
 def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
-    """(family, problem_seed, trajectory_id) triples already on disk."""
+    """(family, problem_seed, trajectory_id) triples already on disk.
+
+    Resume guard (codex final audit B2): the existing file's version stamps
+    must be exactly the CURRENT ones before new records are appended —
+    otherwise resuming after a version change would silently create a
+    mixed-version artifact. Raises SystemExit on incompatibility.
+    """
+    from opt_agent.dataset.versioning import (
+        HARNESS_VERSION, UTILITY_VERSION, check_record_versions)
+
     keys: set[tuple[str, int, int]] = set()
     if not path.exists():
         return keys
+    stamps_seen: set[tuple] = set()
     for rec in iter_jsonl(path):
         meta = rec.metadata
+        stamps_seen.add((meta.get("harness_version"),
+                         meta.get("utility_version")))
         keys.add((
             rec.problem["family"],
             int(rec.problem["seed"]),
             int(meta.get("trajectory_id", 0)),
         ))
+    if len(stamps_seen) > 1:
+        raise SystemExit(
+            f"{path} already mixes version stamps {sorted(stamps_seen)}; "
+            f"refusing to resume into a mixed-version artifact — write a "
+            f"new output file")
+    if stamps_seen and stamps_seen.pop() != (HARNESS_VERSION,
+                                             UTILITY_VERSION):
+        raise SystemExit(
+            f"{path} was written under different version stamps than the "
+            f"current code ({HARNESS_VERSION}/{UTILITY_VERSION}); refusing "
+            f"to append — write a new versioned output file")
     return keys
 
 

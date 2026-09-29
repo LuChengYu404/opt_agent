@@ -34,7 +34,7 @@ from _shared_rq_features import ACTIONS, FAMILIES, extract_features  # noqa: E40
 from exp_rq2_1_cross_family_transfer import build_dataset  # noqa: E402
 from opt_agent.actions.factory import candidate_actions_for_state  # noqa: E402
 from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 from opt_agent.dataset.validation import phase_of_ratio  # noqa: E402
 from opt_agent.loop import DecisionLoop  # noqa: E402
 from opt_agent.loop.policies import RulePolicy  # noqa: E402
@@ -241,7 +241,7 @@ def main() -> None:
     if args.workers < 1:
         parser.error("workers must be positive")
     torch.set_num_threads(1)
-    records = [r.__dict__ for r in iter_jsonl(args.dataset)]
+    records = [r.__dict__ for r in read_jsonl(args.dataset, version_policy="warn")]
     training_seeds = {int(r["problem"]["seed"]) for r in records}
     uses_rf = any(policy.startswith("rf_") for policy in args.policies)
     if uses_rf and training_seeds.intersection(args.seeds):

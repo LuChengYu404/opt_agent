@@ -34,7 +34,7 @@ from _rlcd_common import (  # noqa: E402
     rf_pairwise_and_top1,
 )
 
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 from opt_agent.system1.rlcd import (  # noqa: E402
     RLCDConfig,
     _collate,
@@ -95,8 +95,16 @@ def _rf_arm(train_records, test_records) -> dict:
 
 def main() -> int:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    test = list(iter_jsonl(Path("runs/geartrain_h3_10seed.jsonl")))
-    train = [r for r in iter_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"))]
+    from opt_agent.dataset.versioning import assert_combinable
+    test = read_jsonl(Path("runs/geartrain_h3_10seed.jsonl"),
+                      version_policy="warn")
+    train = read_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+                       version_policy="warn")
+    # cross-dataset consumption: check the COMBINED pool explicitly
+    assert_combinable(
+        {"geartrain_h3_10seed.jsonl": [r.metadata for r in test],
+         "phase8_6d_h3_20seed_5family.jsonl": [r.metadata for r in train]},
+        "warn", pooling_note="transfer probe: train 5-family / eval GearTrain")
     print(f"geartrain records: {len(test)}", flush=True)
 
     out: dict = {}

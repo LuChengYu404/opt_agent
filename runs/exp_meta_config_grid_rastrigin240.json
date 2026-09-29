@@ -274,7 +274,7 @@
   "n_evals_observed": [
     30
   ],
-  "wall_seconds": 33.04372409498319,
+  "wall_seconds": 32.49493221694138,
   "per_family": {
     "Rastrigin": {
       "dimension": 10,
@@ -477,26 +477,29 @@
     }
   },
   "slope_homogeneity_primary": {
-    "statistic": 4.3708490235361654e-32,
+    "statistic": null,
     "df": 0,
-    "p_value": NaN,
+    "p_value": null,
     "pooled": 0.21027386361421713,
-    "i2": 1.0,
+    "i2": null,
+    "note": "undefined for a single family",
     "se_method": "joint seed bootstrap (sd_ref re-estimated per replicate; codex round-4 B1)"
   },
   "delta12_homogeneity_n60": {
-    "statistic": 2.0687047271810114e-33,
+    "statistic": null,
     "df": 0,
-    "p_value": NaN,
+    "p_value": null,
     "pooled": 0.3726352313482179,
-    "i2": 1.0
+    "i2": null,
+    "note": "undefined for a single family"
   },
   "delta12_homogeneity_fresh_seeds": {
-    "statistic": 0.0,
+    "statistic": null,
     "df": 0,
-    "p_value": NaN,
+    "p_value": null,
     "pooled": -0.43258305583736173,
-    "i2": 0.0
+    "i2": null,
+    "note": "undefined for a single family"
   },
   "mechanistic_sign_test": {
     "predicted_signs": {

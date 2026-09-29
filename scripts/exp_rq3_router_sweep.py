@@ -39,7 +39,7 @@ from exp_rq1_rq2_closed_loop import PROBLEM_IDS, fit_models  # noqa: E402
 from exp_rq2_1_cross_family_transfer import build_dataset  # noqa: E402
 from opt_agent.actions.factory import candidate_actions_for_state  # noqa: E402
 from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
-from opt_agent.dataset import iter_jsonl  # noqa: E402
+from opt_agent.dataset import read_jsonl  # noqa: E402
 from opt_agent.dataset.validation import phase_of_ratio  # noqa: E402
 from opt_agent.loop import DecisionLoop  # noqa: E402
 from opt_agent.metrics.temperature import TemperatureCalibrator, fit_temperature  # noqa: E402
@@ -104,7 +104,7 @@ class RandomRouter:
 
 
 def prepare_model(dataset: Path):
-    records = [r.__dict__ for r in iter_jsonl(dataset)]
+    records = [r.__dict__ for r in read_jsonl(dataset, version_policy="warn")]
     train = [r for r in records if int(r["problem"]["seed"]) <= 15]
     calibration = [r for r in records if 16 <= int(r["problem"]["seed"]) <= 19]
     if not train or not calibration:

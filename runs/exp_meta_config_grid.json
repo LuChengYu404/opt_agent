@@ -102,7 +102,7 @@
   "n_evals_observed": [
     30
   ],
-  "wall_seconds": 108.5304240619298,
+  "wall_seconds": 107.41763843805529,
   "per_family": {
     "Branin": {
       "dimension": 2,
