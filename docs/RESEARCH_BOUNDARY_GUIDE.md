@@ -20,6 +20,9 @@
 > 更正为 INCONCLUSIVE，见 §10.3）、§8 重排、注册表 + 版本戳强制机制；
 > 同日完成全文语域规范化（隐喻性表述仅保留于明确标注的直觉注记）——
 > 处置状态见 §10。
+> 同日后续：E2 分析严谨化（判定 POSITIVE → INCONCLUSIVE 的方法更正）；
+> 全文语域规范化（隐喻仅保留于标注的直觉注记）；剂量网格扩展检出
+> 配置条件性（§5.2）。
 
 ---
 
@@ -333,15 +336,17 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
   全部首动作价值）、8.6F 不可加、微调策略闭环塌缩。**下一决策点**：
   schedule/continuation 级标注（把"价值在延续里"变成标注单位）+
   匹配的闭环检验——其结果出来前，不再扩大首动作标签投入。
-- 元层（开放，研究空隙更大；**前置筛选已执行**）：配置级监督 = 同一问题
-  多 episode 结果差 + 跨问题签名匹配下的标签迁移。n_init 轴前置筛选
-  （EXP-META-CONFIG-SCREEN，2026-09-29）：**INCONCLUSIVE**——交互主检验
-  χ²₄ = 8.71、p = 0.069 未达显著（I² = 0.54，中等异质性）；个体层面仅
-  Rastrigin 确认获益（d_z = 0.52，发现/确认半区稳定）；预宣告机理方向
-  假设获 5/5 符号支持（精确 p = 0.031）；零不精确（无族达 0.25·sd
-  精确零界）→ **轴暂缓决策（pending）：不启动管线建设，亦不终止该
-  轴**，升级路径（加种子/
-  加配置档位/层次模型）见报告 §6。文献现状：per-instance 配置 BO 的
+- 元层（开放，研究空隙更大；**配置轴筛选已完成两阶段**）：配置级监督 =
+  同一问题多 episode 结果差 + 跨问题签名匹配下的标签迁移。两阶段筛选
+  （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
+  p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
+  （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
+  ——斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%；光滑族 individually
+  显著负斜率、多峰高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
+  更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
+  臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
+  下一步的正当投入对象；配置级监督管线仍不启动**（oracle 选择价值
+  ≠ 签名可学性，LOFO 3/5 无分辨率）。文献现状：per-instance 配置 BO 的
   元学习比内层策略层更少人做（Rice 1976 框架 / racing / Hyperband
   在 HPO 域有，BO-self-configuration 域近乎空白）。
 
@@ -386,8 +391,8 @@ PROGRESS 记录条件与数据，方案回到 §10 重议：
 4. **元层优势**：某配置轴前置筛选 **FUTILE**（交互未检出 且 全族 CI
    半宽 < 0.25·sd 的精确零界）→ 该轴元层管线停建（§4.4）；**仅未检出
    但零不精确（INCONCLUSIVE）→ 暂缓决策**（加种子/加配置档位后重筛），
-   不得按 FUTILE 处理（n_init 轴现为 INCONCLUSIVE：χ²₄ = 8.71、
-   p = 0.069、零不精确，见 §5.2）。
+   不得按 FUTILE 处理（n_init 轴：剂量网格已检出条件性（§5.2），
+   本条未被触发）。
 
 ---
 
@@ -495,12 +500,12 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 2. **Schedule/continuation 级标注**（§5.2 决策点）：把"价值在延续里"
    变成标注单位（schedule 段级 U / TD 式目标），配匹配闭环检验——
    直接回应 8.6F 不可加与 Gate-4 首动作 ≈0。
-3. **元层监督构造**：n_init 轴前置筛选已执行，**INCONCLUSIVE**（§5.2、
-   `runs/EXP_META_CONFIG_SCREEN.md`）——升级路径（高变异族加种子、
-   n_init 网格档位、层次模型跨族推断）优先于铺管线；配置级反事实
-   怎么造（同一问题、同预算切分下不同配置的 episode 对比）、跨问题
-   标签迁移的签名匹配准则仍开放（维度归一化特征 n_init/(2d+1) 优先
-   于裸 n_init）。
+3. **元层监督构造**：n_init 轴两阶段筛选完成——剂量网格已检出条件性
+   （§5.2、`runs/EXP_META_CONFIG_GRID.md`）。**下一步为签名特征与
+   held-out 预测**（跨族 LOFO + 维度/多峰代理特征；oracle 选择价值
+   已确立，可学性未测）；通过后才进入配置级反事实监督的构造（同一
+   问题、同预算切分下不同配置的 episode 对比、跨问题标签迁移的签名
+   匹配准则；维度归一化特征 n_init/(2d+1) 优先于裸 n_init）。
 4. **闭环可加性**：Phase 8.6F 已证首动作与延续效应不可加；闭环
    价值只能整程评估——反事实监督的短视程近似何时失真？
 5. **重启动作建模**：把"换族重启 + warm start"建成元层动作位后，
@@ -573,13 +578,18 @@ round-2 处置状态（2026-09-29）：
 2. **监督构造的地位（E1）→ 已落地**：§0.3 与 §5.2 将短视程监督的
    实测限制升至同等地位；schedule/continuation 级标注 + 匹配闭环
    检验定为下一决策点（§8.2）。
-3. **元层前置筛选（E2）→ 已执行**：`scripts/exp_meta_config_screen.py`
-   （n_init 轴，5×20×2 配对嵌套 Sobol，预算 30，估计量/机理假设/判定
-   规则均预宣告；主检验为 Δ_f 同质性 Wald χ²，meta-D 降为描述量）
-   → **INCONCLUSIVE**（χ²₄ = 8.71、p = 0.069、I² = 0.54；Rastrigin
-   个体确认 d_z = 0.52；机理符号 5/5，p = 0.031；零不精确）。首版以
-   meta-D 边界 bootstrap 判 POSITIVE，属检验方法错误，同日更正
-   （round-2 评审 D1）——分析全文见 `runs/EXP_META_CONFIG_SCREEN.md`。
+3. **元层前置筛选（E2）→ 已执行（两阶段）**：阶段一
+   `scripts/exp_meta_config_screen.py`（n_init 5 vs 12，5×20×2 配对嵌套
+   Sobol，预算 30，估计量/机理假设/判定规则均预宣告；主检验为 Δ_f
+   同质性 Wald χ²，meta-D 降为描述量）→ **INCONCLUSIVE**（χ²₄ = 8.71、
+   p = 0.069、I² = 0.54）。初判以 meta-D 边界 bootstrap 判 POSITIVE，
+   属检验方法错误，同日更正（round-2 评审 D1）——分析全文见
+   `runs/EXP_META_CONFIG_SCREEN.md`。阶段二（按阶段一预宣告的升级
+   路径）`scripts/exp_meta_config_grid.py`：n_init ∈ {5,8,12,18} 剂量
+   网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
+   DETECTED**（斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%）；并撤回
+   阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
+   d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
    evaluation（唯一两次复现的正面结果）与 schedule/continuation
    标注列前，元层筛选已执行，state 富化靠后。

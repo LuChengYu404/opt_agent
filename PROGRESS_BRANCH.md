@@ -616,3 +616,45 @@ Suite status at commit time: full `uv run pytest tests/` green —
 12 new). Remaining open from round-1: §6.6 full
 procedure formalization + consumer-side hard refusal policy for
 legacy/mismatch stamps.
+
+## 20. Config-axis dose-response grid: conditionality DETECTED; screen's Rastrigin claim retracted (2026-09-29)
+
+Executed the screen's predeclared escalation paths (more levels + more
+seeds): `scripts/exp_meta_config_grid.py`, artifact
+`runs/exp_meta_config_grid.json` (5 families x n_init {5,8,12,18} x 60
+seeds = 1200 trajectories, 107 s) + `runs/exp_meta_config_grid_
+rastrigin240.json` (Rastrigin-only deep arm, 4 x 240, 33 s). Estimands
+predeclared in-script: per-level contrasts vs reference L0=5; per-family
+OLS dose slope in c = n_init/(2d+1) space over seed-paired levels;
+PRIMARY test = slope homogeneity (Wald chi^2, Cochran's-Q form).
+
+- PRIMARY: chi^2_4 = 30.87, p < 1e-4, I^2 = 87% -> CONDITIONALITY_
+  DETECTED. The family x dose interaction is decisively present.
+- Structure: smooth families individually significant NEGATIVE slopes
+  (Hartmann -0.84 sd/unit c, p<1e-4; Branin -1.56, p=0.002; SixHumpCamel
+  -0.30, p=0.0007; monotone level means); Ackley (multimodal, d=10)
+  significantly POSITIVE (+0.45, p=0.029, best level 18); mechanistic
+  sign agreement 5/5 (exact p=0.031).
+- RETRACTION: the screen's Rastrigin 12-vs-5 finding (Delta=+8.36,
+  p=0.032, "confirmed" by within-0-19 halves) does not replicate: seeds
+  0-19 reproduce bit-exact, seeds 20-59 mean -3.30; at n=60 Delta=0.58
+  (p=0.81); deep arm n=240: L=18-vs-5 +2.20 [-0.47,4.82] d_z=0.11,
+  slope one-sided p=0.049. Lesson recorded: within-block half-split
+  confirmation is insufficient for very-high-variance families; require
+  replication across disjoint seed blocks.
+- Method note: on the SAME 60 seeds, the two-level contrast homogeneity
+  stays marginal (Delta_12: p=0.059; fresh-only p=0.114) while the
+  4-level slope homogeneity is decisive — the screen's INCONCLUSIVE is
+  attributed to single-contrast power, vindicating the predeclared
+  escalation design.
+- License level (guide 5.2/8.3): signature features + held-out
+  prediction is the next justified investment; the configuration-level
+  supervision pipeline remains NOT started (oracle value != signature
+  learnability; featureless LOFO 3/5 has no resolution at F=5).
+- Script fixes en route: LOFO guard for single-family runs; single-family
+  verdict labeled SINGLE_FAMILY_ARM instead of misapplying the
+  cross-family rule.
+
+Report: `runs/EXP_META_CONFIG_GRID.md` (paper-style, formal register).
+Guide synced (5.2 two-stage reading, 5.5.4 not triggered, 8.3 next step
+= signature prediction, 10.3 updated).
