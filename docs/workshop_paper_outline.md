@@ -105,7 +105,7 @@ baseline in closed loop on this panel.
   state, no learned policy, token cost reported but not optimized. Our
   closed 8-action space over a compressed 15-scalar process state is the
   opposite trade: expressiveness for measurability — closure enables
-  exhaustive per-decision counterfactual labels over our predefined menu
+  exhaustive per-decision counterfactual labels over our predefined action set
   (and with them the predeclared gates and the noninferiority cost
   frontier); it does not rule out counterfactual comparisons elsewhere.
   Full state/action design spectrum:
@@ -120,7 +120,7 @@ baseline in closed loop on this panel.
   paper, full map in `docs/THEORY.md` "Relation to classical theory"):
   the GP posterior is the classical sufficient statistic our 15-scalar
   state projects; EI/GP-UCB are closed-form one-step decision rules — our
-  utility-plus-menu lifts that structure to the strategy level where no
+  utility-plus-action-set design lifts that structure to the strategy level where no
   closed form exists; GP-Hedge (UAI 2011) and its portfolio successors
   allocate among rules by online bandits, and LMABO (ICLR 2026) delegates
   that allocation to a zero-shot LLM — our P2 is the decision-theoretic
@@ -233,9 +233,9 @@ Four short results formalize claims the experiments measure:
   `D = E[max_a U] − max_a E[U] ≥ 0` equals the one-step regret of the best
   constant action against per-state oracle selection and tightly bounds the
   gain of *any* state-conditional policy over the best constant action —
-  **scope: this fixed 8-action menu, the sampled states, and the rollout
+  **scope: this fixed 8-action set, the sampled states, and the rollout
   utility**; it does not bound closed-loop terminal value or gains from an
-  expanded action menu.
+  expanded action space.
   The Flat families (SixHumpCamel D = 0.012 at 20 seeds) admit no
   state-conditional gain by bound, which is why the RF probe finds no
   signal there. Recomputed at 20 seeds: Hartmann 0.710 > Ackley 0.332 >
@@ -715,7 +715,7 @@ independently establish, that premise). Artifacts:
    negative** (branch `exp/lenz-state-jev-presentation`, untouched
    s100–119 stream): (i) a trajectory-feature RF probe does not beat the
    15 scalars on 5/5 families; (ii) a rich-state LLM A/B (deepseek-chat,
-   temperature 0, same frozen menu, 30 stratified records) changes 6/30
+   temperature 0, same frozen action space, 30 stratified records) changes 6/30
    decisions — 4 of 6 global_exploration → surrogate_acquisition, one
    local_exploitation → surrogate_acquisition, one global_exploration →
    local_exploitation — without

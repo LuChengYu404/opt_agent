@@ -46,10 +46,11 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
     not skip quietly.
     """
     lines = section_text.splitlines()
-    header_idx = next(
-        (i for i, ln in enumerate(lines)
-         if ln.strip().startswith("| ActionType |")), None)
-    assert header_idx is not None, "guide §2.4 table header not found"
+    header_hits = [i for i, ln in enumerate(lines)
+                   if ln.strip().startswith("| ActionType |")]
+    assert len(header_hits) == 1, (
+        f"expected exactly one §2.4 table, found {len(header_hits)}")
+    header_idx = header_hits[0]
     header_cells = [c.strip() for c in lines[header_idx].strip().strip("|").split("|")]
     assert tuple(header_cells[:4]) == EXPECTED_HEADER, (
         f"unexpected §2.4 table header: {header_cells!r} "
@@ -63,8 +64,10 @@ def _parse_section_rows(section_text: str) -> dict[str, tuple[str, str, str]]:
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if cells and cells[0].startswith("-"):
             continue  # separator row
-        assert len(cells) >= 4, f"malformed §2.4 row (needs 4 cells): {line!r}"
-        name, cls, submenu, note = cells[0], cells[1], cells[2], cells[3]
+        assert len(cells) == 4, (
+            f"malformed §2.4 row (needs exactly 4 cells, got {len(cells)}): "
+            f"{line!r}")
+        name, cls, submenu, note = cells
         try:
             action_value = ActionType[name].value
         except KeyError:
@@ -191,7 +194,6 @@ def test_parser_fails_closed(section, fragment):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(not GUIDE_PATH.exists(), reason="guide doc not present")
 def test_guide_table_rows_match_registry():
     """Guide §2.4 table and BOUNDARY_REGISTRY must classify identically
     (class AND submenu columns)."""
@@ -212,7 +214,6 @@ def test_guide_table_rows_match_registry():
         )
 
 
-@pytest.mark.skipif(not GUIDE_PATH.exists(), reason="guide doc not present")
 def test_guide_mentions_current_menu_size():
     """The guide's normative text must not claim a menu size the code lacks."""
     import re

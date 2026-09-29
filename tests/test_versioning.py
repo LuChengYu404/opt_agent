@@ -180,3 +180,38 @@ def test_read_jsonl_version_policies(tmp_path, monkeypatch):
     from opt_agent.dataset.versioning import VersionPolicyError
     with _pytest.raises(VersionPolicyError):
         read_jsonl(path, version_policy="strict")
+
+
+def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
+    """A source mixing legacy and current stamps must not pool silently:
+    WARN warns, STRICT raises, pool_legacy=True records the opt-in."""
+    import warnings as _w
+
+    import opt_agent.dataset.versioning as ver
+    from opt_agent.dataset.decision_record import read_jsonl
+
+    monkeypatch.setattr(ver, "_legacy_warned", set())
+    path = tmp_path / "mixed_pool.jsonl"
+    lines = [
+        _make_record_line({"utility_version": ver.UTILITY_VERSION}),  # legacy
+        _make_record_line({"harness_version": ver.HARNESS_VERSION,
+                           "utility_version": ver.UTILITY_VERSION}),  # current
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with _w.catch_warnings(record=True) as caught:
+        _w.simplefilter("always")
+        read_jsonl(path, version_policy="warn")
+    assert any("mixes" in str(w.message) for w in caught)
+
+    import pytest as _pytest
+    from opt_agent.dataset.versioning import VersionPolicyError
+    with _pytest.raises(VersionPolicyError):
+        read_jsonl(path, version_policy="strict")
+    # explicit opt-in records the pooling decision
+    with _w.catch_warnings(record=True) as caught:
+        _w.simplefilter("always")
+        records = read_jsonl(path, version_policy="strict",
+                             pool_legacy=True)
+    assert len(records) == 2
+    assert not any("mixes" in str(w.message) for w in caught)

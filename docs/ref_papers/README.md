@@ -19,6 +19,9 @@
 2. 部分条目（标注 ⚠️ 的）只经过搜索摘要确认，尚未读全文；
    其表述（如"附录 E"细节）基于摘要/评论转述，引用前需核实。
 3. 状态标记：✅ = 已读摘要/全文核实；⚠️ = 仅搜索结果确认，待核实。
+4. **术语约定（2026-09-29 起）**：正式行文与调研记录统一用 **动作空间 / typed
+   action set** 指称 8 动作设计，不再用"菜单 / menu"（后者仅在 prompt 渲染语境
+   保留——向 LLM 展示的选项列表，见 `src/opt_agent/system1/lenz_prompt.py`）。
 | [state_action_design_survey.md](state_action_design_survey.md) | 状态/动作设计谱系调研（Sara/lenz、LLAMBO、GPTOpt、Volpp、TempoRL、FunBO vs 本项目），供 related work 与设计调整决策使用 |
 | [model_interaction_survey.md](model_interaction_survey.md) | 大小模型交互 × 信息充分性四线调研（路由/级联、System1/2、何时求助、主动信息获取）：代表论文、叙述逻辑、本项目差异化定位 |
 | [exploration_rounds.md](exploration_rounds.md) | 2026-09-28 六轮调研探索的轮次记录 + 分优先级后续优化方向（P0: GP-Hedge 基线/LMABO 划界/codex 复审；P1/P2 期刊版路线） |

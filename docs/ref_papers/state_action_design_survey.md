@@ -50,7 +50,7 @@
 ### 4. Volpp et al. — Meta-Learning Acquisition Functions（ICLR 2021, arXiv:1904.02642）✅
 - **状态**：输入 + 观测 + GP 后验上下文 + 候选点集，注意力编码，context-agnostic
   （跨任务迁移）；**动作**：从候选集选下一个 x；RL 以 regret 训练。
-- 形式上最像本项目"从固定菜单挑"——但菜单是 x、监督是 RL 而非反事实 oracle。
+- 形式上最像本项目"从固定动作空间中选"——但其动作对象是 x、监督是 RL 而非反事实 oracle。
 
 ### 5. TempoRL / DAC 线（Biedenkapp et al., ICML 2021, arXiv:2106.05262）✅
 - **状态**：优化器 trace 统计（loss 曲线、特征统计）；**动作**：显式扩充 **skip 动作**
@@ -107,8 +107,8 @@
 - 无损改动：**None**——没有任何状态/动作定义变更能在不推翻现有 artifact 的
   前提下带来足够收益。
 - 六条 claim 措辞修正（已落实到 outline）：P2 的 D 需注明范围（固定 8-action
-  菜单+采样状态+rollout utility，不含闭环 terminal value/扩容动作）；
+  动作空间+采样状态+rollout utility，不含闭环 terminal value/扩容动作）；
   P3 是条件命题（"tested routers 未赚回成本"+P3 为充分条件解释，非实证证明）；
-  schedule 是 sufficiency（标题从 "Reduces to" 改为 "Subsumes"）；封闭菜单=
-  "exhaustive labels over our predefined menu"（不排除别处反事实比较）；
+  schedule 是 sufficiency（标题从 "Reduces to" 改为 "Subsumes"）；封闭动作空间=
+  "exhaustive labels over our predefined action set"（不排除别处反事实比较）；
   Gate 2 保持粒度限定；Gate 4/首动作标签 "not established"（非 "unattainable"）。

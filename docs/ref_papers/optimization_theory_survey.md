@@ -28,7 +28,7 @@
 | Benjamins, Raponi, Jankovic, Doerr, Lindauer, *Self-Adjusting Weighted Expected Improvement for Bayesian Optimization* | **AutoML 2023 (PMLR v224)** | ✅ `pmlr_v224_benjamins23a_sawei.pdf` | λ 由模型质量/平稳性驱动自调，无手动调参 |
 
 **与本项目对接**：GP-Hedge→PI-is-back/SAWEI→LMABO 是"把规则的一个自由度
-交给在线适应"的脉络；我们的 8 动作菜单是它的一般化，P3 给出退化判据。
+交给在线适应"的脉络；我们的封闭 8 动作空间是它的一般化，P3 给出退化判据。
 
 | Vasconcelos, Souza, Virgolino, Mattos, Gomes, *Self-tuning portfolio-based Bayesian optimization* | **Expert Systems with Applications 188:115847, 2022**（无 arXiv 版；Elsevier 付费墙） | ❌ | GP-Hedge 后继：组合权重逐实例自调 | 同上脉络；引用时按期刊格式 |
 
@@ -41,7 +41,7 @@
 | 论文 | venue | PDF | 核心内容 | 与本项目对接 |
 |---|---|---|---|---|
 | Dai, Yu, Low, Jaillet, *Bayesian Optimization Meets Bayesian Optimal Stopping* (BO-BOS) | ICML 2019（窗口外锚点） | ✅ `pmlr_v97_dai19a.pdf` | GP-UCB × 贝叶斯最优停止，incumbent 上的最优停时 | STOP 的形式化起点 |
-| Wilson, *Stopping Bayesian Optimization with Probabilistic Regret Bounds* (arXiv:2402.16811) | NeurIPS 2024 | ✅ `arxiv_2402.16811.pdf` | (ε,δ) 准则：以"找到的点以概率 ≥1−δ 落在最优 ε 邻域"替代跑满预算；证明正确终止 | **STOP-as-typed-action 最近理论对照**：我们的 stop = 菜单成员 + utility 停机项 + Gate 4 stop-gain（5/5 家族、过 Bonferroni）——stop-gain 是这类准则在反事实数据集上的对应物 |
+| Wilson, *Stopping Bayesian Optimization with Probabilistic Regret Bounds* (arXiv:2402.16811) | NeurIPS 2024 | ✅ `arxiv_2402.16811.pdf` | (ε,δ) 准则：以"找到的点以概率 ≥1−δ 落在最优 ε 邻域"替代跑满预算；证明正确终止 | **STOP-as-typed-action 最近理论对照**：我们的 stop = 封闭动作空间的成员动作 + utility 停机项 + Gate 4 stop-gain（5/5 家族、过 Bonferroni）——stop-gain 是这类准则在反事实数据集上的对应物 |
 | Xie, Cai, Terenin, Frazier, Scully, *Cost-aware Stopping for Bayesian Optimization* (arXiv:2507.12453) | arXiv 2025-07 | ✅ `arxiv_2507.12453.pdf` | 停止规则 × 变评估成本：期望累计评估成本有界 | 成本×停止交叉点，RQ3 相关 |
 
 ## 线 D：GP-bandit 遗憾界 — x 层理论的密度
@@ -113,7 +113,7 @@ LLAMBO（`arxiv_2402.03921.pdf`）、FunBO（`arxiv_2406.04824.pdf`）。
 > prices candidates by the entropy of the joint (x\*, f\*) (Hvarfner et al.,
 > NeurIPS 2022); log-transformed improvement repairs EI's numerical
 > degeneracy and is the acquisition our own backend runs (Ament et al.,
-> NeurIPS 2023). Stopping — one of the eight actions our menu types — has
+> NeurIPS 2023). Stopping — one of the eight typed actions — has
 > been formalized as Bayesian optimal stopping (Dai et al., ICML 2019) and
 > as probabilistic-regret termination with correctness guarantees (Wilson,
 > NeurIPS 2024); our Gate-4 stop-gain is the dataset-side counterpart of

@@ -8,7 +8,7 @@
 > Numbers cross-checked against `docs/workshop_paper_outline.md`,
 > `docs/THEORY.md`, `docs/RLCD_THEORY.md`, and the `runs/*.json`
 > references they cite. Claim wording follows the codex adjudications
-> (schedule = sufficiency, not reduction; P2 scoped to menu/states/
+> (schedule = sufficiency, not reduction; P2 scoped to the action set/states/
 > utility; P3 conditional; G2 qualified by granularity; RLCD transfer
 > labeled analysis-rerun).
 > **Citations**: ✅-verified ref-library entries only. GPTOpt/FunBO cited
@@ -93,7 +93,7 @@ objective spread, `B` the total budget) — a paired-intervention
 estimator in the off-policy-evaluation lineage (Precup et al., 2000;
 Dudík et al., 2011). Softmaxing the branch utilities yields
 `gold_probs(a|s)`, an exhaustive per-decision oracle label over the
-predefined menu: the object an open command space cannot produce, and
+predefined action set: the object an open command space cannot produce, and
 the substrate for everything that follows. Dataset validity itself
 becomes a predeclared, testable hypothesis, via four gates on
 action-preference stability (G2), early-exploration mass (G3, seed-
@@ -120,7 +120,7 @@ state-conditional policy over that constant — a decision-theoretic
 value of information, measured in utility units about the state's label
 rather than in entropy about the optimum (ES/PES target the optimum's
 location, MES its value; related functionals, not unit conversions).
-Scope: this fixed menu, these sampled states, this rollout utility —
+Scope: this fixed action set, these sampled states, this rollout utility —
 closed-loop terminal value is a different functional. P3: if a
 System-2's per-state advantage `A(s) = Q(s, a₂(s)) − Q(s, a₁(s)) ≤ 0`
 almost surely, then every router — oracle or learned — has non-positive
@@ -182,7 +182,7 @@ learned policy — RF or fine-tuned — beats a constant local baseline.
 **Contributions.**
 
 - **A measured decision substrate for BO's control layer**: frozen
-  15-scalar state, 8-action typed menu, paired counterfactual rollout
+  15-scalar state, closed typed action space (8 actions), paired counterfactual rollout
   labels with exact checkpoint replay, and a JSONL decision dataset
   with per-record replay checkpoints — 431 unit tests (423 at the
   reviewed baseline + 8 for the rich-state A/B instrumentation).

@@ -3,7 +3,7 @@
 Branch `exp/lenz-state-jev-presentation`。问题（survey §四）：**全量试验日志
 （𝒟_t）里有没有 15 维压缩摘要之外的决策信号？** 两路独立检验——
 可学性（RF 探针）与 LLM 行为（deepseek 对照）——在**未触碰的 s100–119
-复现流**上执行，冻结 8-action 菜单与可执行判据两侧完全相同，只有状态呈现不同。
+复现流**上执行，冻结 8-action 动作空间与可执行判据两侧完全相同，只有状态呈现不同。
 
 ## E1：轨迹粒度可学性探针（`exp_lenz_gate2_probe.py`）
 

@@ -313,8 +313,12 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
    一致；数据带版本戳。机制（round-2 落地）：`dataset/versioning.py`
    定义 HARNESS_VERSION / UTILITY_VERSION，generator 经 `stamp_metadata`
    为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
-   分类（legacy = 旧值或缺戳，可读但**禁止**与当前版本记录静默混池；
-   mismatch = 未知值，拒绝混池）。任何 A/S 类修改**必须**递增对应戳
+   分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
+   **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+   version_policy 读取**——warn 策略对 legacy 与混池发出警告、strict
+   对 mismatch 与"legacy+当前混池"直接拒绝（`pool_legacy=True` 记录
+   显式豁免）；`iter_jsonl` 为无校验的原始访问，仅限单一冻结工件的
+   回放分析。任何 A/S 类修改**必须**递增对应戳
    并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
    走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
    轨迹库跨版本不可比，RF/微调吸收污染。
@@ -346,8 +350,9 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
   （2026-09-29）：两档版（EXP-META-CONFIG-SCREEN）INCONCLUSIVE（交互
   p = 0.069，系检验力不足）；按预宣告升级路径执行的剂量网格版
   （EXP-META-CONFIG-GRID，n_init ∈ {5,8,12,18} × 60 种子）**检出条件性**
-  ——斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%；光滑族逐族
-  显著负斜率、多峰高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
+  ——参照标准化斜率同质性（尺度稳定）χ²₄ = 38.69、p < 10⁻⁴、
+  I² = 90%（原始单位次要版本 30.87）；光滑族逐族显著负斜率、多峰
+  高维 Ackley 显著正斜率；机理符号 5/5（p = 0.031）。
   更正：两档版的 Rastrigin 个体结论未能在新种子上复制（n = 240 深采样
   臂效应至多 d_z ≈ 0.11）。**当前许可级别：签名特征与 held-out 预测是
   下一步的正当投入对象；配置级监督管线仍不启动**（oracle 选择价值
@@ -386,15 +391,17 @@ P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边�
 PROGRESS 记录条件与数据，方案回到 §10 重议：
 
 1. **教师可靠性**（估计量预宣告钉死：同记录配对标签的 2v2
-   split-half 符号翻转率，R=5 复制预算；当前值 0.359，
-   `runs/exp_teacher_noise_diagnostic_r5.json`）：若标注单位重设计
+   split-half 符号翻转率，复制数 0–3 参与、第 5 个复制未参与该
+   指标；当前值 0.359，`runs/exp_teacher_noise_diagnostic_r5.json`。
+   标签单位重设计后，配对采样规则须重新预宣告方可与 0.359 比较）：若标注单位重设计
    （长视程 / schedule 级）后，该估计量下 flip 率仍 ≥ 0.359 → 冻结
    "构造可测性"的强声明，降格为"噪声标签仍可训练排序模型"。
 2. **闭环增量（成功与终止规则一并预宣告）**：固定 5 族基准问题集、
    预宣告种子数与各族把握度（MDD₈₀）。**成功** = 相对最优常动作或
-   两段 schedule 的配对 terminal-value 增量在 ≥3 族 CI 排零；**终止**
-   = 在预宣告把握度内无一族检出 ≥0.25 sd 的最小感兴趣效应 → 该路线
-   止步于决策级报告，不进主线。
+   两段 schedule 的配对 terminal-value 增量在 ≥3 族满足 **CI 下界
+   > 0**（显著为正；显著为负计为失败）；**终止（等价界）** = 全部
+   相关对比的 CI 完整落在 ±0.25 sd 之内（不仅是"未检出"——窄而
+   远离零的 CI 不构成终止依据）→ 该路线止步于决策级报告，不进主线。
 3. **成本上限**：同一硬件上，单条标签的期望 rollout 成本（CPU·s）
    超过单条 budget-30 闭环轨迹评估成本的 10× → 重新设计标注单位
    （更长视程、更少标签），而非增加复制数。
@@ -453,7 +460,8 @@ best_f）、状态抽取（现读目标第 0 列）、U(a,s) 的 Δopt 项重定
   1.21→1.92）；多轮记忆替代历史重放；温度 0；解析失败兜底
   （其兜底率 0.11%）。
 - 本项目对 LLM 的 P3 教训：RQ3 扫描中八个 LLM 调用臂无一胜 RF，
-  always-LLM 三 family 显著输——一步模型下 A(s)≤0 的签名。rich-state
+  always-LLM 三族显著落败——与一步模型下 A(s)≤0 的前提**一致**
+  （聚合结果不建立逐态前提，后者未测；见 THEORY P3）。rich-state
   实验（exp/lenz-state-jev-presentation）**已完成**，结论为否：更充分
   的状态未改变 gold-argmax 一致率（0.133 两态持平），token 成本
   2.1×（n=30 单模型 A/B，caveats 见 `runs/EXP_LENZ_JEV_REPORT.md`）。
@@ -612,7 +620,8 @@ round-2 处置状态（2026-09-29）：
    `runs/EXP_META_CONFIG_SCREEN.md`。阶段二（按阶段一预宣告的升级
    路径）`scripts/exp_meta_config_grid.py`：n_init ∈ {5,8,12,18} 剂量
    网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
-   DETECTED**（斜率同质性 χ²₄ = 30.87、p < 10⁻⁴、I² = 87%）；并撤回
+   DETECTED**（参照标准化斜率同质性 χ²₄ = 38.69、p < 10⁻⁴、
+  I² = 90%）；并撤回
    阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
    d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
@@ -634,3 +643,12 @@ round-2 处置状态（2026-09-29）：
    成本分母定义、§6.6 完整规程形式化（第 4–6 项）、§0.2 周期重拟合
    标注为预留未实现、THEORY P3 pointwise 前提措辞修正。余项：§6.6
    第 4–6 项检查的机械化。
+   Round-3 评审处置（同日，`runs/codex_boundary_round3_review.log`，
+   0 BLOCKER / 9 MAJOR / 4 MINOR，全部处理）：§6.5"签名"措辞改
+   "一致"；iter_jsonl 文档化为原始访问、混池消费方走 read_jsonl
+   （train_system1_compare 迁移）+ 混池显式豁免（pool_legacy）；
+   §5.5.2 成功改为 CI 下界 > 0、终止改等价界（CI 完整落在
+   ±0.25 sd 内）；§5.5.1 补复制数细节；§4.5 执行边界与规范对齐；
+   网格主检验改为参照标准化斜率（尺度稳定，χ²₄ = 38.69，判定
+   不变，原始单位版降为次要）；筛选报告 Rastrigin 陈述加撤回
+   标注；解析器恰 4 列/单表/指南必须在场。

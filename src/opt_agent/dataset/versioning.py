@@ -110,6 +110,42 @@ def enforce_record_versions(
     return status
 
 
+def enforce_record_pooling(
+    statuses: list[dict],
+    policy: str | VersionPolicy,
+    *,
+    source: str = "",
+    pool_legacy: bool = False,
+) -> None:
+    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+
+    A source that mixes CURRENT and LEGACY stamps on the same axis is a
+    cross-version pool; the guide requires an explicit decision (same-data
+    A/B note) rather than a silent read. Under any non-ALLOW policy:
+    pool_legacy=False -> WARN policy warns, STRICT raises; pool_legacy=True
+    records the explicit opt-in (no enforcement). Mismatched stamps are
+    handled per-record by enforce_record_versions and are not re-checked
+    here.
+    """
+    policy = VersionPolicy(policy)
+    if policy is VersionPolicy.ALLOW or pool_legacy:
+        return
+    import warnings
+
+    for axis in ("harness", "utility"):
+        values = {s[axis] for s in statuses if axis in s}
+        if {type(s[axis]) for s in statuses if axis in s} and len(values) > 1:
+            msg = (f"{source}: mixes "
+                   + " and ".join(str(x.value) for x in sorted(values, key=lambda e: e.value))
+                   + f" {axis} stamps in one source; pooling across versions "
+                     f"requires an explicit same-data A/B note (guide 6.6 "
+                     f"rule 1) — pass pool_legacy=True to record that "
+                     f"decision")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+
+
 def stamp_metadata(
     metadata: Mapping[str, Any] | None,
     *,

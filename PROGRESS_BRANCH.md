@@ -588,7 +588,11 @@ executed, not just planned:
    predeclared directional mechanistic hypotheses get 5/5 sign agreement
    (exact one-sided p = 0.031); the null is imprecise everywhere (no
    family reaches the 0.25·sd precision floor) → axis PARKED (no
-   pipeline, not killed). CORRECTION: the first-pass read (POSITIVE via
+   pipeline, not killed). [SUPERSEDED same day: the Rastrigin
+   "confirmed family" reading in this entry was retracted by the grid's
+   cross-block replication failure (see §20); the verdict was also
+   corrected POSITIVE -> INCONCLUSIVE (method error, see the correction
+   note in the screen report §7).] CORRECTION: the first-pass read (POSITIVE via
    meta-D bootstrap CI excluding zero) tested a nonnegative statistic on
    the boundary and was wrong (codex round-2 D1); meta-D is demoted to a
    descriptor and the report rewritten paper-style with estimands,
@@ -699,3 +703,37 @@ addressed on exp/boundary-scheme-round2:
 
 New/changed tests: 23 in test_boundary_registry + test_versioning
 (was 12). Suite at commit: 439 (excl. test_rlcd) + 15 (test_rlcd) = 454 passed; was 443 before round-3 (12 new tests: parser hardening, enforcement, factory link).
+
+## 22. Round-3 review verdict + full disposition (2026-09-29)
+
+Codex round-3 (`runs/codex_boundary_round3_review.log`, 103k tokens):
+VERDICT: REVISE — 0 BLOCKER / 9 MAJOR / 4 MINOR (trajectory: 7 BLOCKER
+-> 0/14 -> 0/9). Round-2 items: 12 ADDRESSED / 7 PARTIAL / 0 UNADDRESSED.
+All 13 new findings fixed in the same session:
+
+- D1 (real statistical catch): the grid PRIMARY test ran on raw-unit
+  slopes — not scale-stable. Primary re-declared as reference-
+  standardized slopes (b_f/sd_ref): chi^2_4 = 38.69, p < 1e-4, I^2 = 90%
+  — matches codex's own recomputation; verdict unchanged
+  (CONDITIONALITY_DETECTED). Raw-unit version demoted to secondary.
+- E2/C1: "precise null" now an equivalence bound (CI entirely within
+  +/- 0.25 sd) in the grid script and guide 5.5.4/5.5.2; success rule
+  requires CI lower bound > 0 on >= 3 families.
+- B1/B2/E1: iter_jsonl documented as raw unenforced access (replay
+  only); pooling consumers must use read_jsonl with an explicit
+  version_policy; train_system1_compare.py migrated; mixed legacy+
+  current pooling warns (warn) / raises (strict) unless pool_legacy=True
+  records the explicit opt-in; guide 4.5 aligned with enforcement.
+- A1/C2: guide 6.5 and THEORY P3 no longer call the aggregate sweep a
+  "signature" of pointwise A<=0; schedule control is "consistent with";
+  the untested-router claim is explicitly conditional.
+- D2/D3: screen-report Rastrigin statements marked historical +
+  retracted; grid 8.2 relabeled candidate baseline pending held-out;
+  PROGRESS 19 carries the supersession note.
+- C3: 5.5.1 records estimator details (replicas 0-3; replica 5 unused;
+  pair-sampling rule re-declared after redesign).
+- B3: parser requires exactly 4 cells, exactly one table, and the
+  guide's presence (skipifs removed).
+
+Tests: 55 across affected modules (4 new). Grid + deep arm re-run under
+the corrected estimand (deterministic; artifacts refreshed).

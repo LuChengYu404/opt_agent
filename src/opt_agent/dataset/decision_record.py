@@ -97,7 +97,13 @@ def write_jsonl(records: Iterable[DecisionRecord], path: Path) -> None:
 
 
 def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
-    """Read DecisionRecords from JSONL. Skips blank lines."""
+    """Read DecisionRecords from JSONL. Skips blank lines.
+
+    RAW ACCESS: no version enforcement. Replay/analysis scripts that walk a
+    single frozen artifact end-to-end may use this. Any consumer that POOLS
+    records (training, labeling, cross-dataset merging) must use
+    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+    """
     path = Path(path)
     with path.open("r", encoding="utf-8") as stream:
         for line_number, line in enumerate(stream, 1):
@@ -112,7 +118,7 @@ def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
 
 
 def read_jsonl(
-    path: Path, *, version_policy: str = "allow"
+    path: Path, *, version_policy: str = "allow", pool_legacy: bool = False
 ) -> list[DecisionRecord]:
     """Materialize records from JSONL, enforcing a version-pooling policy.
 
@@ -121,15 +127,23 @@ def read_jsonl(
     (summarize legacy, warn on unrecognized stamps), or "strict" (raise on
     unrecognized stamps). See opt_agent.dataset.versioning for semantics.
     """
-    from opt_agent.dataset.versioning import enforce_record_versions
+    from opt_agent.dataset.versioning import (
+        enforce_record_pooling,
+        enforce_record_versions,
+    )
 
     records = list(iter_jsonl(path))
-    if version_policy != "allow":
-        for record in records:
-            enforce_record_versions(
-                record.metadata,
-                version_policy,
-                record_id=record.id,
-                source=str(path),
-            )
+    if version_policy == "allow":
+        return records
+    statuses = [
+        enforce_record_versions(
+            record.metadata,
+            version_policy,
+            record_id=record.id,
+            source=str(path),
+        )
+        for record in records
+    ]
+    enforce_record_pooling(statuses, version_policy,
+                           source=str(path), pool_legacy=pool_legacy)
     return records

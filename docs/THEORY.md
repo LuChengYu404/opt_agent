@@ -152,21 +152,25 @@ rates); none beat `rf` with a CI excluding zero on any family, and
 always-LLM lost detectably on three families. Under the one-step model
 this pattern is CONSISTENT WITH `A(s) ≤ 0` across visited states — but
 the sweep measures aggregate routing outcomes and cannot establish the
-pointwise premise directly; `A(s) ≤ 0` remains an unmeasured premise
-that, if true, explains the outcomes (the deterministic schedule control
-makes it the parsimonious reading), not a quantity the sweep estimated. Two supplementary observations fit: (a) the
+pointwise premise directly. `A(s) ≤ 0` is an unmeasured premise, not a
+quantity the sweep estimated: the proposition says what FOLLOWS if the
+premise holds; the sweep provides the conditional's empirical
+illustration, not its antecedent's verification. Two supplementary observations fit: (a) the
 calibrated RF softmax maximum rarely exceeds 0.25 with m = 8 (near the
 uniform 0.125), so confidence thresholds τ ≥ 0.25 all induce the *same*
 router (route-always); the tested router family collapses to its two
 extremes, and the random-rate arms confirm the interior points also lose.
 (b) The deterministic schedule control (below) shows the LLM's decisions
-are dominated even by a fixed two-phase schedule, reinforcing `A ≤ 0`.
+are dominated even by a fixed two-phase schedule — additional evidence
+CONSISTENT WITH `A ≤ 0` (not a verification of the pointwise premise).
 
 **Caveat.** `V` is additive only in the one-step model with matched
 continuation. Sequential composition breaks additivity (Phase 8.6F), so
 the closed-loop statement is verified empirically per-arm rather than
-deduced; P3 explains *why* the sweep came out as it did and predicts the
-same outcome for any untested router on this panel.
+deduced. Read conditionally: IF the pointwise premise held on this
+panel, P3 would imply the same outcome for any untested router — but
+the premise is unmeasured, so this is a conditional statement about the
+sweep's explanation, not a prediction about untested routers.
 
 ---
 

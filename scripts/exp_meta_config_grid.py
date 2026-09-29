@@ -19,8 +19,12 @@ Estimands (declared before running).
   Per-family dose slope:    b_f = E_s[b_{f,s}], where b_{f,s} is the OLS
                             slope of y_{f,s,·} on c over the 4 levels
                             (seed-paired; levels share the Sobol prefix).
-  H0_slope : b_1 = ... = b_F (common dose response — no family x dose
-             interaction in c-space). PRIMARY test.
+  H0_slope : the REFERENCE-STANDARDIZED slopes b_f / sd_ref(f) are equal
+             across families (common dose response — no family x dose
+             interaction). PRIMARY test. Standardization by each family's
+             reference-level sd makes the test invariant to per-family
+             objective rescaling (scale-stable; codex round-3 D1); raw-unit
+             slopes are reported secondarily.
   H0_pair  : Delta_{f,12} identical across families (direct comparability
              with the screen). SECONDARY.
   Mechanistic (directional, predeclared): multimodal families (Rastrigin,
@@ -160,7 +164,11 @@ def analyze_contrast(diffs: list[float], n_boot: int,
         "paired_t": {"t": t_stat, "df": n - 1, "p_two_sided": p_t},
         "cohens_dz": mean / sd if sd > 0 else float("nan"),
         "mdd80": MDD_FACTOR * se,
-        "precise_enough_for_null": ((ci[1] - ci[0]) / 2.0) < MISE * sd if sd > 0 else False,
+        # Equivalence bound (codex round-3 E2): a precise null requires the
+        # CI to lie ENTIRELY within +/- MISE*sd, not merely to be narrow
+        # (a narrow CI centered on a large effect is not a null).
+        "precise_enough_for_null": (ci[0] > -MISE * sd and ci[1] < MISE * sd)
+        if sd > 0 else False,
         "discovery_half": disc, "confirmation_half": conf,
         "confirmed": (disc["mean"] > 0) == (conf["mean"] > 0)
                      and conf["ci_excludes_zero"],
@@ -232,11 +240,19 @@ def main() -> int:
                   for s in range(args.seeds)]
         sd_ref = statistics.pstdev(
             [by_key[(fam, s, REFERENCE)]["best"] for s in range(args.seeds)]) or 1.0
+        # Reference-standardized slopes (PRIMARY estimand, scale-stable):
+        # dividing by the family's reference-level sd makes the slope
+        # invariant to affine rescaling of that family's objective, so the
+        # cross-family homogeneity test does not depend on raw units
+        # (codex round-3 D1). Raw-unit slopes are retained for reporting.
+        std_slopes = [b / sd_ref for b in slopes]
         slope = {
             "c_values": cvals,
             "mean": statistics.fmean(slopes),
             "sd": statistics.stdev(slopes),
             "se": statistics.stdev(slopes) / math.sqrt(args.seeds),
+            "std_mean": statistics.fmean(std_slopes),
+            "std_se": statistics.stdev(std_slopes) / math.sqrt(args.seeds),
         }
         slope["ci95"] = paired_bootstrap_ci(slopes, args.n_boot, seed=2)
         slope["t"] = slope["mean"] / slope["se"] if slope["se"] > 0 else float("nan")
@@ -260,10 +276,10 @@ def main() -> int:
                 for L in LEVELS},
         }
 
-    # PRIMARY: slope homogeneity
+    # PRIMARY: homogeneity of reference-standardized slopes (scale-stable)
     slope_homog = homogeneity(
-        {fam: row["dose_slope"]["mean"] for fam, row in per_family.items()},
-        {fam: row["dose_slope"]["se"] ** 2 for fam, row in per_family.items()})
+        {fam: row["dose_slope"]["std_mean"] for fam, row in per_family.items()},
+        {fam: row["dose_slope"]["std_se"] ** 2 for fam, row in per_family.items()})
     # SECONDARY: Delta_{.,12} homogeneity (the screen's statistic, n=60)
     pair12_homog = homogeneity(
         {fam: per_family[fam]["contrasts_vs_reference"][12]["mean"]

@@ -112,7 +112,7 @@
 | 问题 | 经典 BO 的答案 | 代表论文 | 本项目对应 |
 |---|---|---|---|
 | 状态/信息怎么定义 | **GP 后验分布**——所有观测 (x,y) 的充分统计量 | Rasmussen & Williams | 15 维摘要（后验的粗投影；E1 阴性即"投影没丢信号"的实证） |
-| 怎么知道下一步采哪/探还是用 | **acquisition function**——从后验解析算分、argmax 即决策；EI 内含探索-利用折中，UCB 显式折中 | Mockus EI；Srinivas GP-UCB | 效用函数 + 8 动作菜单（把规则从 x 层抬到策略层） |
+| 怎么知道下一步采哪/探还是用 | **acquisition function**——从后验解析算分、argmax 即决策；EI 内含探索-利用折中，UCB 显式折中 | Mockus EI；Srinivas GP-UCB | 效用函数 + 封闭 8 动作空间（把规则从 x 层抬到策略层） |
 | 策略切换/组合怎么做 | **GP-Hedge**：PI/EI/UCB 组成 portfolio，在线多臂老虎机（指数权重）按历史收益分配——无监督、在线自适应 | Hoffman, Brochu, Freitas, UAI 2011 (arXiv:1009.5419) ✅ | RulePolicy/路由器；**缺失的基线**（见下） |
 | 信息价值怎么度量 | **信息论采集**：采样价值 = 后验熵的减少（关于最优位置/最优值） | ES (Hennig & Schuler)✅；PES (Hernández-Lobato 2014)✅；MES (Wang & Jegelka 2017)✅ | P2 的 D（决策论的信息价值）——D≈0 ⟺ 熵降换不来效用；两视角可互引 |
 | 组合线后续 | Entropy Search Portfolio（Shahriari et al.）⚠️；Self-tuning Portfolio BO（Vasconcelos et al., **Expert Systems with Applications 188:115847, 2022**——无 arXiv 版；早前记录的 2204.03846 是错误编号，2026-09-29 修正） | — | related work 串联 2011→2026 |
@@ -131,7 +131,7 @@
 ## 借鉴清单（按优先级）
 
 1. **组合线基线**（P0，修订 per codex round 5/6）：GP-Hedge 不能直接
-   搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对被选
+   搬到封闭 8 动作空间（stop/refit 无"提名点"；terminal 反馈延迟且只对被选
    轨迹可见；其奖励是后验均值型全信息奖励而非实现收益）。P0 =
    related work 准确界定（THEORY.md 已修）；实验基线若做，二选一：
    acquisition-only 的 GP-Hedge 对照，或 **StrategyBandit-8**（Exp3

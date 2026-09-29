@@ -23,7 +23,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "src")]
 
 from scripts.ablate_phase8_6d_utility import _rank  # noqa: E402
 from opt_agent.actions.factory import ALL_CANDIDATE_SPECS  # noqa: E402
-from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
 from opt_agent.rollout.utility import UtilityWeights  # noqa: E402
 from opt_agent.system1.typed_decision import JevStyleSystem1, TypedDecisionConfig  # noqa: E402
 
@@ -71,7 +71,7 @@ def main():
     torch.manual_seed(20260926)
     torch.set_num_threads(1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    records = list(iter_jsonl(args.input))
+    records = read_jsonl(args.input)
     train = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) < 8]
     valid = [(r, target_action(r, args.target)) for r in records if int(r.problem["seed"]) in (8, 9)]
     if not train or not valid:

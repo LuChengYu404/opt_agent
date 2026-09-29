@@ -31,7 +31,7 @@
 
 ### P0 —— 投稿前必须
 1. **组合线基线（修订 per codex round 5/6）**：GP-Hedge 不能直接
-   搬到 8 动作菜单（stop/refit 无"提名点"；terminal 反馈延迟且只对
+   搬到封闭 8 动作空间（stop/refit 无"提名点"；terminal 反馈延迟且只对
    被选轨迹可见；GP-Hedge 奖励是后验均值型全信息奖励）。正确的 P0：
    (a) related work 里准确界定 GP-Hedge（THEORY.md 已修）；(b) 若要
    实验基线，二者选一：acquisition-only 的 GP-Hedge 对照，或单独
