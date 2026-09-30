@@ -1,0 +1,2505 @@
+OpenAI Codex v0.156.1
+--------
+workdir: /home/lcy/Documents/projects/opt_agent_v3
+model: gpt-6-sol
+provider: openai
+approval: on-request
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0efcf-1676-73d1-a2bc-eade670722c5
+--------
+user
+FINAL PACKAGE AUDIT round 3 (closing approval re-check). Branch: exp/boundary-scheme-round2, commit bff415b. Your final-audit round 2 (runs/codex_boundary_final_audit2.log) returned REVISE — 1 BLOCKER / 2 MAJOR / 1 MINOR + 3 PARTIALs. All fixed in bff415b:
+
+- BLOCKER (three more training consumers): found this time by OUR OWN systematic sweep (fit/train grep over every iter_jsonl user) rather than name-chasing — exp_rq1_3_rf_probe (RandomForestRegressor), diagnose_continuation_effect (_train), and train_typed_decision (which had its own raw json.loads reader silently skipping malformed lines — now routed through read_jsonl, which raises on malformed records). The complete training-vs-replay classification is recorded in PROGRESS §29 for verifiability: 21 training/pooling consumers on read_jsonl; 9 analysis/replay scripts on iter_jsonl (documented raw access on their own frozen artifacts; exp_rq1_3_decision_landscape's "train" hit is a docstring mention only — no fit call).
+- MAJOR (geartrain opt-in semantics): assert_combinable is now called WITHOUT a note — identical stamps pass on their own; a cross-version mix raises/warns, and only a justified same-data A/B note may opt in.
+- MAJOR (resume config gap): --resume now compares the recorded generation configuration against the requested spec (horizon_mode, utility_weights, continuation_policy via spec_to_metadata, partial-rollout presence vs quota) and refuses on mismatch; fields not serialized into record metadata (decision_every_k, replicates) are named in the refusal message as manually verifiable.
+- MINOR: the mixed-stamp sort uses map(str, ...) — the refusal path no longer raises TypeError.
+- PARTIALs closed: the grid report's H0_slope bullet states the standardized null (b_f/sd_ref(f) equality) consistent with script+artifact; all four remaining "effect at most d_z ~ 0.11" phrasings (screen abstract + section 6, grid abstract, guide ledger) replaced with the point estimate (d_z = 0.106), its CI [−0.47, 4.82], and a precision caveat.
+
+All five touched scripts pass runtime --help smoke; 40 targeted tests green.
+
+Review tasks:
+
+A. Verify each round-2 finding's disposition (ADDRESSED / PARTIAL / UNADDRESSED), including independently re-running the training-consumer sweep (fit/train grep over all iter_jsonl users) to confirm the classification is now complete.
+B. New-issue check on these changes (the resume config comparison's field coverage vs what the generator actually records; the check-only assert_combinable call; the stricter _iter_records semantics in train_typed_decision).
+C. Final merge-readiness judgment for the standing modification specification.
+
+Answer format: A verdict table + your independent sweep result; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs, and recompute statistics from serialized trajectories.
+
+warning: Codex's Linux sandbox uses bubblewrap and needs access to create user namespaces.
+codex
+I’ll read the round-2 audit, inspect commit `bff415b`, and independently classify every `iter_jsonl` consumer. I’ll keep the review read-only and won’t run tests or training.
+exec
+/bin/bash -lc "rg -n 'iter_jsonl|read_jsonl' --glob '*.py' ." in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+./tests/test_versioning.py:145:def test_read_jsonl_version_policies(tmp_path, monkeypatch):
+./tests/test_versioning.py:146:    """read_jsonl enforces the pooling policy at the loading boundary."""
+./tests/test_versioning.py:151:    from opt_agent.dataset.decision_record import read_jsonl
+./tests/test_versioning.py:168:    assert len(read_jsonl(path)) == 3
+./tests/test_versioning.py:173:        records = read_jsonl(path, version_policy="warn")
+./tests/test_versioning.py:182:        read_jsonl(path, version_policy="strict")
+./tests/test_versioning.py:185:def test_read_jsonl_mixed_pooling_requires_opt_in(tmp_path, monkeypatch):
+./tests/test_versioning.py:191:    from opt_agent.dataset.decision_record import read_jsonl
+./tests/test_versioning.py:204:        read_jsonl(path, version_policy="warn")
+./tests/test_versioning.py:210:        read_jsonl(path, version_policy="strict")
+./tests/test_versioning.py:213:        read_jsonl(path, version_policy="strict", pool_legacy=True)
+./tests/test_versioning.py:218:        records = read_jsonl(path, version_policy="strict",
+./tests/test_phase7.py:37:    iter_jsonl,
+./tests/test_phase7.py:215:    records = list(iter_jsonl(path))
+./tests/test_phase7.py:309:    reloaded = list(iter_jsonl(path))
+./tests/test_objective_transform.py:28:    iter_jsonl,
+./tests/test_objective_transform.py:301:    reloaded = list(iter_jsonl(out))
+./tests/test_phase8_empirical.py:43:    iter_jsonl,
+./tests/test_phase8_empirical.py:215:    assert list(iter_jsonl(path)) == expected
+./tests/test_phase8_empirical.py:316:    records = list(iter_jsonl(out_path))
+./src/opt_agent/dataset/analysis.py:18:from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
+./src/opt_agent/dataset/analysis.py:92:    for record in iter_jsonl(path):
+./src/opt_agent/dataset/versioning.py:227:    through read_jsonl and cite the same pooling note.
+./src/opt_agent/dataset/decision_record.py:99:def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+./src/opt_agent/dataset/decision_record.py:105:    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+./src/opt_agent/dataset/decision_record.py:120:def read_jsonl(
+./src/opt_agent/dataset/decision_record.py:140:    records = list(iter_jsonl(path))
+./src/opt_agent/dataset/__init__.py:6:    iter_jsonl,
+./src/opt_agent/dataset/__init__.py:7:    read_jsonl,
+./src/opt_agent/dataset/__init__.py:60:    "iter_jsonl",
+./src/opt_agent/dataset/__init__.py:61:    "read_jsonl",
+./scripts/exp_rlcd_calibration_ablation.py:33:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rlcd_calibration_ablation.py:144:    records = [r for r in read_jsonl(
+./scripts/diagnose_continuation_effect.py:28:from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
+./scripts/diagnose_continuation_effect.py:127:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/diagnose_qs5.py:39:from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
+./scripts/diagnose_qs5.py:507:    records = list(iter_jsonl(args.dataset))
+./scripts/generate_dataset_longhorizon.py:57:    iter_jsonl,
+./scripts/generate_dataset_longhorizon.py:103:    for rec in iter_jsonl(path):
+./scripts/generate_dataset_longhorizon.py:145:    for rec in iter_jsonl(path):
+./scripts/evaluate_no_fit_student.py:34:from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
+./scripts/evaluate_no_fit_student.py:225:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/train_system1_compare.py:26:from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
+./scripts/train_system1_compare.py:74:    records = read_jsonl(args.input, version_policy="warn")
+./scripts/train_rlcd_laya.py:45:from opt_agent.dataset import phase_of_ratio, read_jsonl  # noqa: E402
+./scripts/train_rlcd_laya.py:146:    records = read_jsonl(args.dataset, version_policy=args.version_policy)
+./scripts/exp_rq2_ioh_closed_loop.py:37:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rq2_ioh_closed_loop.py:154:    records = [r.__dict__ for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/exp_rq1_3_rf_probe.py:28:from opt_agent.dataset import read_jsonl
+./scripts/exp_rq1_3_rf_probe.py:175:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/train_typed_decision.py:53:    """Checked loader boundary: training reads go through read_jsonl with
+./scripts/train_typed_decision.py:56:    from opt_agent.dataset.decision_record import read_jsonl
+./scripts/train_typed_decision.py:58:    for record in read_jsonl(path, version_policy="warn"):
+./scripts/exp_geartrain_transfer_probe.py:37:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_geartrain_transfer_probe.py:99:    test = read_jsonl(Path("runs/geartrain_h3_10seed.jsonl"),
+./scripts/exp_geartrain_transfer_probe.py:101:    train = read_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+./scripts/exp_rq1_rq2_closed_loop.py:37:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rq1_rq2_closed_loop.py:244:    records = [r.__dict__ for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/exp_rq1_3_decision_landscape.py:38:from opt_agent.dataset import iter_jsonl, phase_of
+./scripts/exp_rq1_3_decision_landscape.py:98:    records = list(iter_jsonl(args.dataset))
+./scripts/verify_theory_propositions.py:31:from opt_agent.dataset import iter_jsonl  # noqa: E402
+./scripts/verify_theory_propositions.py:119:    records = [r.__dict__ for r in iter_jsonl(DATASET)]
+./scripts/run_oracle_gate.py:19:    iter_jsonl,
+./scripts/run_oracle_gate.py:29:    records = list(iter_jsonl(path))
+./scripts/phase9_baselines.py:22:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/phase9_baselines.py:180:    records = read_jsonl(args.dataset, version_policy="warn")
+./scripts/exp_rlcd_loo_confirmatory.py:39:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rlcd_loo_confirmatory.py:90:    records = read_jsonl(Path(task["dataset"]), version_policy="warn")
+./scripts/exp_rlcd_loo_confirmatory.py:162:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+./scripts/exp_lenz_vs_frozen_llm.py:31:from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+./scripts/exp_lenz_vs_frozen_llm.py:57:    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/exp_rq1_3_scale_sensitivity.py:33:from opt_agent.dataset import iter_jsonl
+./scripts/exp_rq1_3_scale_sensitivity.py:273:    records = list(iter_jsonl(args.dataset))
+./scripts/validate_phase8_6b.py:23:    iter_jsonl,
+./scripts/validate_phase8_6b.py:47:    records = list(iter_jsonl(args.dataset))
+./scripts/ablate_phase8_6d_utility.py:24:from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
+./scripts/ablate_phase8_6d_utility.py:144:    records = [r for r in iter_jsonl(args.dataset) if r.metadata["step"] == 0]
+./scripts/exp_rq3_router_sweep.py:42:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rq3_router_sweep.py:107:    records = [r.__dict__ for r in read_jsonl(dataset, version_policy="warn")]
+./scripts/exp_rq0_5_prompt_controls.py:35:from opt_agent.dataset import iter_jsonl
+./scripts/exp_rq0_5_prompt_controls.py:40:    for r in iter_jsonl(dataset_path):
+./scripts/exp_rq0_5_prompt_controls.py:139:    for r in iter_jsonl(args.dataset):
+./scripts/analyze_rlcd_ci.py:29:from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+./scripts/analyze_rlcd_ci.py:72:    train_records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) < 16]
+./scripts/analyze_rlcd_ci.py:73:    records = [r for r in read_jsonl(dataset, version_policy="warn") if int(r.problem["seed"]) >= 16]
+./scripts/exp_teacher_noise_diagnostic.py:45:from opt_agent.dataset import iter_jsonl  # noqa: E402
+./scripts/exp_teacher_noise_diagnostic.py:169:    records = list(iter_jsonl(args.dataset))
+./scripts/exp_lenz_gate2_probe.py:37:from opt_agent.dataset import read_jsonl, phase_of_ratio  # noqa: E402
+./scripts/exp_lenz_gate2_probe.py:103:    records = [r for r in read_jsonl(args.dataset, version_policy="warn")]
+./scripts/sweep_rlcd.py:26:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/sweep_rlcd.py:37:    records = read_jsonl(Path(task["dataset"]), version_policy="warn")
+./scripts/exp_rlcd_router_panel.py:67:    from opt_agent.dataset import read_jsonl
+./scripts/exp_rlcd_router_panel.py:76:        r for r in read_jsonl(
+./scripts/exp_rlcd_loo_transfer.py:39:from opt_agent.dataset import read_jsonl  # noqa: E402
+./scripts/exp_rlcd_loo_transfer.py:123:    records = read_jsonl(Path(task["dataset"]), version_policy="warn")
+./scripts/exp_rlcd_loo_transfer.py:160:    families = sorted({r.problem["family"] for r in read_jsonl(args.dataset, version_policy="warn")})
+./scripts/exp_rq2_1_cross_family_transfer.py:48:from opt_agent.dataset import read_jsonl
+./scripts/exp_rq2_1_cross_family_transfer.py:319:    records = read_jsonl(args.dataset, version_policy="warn")
+
+exec
+/bin/bash -lc 'git status --short --branch' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+## exp/boundary-scheme-round2
+?? runs/codex_boundary_final_audit3.log
+
+exec
+/bin/bash -c pwd in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+/home/lcy/Documents/projects/opt_agent_v3
+
+exec
+/bin/bash -c "rg -n 'BLOCKER|MAJOR|MINOR|PARTIAL|VERDICT' runs/codex_boundary_final_audit2.log" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+13:FINAL PACKAGE AUDIT round 2 (closing approval re-check). Branch: exp/boundary-scheme-round2, commit 7a5ab2b. Your closing full-scope audit (runs/codex_boundary_final_audit.log) returned REVISE — 2 BLOCKER / 4 MAJOR / 2 MINOR — catching items the narrow incremental rounds had scoped out (notably training consumers still on raw iter_jsonl and an unsafe resume path). All eight findings were fixed in 7a5ab2b:
+15:- BLOCKER (loader boundary): four TRAINING consumers migrated off raw iter_jsonl — exp_geartrain_transfer_probe (now ALSO runs assert_combinable over its two cross-dataset sources with a recorded pooling note), exp_rq3_router_sweep, exp_rq1_rq2_closed_loop, exp_rq2_ioh_closed_loop (this last was found by our own sweep of the same class, beyond your three). Guide 4.5's coverage claim updated to state that training/merging consumers are all on the checked loader.
+16:- BLOCKER (unsafe resume): generate_dataset_longhorizon --resume now refuses (SystemExit with guidance) when the existing output file mixes version stamps or was written under stamps different from the current code; single-stamp compatible files resume as before.
+17:- MAJOR (NaN): homogeneity statistics serialize as null for single-family arms (df = 0) with an explicit "undefined for a single family" note; the detected-rule guards against None; the deep-arm artifact refreshed and contains no NaN.
+18:- MAJOR (replica indexing): guide 5.5.1 and PROGRESS 21 corrected to "replicas 0-1 vs 2-3 split half; replica 4 unused" per the artifact.
+19:- MAJOR (null wording): grid report section 2 now states the primary null as equality of reference-standardized slopes, consistently with the script and serialized artifact.
+20:- MAJOR (version-bump rule): the versioning module docstring now states the guide 6.6 rule (S-class -> UTILITY_VERSION; HARNESS_VERSION additionally iff observation format or action menu also changed).
+21:- MAJOR (honesty): "Rastrigin effect at most d_z ~ 0.11" corrected to the point estimate (0.106) with its CI [−0.47, 4.824] and a precision caveat (cannot exclude small effects; the medium-effect claim fails); the "INCONCLUSIVE was power" attribution softened to note the four-level test also changed the estimand.
+22:- MINOR: grid report's stale primary p (< 10^-4 -> 4.9e-4); screen report's half-width ratios corrected to 1.65-1.77x the 0.25-sd threshold.
+28:A. Verify each of the eight dispositions (ADDRESSED / PARTIAL / UNADDRESSED), checking the actual code/doc state.
+32:Answer format: A eight-row verdict table; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+33:Then one final line: VERDICT: APPROVE | REVISE
+66:8. Review logs: runs/codex_boundary_{guide_review,round2..round8}_review.log — trajectory R1 (24 items, 7 BLOCKER) -> R8 APPROVE (narrow scope).
+76:Answer format: for A-E, PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; state which spot-checks you performed.
+77:Then one final line: VERDICT: APPROVE | REVISE
+343:+2 BLOCKER / 4 MAJOR / 2 MINOR — catching items the incremental rounds
+346:+- BLOCKER (loader boundary incomplete): four TRAINING consumers still on
+352:+- BLOCKER (unsafe resume): generate_dataset_longhorizon --resume now
+356:+- MAJOR (NaN in JSON): homogeneity stats serialize as null for
+359:+- MAJOR (replica indexing): guide 5.5.1 + PROGRESS 21 corrected to
+361:+- MAJOR (report null wording): grid report §2 now states the
+363:+- MAJOR (version-bump rule): versioning module docstring aligned to the
+366:+- MAJOR (honesty): "Rastrigin effect at most d_z ~ 0.11" corrected to
+369:+- MINOR: grid report stale p (<10^-4 -> 4.9e-4); screen report
+660:/bin/bash -lc "rg -n 'BLOCKER|MAJOR|MINOR|VERDICT:|"'^codex$'"' runs/codex_boundary_final_audit.log | tail -65" in /home/lcy/Documents/projects/opt_agent_v3
+662:24:8. Review logs: runs/codex_boundary_{guide_review,round2..round8}_review.log — trajectory R1 (24 items, 7 BLOCKER) -> R8 APPROVE (narrow scope).
+663:34:Answer format: for A-E, PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; state which spot-checks you performed.
+664:35:Then one final line: VERDICT: APPROVE | REVISE
+666:290:PROGRESS_BRANCH.md:852:- MINOR: a failed pooling opt-in leaves no in-memory residue — the
+668:974:    print(f"\nVERDICT: {verdict}  (artifact: {args.output})")
+669:3265:0 BLOCKER / 5 MAJOR / 4 MINOR (14 -> 9 -> 5 MAJOR). All fixed same
+670:3296:0 BLOCKER / 1 MAJOR / 1 MINOR (14 -> 9 -> 5 -> 4 -> 1 -> 1). Both fixed
+671:3299:- MAJOR: assert_combinable now requires the source_notes keys to match
+672:3302:- MINOR: a failed pooling opt-in leaves no in-memory residue — the
+673:3312:YES — **VERDICT: APPROVE**. Full loop: R1 REVISE (24 items, 7 BLOCKER)
+674:3313:-> R2 (0/14) -> R3 (0/9) -> R4 (0/5) -> R5 (0/4) -> R6 (1 BLOCKER, our
+675:3314:migration regression, fixed same round) -> R7 (1 MAJOR + 1 MINOR) ->
+677:3452:> VERDICT: REVISE）后修复全部事实性/一致性错误；同日 round-2（分支
+678:3662:Round-1（`runs/codex_boundary_guide_review.log`，VERDICT: REVISE，
+679:3663:24 项：7 BLOCKER / 16 MAJOR / 1 MINOR）中的方案取舍类问题，
+680:3705:   0 BLOCKER / 9 MAJOR / 4 MINOR，全部处理）：§6.5"签名"措辞改
+681:4245:VERDICT REVISE — 0 BLOCKER / 4 MAJOR / 2 MINOR (14 -> 9 -> 5 -> 4). The
+682:4281:**1 BLOCKER** / 4 MAJOR / 2-partials table (14 -> 9 -> 5 -> 4 -> 1). The
+683:4282:BLOCKER was OUR regression: the round-5 regex migration replaced imports
+684:4287:- BLOCKER: four broken call sites rewritten to
+687:4852:## A. Spot-check integrity — **MAJOR finding**
+688:4856:- **MAJOR** — The pinned flip rate **0.359** is correct, but the estimator’s unused replica is misstated as “replica 5” in [the guide](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:397) and [PROGRESS](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:737). The artifact specifies replicas **0–1 vs 2–3, with replica 4 unused**. **Fix:** correct both descriptions of the pinned estimator.
+689:4858:## B. Code audit — **BLOCKER and MAJOR findings**
+690:4862:- **BLOCKER** — The claimed loader boundary is incomplete. [GearTrain transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_geartrain_transfer_probe.py:98) reads two datasets through raw `iter_jsonl` and trains an RF; [the router sweep](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq3_router_sweep.py:107) and [closed-loop training](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_rq2_closed_loop.py:244) also train from raw reads. No production caller uses `assert_combinable`. These are not solely frozen-artifact replay. **Fix:** migrate training consumers and check combined sources before use; update the guide’s coverage claim.
+691:4864:- **BLOCKER** — [`generate_dataset_longhorizon.py --resume`](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:197) reads existing records without a version check, then [copies and appends](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:218) newly stamped records to the same JSONL. A run resumed after a version change can silently create a mixed-version artifact. **Fix:** reject incompatible existing stamps and configuration before appending, or write to a new versioned output.
+692:4866:- **MAJOR** — The single-family deep-arm artifact contains `p_value: NaN` and `I² = 1` for a **df = 0** homogeneity test ([artifact](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_meta_config_grid_rastrigin240.json:481), [calculation](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:180)). `NaN` is not standard JSON, and heterogeneity is undefined for one family. **Fix:** omit those statistics or serialize them as `null` for single-family arms.
+693:4868:## C. Document coherence — **MAJOR and MINOR findings**
+694:4870:- **MAJOR** — [Grid report §2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:47) declares the primary null as equality of raw slopes `b_f`; [the script and serialized artifact](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) test equality of **`b_f / sd_ref(f)`**. **Fix:** state the standardized null consistently, including in the model interpretation.
+695:4872:- **MAJOR** — [The versioning module’s contract](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:5) says every S-class change requires a `HARNESS_VERSION` bump; [guide §6.6](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:483) requires `UTILITY_VERSION`, adding a harness bump when action or state definitions also change. **Fix:** choose and state one version-bump rule.
+696:4874:- **MINOR** — [Grid report §6.4](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:137) still says primary `p < 10⁻⁴`; the corrected value is **0.000486**. [Screen report §5](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:113) gives contradictory CI half-width ratios; the artifact yields approximately **1.69–1.77 times** the old threshold. **Fix:** replace both stale summaries.
+697:4876:## D. Honesty check — **MAJOR finding**
+698:4880:- **MAJOR** — “Rastrigin effect **at most** `d_z ≈ 0.11`” in [the guide](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:360) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:132) treats a point estimate as an upper bound. The deep-arm raw 95% CI is **[−0.469, 4.824]**; its upper endpoint is about **0.23** of the observed paired-difference SD. The retraction is supported; that bound is not. **Fix:** call 0.106 the point estimate and report the interval and limited precision. Also soften [“INCONCLUSIVE was due to insufficient power”](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:137): the four-level test changed the estimand as well as the information used.
+699:4882:## E. Merge readiness — **BLOCKER**
+700:4886:**VERDICT: REVISE**
+701:4889:## A. Spot-check integrity — **MAJOR finding**
+702:4893:- **MAJOR** — The pinned flip rate **0.359** is correct, but the estimator’s unused replica is misstated as “replica 5” in [the guide](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:397) and [PROGRESS](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:737). The artifact specifies replicas **0–1 vs 2–3, with replica 4 unused**. **Fix:** correct both descriptions of the pinned estimator.
+703:4895:## B. Code audit — **BLOCKER and MAJOR findings**
+704:4899:- **BLOCKER** — The claimed loader boundary is incomplete. [GearTrain transfer](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_geartrain_transfer_probe.py:98) reads two datasets through raw `iter_jsonl` and trains an RF; [the router sweep](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq3_router_sweep.py:107) and [closed-loop training](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_rq2_closed_loop.py:244) also train from raw reads. No production caller uses `assert_combinable`. These are not solely frozen-artifact replay. **Fix:** migrate training consumers and check combined sources before use; update the guide’s coverage claim.
+705:4901:- **BLOCKER** — [`generate_dataset_longhorizon.py --resume`](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:197) reads existing records without a version check, then [copies and appends](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:218) newly stamped records to the same JSONL. A run resumed after a version change can silently create a mixed-version artifact. **Fix:** reject incompatible existing stamps and configuration before appending, or write to a new versioned output.
+706:4903:- **MAJOR** — The single-family deep-arm artifact contains `p_value: NaN` and `I² = 1` for a **df = 0** homogeneity test ([artifact](/home/lcy/Documents/projects/opt_agent_v3/runs/exp_meta_config_grid_rastrigin240.json:481), [calculation](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:180)). `NaN` is not standard JSON, and heterogeneity is undefined for one family. **Fix:** omit those statistics or serialize them as `null` for single-family arms.
+707:4905:## C. Document coherence — **MAJOR and MINOR findings**
+708:4907:- **MAJOR** — [Grid report §2](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:47) declares the primary null as equality of raw slopes `b_f`; [the script and serialized artifact](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:376) test equality of **`b_f / sd_ref(f)`**. **Fix:** state the standardized null consistently, including in the model interpretation.
+709:4909:- **MAJOR** — [The versioning module’s contract](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:5) says every S-class change requires a `HARNESS_VERSION` bump; [guide §6.6](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:483) requires `UTILITY_VERSION`, adding a harness bump when action or state definitions also change. **Fix:** choose and state one version-bump rule.
+710:4911:- **MINOR** — [Grid report §6.4](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:137) still says primary `p < 10⁻⁴`; the corrected value is **0.000486**. [Screen report §5](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:113) gives contradictory CI half-width ratios; the artifact yields approximately **1.69–1.77 times** the old threshold. **Fix:** replace both stale summaries.
+711:4913:## D. Honesty check — **MAJOR finding**
+712:4917:- **MAJOR** — “Rastrigin effect **at most** `d_z ≈ 0.11`” in [the guide](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:360) and [grid report](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:132) treats a point estimate as an upper bound. The deep-arm raw 95% CI is **[−0.469, 4.824]**; its upper endpoint is about **0.23** of the observed paired-difference SD. The retraction is supported; that bound is not. **Fix:** call 0.106 the point estimate and report the interval and limited precision. Also soften [“INCONCLUSIVE was due to insufficient power”](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:137): the four-level test changed the estimand as well as the information used.
+713:4919:## E. Merge readiness — **BLOCKER**
+714:4923:**VERDICT: REVISE**
+2794:PROGRESS_BRANCH.md:900:- MAJOR (honesty): "Rastrigin effect at most d_z ~ 0.11" corrected to
+2891:   712	VERDICT: REVISE — 0 BLOCKER / 9 MAJOR / 4 MINOR (trajectory: 7 BLOCKER
+2892:   713	-> 0/14 -> 0/9). Round-2 items: 12 ADDRESSED / 7 PARTIAL / 0 UNADDRESSED.
+3260:PROGRESS_BRANCH.md:900:- MAJOR (honesty): "Rastrigin effect at most d_z ~ 0.11" corrected to
+3504:   273	    # a source omitted from source_notes is rejected (round-7 MAJOR)
+3535:| Training loader boundary | **PARTIAL** | The four named scripts now use `read_jsonl`, but three other training consumers still bypass it: [RF probe](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [continuation diagnostic](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127), and [typed-decision trainer](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52). The [guide’s complete-coverage claim](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:323) is premature. |
+3536:| Unsafe resume | **PARTIAL** | [The guard](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:78) rejects a single incompatible stamp pair, including an unstamped legacy file. It does not compare generation configuration; a same-stamp resume with changed horizon or utility settings can append incompatible records. Mixed legacy/current stamps also trigger a `TypeError` while formatting the refusal message. |
+3539:| Primary-null wording | **PARTIAL** | The report’s model text now names standardized slopes, but its [explicit `H0_slope` bullet](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:48) still says `b₁ = … = b_F`. The script and artifact specify equality of `b_f / sd_ref(f)`. |
+3541:| Honesty wording | **PARTIAL** | The main guide discussion and grid §6.3 now give the point estimate and CI, but “effect at most” remains in the [screen abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:18), [screen §6](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:128), [grid abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:24), and [guide ledger](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:634). |
+3548:- **[BLOCKER]** [train_typed_decision.py:52](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52), [exp_rq1_3_rf_probe.py:175](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [diagnose_continuation_effect.py:127](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127): all feed training from unchecked JSONL reads. **Fix:** migrate all three to `read_jsonl` with explicit policy, then correct the guide’s coverage claim.
+3549:- **[MAJOR]** [exp_geartrain_transfer_probe.py:104](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_geartrain_transfer_probe.py:104): the unconditional transfer note activates a recorded cross-version opt-in, although the two current files have the same raw stamps and the note gives no same-data A/B justification. Future mismatched files would pass. **Fix:** check without an opt-in by default; permit a note only for a justified same-data A/B comparison.
+3550:- **[MAJOR]** [generate_dataset_longhorizon.py:220](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:220): `--resume` checks stamps but can append records generated with different same-version settings. **Fix:** compare the existing generation configuration with the requested configuration before copying or appending.
+3551:- **[MINOR]** [generate_dataset_longhorizon.py:90](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:90): sorting mixed `(None, …)` and string stamp tuples raises `TypeError` instead of the promised guided `SystemExit`. **Fix:** format or sort stamp pairs using string representations.
+3557:VERDICT: REVISE
+3564:| Training loader boundary | **PARTIAL** | The four named scripts now use `read_jsonl`, but three other training consumers still bypass it: [RF probe](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [continuation diagnostic](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127), and [typed-decision trainer](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52). The [guide’s complete-coverage claim](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:323) is premature. |
+3565:| Unsafe resume | **PARTIAL** | [The guard](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:78) rejects a single incompatible stamp pair, including an unstamped legacy file. It does not compare generation configuration; a same-stamp resume with changed horizon or utility settings can append incompatible records. Mixed legacy/current stamps also trigger a `TypeError` while formatting the refusal message. |
+3568:| Primary-null wording | **PARTIAL** | The report’s model text now names standardized slopes, but its [explicit `H0_slope` bullet](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:48) still says `b₁ = … = b_F`. The script and artifact specify equality of `b_f / sd_ref(f)`. |
+3570:| Honesty wording | **PARTIAL** | The main guide discussion and grid §6.3 now give the point estimate and CI, but “effect at most” remains in the [screen abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:18), [screen §6](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:128), [grid abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:24), and [guide ledger](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:634). |
+3577:- **[BLOCKER]** [train_typed_decision.py:52](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52), [exp_rq1_3_rf_probe.py:175](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [diagnose_continuation_effect.py:127](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127): all feed training from unchecked JSONL reads. **Fix:** migrate all three to `read_jsonl` with explicit policy, then correct the guide’s coverage claim.
+3578:- **[MAJOR]** [exp_geartrain_transfer_probe.py:104](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_geartrain_transfer_probe.py:104): the unconditional transfer note activates a recorded cross-version opt-in, although the two current files have the same raw stamps and the note gives no same-data A/B justification. Future mismatched files would pass. **Fix:** check without an opt-in by default; permit a note only for a justified same-data A/B comparison.
+3579:- **[MAJOR]** [generate_dataset_longhorizon.py:220](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:220): `--resume` checks stamps but can append records generated with different same-version settings. **Fix:** compare the existing generation configuration with the requested configuration before copying or appending.
+3580:- **[MINOR]** [generate_dataset_longhorizon.py:90](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:90): sorting mixed `(None, …)` and string stamp tuples raises `TypeError` instead of the promised guided `SystemExit`. **Fix:** format or sort stamp pairs using string representations.
+3586:VERDICT: REVISE
+
+exec
+/bin/bash -c 'git show --stat --oneline bff415b' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+bff415b Final-audit round-2 dispositions: loader boundary closed by systematic sweep
+ PROGRESS_BRANCH.md                      |   45 +-
+ docs/RESEARCH_BOUNDARY_GUIDE.md         |    5 +-
+ runs/EXP_META_CONFIG_GRID.md            |    8 +-
+ runs/EXP_META_CONFIG_SCREEN.md          |    7 +-
+ runs/codex_boundary_final_audit2.log    | 3586 +++++++++++++++++++++++++++++++
+ scripts/diagnose_continuation_effect.py |    4 +-
+ scripts/exp_geartrain_transfer_probe.py |    7 +-
+ scripts/exp_rq1_3_rf_probe.py           |    4 +-
+ scripts/generate_dataset_longhorizon.py |   59 +-
+ scripts/train_typed_decision.py         |   16 +-
+ 10 files changed, 3713 insertions(+), 28 deletions(-)
+
+exec
+/bin/bash -c "sed -n '3528,3558p' runs/codex_boundary_final_audit2.log" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+Q 20.058712694859675 I2 0.800585408403349 mu -0.13956318955231672
+
+codex
+## A. Eight dispositions
+
+| Finding | Verdict | Evidence |
+|---|---|---|
+| Training loader boundary | **PARTIAL** | The four named scripts now use `read_jsonl`, but three other training consumers still bypass it: [RF probe](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [continuation diagnostic](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127), and [typed-decision trainer](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52). The [guide’s complete-coverage claim](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:323) is premature. |
+| Unsafe resume | **PARTIAL** | [The guard](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:78) rejects a single incompatible stamp pair, including an unstamped legacy file. It does not compare generation configuration; a same-stamp resume with changed horizon or utility settings can append incompatible records. Mixed legacy/current stamps also trigger a `TypeError` while formatting the refusal message. |
+| Single-family NaN | **ADDRESSED** | The [df=0 branch](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:186) returns null statistics, the [verdict logic](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_meta_config_grid.py:351) handles them, and the refreshed deep-arm JSON parses with strict rejection of NaN. |
+| Replica indexing | **ADDRESSED** | [Guide §5.5.1](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:401) and [PROGRESS](/home/lcy/Documents/projects/opt_agent_v3/PROGRESS_BRANCH.md:737) state replicas 0–1 versus 2–3, with 4 unused. |
+| Primary-null wording | **PARTIAL** | The report’s model text now names standardized slopes, but its [explicit `H0_slope` bullet](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:48) still says `b₁ = … = b_F`. The script and artifact specify equality of `b_f / sd_ref(f)`. |
+| Version-bump rule | **ADDRESSED** | The [module docstring](/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/versioning.py:5) now matches guide §6.6. |
+| Honesty wording | **PARTIAL** | The main guide discussion and grid §6.3 now give the point estimate and CI, but “effect at most” remains in the [screen abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:18), [screen §6](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_SCREEN.md:128), [grid abstract](/home/lcy/Documents/projects/opt_agent_v3/runs/EXP_META_CONFIG_GRID.md:24), and [guide ledger](/home/lcy/Documents/projects/opt_agent_v3/docs/RESEARCH_BOUNDARY_GUIDE.md:634). |
+| Stale p and half-width ratios | **ADDRESSED** | Grid §6.4 gives `4.9×10⁻⁴`; the artifact gives `0.000486246`. Screen §5 gives `1.65–1.77×`; recalculation from its artifact gives `1.689–1.766×`. |
+
+I also recomputed the grid homogeneity statistic from serialized family slopes and joint-bootstrap SEs: χ² = **20.0587**, I² = **0.8006**.
+
+## B. New-issue check — findings
+
+- **[BLOCKER]** [train_typed_decision.py:52](/home/lcy/Documents/projects/opt_agent_v3/scripts/train_typed_decision.py:52), [exp_rq1_3_rf_probe.py:175](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_rq1_3_rf_probe.py:175), [diagnose_continuation_effect.py:127](/home/lcy/Documents/projects/opt_agent_v3/scripts/diagnose_continuation_effect.py:127): all feed training from unchecked JSONL reads. **Fix:** migrate all three to `read_jsonl` with explicit policy, then correct the guide’s coverage claim.
+- **[MAJOR]** [exp_geartrain_transfer_probe.py:104](/home/lcy/Documents/projects/opt_agent_v3/scripts/exp_geartrain_transfer_probe.py:104): the unconditional transfer note activates a recorded cross-version opt-in, although the two current files have the same raw stamps and the note gives no same-data A/B justification. Future mismatched files would pass. **Fix:** check without an opt-in by default; permit a note only for a justified same-data A/B comparison.
+- **[MAJOR]** [generate_dataset_longhorizon.py:220](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:220): `--resume` checks stamps but can append records generated with different same-version settings. **Fix:** compare the existing generation configuration with the requested configuration before copying or appending.
+- **[MINOR]** [generate_dataset_longhorizon.py:90](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:90): sorting mixed `(None, …)` and string stamp tuples raises `TypeError` instead of the promised guided `SystemExit`. **Fix:** format or sort stamp pairs using string representations.
+
+## C. Merge readiness
+
+**REVISE.** The refreshed statistics and most targeted corrections check out, but the standing specification still claims a complete training loader boundary that three scripts bypass. The resume configuration gap and contradictory normative and effect wording also need correction before the closing approval. This was a read-only audit; no tests or training were run.
+
+VERDICT: REVISE
+tokens used
+
+exec
+/bin/bash -c 'git diff 7a5ab2b bff415b -- scripts/generate_dataset_longhorizon.py scripts/train_typed_decision.py scripts/exp_geartrain_transfer_probe.py scripts/exp_rq1_3_rf_probe.py scripts/diagnose_continuation_effect.py' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/scripts/diagnose_continuation_effect.py b/scripts/diagnose_continuation_effect.py
+index 6e4868f..01844f5 100644
+--- a/scripts/diagnose_continuation_effect.py
++++ b/scripts/diagnose_continuation_effect.py
+@@ -25,7 +25,7 @@ from scripts.evaluate_no_fit_student import (  # noqa: E402
+     RuleFullBudget, StateStudent, WEIGHTS, _bootstrap_ci, _train,
+ )
+ from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend  # noqa: E402
+-from opt_agent.dataset.decision_record import iter_jsonl  # noqa: E402
++from opt_agent.dataset.decision_record import read_jsonl  # noqa: E402
+ from opt_agent.loop import DecisionLoop  # noqa: E402
+ 
+ 
+@@ -124,7 +124,7 @@ def main() -> None:
+     if min(args.seeds) < 10:
+         parser.error("evaluation seeds must be >= 10")
+     torch.set_num_threads(1)
+-    records = list(iter_jsonl(args.dataset))
++    records = read_jsonl(args.dataset, version_policy="warn")
+     model_data = _train(records, WEIGHTS["no_fit_student"], seed=20260926)[:3]
+     rows = []
+     for problem in args.problems:
+diff --git a/scripts/exp_geartrain_transfer_probe.py b/scripts/exp_geartrain_transfer_probe.py
+index f1ad8a5..573e95c 100644
+--- a/scripts/exp_geartrain_transfer_probe.py
++++ b/scripts/exp_geartrain_transfer_probe.py
+@@ -100,11 +100,14 @@ def main() -> int:
+                       version_policy="warn")
+     train = read_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+                        version_policy="warn")
+-    # cross-dataset consumption: check the COMBINED pool explicitly
++    # Cross-dataset consumption: CHECK the combined pool without an
++    # opt-in — identical stamps must pass on their own; a cross-version
++    # mix raises/warns and only a justified same-data A/B note may opt in
++    # (codex final-audit-2).
+     assert_combinable(
+         {"geartrain_h3_10seed.jsonl": [r.metadata for r in test],
+          "phase8_6d_h3_20seed_5family.jsonl": [r.metadata for r in train]},
+-        "warn", pooling_note="transfer probe: train 5-family / eval GearTrain")
++        "warn")
+     print(f"geartrain records: {len(test)}", flush=True)
+ 
+     out: dict = {}
+diff --git a/scripts/exp_rq1_3_rf_probe.py b/scripts/exp_rq1_3_rf_probe.py
+index 97d4c08..acbb71a 100644
+--- a/scripts/exp_rq1_3_rf_probe.py
++++ b/scripts/exp_rq1_3_rf_probe.py
+@@ -25,7 +25,7 @@ from pathlib import Path
+ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT / "src"))
+ 
+-from opt_agent.dataset import iter_jsonl
++from opt_agent.dataset import read_jsonl
+ from opt_agent.dataset.validation import phase_of_ratio
+ 
+ ACTIONS = (
+@@ -172,7 +172,7 @@ def main() -> int:
+     args = parser.parse_args()
+ 
+     print(f"Loading {args.dataset}...")
+-    records = list(iter_jsonl(args.dataset))
++    records = read_jsonl(args.dataset, version_policy="warn")
+     print(f"Loaded {len(records)} records")
+ 
+     record_dicts = [r.__dict__ for r in records]
+diff --git a/scripts/generate_dataset_longhorizon.py b/scripts/generate_dataset_longhorizon.py
+index 24b338f..5617d88 100644
+--- a/scripts/generate_dataset_longhorizon.py
++++ b/scripts/generate_dataset_longhorizon.py
+@@ -61,7 +61,31 @@ from opt_agent.dataset import (  # noqa: E402
+ PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
+ 
+ 
+-def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
++def _expected_resume_meta(spec) -> dict:
++    """Metadata projection of the REQUESTED config, for resume comparison
++    (codex final-audit-2): same-stamp resumes with a different horizon
++    mode / utility weights / continuation policy / quota must not append.
++    Fields not serialized into record metadata (decision_every_k,
++    replicates) cannot be compared here — the refusal message says so."""
++    from opt_agent.rollout.specs import spec_to_metadata
++
++    return {
++        "horizon_mode": str(spec.horizon_mode),
++        "utility_weights": {
++            "w_optimization": float(spec.utility_weights.w_optimization),
++            "w_surrogate": float(spec.utility_weights.w_surrogate),
++            "w_coverage": float(spec.utility_weights.w_coverage),
++            "w_evaluation": float(spec.utility_weights.w_evaluation),
++            "w_fit": float(spec.utility_weights.w_fit),
++            "w_stop_opportunity": float(
++                spec.utility_weights.w_stop_opportunity),
++        },
++        "continuation_policy": spec_to_metadata(spec.continuation_spec),
++        "expects_partial_rollout": spec.rollout_action_subsample < 8,
++    }
++
++
++def _existing_trajectory_keys(path: Path, spec=None) -> set[tuple[str, int, int]]:
+     """(family, problem_seed, trajectory_id) triples already on disk.
+ 
+     Resume guard (codex final audit B2): the existing file's version stamps
+@@ -87,18 +111,42 @@ def _existing_trajectory_keys(path: Path) -> set[tuple[str, int, int]]:
+         ))
+     if len(stamps_seen) > 1:
+         raise SystemExit(
+-            f"{path} already mixes version stamps {sorted(stamps_seen)}; "
+-            f"refusing to resume into a mixed-version artifact — write a "
+-            f"new output file")
++            f"{path} already mixes version stamps "
++            f"{sorted(map(str, stamps_seen))}; refusing to resume into a "
++            f"mixed-version artifact — write a new output file")
+     if stamps_seen and stamps_seen.pop() != (HARNESS_VERSION,
+                                              UTILITY_VERSION):
+         raise SystemExit(
+             f"{path} was written under different version stamps than the "
+             f"current code ({HARNESS_VERSION}/{UTILITY_VERSION}); refusing "
+             f"to append — write a new versioned output file")
++    if spec is not None and keys:
++        expected = _expected_resume_meta(spec)
++        first_meta = _first_record_meta(path)
++        mismatched = [
++            k for k in ("horizon_mode", "utility_weights",
++                        "continuation_policy")
++            if k in first_meta and first_meta[k] != expected[k]
++        ]
++        has_partial = "partial_rollout" in first_meta
++        if has_partial != expected["expects_partial_rollout"]:
++            mismatched.append("partial_rollout (quota)")
++        if mismatched:
++            raise SystemExit(
++                f"{path} was generated with a different configuration on "
++                f"{mismatched}; refusing to append under the requested "
++                f"config — write a new output file. (Fields not recorded "
++                f"in record metadata — decision_every_k, replicates — "
++                f"cannot be compared; verify them manually.)")
+     return keys
+ 
+ 
++def _first_record_meta(path: Path) -> dict:
++    for rec in iter_jsonl(path):
++        return rec.metadata
++    return {}
++
++
+ def _config_from_task(cfg: dict) -> "DatasetConfig":
+     """Rebuild DatasetConfig from its asdict() form (nested dataclasses back)."""
+     from opt_agent.rollout.specs import ContinuationPolicySpec
+@@ -217,7 +265,8 @@ def main() -> int:
+         rollout_replicates=args.replicates,
+     )
+ 
+-    done_keys = _existing_trajectory_keys(args.output) if args.resume else set()
++    done_keys = (_existing_trajectory_keys(args.output, spec)
++                 if args.resume else set())
+     tasks = [
+         {"family": p, "seed": s, "trajectory_id": t, "config": asdict(spec)}
+         for p in spec.problems
+diff --git a/scripts/train_typed_decision.py b/scripts/train_typed_decision.py
+index bbb3e29..ecb77a1 100644
+--- a/scripts/train_typed_decision.py
++++ b/scripts/train_typed_decision.py
+@@ -50,15 +50,13 @@ from opt_agent.system1.typed_decision import (  # noqa: E402
+ 
+ 
+ def _iter_records(path: Path) -> Iterator[dict]:
+-    with path.open() as f:
+-        for line in f:
+-            line = line.strip()
+-            if not line:
+-                continue
+-            try:
+-                yield json.loads(line)
+-            except json.JSONDecodeError:
+-                continue
++    """Checked loader boundary: training reads go through read_jsonl with
++    an explicit version policy (codex final-audit-2). Malformed lines now
++    raise instead of being silently skipped."""
++    from opt_agent.dataset.decision_record import read_jsonl
++
++    for record in read_jsonl(path, version_policy="warn"):
++        yield dict(record.__dict__)
+ 
+ 
+ def _prepare_batch(
+
+codex
+The diff shows the three missed training readers now use `read_jsonl`, and the transfer check no longer supplies an opt-in note. I’m checking the resume guard against the metadata the generator actually writes, then I’ll verify the wider consumer inventory.
+exec
+/bin/bash -c "rg -n 'class DatasetConfig|def spec_to_metadata|horizon_mode|partial_rollout|continuation_policy|utility_weights|rollout_action_subsample|decision_every_k|rollout_replicates' src/opt_agent/rollout src/opt_agent/dataset scripts/generate_dataset_longhorizon.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/generate_dataset_longhorizon.py:18:                         Records carry metadata["partial_rollout"]; pairwise
+scripts/generate_dataset_longhorizon.py:68:    Fields not serialized into record metadata (decision_every_k,
+scripts/generate_dataset_longhorizon.py:73:        "horizon_mode": str(spec.horizon_mode),
+scripts/generate_dataset_longhorizon.py:74:        "utility_weights": {
+scripts/generate_dataset_longhorizon.py:75:            "w_optimization": float(spec.utility_weights.w_optimization),
+scripts/generate_dataset_longhorizon.py:76:            "w_surrogate": float(spec.utility_weights.w_surrogate),
+scripts/generate_dataset_longhorizon.py:77:            "w_coverage": float(spec.utility_weights.w_coverage),
+scripts/generate_dataset_longhorizon.py:78:            "w_evaluation": float(spec.utility_weights.w_evaluation),
+scripts/generate_dataset_longhorizon.py:79:            "w_fit": float(spec.utility_weights.w_fit),
+scripts/generate_dataset_longhorizon.py:81:                spec.utility_weights.w_stop_opportunity),
+scripts/generate_dataset_longhorizon.py:83:        "continuation_policy": spec_to_metadata(spec.continuation_spec),
+scripts/generate_dataset_longhorizon.py:84:        "expects_partial_rollout": spec.rollout_action_subsample < 8,
+scripts/generate_dataset_longhorizon.py:127:            k for k in ("horizon_mode", "utility_weights",
+scripts/generate_dataset_longhorizon.py:128:                        "continuation_policy")
+scripts/generate_dataset_longhorizon.py:131:        has_partial = "partial_rollout" in first_meta
+scripts/generate_dataset_longhorizon.py:132:        if has_partial != expected["expects_partial_rollout"]:
+scripts/generate_dataset_longhorizon.py:133:            mismatched.append("partial_rollout (quota)")
+scripts/generate_dataset_longhorizon.py:139:                f"in record metadata — decision_every_k, replicates — "
+scripts/generate_dataset_longhorizon.py:156:    if isinstance(fixed.get("utility_weights"), dict):
+scripts/generate_dataset_longhorizon.py:157:        fixed["utility_weights"] = UtilityWeights(**fixed["utility_weights"])
+scripts/generate_dataset_longhorizon.py:228:        horizon, horizon_mode = 1, "remaining"
+scripts/generate_dataset_longhorizon.py:234:        horizon_mode = "fixed"
+scripts/generate_dataset_longhorizon.py:257:        utility_weights=weights,
+scripts/generate_dataset_longhorizon.py:261:        decision_every_k_actions=args.decision_every_k,
+scripts/generate_dataset_longhorizon.py:263:        horizon_mode=horizon_mode,
+scripts/generate_dataset_longhorizon.py:264:        rollout_action_subsample=args.subsample_k,
+scripts/generate_dataset_longhorizon.py:265:        rollout_replicates=args.replicates,
+scripts/generate_dataset_longhorizon.py:315:    partial = sum(1 for r in collected if r.metadata.get("partial_rollout"))
+scripts/generate_dataset_longhorizon.py:318:        "horizon_mode": horizon_mode,
+src/opt_agent/rollout/specs.py:12:compatibility, but `build_continuation_policy` raises if asked to construct
+src/opt_agent/rollout/specs.py:78:def build_continuation_policy(spec: ContinuationPolicySpec) -> Any:
+src/opt_agent/rollout/specs.py:95:def spec_to_metadata(spec: ContinuationPolicySpec) -> dict[str, Any]:
+src/opt_agent/rollout/rollout.py:41:    build_continuation_policy,
+src/opt_agent/rollout/rollout.py:109:    utility_weights : UtilityWeights
+src/opt_agent/rollout/rollout.py:125:        utility_weights: UtilityWeights | None = None,
+src/opt_agent/rollout/rollout.py:141:        self.weights = utility_weights or UtilityWeights()
+src/opt_agent/rollout/rollout.py:213:            build_continuation_policy(self.continuation_spec)
+src/opt_agent/dataset/validation.py:19:    (continuation_spec / utility_weights / horizon / temperature) without
+src/opt_agent/dataset/validation.py:264:    continuation_policy = RulePolicy(seed=continuation_seed)
+src/opt_agent/dataset/validation.py:266:        return continuation_policy.select_action(s, b)
+src/opt_agent/dataset/validation.py:688:    """Reconstruct `UtilityWeights` from `metadata["utility_weights"]`.
+src/opt_agent/dataset/validation.py:693:    uw = meta.get("utility_weights")
+src/opt_agent/dataset/validation.py:748:    utility_weights: UtilityWeights | None = None,
+src/opt_agent/dataset/validation.py:759:    {continuation_spec × utility_weights × horizon} without re-running
+src/opt_agent/dataset/validation.py:769:        in `record.metadata["continuation_policy"]`.
+src/opt_agent/dataset/validation.py:770:    utility_weights : UtilityWeights | None
+src/opt_agent/dataset/validation.py:772:        `record.metadata["utility_weights"]` (or Phase 8.6B legacy fallback).
+src/opt_agent/dataset/validation.py:798:        meta.get("continuation_policy")
+src/opt_agent/dataset/validation.py:800:    weights = utility_weights if utility_weights is not None else _weights_from_metadata(meta)
+src/opt_agent/dataset/validation.py:835:            utility_weights=weights,
+src/opt_agent/dataset/analysis.py:37:    ``rollout_action_subsample < 8`` (partial rollout) only a k-subset of
+src/opt_agent/dataset/decision_record.py:34:partial rollouts (rollout_action_subsample < 8) only a deterministic
+src/opt_agent/dataset/decision_record.py:36:metadata["partial_rollout"] records which ids; full datasets are set-equal
+src/opt_agent/dataset/generator.py:170:class DatasetConfig:
+src/opt_agent/dataset/generator.py:176:    decision_every_k_actions: int = 2  # extract decision every 2 actions
+src/opt_agent/dataset/generator.py:179:    utility_weights: UtilityWeights = field(default_factory=UtilityWeights)
+src/opt_agent/dataset/generator.py:202:    # metadata["partial_rollout"] records which ids were rolled out. Pairwise
+src/opt_agent/dataset/generator.py:204:    # softmax-target consumers must read `partial_rollout` first (renormalizing
+src/opt_agent/dataset/generator.py:206:    rollout_action_subsample: int | None = None
+src/opt_agent/dataset/generator.py:211:    # per-record value; metadata["horizon_mode"] records the mode.
+src/opt_agent/dataset/generator.py:212:    horizon_mode: str = "fixed"
+src/opt_agent/dataset/generator.py:223:    rollout_replicates: int = 1
+src/opt_agent/dataset/generator.py:254:        k = self.rollout_action_subsample
+src/opt_agent/dataset/generator.py:257:                f"rollout_action_subsample must be None or in "
+src/opt_agent/dataset/generator.py:260:        if self.horizon_mode not in ("fixed", "remaining"):
+src/opt_agent/dataset/generator.py:262:                f"horizon_mode must be 'fixed' or 'remaining'; "
+src/opt_agent/dataset/generator.py:263:                f"got {self.horizon_mode!r}"
+src/opt_agent/dataset/generator.py:265:        if self.horizon_mode == "fixed" and self.horizon < 1:
+src/opt_agent/dataset/generator.py:267:        if not 1 <= self.rollout_replicates <= 8:
+src/opt_agent/dataset/generator.py:269:                f"rollout_replicates must be in [1, 8]; "
+src/opt_agent/dataset/generator.py:270:                f"got {self.rollout_replicates}"
+src/opt_agent/dataset/generator.py:370:            if step % self.config.decision_every_k_actions == 0:
+src/opt_agent/dataset/generator.py:374:                    if self.config.horizon_mode == "remaining"
+src/opt_agent/dataset/generator.py:377:                if self.config.horizon_mode == "remaining" and remaining <= 0:
+src/opt_agent/dataset/generator.py:380:                k = self.config.rollout_action_subsample
+src/opt_agent/dataset/generator.py:391:                R = self.config.rollout_replicates
+src/opt_agent/dataset/generator.py:407:                        utility_weights=self.config.utility_weights,
+src/opt_agent/dataset/generator.py:458:                    partial_rollout=partial_meta,
+src/opt_agent/dataset/generator.py:489:        partial_rollout: dict | None = None,
+src/opt_agent/dataset/generator.py:559:                "horizon_mode": str(self.config.horizon_mode),
+src/opt_agent/dataset/generator.py:564:                # Sprint 0: full utility_weights (not just w_stop_opportunity)
+src/opt_agent/dataset/generator.py:565:                # and continuation_policy spec, so any record is replayable
+src/opt_agent/dataset/generator.py:567:                "utility_weights": {
+src/opt_agent/dataset/generator.py:568:                    "w_optimization": float(self.config.utility_weights.w_optimization),
+src/opt_agent/dataset/generator.py:569:                    "w_surrogate": float(self.config.utility_weights.w_surrogate),
+src/opt_agent/dataset/generator.py:570:                    "w_coverage": float(self.config.utility_weights.w_coverage),
+src/opt_agent/dataset/generator.py:571:                    "w_evaluation": float(self.config.utility_weights.w_evaluation),
+src/opt_agent/dataset/generator.py:572:                    "w_fit": float(self.config.utility_weights.w_fit),
+src/opt_agent/dataset/generator.py:573:                    "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+src/opt_agent/dataset/generator.py:575:                "continuation_policy": spec_to_metadata(self.config.continuation_spec),
+src/opt_agent/dataset/generator.py:577:                # Phase 8.6B readers. New code should use utility_weights.
+src/opt_agent/dataset/generator.py:578:                "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+src/opt_agent/dataset/generator.py:580:                # generated with rollout_action_subsample < |vocab|.
+src/opt_agent/dataset/generator.py:581:                **({"partial_rollout": partial_rollout} if partial_rollout else {}),
+
+exec
+/bin/bash -c "nl -ba scripts/generate_dataset_longhorizon.py | sed -n '60,330p'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    60	
+    61	PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
+    62	
+    63	
+    64	def _expected_resume_meta(spec) -> dict:
+    65	    """Metadata projection of the REQUESTED config, for resume comparison
+    66	    (codex final-audit-2): same-stamp resumes with a different horizon
+    67	    mode / utility weights / continuation policy / quota must not append.
+    68	    Fields not serialized into record metadata (decision_every_k,
+    69	    replicates) cannot be compared here — the refusal message says so."""
+    70	    from opt_agent.rollout.specs import spec_to_metadata
+    71	
+    72	    return {
+    73	        "horizon_mode": str(spec.horizon_mode),
+    74	        "utility_weights": {
+    75	            "w_optimization": float(spec.utility_weights.w_optimization),
+    76	            "w_surrogate": float(spec.utility_weights.w_surrogate),
+    77	            "w_coverage": float(spec.utility_weights.w_coverage),
+    78	            "w_evaluation": float(spec.utility_weights.w_evaluation),
+    79	            "w_fit": float(spec.utility_weights.w_fit),
+    80	            "w_stop_opportunity": float(
+    81	                spec.utility_weights.w_stop_opportunity),
+    82	        },
+    83	        "continuation_policy": spec_to_metadata(spec.continuation_spec),
+    84	        "expects_partial_rollout": spec.rollout_action_subsample < 8,
+    85	    }
+    86	
+    87	
+    88	def _existing_trajectory_keys(path: Path, spec=None) -> set[tuple[str, int, int]]:
+    89	    """(family, problem_seed, trajectory_id) triples already on disk.
+    90	
+    91	    Resume guard (codex final audit B2): the existing file's version stamps
+    92	    must be exactly the CURRENT ones before new records are appended —
+    93	    otherwise resuming after a version change would silently create a
+    94	    mixed-version artifact. Raises SystemExit on incompatibility.
+    95	    """
+    96	    from opt_agent.dataset.versioning import (
+    97	        HARNESS_VERSION, UTILITY_VERSION, check_record_versions)
+    98	
+    99	    keys: set[tuple[str, int, int]] = set()
+   100	    if not path.exists():
+   101	        return keys
+   102	    stamps_seen: set[tuple] = set()
+   103	    for rec in iter_jsonl(path):
+   104	        meta = rec.metadata
+   105	        stamps_seen.add((meta.get("harness_version"),
+   106	                         meta.get("utility_version")))
+   107	        keys.add((
+   108	            rec.problem["family"],
+   109	            int(rec.problem["seed"]),
+   110	            int(meta.get("trajectory_id", 0)),
+   111	        ))
+   112	    if len(stamps_seen) > 1:
+   113	        raise SystemExit(
+   114	            f"{path} already mixes version stamps "
+   115	            f"{sorted(map(str, stamps_seen))}; refusing to resume into a "
+   116	            f"mixed-version artifact — write a new output file")
+   117	    if stamps_seen and stamps_seen.pop() != (HARNESS_VERSION,
+   118	                                             UTILITY_VERSION):
+   119	        raise SystemExit(
+   120	            f"{path} was written under different version stamps than the "
+   121	            f"current code ({HARNESS_VERSION}/{UTILITY_VERSION}); refusing "
+   122	            f"to append — write a new versioned output file")
+   123	    if spec is not None and keys:
+   124	        expected = _expected_resume_meta(spec)
+   125	        first_meta = _first_record_meta(path)
+   126	        mismatched = [
+   127	            k for k in ("horizon_mode", "utility_weights",
+   128	                        "continuation_policy")
+   129	            if k in first_meta and first_meta[k] != expected[k]
+   130	        ]
+   131	        has_partial = "partial_rollout" in first_meta
+   132	        if has_partial != expected["expects_partial_rollout"]:
+   133	            mismatched.append("partial_rollout (quota)")
+   134	        if mismatched:
+   135	            raise SystemExit(
+   136	                f"{path} was generated with a different configuration on "
+   137	                f"{mismatched}; refusing to append under the requested "
+   138	                f"config — write a new output file. (Fields not recorded "
+   139	                f"in record metadata — decision_every_k, replicates — "
+   140	                f"cannot be compared; verify them manually.)")
+   141	    return keys
+   142	
+   143	
+   144	def _first_record_meta(path: Path) -> dict:
+   145	    for rec in iter_jsonl(path):
+   146	        return rec.metadata
+   147	    return {}
+   148	
+   149	
+   150	def _config_from_task(cfg: dict) -> "DatasetConfig":
+   151	    """Rebuild DatasetConfig from its asdict() form (nested dataclasses back)."""
+   152	    from opt_agent.rollout.specs import ContinuationPolicySpec
+   153	    from opt_agent.rollout.utility import UtilityWeights
+   154	
+   155	    fixed = dict(cfg)
+   156	    if isinstance(fixed.get("utility_weights"), dict):
+   157	        fixed["utility_weights"] = UtilityWeights(**fixed["utility_weights"])
+   158	    if isinstance(fixed.get("continuation_spec"), dict):
+   159	        fixed["continuation_spec"] = ContinuationPolicySpec(
+   160	            **fixed["continuation_spec"]
+   161	        )
+   162	    return DatasetConfig(**fixed)
+   163	
+   164	
+   165	def _run_trajectory(task: dict) -> list:
+   166	    """Worker: generate all records for one (problem, seed, trajectory_id).
+   167	
+   168	    Pin torch to a single thread: GP fitting is the bottleneck, and with
+   169	    many process workers the default (all cores) oversubscribes the machine.
+   170	    """
+   171	    import torch
+   172	
+   173	    torch.set_num_threads(1)
+   174	    from dataclasses import replace as _replace
+   175	
+   176	    base = _config_from_task(task["config"])
+   177	    spec = _replace(
+   178	        base,
+   179	        problems=(task["family"],),
+   180	        seeds=(task["seed"],),
+   181	        trajectories_per_problem_seed=1,
+   182	    )
+   183	    return list(DatasetGenerator(spec).generate())
+   184	
+   185	
+   186	def _record_line(rec) -> str:
+   187	    from opt_agent.dataset.decision_record import _json_safe
+   188	
+   189	    return json.dumps(_json_safe(rec), sort_keys=True) + "\n"
+   190	
+   191	
+   192	def _cost_units(records: list) -> int:
+   193	    """Backend cost proxy: total new samples + GP fits across rolled branches."""
+   194	    total = 0
+   195	    for rec in records:
+   196	        for r in rec.rollout_results.values():
+   197	            total += int(r.get("n_new_samples", 0)) + int(r.get("n_model_fits", 0))
+   198	    return total
+   199	
+   200	
+   201	def main() -> int:
+   202	    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+   203	    parser.add_argument("output", type=Path)
+   204	    parser.add_argument("--horizon", default="remaining",
+   205	                        help="'remaining' (to budget exhaustion) or a fixed int")
+   206	    parser.add_argument("--subsample-k", type=int, default=4,
+   207	                        help="Candidates rolled out per decision point (1-8)")
+   208	    parser.add_argument("--replicates", type=int, default=1,
+   209	                        help="Rollout replicates per decision point; utilities averaged (P1b denoising)")
+   210	    parser.add_argument("--continuation", default="on_policy", choices=["on_policy", "rule"],
+   211	                        help="Rollout continuation policy (P1b alignment: rule matches Gate 4)")
+   212	    parser.add_argument("--terminal-utility", action="store_true",
+   213	                        help="Pure terminal-delta-best utility (w_opt=1, cost/stop terms zeroed)")
+   214	    parser.add_argument("--problems", nargs="+", default=list(PROBLEMS_5FAMILY))
+   215	    parser.add_argument("--seeds", type=int, default=5,
+   216	                        help="Number of problem seeds (0..N-1)")
+   217	    parser.add_argument("--budget", type=int, default=30)
+   218	    parser.add_argument("--max-actions", type=int, default=25)
+   219	    parser.add_argument("--decision-every-k", type=int, default=2)
+   220	    parser.add_argument("--workers", type=int, default=4)
+   221	    parser.add_argument("--resume", action="store_true",
+   222	                        help="Skip trajectories whose records already exist")
+   223	    parser.add_argument("--force", action="store_true",
+   224	                        help="Overwrite existing output (ignored with --resume)")
+   225	    args = parser.parse_args()
+   226	
+   227	    if args.horizon == "remaining":
+   228	        horizon, horizon_mode = 1, "remaining"
+   229	    else:
+   230	        try:
+   231	            horizon = int(args.horizon)
+   232	        except ValueError:
+   233	            parser.error(f"--horizon must be 'remaining' or an int; got {args.horizon!r}")
+   234	        horizon_mode = "fixed"
+   235	
+   236	    if args.output.exists() and not args.resume and not args.force:
+   237	        print(f"error: {args.output} exists; pass --force or --resume", file=sys.stderr)
+   238	        return 1
+   239	
+   240	    from opt_agent.rollout.specs import ContinuationPolicySpec
+   241	    from opt_agent.rollout.utility import UtilityWeights
+   242	
+   243	    weights = UtilityWeights()
+   244	    if args.terminal_utility:
+   245	        weights = UtilityWeights(
+   246	            w_optimization=1.0, w_surrogate=0.0, w_coverage=0.0,
+   247	            w_evaluation=0.0, w_fit=0.0, w_stop_opportunity=0.0,
+   248	        )
+   249	    cont = ContinuationPolicySpec(
+   250	        name=args.continuation, seed=0,
+   251	        extras={"rule_weight": 0.8} if args.continuation == "on_policy" else {},
+   252	    )
+   253	    spec = replace(
+   254	        DatasetConfig(),
+   255	        problems=tuple(args.problems),
+   256	        continuation_spec=cont,
+   257	        utility_weights=weights,
+   258	        seeds=tuple(range(args.seeds)),
+   259	        total_budget=args.budget,
+   260	        max_actions=args.max_actions,
+   261	        decision_every_k_actions=args.decision_every_k,
+   262	        horizon=horizon,
+   263	        horizon_mode=horizon_mode,
+   264	        rollout_action_subsample=args.subsample_k,
+   265	        rollout_replicates=args.replicates,
+   266	    )
+   267	
+   268	    done_keys = (_existing_trajectory_keys(args.output, spec)
+   269	                 if args.resume else set())
+   270	    tasks = [
+   271	        {"family": p, "seed": s, "trajectory_id": t, "config": asdict(spec)}
+   272	        for p in spec.problems
+   273	        for s in spec.seeds
+   274	        for t in range(spec.trajectories_per_problem_seed)
+   275	        if (p.lower(), s, t) not in done_keys
+   276	    ]
+   277	    skipped = len(done_keys)
+   278	
+   279	    tmp = args.output.with_suffix(args.output.suffix + ".tmp")
+   280	    collected: list = []
+   281	    t0 = time.time()
+   282	    n_tasks = len(tasks)
+   283	    if tasks:
+   284	        import multiprocessing
+   285	
+   286	        # spawn: workers import cleanly (no fork-safety issues with torch
+   287	        # state); each worker pins itself to 1 torch thread.
+   288	        ctx = multiprocessing.get_context("spawn")
+   289	        # Serialise the already-present records into tmp first when resuming.
+   290	        if args.resume and args.output.exists():
+   291	            tmp.write_text(args.output.read_text(), encoding="utf-8")
+   292	        else:
+   293	            tmp.write_text("", encoding="utf-8")
+   294	        with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx) as pool:
+   295	            futures = {pool.submit(_run_trajectory, t): t for t in tasks}
+   296	            for fut in as_completed(futures):
+   297	                task = futures[fut]
+   298	                recs = fut.result()
+   299	                collected.extend(recs)
+   300	                with tmp.open("a", encoding="utf-8") as fh:
+   301	                    for rec in recs:
+   302	                        fh.write(_record_line(rec))
+   303	                done = sum(1 for f in futures if f.done())
+   304	                print(
+   305	                    f"[{done}/{n_tasks}] {task['family']} seed={task['seed']} "
+   306	                    f"→ {len(recs)} records",
+   307	                    flush=True,
+   308	                )
+   309	    else:
+   310	        tmp.write_text("", encoding="utf-8")
+   311	
+   312	    wall = time.time() - t0
+   313	    tmp.replace(args.output)
+   314	
+   315	    partial = sum(1 for r in collected if r.metadata.get("partial_rollout"))
+   316	    summary = {
+   317	        "output": str(args.output),
+   318	        "horizon_mode": horizon_mode,
+   319	        "subsample_k": args.subsample_k,
+   320	        "problems": list(spec.problems),
+   321	        "seeds": args.seeds,
+   322	        "records_new": len(collected),
+   323	        "records_partial": partial,
+   324	        "trajectories_skipped_resume": skipped,
+   325	        "cost_units_new": _cost_units(collected),
+   326	        "cost_units_per_record": (
+   327	            round(_cost_units(collected) / len(collected), 2) if collected else 0.0
+   328	        ),
+   329	        "wall_clock_s": round(wall, 1),
+   330	        "quot_note": (
+
+exec
+/bin/bash -c "sed -n '170,275p;350,470p;485,590p' src/opt_agent/dataset/generator.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+class DatasetConfig:
+    problems: tuple[str, ...] = ("Branin", "Hartmann", "Ackley")
+    seeds: tuple[int, ...] = (0,)
+    n_init: int = 5
+    total_budget: int = 30
+    trajectories_per_problem_seed: int = 1
+    decision_every_k_actions: int = 2  # extract decision every 2 actions
+    max_actions: int = 25
+    horizon: int = 1
+    utility_weights: UtilityWeights = field(default_factory=UtilityWeights)
+    temperature: float = 1.0
+    random_action_rate: float = 0.2  # 20% random, 80% rule
+    # Phase 8.6A oracle-gate fix (per codex 2025-09-23):
+    # - evaluation_scale / fit_scale default to None → generator sets
+    #   evaluation_scale = fit_scale = total_budget (so 1 evaluation ≈
+    #   1/total_budget utility units, comparable to Δopt).
+    # - optimization_scale default to None → generator computes
+    #   std(initial_objectives) per trajectory for cross-problem invariance.
+    optimization_scale: float | None = None
+    evaluation_scale: float | None = None
+    fit_scale: float | None = None
+    # Phase 9 Gate 5 — affine rescaling of the objective (codex §27).
+    # Applied at write-time inside BocodeBotorchBackend so GP fits, state
+    # extractor, optimizer, and counterfactual rollouts all see the
+    # transformed scale consistently. Default (1.0, 0.0) is the identity.
+    objective_scale: float = 1.0
+    objective_shift: float = 0.0
+    # Long-horizon quota control (2026-09-27): when set to k < |vocab|, each
+    # decision point rolls out only a deterministic k-subset of the candidate
+    # vocabulary at the configured horizon. Rollout cost scales as k/|vocab|.
+    # `candidate_actions` still lists the full vocabulary; the record's
+    # `gold_probs`/`rollout_results` cover only the rolled-out subset and
+    # metadata["partial_rollout"] records which ids were rolled out. Pairwise
+    # consumers (contrastive distillation) are unaffected by construction;
+    # softmax-target consumers must read `partial_rollout` first (renormalizing
+    # a subset softmax to the full vocabulary would inflate the top gap).
+    rollout_action_subsample: int | None = None
+    # "fixed": use `horizon` for every decision point (historical default).
+    # "remaining": per decision point, roll out until the budget is exhausted
+    # (horizon = remaining_budget) — the true long-horizon semantics from the
+    # Phase 8.6C horizon diagnosis. metadata["horizon"] records the actual
+    # per-record value; metadata["horizon_mode"] records the mode.
+    horizon_mode: str = "fixed"
+    # P1b denoising (2026-09-27, per the noise-vs-misspecification diagnostic
+    # `exp_teacher_noise_diagnostic.py`: single-rollout labels are
+    # NOISE-dominated — inter-roll gap spread 0.0915 > median stored gap 0.05,
+    # above-median-gap any-of-3 flip rate 0.73; overall any-of-3 0.65).
+    # When R > 1, each decision point's
+    # rollout is repeated R times with fresh candidate/continuation seeds and
+    # the per-action utilities are AVERAGED (T2: noise shrinks as 1/sqrt(R);
+    # the expected ranking is unchanged). rollout_results carry the mean
+    # utility plus `utility_replicas` and `utility_std` for downstream
+    # uncertainty accounting.
+    rollout_replicates: int = 1
+    # Sprint 0 (per codex Q-T2 2026-09-25): continuation policy spec, used by
+    # `CounterfactualRollout` for follow-up steps and recorded in metadata
+    # so records can be replayed with a different continuation. Default:
+    # "on_policy" matching the dataset's behavior mix.
+    continuation_spec: ContinuationPolicySpec = field(
+        default_factory=lambda: ContinuationPolicySpec(
+            name="on_policy",
+            seed=0,
+            extras={"rule_weight": 0.8},
+        )
+    )
+
+    def __post_init__(self) -> None:
+        """Validate Phase 9 Gate 5 affine params eagerly.
+
+        `objective_scale` must be finite and strictly positive; `objective_shift`
+        must be finite. Rejecting at config construction time (rather than
+        deep inside generate()) gives a clearer error and avoids a partially-
+        constructed DatasetGenerator if downstream code re-uses the factory.
+        """
+        scale = float(self.objective_scale)
+        shift = float(self.objective_shift)
+        if not math.isfinite(scale) or scale <= 0:
+            raise ValueError(
+                f"DatasetConfig.objective_scale must be finite and > 0; got {scale!r}"
+            )
+        if not math.isfinite(shift):
+            raise ValueError(
+                f"DatasetConfig.objective_shift must be finite; got {shift!r}"
+            )
+        k = self.rollout_action_subsample
+        if k is not None and not 1 <= k <= len(ALL_CANDIDATE_SPECS):
+            raise ValueError(
+                f"rollout_action_subsample must be None or in "
+                f"[1, {len(ALL_CANDIDATE_SPECS)}]; got {k!r}"
+            )
+        if self.horizon_mode not in ("fixed", "remaining"):
+            raise ValueError(
+                f"horizon_mode must be 'fixed' or 'remaining'; "
+                f"got {self.horizon_mode!r}"
+            )
+        if self.horizon_mode == "fixed" and self.horizon < 1:
+            raise ValueError(f"horizon must be >= 1 in fixed mode; got {self.horizon}")
+        if not 1 <= self.rollout_replicates <= 8:
+            raise ValueError(
+                f"rollout_replicates must be in [1, 8]; "
+                f"got {self.rollout_replicates}"
+            )
+
+
+BackendFactory = Callable[[], UnifiedBackend]
+
+        )
+        fit_scale = (
+            float(self.config.total_budget)
+            if self.config.fit_scale is None
+            else float(self.config.fit_scale)
+        )
+
+        rule = RulePolicy(seed=run_seed)
+        random_policy = RandomPolicy(seed=run_seed)
+        behavior_rng = random.Random(run_seed)
+        last_action_name: str | None = None  # Phase 8.5 fix: track for state.history.last_action
+
+        for step in range(self.config.max_actions):
+            state = extract_state(
+                backend,
+                total_budget=self.config.total_budget,
+                last_action=last_action_name,
+            )
+
+            # Decision point?
+            if step % self.config.decision_every_k_actions == 0:
+                remaining = int(state.resource.remaining_budget)
+                h_step = (
+                    max(1, remaining)
+                    if self.config.horizon_mode == "remaining"
+                    else self.config.horizon
+                )
+                if self.config.horizon_mode == "remaining" and remaining <= 0:
+                    break  # nothing left to decide; budget exhausted
+                cands = full_candidates(seed=derive_seed(run_seed, step))
+                k = self.config.rollout_action_subsample
+                if k is not None and k < len(cands):
+                    rolled = subsample_candidates(
+                        cands, k, derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                    )
+                else:
+                    rolled = cands
+                # Sprint 0 fix: scale the rollout cap to rolled candidates ×
+                # horizon so long-horizon runs (e.g. horizon=total_budget)
+                # don't hit the default cap of 200.
+                rollout_cap = max(200, len(rolled) * h_step + 32)
+                R = self.config.rollout_replicates
+                subset_seed = derive_seed(run_seed, step, _SUBSAMPLE_SALT)
+                outputs = []
+                for rep in range(R):
+                    # Same rolled subset every replicate (deterministic salt);
+                    # fresh action seeds and continuation seed per replicate.
+                    rep_cands = (
+                        cands if R == 1
+                        else full_candidates(seed=derive_seed(run_seed, step, rep))
+                    )
+                    rep_rolled = rolled if R == 1 else subsample_candidates(
+                        rep_cands, len(rolled), subset_seed
+                    )
+                    outputs.append(CounterfactualRollout(
+                        backend,
+                        horizon=h_step,
+                        utility_weights=self.config.utility_weights,
+                        continuation_spec=(
+                            self.config.continuation_spec if R == 1 else
+                            replace(
+                                self.config.continuation_spec,
+                                seed=derive_seed(
+                                    int(self.config.continuation_spec.seed),
+                                    rep, 424242,
+                                ),
+                            )
+                        ),
+                        max_rollout_steps=rollout_cap,
+                        optimization_scale=optimization_scale,
+                        evaluation_scale=evaluation_scale,
+                        fit_scale=fit_scale,
+                    ).rollout(state, rep_rolled))
+                output = outputs[0] if R == 1 else _average_rollouts(outputs)
+                probs = to_gold_probs(
+                    output.results,
+                    temperature=self.config.temperature,
+                    include_invalid_as_zero=True,
+                )
+                partial_meta: dict | None = None
+                if rolled is not cands:
+                    partial_meta = {
+                        "k": int(k),
+                        "action_ids": [c.action_id for c in rolled],
+                        "note": (
+                            "gold_probs and rollout_results cover only these "
+                            "action_ids; do not renormalize to the full "
+                            "vocabulary. Pairwise (contrastive) consumers are "
+                            "unaffected by construction."
+                        ),
+                    }
+                # Preserve the complete decision point, including a fitted GP
+                # and RNG state. History alone cannot faithfully replay it.
+                replay_checkpoint = backend.checkpoint()
+                yield self._make_record(
+                    problem=problem,
+                    problem_seed=problem_seed,
+                    trajectory_id=trajectory_id,
+                    step=step,
+                    run_seed=run_seed,
+                    state=state,
+                    candidates=cands,
+                    output=output,
+                    probs=probs,
+                    optimization_scale=optimization_scale,
+                    evaluation_scale=evaluation_scale,
+                    fit_scale=fit_scale,
+                    replay_checkpoint=replay_checkpoint,
+                    partial_rollout=partial_meta,
+                    horizon=h_step,
+                )
+
+            # Behavior policy — NEVER samples from gold_probs.
+            if behavior_rng.random() < self.config.random_action_rate:
+                action = random_policy.select_action(state, backend)
+            else:
+                action = rule.select_action(state, backend)
+
+            result: ActionResult = execute_action(backend, state, action)
+            last_action_name = action.type.value
+            if result.should_stop:
+        optimization_scale: float,
+        evaluation_scale: float,
+        fit_scale: float,
+        replay_checkpoint: Checkpoint | None = None,
+        partial_rollout: dict | None = None,
+        horizon: int | None = None,
+    ) -> DecisionRecord:
+        # Phase 8.6B: serialize enough backend state for exact replay.
+        replay_meta: dict = {}
+        if replay_checkpoint is not None:
+            cp = replay_checkpoint
+            replay_meta = {
+                "backend_X": cp.X.detach().cpu().tolist(),
+                "backend_objectives": cp.objectives.detach().cpu().tolist(),
+                "backend_constraints": cp.constraints.detach().cpu().tolist(),
+                "backend_id": cp.backend_id,
+                "backend_problem_id": cp.problem_id,
+                "backend_problem_bounds": cp.problem_bounds,
+                "backend_fitted": cp.fitted,
+                "backend_model_state_b64": (
+                    base64.b64encode(cp.model_state_dict).decode("ascii")
+                    if cp.model_state_dict is not None else None
+                ),
+                "backend_rng_state_b64": (
+                    base64.b64encode(cp.torch_rng_state).decode("ascii")
+                    if cp.torch_rng_state is not None else None
+                ),
+            }
+        return DecisionRecord(
+            id=f"{problem.lower()}:{problem_seed}:{trajectory_id}:{step}",
+            problem={
+                "family": problem.lower(),
+                "dimension": int(state.sampling.dimension),
+                "seed": int(problem_seed),
+            },
+            state=_json_safe(state),
+            candidate_actions=[
+                {
+                    "action_id": c.action_id,
+                    "type": c.action.type.value,
+                    "params": dict(c.action.params),
+                }
+                for c in candidates
+            ],
+            gold_probs=probs,
+            rollout_results={
+                r.action_id: {
+                    "status": r.status,
+                    "utility": r.utility,
+                    "delta_optimization": r.delta_optimization,
+                    "delta_surrogate": r.delta_surrogate,
+                    "delta_coverage": r.delta_coverage,
+                    "n_new_samples": r.n_new_samples,
+                    "n_model_fits": r.n_model_fits,
+                    "error": r.error,
+                    **(
+                        {"utility_replicas": r.metrics["utility_replicas"],
+                         "utility_std": r.metrics["utility_std"]}
+                        if "utility_replicas" in r.metrics else {}
+                    ),
+                }
+                for r in output.results
+            },
+            temperature=float(self.config.temperature),
+            metadata=stamp_metadata({
+                "trajectory_id": int(trajectory_id),
+                "step": int(step),
+                "run_seed": int(run_seed),
+                "optimization_scale": float(optimization_scale),
+                "evaluation_scale": float(evaluation_scale),
+                "fit_scale": float(fit_scale),
+                "horizon": int(
+                    self.config.horizon if horizon is None else horizon
+                ),
+                "horizon_mode": str(self.config.horizon_mode),
+                # Phase 9 Gate 5 — affine objective transform (so replay
+                # infrastructure can reconstruct the same transformed backend).
+                "objective_scale": float(self.config.objective_scale),
+                "objective_shift": float(self.config.objective_shift),
+                # Sprint 0: full utility_weights (not just w_stop_opportunity)
+                # and continuation_policy spec, so any record is replayable
+                # with different config (per codex Q-T2 2026-09-25).
+                "utility_weights": {
+                    "w_optimization": float(self.config.utility_weights.w_optimization),
+                    "w_surrogate": float(self.config.utility_weights.w_surrogate),
+                    "w_coverage": float(self.config.utility_weights.w_coverage),
+                    "w_evaluation": float(self.config.utility_weights.w_evaluation),
+                    "w_fit": float(self.config.utility_weights.w_fit),
+                    "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+                },
+                "continuation_policy": spec_to_metadata(self.config.continuation_spec),
+                # Keep w_stop_opportunity for backward compatibility with
+                # Phase 8.6B readers. New code should use utility_weights.
+                "w_stop_opportunity": float(self.config.utility_weights.w_stop_opportunity),
+                # Long-horizon quota (2026-09-27): present only for records
+                # generated with rollout_action_subsample < |vocab|.
+                **({"partial_rollout": partial_rollout} if partial_rollout else {}),
+                **replay_meta,
+            }),
+        )
+
+exec
+/bin/bash -c "rg -l '\\biter_jsonl\\b' scripts --glob '*.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_rq1_3_decision_landscape.py
+scripts/validate_phase8_6b.py
+scripts/exp_rq0_5_prompt_controls.py
+scripts/diagnose_qs5.py
+scripts/generate_dataset_longhorizon.py
+scripts/verify_theory_propositions.py
+scripts/ablate_phase8_6d_utility.py
+scripts/run_oracle_gate.py
+scripts/exp_rq1_3_scale_sensitivity.py
+scripts/exp_teacher_noise_diagnostic.py
+
+exec
+/bin/bash -c "rg -n '\\b(fit|train|_train|\\.fit\\(|\\.train\\()\\b|\\.fit\\(' scripts/exp_rq1_3_decision_landscape.py scripts/validate_phase8_6b.py scripts/exp_rq0_5_prompt_controls.py scripts/diagnose_qs5.py scripts/generate_dataset_longhorizon.py scripts/verify_theory_propositions.py scripts/ablate_phase8_6d_utility.py scripts/run_oracle_gate.py scripts/exp_rq1_3_scale_sensitivity.py scripts/exp_teacher_noise_diagnostic.py" in /home/lcy/Documents/projects/opt_agent_v3
+ exited 1 in 0ms:
+exec
+/bin/bash -c "rg -ni 'fit|train' scripts/exp_rq1_3_decision_landscape.py scripts/validate_phase8_6b.py scripts/exp_rq0_5_prompt_controls.py scripts/diagnose_qs5.py scripts/generate_dataset_longhorizon.py scripts/verify_theory_propositions.py scripts/ablate_phase8_6d_utility.py scripts/run_oracle_gate.py scripts/exp_rq1_3_scale_sensitivity.py scripts/exp_teacher_noise_diagnostic.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_teacher_noise_diagnostic.py:8:               seeds, GP refits); sign(U_a − U_b) flips under re-rolls.
+scripts/exp_teacher_noise_diagnostic.py:110:            fit_scale=float(md.get("fit_scale", 30.0)),
+scripts/generate_dataset_longhorizon.py:27:                         (Σ n_new_samples + n_model_fits over rolled-out
+scripts/generate_dataset_longhorizon.py:79:            "w_fit": float(spec.utility_weights.w_fit),
+scripts/generate_dataset_longhorizon.py:168:    Pin torch to a single thread: GP fitting is the bottleneck, and with
+scripts/generate_dataset_longhorizon.py:193:    """Backend cost proxy: total new samples + GP fits across rolled branches."""
+scripts/generate_dataset_longhorizon.py:197:            total += int(r.get("n_new_samples", 0)) + int(r.get("n_model_fits", 0))
+scripts/generate_dataset_longhorizon.py:247:            w_evaluation=0.0, w_fit=0.0, w_stop_opportunity=0.0,
+scripts/diagnose_qs5.py:66:        w_evaluation=0.0, w_fit=0.0, w_stop_opportunity=0.0,
+scripts/exp_rq1_3_scale_sensitivity.py:39:    "retrain_surrogate", "stop",
+scripts/exp_rq1_3_decision_landscape.py:43:    "retrain_surrogate", "stop",
+scripts/ablate_phase8_6d_utility.py:36:    "no_fit": UtilityWeights(w_fit=0),
+scripts/ablate_phase8_6d_utility.py:38:    "no_cost": UtilityWeights(w_evaluation=0, w_fit=0),
+scripts/ablate_phase8_6d_utility.py:40:        w_evaluation=0, w_fit=0, w_stop_opportunity=0
+scripts/ablate_phase8_6d_utility.py:77:            n_model_fits=result["n_model_fits"],
+scripts/ablate_phase8_6d_utility.py:81:            fit_scale=meta["fit_scale"],
+scripts/ablate_phase8_6d_utility.py:166:                    "n_model_fits": result.n_model_fits,
+scripts/verify_theory_propositions.py:56:                n_model_fits=int(cell.get("n_model_fits", 0)),
+scripts/verify_theory_propositions.py:59:                fit_scale=float(md.get("fit_scale", 30.0)),
+scripts/verify_theory_propositions.py:70:                n_model_fits=int(cell.get("n_model_fits", 0)),
+scripts/verify_theory_propositions.py:73:                fit_scale=float(md.get("fit_scale", 30.0)),
+
+exec
+/bin/bash -c "rg -n '"'^## .*29|read_jsonl|iter_jsonl|21 training|9 analysis'"' PROGRESS_BRANCH.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+502:## 18. Research boundary guide: drafted + codex round-1 + initial fixes (2026-09-29)
+558:## 19. Round-2: scheme-class items landed on exp/boundary-scheme-round2 (2026-09-29)
+624:## 20. Config-axis dose-response grid: conditionality DETECTED; screen's Rastrigin claim retracted (2026-09-29)
+668:## 21. Round-3 closure: codex round-2 leftovers landed (2026-09-29)
+676:  raise under strict); decision_record.read_jsonl(path,
+678:  train_rlcd_laya.py reads via read_jsonl with --version-policy (default
+679:  warn). Tests: warn/strict/legacy/mismatch + read_jsonl roundtrip.
+709:## 22. Round-3 review verdict + full disposition (2026-09-29)
+726:- B1/B2/E1: iter_jsonl documented as raw unenforced access (replay
+727:  only); pooling consumers must use read_jsonl with an explicit
+745:## 23. Round-4 review verdict + full disposition (2026-09-29)
+758:  explicitly; phase9_baselines.py migrated from iter_jsonl to
+759:  read_jsonl(version_policy="warn").
+778:## 24. Round-5 review verdict + full disposition (2026-09-29)
+802:- Remaining iter_jsonl pooling consumers migrated to
+803:  read_jsonl(version_policy="warn"): exp_rlcd_{calibration_ablation,
+814:## 25. Round-6 review verdict + full disposition (2026-09-29)
+824:  read_jsonl(..., version_policy="warn"); ALL 13 touched scripts now pass
+834:  training/pooling consumers) migrated off raw iter_jsonl.
+844:## 26. Round-7 review verdict + disposition (2026-09-29)
+859:## 27. Round-8: APPROVE — boundary-guide review loop closed (2026-09-29)
+870:as stated in the guide (6.6 items 4-6 mechanization; iter_jsonl raw
+873:## 28. Final full-package audit: findings fixed (2026-09-29)
+881:  raw iter_jsonl — exp_geartrain_transfer_probe (now ALSO runs
+908:## 29. Final-audit round 2: findings fixed; loader boundary closed by sweep (2026-09-29)
+917:  that silently skipped malformed lines — stricter now: read_jsonl
+918:  raises). All on read_jsonl(version_policy="warn").
+920:  all iter_jsonl users): TRAINING -> read_jsonl: train_rlcd_laya,
+928:  own frozen artifacts (iter_jsonl retained, documented raw access):
+959:src/opt_agent/dataset/analysis.py:92 using iter_jsonl — was verified by
+
+exec
+/bin/bash -c "sed -n '908,970p' PROGRESS_BRANCH.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+## 29. Final-audit round 2: findings fixed; loader boundary closed by sweep (2026-09-29)
+
+Final-audit round 2 (`runs/codex_boundary_final_audit2.log`): REVISE —
+1 BLOCKER / 2 MAJOR / 1 MINOR + 3 PARTIALs. All fixed same session:
+
+- BLOCKER (three more training consumers — found this time by our own
+  systematic sweep rather than name-chasing): exp_rq1_3_rf_probe
+  (RandomForestRegressor fit), diagnose_continuation_effect (_train),
+  and train_typed_decision (which used its OWN raw json.loads reader
+  that silently skipped malformed lines — stricter now: read_jsonl
+  raises). All on read_jsonl(version_policy="warn").
+  Loader-consumer classification (verifiable sweep, fit/train grep over
+  all iter_jsonl users): TRAINING -> read_jsonl: train_rlcd_laya,
+  train_system1_compare, train_typed_decision, phase9_baselines,
+  sweep_rlcd, exp_rq2_1_cross_family_transfer,
+  exp_rlcd_{calibration_ablation, loo_confirmatory, loo_transfer,
+  router_panel}, analyze_rlcd_ci, exp_lenz_{vs_frozen_llm,
+  gate2_probe}, evaluate_no_fit_student, exp_geartrain_transfer_probe,
+  exp_rq3_router_sweep, exp_rq1_rq2_closed_loop, exp_rq2_ioh_closed_loop,
+  exp_rq1_3_rf_probe, diagnose_continuation_effect. ANALYSIS/REPLAY on
+  own frozen artifacts (iter_jsonl retained, documented raw access):
+  exp_rq1_3_decision_landscape (docstring mention only — no fit),
+  exp_rq1_3_scale_sensitivity, exp_teacher_noise_diagnostic,
+  exp_rq0_5_prompt_controls, diagnose_qs5, ablate_phase8_6d_utility,
+  verify_theory_propositions, validate_phase8_6b, run_oracle_gate.
+- MAJOR (geartrain opt-in semantics): assert_combinable now called
+  WITHOUT a note — identical stamps pass on their own; a mix raises/
+  warns and only a justified same-data A/B note may opt in.
+- MAJOR (resume config gap): --resume now also compares the recorded
+  generation configuration (horizon_mode, utility_weights,
+  continuation_policy, partial-rollout presence) against the requested
+  spec and refuses on mismatch; fields not serialized into record
+  metadata (decision_every_k, replicates) are named in the refusal
+  message as manually verifiable.
+- MINOR: mixed-stamp sort uses map(str, ...) — no TypeError in the
+  refusal path.
+- PARTIALs closed: grid report H0_slope bullet states the standardized
+  null; all four remaining "effect at most d_z 0.11" phrasings
+  (screen abstract + 6.2, grid abstract, guide ledger) replaced with
+  point-estimate + CI + precision caveat.
+
+All five touched scripts pass runtime --help smoke; targeted tests
+green.
+## 30. Final-audit round-3 interrupted by codex usage limit (2026-09-30)
+
+The round-3 closing audit (prompt archived at
+runs/codex_boundary_final3_prompt.txt) ran ~82k tokens of investigation
+and died on the account usage limit mid-review (reset 01:16 local; the
+error is an approval-system rejection, not a review verdict). No
+findings of its own had been emitted before the interruption (log
+contains only prompt echoes). Its one visible open lead —
+src/opt_agent/dataset/analysis.py:92 using iter_jsonl — was verified by
+us: analyze_dataset is a single-file statistics/validation utility
+(runs validate_record per record; consumers are the validation scripts),
+i.e. the documented analysis/replay class, not a training/pooling
+bypass. A scheduled retry at 01:26 (automation
+"额度重置后重跑 codex 终审 round-3") will rerun the identical prompt
+and commit the verdict.
+
+exec
+/bin/bash -c "rg -l '\\bread_jsonl\\b' scripts --glob '*.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_rlcd_calibration_ablation.py
+scripts/diagnose_continuation_effect.py
+scripts/exp_rq1_3_rf_probe.py
+scripts/train_typed_decision.py
+scripts/exp_rlcd_router_panel.py
+scripts/exp_rq2_1_cross_family_transfer.py
+scripts/exp_rlcd_loo_transfer.py
+scripts/exp_lenz_gate2_probe.py
+scripts/sweep_rlcd.py
+scripts/evaluate_no_fit_student.py
+scripts/train_system1_compare.py
+scripts/train_rlcd_laya.py
+scripts/exp_rq2_ioh_closed_loop.py
+scripts/exp_rq1_rq2_closed_loop.py
+scripts/phase9_baselines.py
+scripts/analyze_rlcd_ci.py
+scripts/exp_geartrain_transfer_probe.py
+scripts/exp_lenz_vs_frozen_llm.py
+scripts/exp_rlcd_loo_confirmatory.py
+scripts/exp_rq3_router_sweep.py
+
+exec
+/bin/bash -c "rg -n 'json\\.loads|\\.read_text\\(|\\.open\\(' scripts --glob '*.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/exp_rq0_5_full.py:222:    for line in env_path.read_text().splitlines():
+scripts/exp_rq1_3_bootstrap_ci.py:52:    data = json.loads(args.sensitivity_json.read_text())
+scripts/run_jev_baseline.py:117:        previous = json.loads(args.output.read_text())
+scripts/run_branin_demo.py:62:    with out_path.open("w") as f:
+scripts/analyze_ioh_crossed_transfer.py:97:    result = analyze(json.loads(args.input.read_text()))
+scripts/generate_dataset_5family.py:54:with tmp.open("w", encoding="utf-8", newline="\n") as f:
+scripts/run_affine_rescaling_gate.py:86:    with path.open("w", encoding="utf-8", newline="\n") as f:
+scripts/exp_rq0_5_prompt_controls.py:126:    for line in env_path.read_text().splitlines():
+scripts/analyze_rq3_cost_frontier.py:34:        data = json.loads(path.read_text())
+scripts/generate_phase8_6d_20seed.py:50:with tmp.open("w", encoding="utf-8", newline="\n") as f:
+scripts/exp_rq3_schedule_baseline.py:99:        sweeps.extend(json.loads(path.read_text())["runs"])
+scripts/exp_rq3_schedule_baseline.py:111:        rows = json.loads(args.output.read_text())["runs"]
+scripts/exp_rq0_5_ioh_dimension_crossed.py:192:    for line in env_path.read_text().splitlines():
+scripts/generate_dataset_longhorizon.py:291:            tmp.write_text(args.output.read_text(), encoding="utf-8")
+scripts/generate_dataset_longhorizon.py:300:                with tmp.open("a", encoding="utf-8") as fh:
+scripts/analyze_llm_action_distribution.py:102:    with joint_path.open() as f:
+scripts/exp_rq2_ioh_closed_loop.py:167:        previous = json.loads(args.output.read_text())
+scripts/exp_rq3_existing_cost_audit.py:18:    results = json.loads(source.read_text())["results"]
+scripts/exp_rq1_rq2_closed_loop.py:266:        previous = json.loads(args.output.read_text())
+scripts/ablate_phase8_6d_utility.py:148:    gate_rows = {r["record_id"]: r for r in json.loads(args.gate_report.read_text())["gate4"]["rows"]}
+scripts/generate_phase8_6d_20seed_replication.py:49:with tmp.open("w", encoding="utf-8", newline="\n") as f:
+scripts/exp_gate4_multiplicity_sensitivity.py:46:    src = json.loads((ROOT / "runs/exp_rq1_2_h3_20seed_report.json").read_text())
+scripts/exp_lenz_vs_frozen_llm.py:40:    for line in (ROOT / ".env").read_text().splitlines():
+scripts/exp_rq3_router_sweep.py:241:        previous = json.loads(args.output.read_text())
+
+exec
+/bin/bash -c "sed -n '1,140p' src/opt_agent/dataset/analysis.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Dataset analysis helpers (Phase 8 empirical validation).
+
+Per codex (gpt-5.6-sol) review 2025-09-23:
+  - `validate_record` enforces the aligned-vocabulary invariant.
+  - Phase is defined by remaining_budget_ratio (>0.7 early, <0.3 late, 0 terminal).
+  - Entropy is normalized to [0, 1] by log(len(valid)).
+  - We do NOT yet assert "early = exploration-dominant" etc.; those are
+    acceptance thresholds to add only after we observe the patterns.
+"""
+
+from __future__ import annotations
+
+import math
+from collections import Counter, defaultdict
+from dataclasses import dataclass
+from pathlib import Path
+
+from opt_agent.dataset.decision_record import DecisionRecord, iter_jsonl
+
+
+def _phase(ratio: float) -> str:
+    """Classify a BO trajectory point by remaining-budget ratio. The
+    canonical version lives in ``dataset.validation.phase_of_ratio``;
+    this stub is a deferred-import indirection so ``dataset.analysis``
+    doesn't pull in the full validation module (which transitively
+    imports the rollout machinery) at import time.
+    """
+    from opt_agent.dataset.validation import phase_of_ratio
+    return phase_of_ratio(ratio)
+
+
+def validate_record(record: DecisionRecord) -> None:
+    """Enforce vocabulary and probability invariants.
+
+    ``gold_probs`` and ``rollout_results`` must cover the same action ids,
+    and those ids must be a subset of the candidate vocabulary: with
+    ``rollout_action_subsample < 8`` (partial rollout) only a k-subset of
+    the candidates is rolled out and labeled. Full datasets remain
+    set-equal across all three fields.
+    """
+    ids = [a["action_id"] for a in record.candidate_actions]
+    if len(ids) != len(set(ids)):
+        raise ValueError(f"{record.id}: duplicate candidate IDs")
+    if set(record.gold_probs) != set(record.rollout_results):
+        raise ValueError(f"{record.id}: unaligned action vocabulary")
+    if not set(record.gold_probs) <= set(ids):
+        raise ValueError(f"{record.id}: labeled ids outside candidate vocabulary")
+
+    probs = record.gold_probs
+    if any(not math.isfinite(p) or p < 0 for p in probs.values()):
+        raise ValueError(f"{record.id}: invalid probability")
+    if not math.isclose(sum(probs.values()), 1.0, abs_tol=1e-9):
+        raise ValueError(
+            f"{record.id}: probabilities do not sum to one (got {sum(probs.values())})"
+        )
+
+    for action_id, result in record.rollout_results.items():
+        if result["status"] == "invalid" and probs[action_id] != 0:
+            raise ValueError(
+                f"{record.id}: invalid action {action_id!r} has nonzero probability"
+            )
+
+
+@dataclass(frozen=True)
+class DatasetStats:
+    n_records: int
+    problems: dict[str, int]
+    phase_counts: dict[str, dict[str, int]]
+    avg_entropy: dict[str, float]
+    early_phase_top_action: dict[str, str]
+    late_phase_top_action: dict[str, str]
+    invalid_rate: dict[str, float]
+
+
+def analyze_dataset(path: Path) -> DatasetStats:
+    """Walk a JSONL dataset and compute summary stats.
+
+    Raises
+    ------
+    ValueError
+        If any record violates the aligned-vocabulary / probability invariants.
+    """
+    problem_counts: Counter = Counter()
+    phase_counts: dict[str, Counter] = defaultdict(Counter)
+    entropy_sum: Counter = Counter()
+    entropy_count: Counter = Counter()
+    invalid_sum: Counter = Counter()
+    candidate_sum: Counter = Counter()
+    phase_probs: dict[tuple[str, str], Counter] = defaultdict(Counter)
+    n_records = 0
+
+    for record in iter_jsonl(path):
+        validate_record(record)
+        n_records += 1
+        family = record.problem["family"]
+        ratio = float(record.state["resource"]["remaining_budget_ratio"])
+        phase = _phase(ratio)
+
+        problem_counts[family] += 1
+        phase_counts[family][phase] += 1
+
+        valid = [
+            aid
+            for aid, r in record.rollout_results.items()
+            if r["status"] == "valid"
+        ]
+        if valid:
+            entropy = -sum(
+                p * math.log(p)
+                for p in record.gold_probs.values()
+                if p > 0
+            )
+            entropy /= math.log(len(valid))  # normalized to [0, 1]
+        else:
+            entropy = 0.0
+
+        if phase != "terminal":
+            entropy_sum[family] += entropy
+            entropy_count[family] += 1
+
+        invalid_sum[family] += len(record.gold_probs) - len(valid)
+        candidate_sum[family] += len(record.gold_probs)
+
+        phase_probs[(family, phase)].update(record.gold_probs)
+
+    def top(family: str, phase: str) -> str:
+        totals = phase_probs[(family, phase)]
+        return max(totals, key=totals.get) if totals else ""
+
+    families = sorted(problem_counts)
+    return DatasetStats(
+        n_records=n_records,
+        problems=dict(problem_counts),
+        phase_counts={f: dict(phase_counts[f]) for f in families},
+        avg_entropy={
+            f: entropy_sum[f] / entropy_count[f] if entropy_count[f] else math.nan
+            for f in families
+        },
+        early_phase_top_action={f: top(f, "early") for f in families},
+        late_phase_top_action={f: top(f, "late") for f in families},
+
+exec
+/bin/bash -c "sed -n '1,255p' scripts/train_typed_decision.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Phase 9.3: fine-tune a Jev-style typed-decision model on rollout data.
+
+Per MASTER_PLAN §26 (NanoJev-style fine-tuning) and codex gpt-6-sol
+review 2026-09-23 ("the gold_probs label is a rollout soft target, not
+ground truth; use proper-scoring-rule loss"):
+
+  - Train on `runs/phase8_6b_h3_10seed.jsonl` (or similar Phase 8.6B
+    corpus).
+  - Loss: KL(gold_probs || pred_probs) per record — a proper
+    scoring rule on the soft target distribution. Equivalent to
+    cross-entropy when gold_probs is treated as a teacher distribution.
+  - Architecture: `JevStyleSystem1` (ModernBERT-base encoder + set
+    attention over candidate embeddings).
+  - Optimizer: AdamW, lr=1e-5 (BERT fine-tuning default).
+  - Epochs: 5 (small dataset, RTX 3090, ~minutes per epoch).
+  - Save checkpoint to `runs/typed_decision_v1.pt`.
+
+Usage:
+  uv run python scripts/train_typed_decision.py \
+      --input  runs/phase8_6b_h3_10seed.jsonl \
+      --output runs/typed_decision_v1.pt \
+      --epochs 5
+
+Then plug the trained model into the smoke harness via a thin adapter
+(see scripts/run_hybrid_smoke.py — `trained-decision` policy kind).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from dataclasses import asdict
+from pathlib import Path
+from typing import Iterator
+
+import torch
+import torch.nn.functional as F
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from opt_agent.actions.factory import ALL_CANDIDATE_SPECS  # noqa: E402
+from opt_agent.system1.typed_decision import (  # noqa: E402
+    JevStyleSystem1,
+    TypedDecisionConfig,
+    gold_probs_to_target_tensor,
+)
+
+
+def _iter_records(path: Path) -> Iterator[dict]:
+    """Checked loader boundary: training reads go through read_jsonl with
+    an explicit version policy (codex final-audit-2). Malformed lines now
+    raise instead of being silently skipped."""
+    from opt_agent.dataset.decision_record import read_jsonl
+
+    for record in read_jsonl(path, version_policy="warn"):
+        yield dict(record.__dict__)
+
+
+def _prepare_batch(
+    records: list[dict], device: torch.device,
+) -> tuple[list[dict], torch.Tensor]:
+    """Stack per-record target tensors for batched KL loss."""
+    states = [r["state"] for r in records]
+    candidates_list = []
+    targets_list = []
+    for r in records:
+        # Use the factory's full vocabulary for evaluation alignment;
+        # mask absent candidates so they don't pull probability mass.
+        cands = [c[0] for c in ALL_CANDIDATE_SPECS]
+        candidates_list.append(cands)
+        targets_list.append(
+            gold_probs_to_target_tensor(
+                r["gold_probs"], cands, device=device,
+            )
+        )
+    return states, torch.stack(targets_list)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path,
+                        default=Path("runs/phase8_6b_h3_10seed.jsonl"))
+    parser.add_argument("--output", type=Path,
+                        default=Path("runs/typed_decision_v1.pt"))
+    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--lr", type=float, default=1e-5)
+    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="Cap the dataset size (for quick smoke runs).")
+    args = parser.parse_args()
+
+    if not args.input.exists():
+        print(f"ERROR: input file not found: {args.input}", file=sys.stderr)
+        return 1
+
+    config = TypedDecisionConfig(
+        learning_rate=args.lr, batch_size=args.batch_size,
+        num_epochs=args.epochs,
+    )
+    print(f"Loading model {config.encoder_name} ...")
+    model = JevStyleSystem1(config).to(args.device)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
+
+    # Load records.
+    records = list(_iter_records(args.input))
+    if args.limit is not None:
+        records = records[:args.limit]
+    print(f"Loaded {len(records)} records from {args.input}")
+
+    if not records:
+        print("ERROR: no training records available", file=sys.stderr)
+        return 1
+
+    history: list[dict] = []
+
+    for epoch in range(args.epochs):
+        model.train()
+        # Shuffle each epoch.
+        import random
+        random.Random(epoch).shuffle(records)
+        total_loss = 0.0
+        n_batches = 0
+        t0 = time.monotonic()
+        for start in range(0, len(records), args.batch_size):
+            batch = records[start:start + args.batch_size]
+            states, targets = _prepare_batch(batch, args.device)
+            # Per-record forward (variable candidate subsets not needed
+            # here — we use the full 8-candidate vocabulary for every
+            # record, which simplifies batching at the cost of slight
+            # distribution shift between train and inference).
+            cands = [c[0] for c in ALL_CANDIDATE_SPECS]
+            logits_list = []
+            for s in states:
+                logits, _ = model(s, cands)
+                logits_list.append(logits)
+            logits_batch = torch.stack(logits_list, dim=0)
+            log_probs = F.log_softmax(logits_batch, dim=-1)
+            loss = F.kl_div(log_probs, targets, reduction="batchmean")
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
+            total_loss += float(loss.item())
+            n_batches += 1
+        avg_loss = total_loss / max(n_batches, 1)
+        elapsed = time.monotonic() - t0
+        print(f"epoch {epoch + 1}/{args.epochs}  loss={avg_loss:.4f}  ({elapsed:.1f}s)")
+        history.append({"epoch": epoch + 1, "loss": avg_loss, "seconds": elapsed})
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    torch.save({
+        "model_state_dict": model.state_dict(),
+        "config": asdict(config),
+        "history": history,
+        "n_records": len(records),
+    }, args.output)
+    print(f"\nSaved checkpoint to {args.output}")
+    print(f"Final loss: {history[-1]['loss']:.4f}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+exec
+/bin/bash -c "sed -n '85,170p' src/opt_agent/dataset/decision_record.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    with path.open("w", encoding="utf-8", newline="\n") as stream:
+        for record in records:
+            payload = _json_safe(record)
+            stream.write(
+                json.dumps(
+                    payload,
+                    allow_nan=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+            )
+            stream.write("\n")
+
+
+def iter_jsonl(path: Path) -> Iterator[DecisionRecord]:
+    """Read DecisionRecords from JSONL. Skips blank lines.
+
+    RAW ACCESS: no version enforcement. Replay/analysis scripts that walk a
+    single frozen artifact end-to-end may use this. Any consumer that POOLS
+    records (training, labeling, cross-dataset merging) must use
+    `read_jsonl` with an explicit `version_policy` (guide 4.5/6.6).
+    """
+    path = Path(path)
+    with path.open("r", encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            if not line.strip():
+                continue
+            try:
+                yield DecisionRecord(**json.loads(line))
+            except Exception as exc:
+                raise ValueError(
+                    f"{path}:{line_number}: invalid DecisionRecord"
+                ) from exc
+
+
+def read_jsonl(
+    path: Path, *, version_policy: str = "warn", pool_legacy: bool = False,
+    pooling_note: str = "",
+) -> list[DecisionRecord]:
+    """Materialize records from JSONL, enforcing a version-pooling policy.
+
+    The version policy (guide 4.5/6.6) is the explicit pooling decision at
+    the loading boundary. DEFAULT IS "warn" (codex round-5 B3: a pooling
+    boundary must not silently default to unchecked): legacy stamps are
+    summarized once with a do-not-pool reminder, unrecognized stamps and
+    cross-version mixes warn; "strict" raises on unrecognized stamps and
+    mixes (pool_legacy=True + pooling_note records the explicit opt-in,
+    persisted to the pooling audit log); "allow" is the explicit
+    unchecked escape hatch. See opt_agent.dataset.versioning.
+    """
+    from opt_agent.dataset.versioning import (
+        enforce_record_pooling,
+        enforce_record_versions,
+    )
+
+    records = list(iter_jsonl(path))
+    if version_policy == "allow":
+        return records
+    statuses = [
+        enforce_record_versions(
+            record.metadata,
+            version_policy,
+            record_id=record.id,
+            source=str(path),
+        )
+        for record in records
+    ]
+    enforce_record_pooling(
+        [record.metadata for record in records], version_policy,
+        source=str(path), pool_legacy=pool_legacy,
+        pooling_note=pooling_note)
+    return records
+
+exec
+/bin/bash -c "sed -n '1,340p' src/opt_agent/dataset/versioning.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+"""Dataset / harness version stamps — code-side half of guide §4.5 + §6.6.
+
+Discipline (RESEARCH_BOUNDARY_GUIDE.md):
+
+- ``HARNESS_VERSION`` freezes the measurement system: observation format
+  (state features), the action menu, and the harness-side record schema.
+  ``UTILITY_VERSION`` is the finer stamp tracking the S-class
+  supervision-defining components (utility weights/scales, continuation
+  policy, rollout horizon, gold temperature, action-subset quota,
+  replicate count): an S-class change bumps UTILITY_VERSION (and
+  HARNESS_VERSION too iff observation format or the action menu also
+  changed) — matching guide §6.6 rule 1.
+- ``UTILITY_VERSION`` is the finer stamp: it tracks the S-class label
+  definition only (utility weights/scales, continuation policy, rollout
+  horizon, gold temperature, action-subset quota, replicate count).
+
+Reading rule (:func:`check_record_versions`):
+
+- ``OK``       — record carries the current stamps; poolable.
+- ``LEGACY``   — stamp missing (records predate the mechanism) or holds a
+  known-past value: readable, but must not be pooled with current-version
+  records without an explicit same-data A/B note (§6.6 rule 1).
+- ``MISMATCH`` — stamp is not a recognized value (e.g. a future version
+  read by older code): refuse to pool.
+
+Known-past values are listed in ``_KNOWN_PAST``; extend it when bumping
+either constant so old data reads as LEGACY rather than MISMATCH.
+"""
+
+from __future__ import annotations
+
+import json
+from enum import Enum
+from pathlib import Path
+from typing import Any, Mapping
+
+HARNESS_VERSION = "h1"
+UTILITY_VERSION = "phase8.6b"
+
+# Stamps that may appear in historical records. "phase8.6b" doubles as the
+# current UTILITY_VERSION; harness_version was simply absent before h1.
+_KNOWN_PAST: dict[str, set[str]] = {
+    "harness": set(),  # h1 is the first stamped harness version
+    "utility": set(),  # phase8.6b is the first formalized utility version
+}
+
+
+class VersionStatus(str, Enum):
+    OK = "ok"
+    LEGACY = "legacy"
+    MISMATCH = "mismatch"
+
+
+class VersionPolicy(str, Enum):
+    """Pooling policy enforced at a dataset loading boundary (guide 4.5/6.6).
+
+    ALLOW  - no check (back-compat; implicit pooling decision is "unchecked").
+    WARN   - summarize LEGACY once per source (do-not-pool reminder) and warn
+             on MISMATCH, but keep reading.
+    STRICT - raise VersionPolicyError on the first MISMATCH; LEGACY still only
+             warns (legacy records are the repo's history, the policy makes
+             the pooling decision EXPLICIT rather than forbidding reads).
+    """
+
+    ALLOW = "allow"
+    WARN = "warn"
+    STRICT = "strict"
+
+
+class VersionPolicyError(ValueError):
+    """A record carries an unrecognized version stamp under STRICT policy."""
+
+
+_legacy_warned: set[str] = set()
+
+
+def enforce_record_versions(
+    record_metadata: Mapping[str, Any],
+    policy: str | VersionPolicy,
+    *,
+    record_id: str = "",
+    source: str = "",
+) -> dict[str, VersionStatus]:
+    """Apply a pooling policy to one record's metadata.
+
+    Returns the per-axis status (same shape as check_record_versions).
+    LEGACY warns at most once per (source, axis) to avoid spam on large
+    legacy datasets; MISMATCH raises under STRICT.
+    """
+    policy = VersionPolicy(policy)
+    status = check_record_versions(record_metadata)
+    if policy is VersionPolicy.ALLOW:
+        return status
+    import warnings
+
+    for axis, st in status.items():
+        key = f"{source}:{axis}"
+        if st is VersionStatus.LEGACY and key not in _legacy_warned:
+            _legacy_warned.add(key)
+            warnings.warn(
+                f"{source}: {axis} stamp is legacy/absent (record "
+                f"{record_id!r} first seen); pooling legacy records with "
+                f"current-version records requires an explicit same-data "
+                f"A/B note (guide 6.6 rule 1)",
+                stacklevel=2,
+            )
+        if st is VersionStatus.MISMATCH:
+            stamp = record_metadata.get(f"{axis}_version")
+            msg = (f"{source}: record {record_id!r} has unrecognized "
+                   f"{axis} stamp {stamp!r} (current: "
+                   f"{HARNESS_VERSION if axis == 'harness' else UTILITY_VERSION}); "
+                   f"refusing to pool under STRICT policy")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+    return status
+
+
+import os
+
+_recorded_pooling_decisions: list[dict] = []
+
+# Pooling opt-ins are persisted here (best effort) so the decision survives
+# the process that made it (codex round-5 B3). Override for tests/other CWDs.
+POOLING_AUDIT_PATH = Path(
+    os.environ.get("OPT_AGENT_POOLING_AUDIT", "runs/POOLING_DECISIONS.jsonl"))
+
+
+def pooling_decisions() -> list[dict]:
+    """Audit trail of explicit cross-version pooling decisions."""
+    return list(_recorded_pooling_decisions)
+
+
+def _persist_pooling_decision(entry: dict) -> None:
+    """Persist a pooling opt-in; an opt-in without a durable trail FAILS.
+
+    Codex round-6 B3: silently swallowing the write error would let an
+    accepted cross-version pool leave no record, defeating the audit.
+    """
+    try:
+        POOLING_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with POOLING_AUDIT_PATH.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(entry, ensure_ascii=False,
+                                    sort_keys=True) + "\n")
+    except OSError as exc:
+        raise VersionPolicyError(
+            f"pooling opt-in for {entry.get('source')!r} could not be "
+            f"persisted to {POOLING_AUDIT_PATH} ({exc}); refusing to "
+            f"proceed without a durable audit trail") from exc
+
+
+def assert_combinable(
+    stamps_by_source: dict[str, list[dict]],
+    policy: str | VersionPolicy,
+    *,
+    pooling_note: str = "",
+    source_notes: dict[str, str] | None = None,
+) -> None:
+    """Cross-file companion to enforce_record_pooling (guide 4.5).
+
+    Any consumer combining records from SEVERAL loaded sources must pass
+    each source's raw metadata dicts here: the check unions the stamps
+    across the complete combined pool and applies the same no-silent-
+    mixing rule (warn/raise under non-allow policies).
+
+    The explicit opt-in requires ONE consistent note for the whole pool:
+    either `pooling_note` (a single decision covering all sources), or
+    `source_notes` (the per-source opt-in notes recorded when each source
+    was loaded) — the latter must be non-empty for every source and all
+    identical, and must agree with `pooling_note` when both are given
+    (codex round-6 B2).
+    """
+    if source_notes is not None:
+        missing_note = sorted(s for s, n in source_notes.items()
+                              if not str(n).strip())
+        if missing_note:
+            raise VersionPolicyError(
+                f"source_notes missing/empty for {missing_note}; every "
+                f"pooled source needs its recorded opt-in note")
+        missing_source = sorted(set(stamps_by_source)
+                                 - set(source_notes))
+        extra_source = sorted(set(source_notes)
+                              - set(stamps_by_source))
+        if missing_source or extra_source:
+            raise VersionPolicyError(
+                f"source_notes keys must match the pooled sources exactly: "
+                f"missing={missing_source}, extra={extra_source}")
+        distinct = {str(n).strip() for n in source_notes.values()}
+        if len(distinct) != 1:
+            raise VersionPolicyError(
+                f"per-source pooling notes disagree: {sorted(distinct)} — "
+                f"a combined pool requires ONE consistent decision")
+        if pooling_note and str(pooling_note).strip() not in distinct:
+            raise VersionPolicyError(
+                f"pooling_note {pooling_note!r} disagrees with the "
+                f"per-source notes {sorted(distinct)}")
+        pooling_note = distinct.pop()
+    combined: list[dict] = []
+    for source, stamps in stamps_by_source.items():
+        for s in stamps:
+            combined.append({**s, "_source": source})
+    enforce_record_pooling(
+        combined, policy, source="+".join(stamps_by_source),
+        pool_legacy=bool(pooling_note), pooling_note=pooling_note)
+
+
+def enforce_record_pooling(
+    stamps: list[dict],
+    policy: str | VersionPolicy,
+    *,
+    source: str = "",
+    pool_legacy: bool = False,
+    pooling_note: str = "",
+) -> None:
+    """Enforce the guide 4.5 no-silent-mixing rule over a loaded source.
+
+    Compares RAW stamp values (not status classes), so two DIFFERENT
+    known-past stamps also count as a mix (codex round-4 B3). A mix of
+    distinct stamps on one axis is a cross-version pool; the guide
+    requires an explicit decision with a recorded same-data A/B note.
+    Under any non-ALLOW policy: pool_legacy=False -> WARN warns, STRICT
+    raises; pool_legacy=True REQUIRES a non-empty pooling_note, records
+    the decision in the audit trail (pooling_decisions()), and proceeds.
+
+    Boundary limitation (documented in guide 4.5): this checks ONE loaded
+    source; combining multiple separately loaded files must pass each
+    through read_jsonl and cite the same pooling note.
+    """
+    policy = VersionPolicy(policy)
+    if policy is VersionPolicy.ALLOW:
+        return
+    if pool_legacy:
+        if not pooling_note.strip():
+            raise VersionPolicyError(
+                f"{source}: pool_legacy=True requires a pooling_note "
+                f"describing the same-data A/B justification (guide 6.6 "
+                f"rule 1)")
+        entry = {"source": source, "note": pooling_note}
+        _persist_pooling_decision(entry)  # raises on failure — only then:
+        _recorded_pooling_decisions.append(entry)  # durable before visible
+        return
+    import warnings
+
+    for axis in ("harness", "utility"):
+        # An absent stamp counts as its own value: records that predate the
+        # stamp mechanism pool with stamped records only by explicit note.
+        values = sorted({str(s.get(f"{axis}_version")) for s in stamps})
+        if len(values) > 1:
+            msg = (f"{source}: mixes {axis} stamps {values}; pooling "
+                   f"across versions requires an explicit same-data A/B "
+                   f"note (guide 6.6 rule 1) — pass pool_legacy=True with "
+                   f"a pooling_note to record that decision")
+            if policy is VersionPolicy.STRICT:
+                raise VersionPolicyError(msg)
+            warnings.warn(msg, stacklevel=2)
+
+
+def stamp_metadata(
+    metadata: Mapping[str, Any] | None,
+    *,
+    harness_version: str = HARNESS_VERSION,
+    utility_version: str = UTILITY_VERSION,
+) -> dict[str, Any]:
+    """Return a copy of ``metadata`` with both version stamps applied.
+
+    Existing stamp keys are overwritten (the caller is generating records
+    with the current code, whose stamps ARE the current constants).
+    """
+    out = dict(metadata) if metadata else {}
+    out["harness_version"] = harness_version
+    out["utility_version"] = utility_version
+    return out
+
+
+def check_record_versions(
+    record_metadata: Mapping[str, Any],
+) -> dict[str, VersionStatus]:
+    """Classify a record's stamps against the current constants.
+
+    ``record_metadata`` is the ``metadata`` dict of a DecisionRecord (the
+    stamps live at its top level; see the generator).
+    """
+    return {
+        "harness": _status(record_metadata.get("harness_version"),
+                           HARNESS_VERSION, "harness"),
+        "utility": _status(record_metadata.get("utility_version"),
+                           UTILITY_VERSION, "utility"),
+    }
+
+
+def _status(stamp: Any, current: str, axis: str) -> VersionStatus:
+    if stamp == current:
+        return VersionStatus.OK
+    if stamp is None or stamp in _KNOWN_PAST.get(axis, set()):
+        return VersionStatus.LEGACY
+    return VersionStatus.MISMATCH
+
+exec
+/bin/bash -c "sed -n '92,106p' src/opt_agent/rollout/specs.py; sed -n '90,125p' scripts/exp_geartrain_transfer_probe.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+    return CONTINUATION_POLICY_REGISTRY[spec.name](spec)
+
+
+def spec_to_metadata(spec: ContinuationPolicySpec) -> dict[str, Any]:
+    """Serialize a spec to a JSON-safe dict (for dataset metadata)."""
+    return {
+        "name": str(spec.name),
+        "seed": int(spec.seed),
+        "k": spec.k,
+        "extras": {str(k): _json_safe(v) for k, v in spec.extras.items()},
+    }
+
+
+def spec_from_metadata(meta: Mapping[str, Any] | None) -> ContinuationPolicySpec:
+    """Reconstruct a spec from metadata dict. Falls back to rule/seed=0."""
+        n_correct += c
+    return {"records": n, "pairs": n_pairs,
+            "pairwise_accuracy": n_correct / n_pairs if n_pairs else 0.0,
+            "top1_agreement": n_top1 / n if n else 0.0}
+
+
+def main() -> int:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    from opt_agent.dataset.versioning import assert_combinable
+    test = read_jsonl(Path("runs/geartrain_h3_10seed.jsonl"),
+                      version_policy="warn")
+    train = read_jsonl(Path("runs/phase8_6d_h3_20seed_5family.jsonl"),
+                       version_policy="warn")
+    # Cross-dataset consumption: CHECK the combined pool without an
+    # opt-in — identical stamps must pass on their own; a cross-version
+    # mix raises/warns and only a justified same-data A/B note may opt in
+    # (codex final-audit-2).
+    assert_combinable(
+        {"geartrain_h3_10seed.jsonl": [r.metadata for r in test],
+         "phase8_6d_h3_20seed_5family.jsonl": [r.metadata for r in train]},
+        "warn")
+    print(f"geartrain records: {len(test)}", flush=True)
+
+    out: dict = {}
+    model, tok, _cfg, _ = load_laya_for_training("/home/lcy/.cache/opt_agent_v3/laya")
+    out["zero_shot"] = _laya_arm(model, tok, test, device)
+    del model
+    torch.cuda.empty_cache()
+    for name, path in (("proper_h3", "runs/rlcd_laya_proper_v1"),
+                       ("bt_h3", "runs/rlcd_laya_bt_v1")):
+        m, t2, _c, _ = load_laya_for_training(path)
+        out[name] = _laya_arm(m, t2, test, device)
+        del m
+        torch.cuda.empty_cache()
+    out["rf_synthetic"] = _rf_arm(train, test)
+
+
+exec
+/bin/bash -c 'git diff 7a5ab2b bff415b -- docs/RESEARCH_BOUNDARY_GUIDE.md runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md PROGRESS_BRANCH.md' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+diff --git a/PROGRESS_BRANCH.md b/PROGRESS_BRANCH.md
+index ebe9e7a..b0be8d1 100644
+--- a/PROGRESS_BRANCH.md
++++ b/PROGRESS_BRANCH.md
+@@ -904,4 +904,47 @@ had scoped out. All fixed same session:
+   half-width ratios corrected to 1.65-1.77x.
+ 
+ All five touched scripts pass runtime --help smoke; targeted tests
+-green; both grid artifacts refreshed deterministically.
+\ No newline at end of file
++green; both grid artifacts refreshed deterministically.
++## 29. Final-audit round 2: findings fixed; loader boundary closed by sweep (2026-09-29)
++
++Final-audit round 2 (`runs/codex_boundary_final_audit2.log`): REVISE —
++1 BLOCKER / 2 MAJOR / 1 MINOR + 3 PARTIALs. All fixed same session:
++
++- BLOCKER (three more training consumers — found this time by our own
++  systematic sweep rather than name-chasing): exp_rq1_3_rf_probe
++  (RandomForestRegressor fit), diagnose_continuation_effect (_train),
++  and train_typed_decision (which used its OWN raw json.loads reader
++  that silently skipped malformed lines — stricter now: read_jsonl
++  raises). All on read_jsonl(version_policy="warn").
++  Loader-consumer classification (verifiable sweep, fit/train grep over
++  all iter_jsonl users): TRAINING -> read_jsonl: train_rlcd_laya,
++  train_system1_compare, train_typed_decision, phase9_baselines,
++  sweep_rlcd, exp_rq2_1_cross_family_transfer,
++  exp_rlcd_{calibration_ablation, loo_confirmatory, loo_transfer,
++  router_panel}, analyze_rlcd_ci, exp_lenz_{vs_frozen_llm,
++  gate2_probe}, evaluate_no_fit_student, exp_geartrain_transfer_probe,
++  exp_rq3_router_sweep, exp_rq1_rq2_closed_loop, exp_rq2_ioh_closed_loop,
++  exp_rq1_3_rf_probe, diagnose_continuation_effect. ANALYSIS/REPLAY on
++  own frozen artifacts (iter_jsonl retained, documented raw access):
++  exp_rq1_3_decision_landscape (docstring mention only — no fit),
++  exp_rq1_3_scale_sensitivity, exp_teacher_noise_diagnostic,
++  exp_rq0_5_prompt_controls, diagnose_qs5, ablate_phase8_6d_utility,
++  verify_theory_propositions, validate_phase8_6b, run_oracle_gate.
++- MAJOR (geartrain opt-in semantics): assert_combinable now called
++  WITHOUT a note — identical stamps pass on their own; a mix raises/
++  warns and only a justified same-data A/B note may opt in.
++- MAJOR (resume config gap): --resume now also compares the recorded
++  generation configuration (horizon_mode, utility_weights,
++  continuation_policy, partial-rollout presence) against the requested
++  spec and refuses on mismatch; fields not serialized into record
++  metadata (decision_every_k, replicates) are named in the refusal
++  message as manually verifiable.
++- MINOR: mixed-stamp sort uses map(str, ...) — no TypeError in the
++  refusal path.
++- PARTIALs closed: grid report H0_slope bullet states the standardized
++  null; all four remaining "effect at most d_z 0.11" phrasings
++  (screen abstract + 6.2, grid abstract, guide ledger) replaced with
++  point-estimate + CI + precision caveat.
++
++All five touched scripts pass runtime --help smoke; targeted tests
++green.
+\ No newline at end of file
+diff --git a/docs/RESEARCH_BOUNDARY_GUIDE.md b/docs/RESEARCH_BOUNDARY_GUIDE.md
+index 95d5669..9d67f6f 100644
+--- a/docs/RESEARCH_BOUNDARY_GUIDE.md
++++ b/docs/RESEARCH_BOUNDARY_GUIDE.md
+@@ -631,8 +631,9 @@ round-2 处置状态（2026-09-29）：
+    网格 × 60 种子 + Rastrigin 240 种子深采样臂 → **CONDITIONALITY_
+    DETECTED**（参照标准化斜率同质性 χ²₄ = 20.06、p = 5×10⁻⁴、
+   I² = 80%，联合 bootstrap SE）；并撤回
+-   阶段一的 Rastrigin 个体结论（种子区块间不复制，n = 240 效应至多
+-   d_z ≈ 0.11）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
++   阶段一的 Rastrigin 个体结论（种子区块间不复制；n = 240 深采样臂
++   点估计 d_z = 0.106、95% CI [−0.47, 4.82]，中等效应量结论不
++   成立）。分析全文见 `runs/EXP_META_CONFIG_GRID.md`。
+ 4. **开放问题排序（E3）→ 已落地**：§8 重排——locked transfer
+    evaluation（唯一两次复现的正面结果）与 schedule/continuation
+    标注列前，元层筛选已执行，state 富化靠后。
+diff --git a/runs/EXP_META_CONFIG_GRID.md b/runs/EXP_META_CONFIG_GRID.md
+index 954fbf8..f09b74a 100644
+--- a/runs/EXP_META_CONFIG_GRID.md
++++ b/runs/EXP_META_CONFIG_GRID.md
+@@ -21,8 +21,9 @@ SixHumpCamel −0.30，p = 0.0007），多峰高维的 Ackley 呈显著正斜率
+ （+0.45 sd/单位 c，p = 0.029）。两项更正随之确立：(i) 筛选实验的
+ Rastrigin 结论（Δ₁₂ = +8.36，p = 0.032）**未能在新种子上复制**——
+ 种子 0–19 与原工件逐位一致，新增种子 20–59 均值为 −3.30；n = 240 的
+-深采样臂显示其效应至多小且边际（L = 18 对参照 +2.20 [−0.47, 4.82]，
+-d_z = 0.11；斜率单侧 p = 0.049）。(ii) 两档对比（12 vs 5）在同质性
++深采样臂显示其效应为小且边际（点估计：L = 18 对参照 +2.20，95% CI
++[−0.47, 4.82]，d_z = 0.106——精度有限、不能排除小效应；斜率单侧
++p = 0.049）。(ii) 两档对比（12 vs 5）在同质性
+ 检验下于 n = 60 仍为边缘（p = 0.059）——剂量-反应形式化（利用全部
+ 四档）以远高于单对比的检验力解决了筛选实验的 INCONCLUSIVE。
+ 
+@@ -45,7 +46,8 @@ d_z = 0.11；斜率单侧 p = 0.049）。(ii) 两档对比（12 vs 5）在同质
+ - **对比估计量**：Δ_{f,L} = E_s[y_{f,s,L} − y_{f,s,L₀}]。
+ - **剂量斜率**：b_f = E_s[b_{f,s}]，b_{f,s} 为该种子在四档上对 c 的
+   OLS 斜率（种子配对合法：同族同种子的各档共享 Sobol 前缀流）。
+-- **主检验** H0_slope：b_1 = … = b_F（公共剂量反应，无交互）。
++- **主检验** H0_slope：b_1/sd_ref(1) = … = b_F/sd_ref(F)（参照标准化
++  斜率族间相等——公共剂量反应，无交互；与脚本及序列化工件一致）。
+ - **次要检验** H0_pair：Δ_{f,12} 族间同质（与筛选实验直接可比，
+   n = 60 与仅新种子 20–59 两个版本）。
+ - **机理方向假设**（沿用筛选实验的预宣告）：多峰族（Rastrigin、
+diff --git a/runs/EXP_META_CONFIG_SCREEN.md b/runs/EXP_META_CONFIG_SCREEN.md
+index 02c0924..1b90225 100644
+--- a/runs/EXP_META_CONFIG_SCREEN.md
++++ b/runs/EXP_META_CONFIG_SCREEN.md
+@@ -15,7 +15,8 @@
+ 同质性 Wald 检验——得 χ²₄ = 8.71，**p = 0.069**，未在 α = 0.05 下检出
+ 交互（I² = 54%，中等异质性）。个体层面 Rastrigin 在种子区段 0–19 内"确认"获益（Δ = +8.36
+ 原始单位，d_z = 0.52，p = 0.032）——**该结论后被同日网格实验撤回**
+-（跨种子区块不复制，n = 240 效应至多 d_z ≈ 0.11；见
++（跨种子区块不复制；n = 240 深采样臂点估计 d_z = 0.106、95% CI
++[−0.47, 4.82]，精度有限但不能支撑中等效应量结论；见
+ `EXP_META_CONFIG_GRID.md`），此处按历史结果保留。预宣告
+ 的方向性机理假设获 5/5 符号支持（精确单侧二项 p = 0.031）：多峰族受益
+ 于更大空间填充设计、光滑族受损（轻度）。按预宣告规则，本筛选判定为
+@@ -125,7 +126,9 @@ LOFO 符号预测 3/5（默认平票规则；F = 5、近均分下无分辨率）
+ 2. **（历史陈述，同日撤回）种子区段内的 Rastrigin 发现**：
+    Rastrigin（强多峰、d = 10、两臂设计均低于启发式）在种子 0–19 内
+    显示 d_z = 0.52 的获益——网格实验证明其未跨种子区块复制（新增
+-   种子 20–59 均值 −3.30；n = 240 效应至多 d_z ≈ 0.11）。本节按发现
++   种子 20–59 均值 −3.30；n = 240 深采样臂点估计 d_z = 0.106、
++   95% CI [−0.47, 4.82]——精度有限、不能排除小效应，但中等效应量
++   结论不成立）。本节按发现
+    当时的陈述保留并加撤回标记；跨区块复制是族级结论的必要确认
+    标准（网格报告 §6.3、§8.3）。
+ 3. **机理假设获方向性支持但幅度分化**：5/5 符号符合预宣告方向
+
+codex
+The resume comparison has a concrete gap: it checks only the first record and only whether `partial_rollout` exists. A changed `--subsample-k` can pass that check, and a changed fixed `--horizon` passes because only `horizon_mode` is compared. I also found a separate no-work resume path that appears to replace the existing file with an empty one; I’m checking its control flow before assigning severity.
+exec
+/bin/bash -c "rg -n 'effect at most|效应至多|H0_slope|sd_ref|d_z = 0\\.106' docs/RESEARCH_BOUNDARY_GUIDE.md runs/EXP_META_CONFIG_GRID.md runs/EXP_META_CONFIG_SCREEN.md" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+runs/EXP_META_CONFIG_SCREEN.md:18:（跨种子区块不复制；n = 240 深采样臂点估计 d_z = 0.106、95% CI
+runs/EXP_META_CONFIG_SCREEN.md:129:   种子 20–59 均值 −3.30；n = 240 深采样臂点估计 d_z = 0.106、
+runs/EXP_META_CONFIG_GRID.md:15:中，以各族**参照标准化**剂量-反应斜率（b_f / sd_ref，尺度稳定）的
+runs/EXP_META_CONFIG_GRID.md:16:同质性为主检验（联合种子重抽样 SE，含 sd_ref 估计不确定性），
+runs/EXP_META_CONFIG_GRID.md:25:[−0.47, 4.82]，d_z = 0.106——精度有限、不能排除小效应；斜率单侧
+runs/EXP_META_CONFIG_GRID.md:42:参照标准化斜率 b_f/sd_ref(f) 族间相等），L ∈ {5, 8, 12, 18}
+runs/EXP_META_CONFIG_GRID.md:49:- **主检验** H0_slope：b_1/sd_ref(1) = … = b_F/sd_ref(F)（参照标准化
+runs/EXP_META_CONFIG_GRID.md:99:bootstrap——每个重抽样重复内 sd_ref 重新估计，其不确定性进入 SE）**：
+runs/EXP_META_CONFIG_GRID.md:102:I² = 0.87；早期把 sd_ref 视为固定的标准化版本（χ²₄ = 38.69）已被
+runs/EXP_META_CONFIG_GRID.md:117:4.824]，d_z = 0.106，p = 0.103；发现区（0–79）+3.97 对确认区
+runs/EXP_META_CONFIG_GRID.md:136:   均值 −3.30；n = 240 深采样臂点估计 d_z = 0.106、95% CI [−0.47,
+docs/RESEARCH_BOUNDARY_GUIDE.md:358:  sd_ref 不确定性）χ²₄ = 20.06、p = 5×10⁻⁴、I² = 80%（原始单位
+docs/RESEARCH_BOUNDARY_GUIDE.md:362:  臂点估计 d_z = 0.106，95% CI [−0.47, 4.82] 原始单位——上限约为
+docs/RESEARCH_BOUNDARY_GUIDE.md:635:   点估计 d_z = 0.106、95% CI [−0.47, 4.82]，中等效应量结论不
+
+exec
+/bin/bash -c "rg -n 'analyze_dataset\\(' scripts src --glob '*.py'; rg -n 'assert_combinable\\(' scripts src --glob '*.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+scripts/generate_dataset.py:72:    print(json.dumps(asdict(analyze_dataset(args.output)), indent=2, sort_keys=True))
+src/opt_agent/dataset/analysis.py:75:def analyze_dataset(path: Path) -> DatasetStats:
+scripts/exp_geartrain_transfer_probe.py:107:    assert_combinable(
+src/opt_agent/dataset/versioning.py:152:def assert_combinable(
+
+exec
+/bin/bash -c 'git status --short --branch' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+## exp/boundary-scheme-round2
+?? runs/codex_boundary_final_audit3.log
+
+exec
+/bin/bash -c "sed -n '314,331p;467,500p' docs/RESEARCH_BOUNDARY_GUIDE.md; sed -n '100,155p' scripts/exp_rq1_3_rf_probe.py; sed -n '118,135p' scripts/diagnose_continuation_effect.py" in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+   定义 HARNESS_VERSION / UTILITY_VERSION，generator 经 `stamp_metadata`
+   为每条新记录盖双戳；`check_record_versions` 按 ok / legacy / mismatch
+   分类（legacy = 旧值或缺戳；mismatch = 未知值）。执行边界：
+   **混池消费方（训练/标注/跨数据集合并）必须经 `read_jsonl` 显式
+   version_policy 读取（默认 warn）**——warn 策略对 legacy 与混池发出
+   警告、strict 对 mismatch 与跨版本混池直接拒绝（`pool_legacy=True`
+   + `pooling_note` 记录显式豁免并**持久化**到
+   `runs/POOLING_DECISIONS.jsonl` 审计日志）；**合并多个来源时必须经
+   `versioning.assert_combinable` 对合并后全池校验、并引用同一
+   pooling_note**（训练/合并类消费方已全部迁移至 `read_jsonl`，
+   含跨数据集传输探针经 `assert_combinable`）；`iter_jsonl` 为无校验
+   的原始访问，仅限单一冻结工件的回放分析。任何 A/S 类修改**必须**递增对应戳
+   并在 `_KNOWN_PAST` 登记旧值；`tests/test_versioning.py` 强制 generator
+   走戳。harness 演化发生在版本边界（与 episode 边界同理）。违反则
+   轨迹库跨版本不可比，RF/微调吸收污染。
+
+---
+
+  （靠模型内化知识，防偏置）；few-shot 示例用占位符（防小模型模仿）；
+  显式反馈指令（"避免重复无效动作"——其消融中最大退化项，RP
+  1.21→1.92）；多轮记忆替代历史重放；温度 0；解析失败兜底
+  （其兜底率 0.11%）。
+- 本项目对 LLM 的 P3 教训：RQ3 扫描中八个 LLM 调用臂无一胜 RF，
+  always-LLM 三族显著落败——与一步模型下 A(s)≤0 的前提**一致**
+  （聚合结果不建立逐态前提，后者未测；见 THEORY P3）。rich-state
+  实验（exp/lenz-state-jev-presentation）**已完成**，结论为否：更充分
+  的状态未改变 gold-argmax 一致率（0.133 两态持平），token 成本
+  2.1×（n=30 单模型 A/B，caveats 见 `runs/EXP_LENZ_JEV_REPORT.md`）。
+  **LLM 进系统的前提是其逐态优势被证实非负**，否则按 P3
+  （一步模型内）只能输。
+
+### 6.6 监督定义组件（S 类）
+
+以下组件改变标签但不改变任何动作/状态定义，此前未被分类学覆盖、
+缺少修改规程（round-1 评审 D1）：utility 权重与尺度（`UtilityWeights`）、
+反事实延续策略、rollout 视程、gold 温度 T、动作子集配额（quota
+k<8）、rollout 复制数（teacher 噪声控制）。
+
+规程（**必须**遵守）：
+
+1. 任何 S 类修改 = `UTILITY_VERSION` 递增（`dataset/versioning.py`，
+   旧值登记 `_KNOWN_PAST`；generator 经 `stamp_metadata` 自动盖戳）
+   + 新旧版本**同数据** A/B + P1 等变复查（按 §3.4 第 2 项修正后
+   的口径）。修改若同时触及观测格式/动作菜单，则同时递增
+   `HARNESS_VERSION`。
+2. S 类修改**禁止**与动作/特征修改混入同一版本（归因隔离）。
+3. 标签信噪比是 S 类预算的一部分：新监督源**必须**报告可负担
+   复制数下的 flip 率（参照 journal-round P1 实测链：单次 rollout
+   标签 flip 0.74 → R=5 复制平均后 0.37——仍高，复制数与可接受
+   flip 率须显式声明）；终止阈值见 §5.5 第 1 条。
+
+完整规程（round-3 形式化，取代占位）：
+        if not (math.isfinite(u_orig) and math.isfinite(d_opt)):
+            continue
+        u_new = u_orig + w_opt * d_opt * (1.0 / new_scale - 1.0 / old_scale)
+        out[action] = u_new
+    return out if len(out) >= 2 else None
+
+
+def compute_family_scales(records: list[dict]) -> dict[str, dict[str, float]]:
+    by_fam = defaultdict(list)
+    for r in records:
+        s = float((r.get("metadata") or {}).get("optimization_scale", 0.0))
+        if s > 0:
+            by_fam[r["problem"]["family"]].append(s)
+    return {fam: {"median": statistics.median(vals)} for fam, vals in by_fam.items()}
+
+
+def leave_one_seed_out_cv(X: list, Y: list, seed_idx: list, family_filter: str = "hartmann"):
+    """Run leave-one-seed-out CV. Reports regret for each fold."""
+    from sklearn.ensemble import RandomForestRegressor
+
+    indices_by_seed: dict[int, list[int]] = defaultdict(list)
+    for i, s in enumerate(seed_idx):
+        indices_by_seed[s].append(i)
+
+    seed_results = []
+    for held_out_seed in sorted(indices_by_seed):
+        train_idx = [i for s, idxs in indices_by_seed.items()
+                     if s != held_out_seed for i in idxs]
+        test_idx = indices_by_seed[held_out_seed]
+        X_tr = [X[i] for i in train_idx]
+        Y_tr = [Y[i] for i in train_idx]
+        X_te = [X[i] for i in test_idx]
+        Y_te = [Y[i] for i in test_idx]
+
+        # Multi-output: one regressor per action.
+        regressors = {}
+        for j, action in enumerate(ACTIONS):
+            rf = RandomForestRegressor(
+                n_estimators=100, max_depth=8, min_samples_leaf=5,
+                random_state=42, n_jobs=-1,
+            )
+            rf.fit(X_tr, [y[j] for y in Y_tr])
+            regressors[action] = rf
+
+        # Predict utilities for test set; argmax = chosen action.
+        regrets = []
+        for k, x in enumerate(X_te):
+            y_pred = {a: regressors[a].predict([x])[0] for a in ACTIONS}
+            a_hat = max(y_pred, key=y_pred.get)
+            # Regret = U(s, a*) - U(s, a_hat) using TRUE utilities.
+            true_ys = Y_te[k]
+            a_true = max(range(len(true_ys)), key=lambda j: true_ys[j])
+            u_star = true_ys[a_true]
+            u_hat = true_ys[ACTIONS.index(a_hat)]
+            regrets.append(u_star - u_hat)
+        seed_results.append({
+    parser.add_argument("--problems", nargs="+", default=[
+        "Branin", "Ackley", "Hartmann", "SixHumpCamel", "Rastrigin"
+    ])
+    parser.add_argument("--seeds", nargs="+", type=int, default=list(range(10, 20)))
+    parser.add_argument("--budget", type=int, default=30)
+    args = parser.parse_args()
+    if min(args.seeds) < 10:
+        parser.error("evaluation seeds must be >= 10")
+    torch.set_num_threads(1)
+    records = read_jsonl(args.dataset, version_policy="warn")
+    model_data = _train(records, WEIGHTS["no_fit_student"], seed=20260926)[:3]
+    rows = []
+    for problem in args.problems:
+        for seed in args.seeds:
+            for first, later in (
+                ("rule", "rule"), ("student", "rule"),
+                ("rule", "student"), ("student", "student"),
+            ):
+
+exec
+/bin/bash -c 'git rev-parse --short HEAD' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+dadc304
+
+exec
+/bin/bash -c 'git log -5 --oneline --decorate' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+dadc304 (HEAD -> exp/boundary-scheme-round2) Final-audit round-3 interrupted by codex usage limit; retry scheduled
+bff415b Final-audit round-2 dispositions: loader boundary closed by systematic sweep
+7a5ab2b Final-audit dispositions: complete loader boundary, safe resume, null stats, honesty fixes
+51943b6 Codex round-8 review: APPROVE — boundary-guide review loop closed
+0999e5b Round-7 dispositions: exact source_notes coverage; no residue on failed opt-in
+
+exec
+/bin/bash -c 'git diff --stat bff415b HEAD' in /home/lcy/Documents/projects/opt_agent_v3
+ succeeded in 0ms:
+ PROGRESS_BRANCH.md                    | 17 ++++++++++++++++-
+ runs/codex_boundary_final3_prompt.txt | 20 ++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+exec
+/bin/bash -c "rg -n '_existing_trajectory_keys|generate_dataset_longhorizon|--resume' tests --glob '*.py'" in /home/lcy/Documents/projects/opt_agent_v3
+ exited 1 in 0ms:
+codex
+## A. Round-2 dispositions
+
+| Finding | Disposition | Verification |
+|---|---|---|
+| Training loader boundary | **ADDRESSED** | The three missed trainers now use `read_jsonl`; the independent sweep found no remaining training caller on raw `iter_jsonl`. |
+| Unsafe resume | **PARTIAL** | Stamp checks remain, but the new configuration check misses changed fixed horizons and changed subset quotas, among other settings. |
+| Single-family NaN | **ADDRESSED** | The previously verified fix is unchanged at `bff415b`. |
+| Replica indexing | **ADDRESSED** | The corrected descriptions are unchanged. |
+| Primary null wording | **ADDRESSED** | The `H0_slope` bullet now states equality of `b_f/sd_ref(f)`. |
+| Version bump rule | **ADDRESSED** | The module and guide remain aligned. |
+| Effect wording | **ADDRESSED** | The four remaining “effect at most” claims now give the point estimate, interval, and precision caveat. |
+| Stale p value and CI ratios | **ADDRESSED** | The previously verified corrections are unchanged. |
+| GearTrain pooling opt-in | **ADDRESSED** | `assert_combinable` is called without a note. |
+| Mixed-stamp formatting | **ADDRESSED** | `map(str, ...)` avoids sorting `None` against strings. |
+
+**Independent sweep:** I searched every direct `iter_jsonl` script user for `fit`/`train` and inspected the matches. There are **20** script consumers using `read_jsonl` (the §29 list contains 20 names, rather than the prompt’s 21), **9** raw analysis/replay scripts, and **1** raw reader in the generator’s resume guard. The library’s `analyze_dataset` also uses raw access for single-file statistics. None of the raw analysis/replay users trains a model; the decision-landscape “train” hit is descriptive text.
+
+## B. New-issue check — findings
+
+- **[BLOCKER]** [generate_dataset_longhorizon.py:123](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:123): Resume compares only the first record, skips absent fields, checks quota presence instead of `partial_rollout.k`, and checks `horizon_mode` instead of the recorded fixed `horizon`; incompatible same-stamp runs can still be combined. **Fix:** record and compare the complete material generation configuration across existing records, failing closed on missing or mixed values.
+- **[BLOCKER]** [generate_dataset_longhorizon.py:309](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:309): When all requested trajectories already exist, `--resume` writes an empty temporary file and replaces the dataset with it. **Fix:** return without replacing the output when `tasks` is empty.
+
+The GearTrain check-only call and the stricter typed-decision reader match their intended behavior.
+
+## C. Merge readiness
+
+**REVISE.** The loader boundary and report corrections are ready, but resume can still combine incompatible configurations and can erase a completed dataset. This was a read-only review; I did not run tests or training. The branch has advanced to `dadc304`, whose changes since `bff415b` are audit notes only; the reviewed code is the same.
+
+VERDICT: REVISE
+tokens used
+127,055
+## A. Round-2 dispositions
+
+| Finding | Disposition | Verification |
+|---|---|---|
+| Training loader boundary | **ADDRESSED** | The three missed trainers now use `read_jsonl`; the independent sweep found no remaining training caller on raw `iter_jsonl`. |
+| Unsafe resume | **PARTIAL** | Stamp checks remain, but the new configuration check misses changed fixed horizons and changed subset quotas, among other settings. |
+| Single-family NaN | **ADDRESSED** | The previously verified fix is unchanged at `bff415b`. |
+| Replica indexing | **ADDRESSED** | The corrected descriptions are unchanged. |
+| Primary null wording | **ADDRESSED** | The `H0_slope` bullet now states equality of `b_f/sd_ref(f)`. |
+| Version bump rule | **ADDRESSED** | The module and guide remain aligned. |
+| Effect wording | **ADDRESSED** | The four remaining “effect at most” claims now give the point estimate, interval, and precision caveat. |
+| Stale p value and CI ratios | **ADDRESSED** | The previously verified corrections are unchanged. |
+| GearTrain pooling opt-in | **ADDRESSED** | `assert_combinable` is called without a note. |
+| Mixed-stamp formatting | **ADDRESSED** | `map(str, ...)` avoids sorting `None` against strings. |
+
+**Independent sweep:** I searched every direct `iter_jsonl` script user for `fit`/`train` and inspected the matches. There are **20** script consumers using `read_jsonl` (the §29 list contains 20 names, rather than the prompt’s 21), **9** raw analysis/replay scripts, and **1** raw reader in the generator’s resume guard. The library’s `analyze_dataset` also uses raw access for single-file statistics. None of the raw analysis/replay users trains a model; the decision-landscape “train” hit is descriptive text.
+
+## B. New-issue check — findings
+
+- **[BLOCKER]** [generate_dataset_longhorizon.py:123](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:123): Resume compares only the first record, skips absent fields, checks quota presence instead of `partial_rollout.k`, and checks `horizon_mode` instead of the recorded fixed `horizon`; incompatible same-stamp runs can still be combined. **Fix:** record and compare the complete material generation configuration across existing records, failing closed on missing or mixed values.
+- **[BLOCKER]** [generate_dataset_longhorizon.py:309](/home/lcy/Documents/projects/opt_agent_v3/scripts/generate_dataset_longhorizon.py:309): When all requested trajectories already exist, `--resume` writes an empty temporary file and replaces the dataset with it. **Fix:** return without replacing the output when `tasks` is empty.
+
+The GearTrain check-only call and the stricter typed-decision reader match their intended behavior.
+
+## C. Merge readiness
+
+**REVISE.** The loader boundary and report corrections are ready, but resume can still combine incompatible configurations and can erase a completed dataset. This was a read-only review; I did not run tests or training. The branch has advanced to `dadc304`, whose changes since `bff415b` are audit notes only; the reviewed code is the same.
+
+VERDICT: REVISE

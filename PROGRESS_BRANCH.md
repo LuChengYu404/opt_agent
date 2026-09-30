@@ -963,3 +963,34 @@ i.e. the documented analysis/replay class, not a training/pooling
 bypass. A scheduled retry at 01:26 (automation
 "额度重置后重跑 codex 终审 round-3") will rerun the identical prompt
 and commit the verdict.
+
+## 31. Final-audit round-3: both resume BLOCKERs fixed + provenance fields (2026-09-30)
+
+Final-audit round-3 rerun after the usage-limit interruption
+(`runs/codex_boundary_final_audit3.log`, 127k tokens): REVISE — 2
+BLOCKER, both in the longhorizon resume path; all 10 other round-2
+dispositions ADDRESSED, and codex's independent sweep confirmed no
+remaining training consumer on raw iter_jsonl (20 read_jsonl training
+consumers; count in §29 corrected from 21 to 20). Fixes:
+
+- BLOCKER (config check too weak): the generator now RECORDS the
+  requested config as record-metadata provenance (decision_every_k,
+  subsample_k — None normalized to 8/full — rollout_replicates); the
+  resume guard compares the complete recorded projection across ALL
+  existing records, fails closed on missing fields (legacy records) and
+  on mixed values; horizon is compared only in "fixed" mode (in
+  "remaining" mode the recorded value is the per-trajectory actual
+  remaining horizon and is not config-comparable — the mode is
+  compared). First-pass implementation had two bugs caught by our own
+  functional test before commit: int(None) on the subsample default,
+  and a false-positive refusal driven by (a) per-trajectory horizon
+  values and (b) len(partial_rollout)=min(k, feasible) not being k.
+- BLOCKER (data destruction): --resume with nothing left to do now
+  returns early WITHOUT touching the output (previously wrote an empty
+  temp file and replaced the dataset with it).
+
+Functional verification (tiny Branin dataset, real generator):
+same-config resume reports "output left untouched" (md5 identical);
+quota mismatch refused; horizon mismatch refused; the real legacy
+artifact runs/longhorizon_k4_20seed_5family.jsonl is refused at the
+stamp gate and left untouched. Tests: 93 across the affected modules.

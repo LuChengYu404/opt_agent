@@ -557,6 +557,17 @@ class DatasetGenerator:
                     self.config.horizon if horizon is None else horizon
                 ),
                 "horizon_mode": str(self.config.horizon_mode),
+                # Requested-config provenance (codex final-audit-3 B1):
+                # the resume guard compares these verbatim; legacy records
+                # without them fail closed. Additive metadata only — no
+                # observation-format / action-menu / label-pipeline change.
+                "decision_every_k": int(
+                    getattr(self.config, "decision_every_k_actions", 0)),
+                "subsample_k": int(
+                    getattr(self.config, "rollout_action_subsample", None)
+                    or 8),  # None = full 8-action rollout
+                "rollout_replicates": int(
+                    getattr(self.config, "rollout_replicates", 1)),
                 # Phase 9 Gate 5 — affine objective transform (so replay
                 # infrastructure can reconstruct the same transformed backend).
                 "objective_scale": float(self.config.objective_scale),

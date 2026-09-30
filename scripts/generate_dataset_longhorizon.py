@@ -61,17 +61,54 @@ from opt_agent.dataset import (  # noqa: E402
 PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
 
 
-def _expected_resume_meta(spec) -> dict:
-    """Metadata projection of the REQUESTED config, for resume comparison
-    (codex final-audit-2): same-stamp resumes with a different horizon
-    mode / utility weights / continuation policy / quota must not append.
-    Fields not serialized into record metadata (decision_every_k,
-    replicates) cannot be compared here — the refusal message says so."""
+_RESUME_FIELDS = ("horizon*", "horizon_mode", "utility_weights",
+                  "continuation_policy", "decision_every_k",
+                  "subsample_k", "rollout_replicates")
+# horizon*: in "remaining" mode the recorded value is the trajectory's
+# actual remaining horizon (varies per trajectory) and is NOT comparable
+# to the config value — only the mode is compared; in "fixed" mode the
+# recorded value equals the config value and IS compared.
+
+
+def _record_projection(meta: dict) -> tuple:
+    """Comparable config projection of ONE record's metadata.
+
+    Fails closed on records missing any recorded config field (legacy
+    records predate the provenance fields; codex final-audit-3 B1).
+    """
+    required = ("horizon", "horizon_mode", "utility_weights",
+                "continuation_policy", "decision_every_k",
+                "subsample_k", "rollout_replicates")
+    missing = [k for k in required if k not in meta]
+    if missing:
+        raise SystemExit(
+            f"resume guard: existing records lack metadata fields "
+            f"{missing}; cannot verify generation configuration — "
+            f"refusing to append. Write a new output file.")
+    mode = str(meta["horizon_mode"])
+    horizon_slot = int(meta["horizon"]) if mode == "fixed" else mode
+    return (
+        horizon_slot,
+        mode,
+        json.dumps(meta["utility_weights"], sort_keys=True),
+        json.dumps(meta["continuation_policy"], sort_keys=True),
+        int(meta["decision_every_k"]),
+        int(meta["subsample_k"]),
+        int(meta["rollout_replicates"]),
+    )
+
+
+def _expected_resume_meta(spec) -> tuple:
+    """Config projection of the REQUESTED spec (same shape as
+    _record_projection)."""
     from opt_agent.rollout.specs import spec_to_metadata
 
-    return {
-        "horizon_mode": str(spec.horizon_mode),
-        "utility_weights": {
+    mode = str(spec.horizon_mode)
+    horizon_slot = int(spec.horizon) if mode == "fixed" else mode
+    return (
+        horizon_slot,
+        mode,
+        json.dumps({
             "w_optimization": float(spec.utility_weights.w_optimization),
             "w_surrogate": float(spec.utility_weights.w_surrogate),
             "w_coverage": float(spec.utility_weights.w_coverage),
@@ -79,10 +116,13 @@ def _expected_resume_meta(spec) -> dict:
             "w_fit": float(spec.utility_weights.w_fit),
             "w_stop_opportunity": float(
                 spec.utility_weights.w_stop_opportunity),
-        },
-        "continuation_policy": spec_to_metadata(spec.continuation_spec),
-        "expects_partial_rollout": spec.rollout_action_subsample < 8,
-    }
+        }, sort_keys=True),
+        json.dumps(spec_to_metadata(spec.continuation_spec),
+                   sort_keys=True),
+        int(spec.decision_every_k_actions),
+        int(spec.rollout_action_subsample or 8),  # None = full rollout
+        int(spec.rollout_replicates),
+    )
 
 
 def _existing_trajectory_keys(path: Path, spec=None) -> set[tuple[str, int, int]]:
@@ -122,29 +162,26 @@ def _existing_trajectory_keys(path: Path, spec=None) -> set[tuple[str, int, int]
             f"to append — write a new versioned output file")
     if spec is not None and keys:
         expected = _expected_resume_meta(spec)
-        first_meta = _first_record_meta(path)
-        mismatched = [
-            k for k in ("horizon_mode", "utility_weights",
-                        "continuation_policy")
-            if k in first_meta and first_meta[k] != expected[k]
-        ]
-        has_partial = "partial_rollout" in first_meta
-        if has_partial != expected["expects_partial_rollout"]:
-            mismatched.append("partial_rollout (quota)")
-        if mismatched:
+        projections = {_record_projection(rec.metadata)
+                       for rec in iter_jsonl(path)}
+        if len(projections) > 1:
             raise SystemExit(
-                f"{path} was generated with a different configuration on "
-                f"{mismatched}; refusing to append under the requested "
-                f"config — write a new output file. (Fields not recorded "
-                f"in record metadata — decision_every_k, replicates — "
-                f"cannot be compared; verify them manually.)")
+                f"{path} was generated with MIXED configurations "
+                f"({_len_limit(projections)} distinct projections over "
+                f"{_RESUME_FIELDS}); refusing to append — write a new "
+                f"output file")
+        if projections and projections.pop() != expected:
+            raise SystemExit(
+                f"{path} was generated with a different configuration "
+                f"(fields {_RESUME_FIELDS}) than the requested spec; "
+                f"refusing to append — write a new output file.")
     return keys
 
 
-def _first_record_meta(path: Path) -> dict:
-    for rec in iter_jsonl(path):
-        return rec.metadata
-    return {}
+def _len_limit(s: set) -> str:
+    """Cap the count shown in refusal messages (sets can be large)."""
+    n = len(s)
+    return str(n) if n <= 8 else f"{n}+"
 
 
 def _config_from_task(cfg: dict) -> "DatasetConfig":
@@ -307,7 +344,17 @@ def main() -> int:
                     flush=True,
                 )
     else:
-        tmp.write_text("", encoding="utf-8")
+        # Nothing to do (resume found everything). Do NOT write/replace the
+        # output — replacing with an empty temp file would destroy the
+        # completed dataset (codex final-audit-3 B2).
+        print(json.dumps({
+            "output": str(args.output),
+            "records_new": 0,
+            "trajectories_skipped_resume": skipped,
+            "note": "all requested trajectories already exist; output "
+                    "left untouched",
+        }, indent=2, sort_keys=True))
+        return 0
 
     wall = time.time() - t0
     tmp.replace(args.output)
