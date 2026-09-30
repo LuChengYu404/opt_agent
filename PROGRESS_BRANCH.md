@@ -1019,3 +1019,38 @@ pooling enforcement with persistent audit trail, resume-safe generators,
 20 migrated training loaders, and the test suite — is the reviewed
 standing modification specification, ready for the owner's manual review
 and merge.
+
+## 34. Targeted audit: the D-value ceiling measurement (2026-09-30)
+
+Owner challenge: how was "perfect picker ≈ best constant" measured, and
+is the design/code sound? Codex audit (`runs/codex_D_value_audit.log`,
+187k tokens, independent recomputation from raw JSONL):
+**VERDICT: SOUND_WITH_OVERREACH.**
+
+Reproduced: all reported D values match to 3 decimals; independent seed
+stream (s100-119) preserves ordering; full-eight rollouts everywhere
+(no quota-subsampling deflation); STOP handling exact
+(U(stop) = −0.75 × remaining-budget ratio, removal changes nothing);
+invalid-rollout inclusion biases D slightly UPWARD (against the
+negative conclusion).
+
+Findings: (1) MAJOR definitional — the reported D uses FAMILY-MEDIAN
+rescaled U (raw-trajectory-scale D: Hartmann 1.594, not 0.710); must be
+labeled as such. (2) MAJOR overreach — "4/5 families capped" is not
+supported: near-zero adaptive room holds only for Branin (0.040) and
+SixHumpCamel (0.012); Ackley (0.332) and Rastrigin (0.262) are
+substantial (~8-10 evaluation-costs each), Hartmann large; the outline's
+own "heavy-tailed" description (line 455) contradicts its "4/5 capped"
+claim (line 723). (3) MAJOR attribution — D bounds one-step h=3 gains
+only; some reports (e.g. EXP_RLCD_LONGHORIZON_REPORT "capped by D/T4")
+attribute closed-loop caps to D — the closed-loop negative rests on the
+separate collapse/schedule evidence. (4) Horizon sensitivity
+unquantified: long-horizon Gate-3 signal is 10x stronger (12.9 vs
+1.29); no full-eight long-horizon D replication exists. (5) Noise
+inflates D (winner's curse) — direction protects the negative result.
+
+Corrections queued: narrative must read "2/5 flat, 2 moderate, 1 large
+(in family-median U, h=3)"; closed-loop ceiling attribution moved to
+the collapse/schedule evidence; D estimand labeling in
+verify_theory_propositions + THEORY P2 empirical tie; outline line-723
+phrasing (main-branch paper baseline — needs owner decision).
