@@ -1,0 +1,14 @@
+FINAL PACKAGE AUDIT round 5 (closing approval re-check). Branch: exp/boundary-scheme-round2, HEAD after the round-4 disposition commit. Your round-4 audit (runs/codex_boundary_final_audit4.log) returned REVISE with exactly one BLOCKER: the resume projection omitted --budget and --max-actions. Fixed:
+
+- The generator's record-metadata provenance now also records total_budget and max_actions (alongside decision_every_k, subsample_k, rollout_replicates); the resume guard's projection requires and compares BOTH across every existing record, failing closed when missing.
+- Functional retest on a real tiny generated dataset: same-config resume -> "output left untouched" (md5 identical); budget mismatch (10 vs 12) -> refusal; max-actions mismatch (4 vs 6) -> refusal. 70 tests green across the affected modules.
+
+Review tasks:
+A. Verify the round-4 BLOCKER disposition (ADDRESSED / PARTIAL / UNADDRESSED).
+B. New-issue check on this change only.
+C. Final merge-readiness judgment for the standing modification specification.
+
+Answer format: A one-row verdict; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs.

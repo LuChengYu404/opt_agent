@@ -1005,3 +1005,17 @@ max_actions; the resume projection requires and compares both (fail
 closed on missing). Functional retest on a real tiny dataset: same-config
 noop (md5 intact), budget mismatch refused, max-actions mismatch refused;
 70 tests green across affected modules.
+
+## 33. Final full-package audit: APPROVE — standing specification closed (2026-09-30)
+
+Final-audit round-5 (`runs/codex_boundary_final_audit5.log`): round-4
+BLOCKER ADDRESSED, new-issue check PASS, merge readiness APPROVE —
+**VERDICT: APPROVE**. Closing-audit trajectory: full-1 REVISE (2 BLOCKER)
+-> full-2 REVISE (1) -> full-3 REVISE (2, both resume-path) -> full-4
+REVISE (1) -> full-5 APPROVE (plus the incremental loop R1-R8 ending in
+the narrow round-8 APPROVE). The package — RESEARCH_BOUNDARY_GUIDE,
+THEORY, both config-screen reports, boundary registry, versioning/
+pooling enforcement with persistent audit trail, resume-safe generators,
+20 migrated training loaders, and the test suite — is the reviewed
+standing modification specification, ready for the owner's manual review
+and merge.
