@@ -568,6 +568,8 @@ class DatasetGenerator:
                     or 8),  # None = full 8-action rollout
                 "rollout_replicates": int(
                     getattr(self.config, "rollout_replicates", 1)),
+                "total_budget": int(self.config.total_budget),
+                "max_actions": int(self.config.max_actions),
                 # Phase 9 Gate 5 — affine objective transform (so replay
                 # infrastructure can reconstruct the same transformed backend).
                 "objective_scale": float(self.config.objective_scale),

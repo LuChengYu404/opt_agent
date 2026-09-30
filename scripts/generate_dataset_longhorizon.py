@@ -63,7 +63,8 @@ PROBLEMS_5FAMILY = ("Branin", "Hartmann", "Ackley", "SixHumpCamel", "Rastrigin")
 
 _RESUME_FIELDS = ("horizon*", "horizon_mode", "utility_weights",
                   "continuation_policy", "decision_every_k",
-                  "subsample_k", "rollout_replicates")
+                  "subsample_k", "rollout_replicates", "total_budget",
+                  "max_actions")
 # horizon*: in "remaining" mode the recorded value is the trajectory's
 # actual remaining horizon (varies per trajectory) and is NOT comparable
 # to the config value — only the mode is compared; in "fixed" mode the
@@ -78,7 +79,8 @@ def _record_projection(meta: dict) -> tuple:
     """
     required = ("horizon", "horizon_mode", "utility_weights",
                 "continuation_policy", "decision_every_k",
-                "subsample_k", "rollout_replicates")
+                "subsample_k", "rollout_replicates", "total_budget",
+                "max_actions")
     missing = [k for k in required if k not in meta]
     if missing:
         raise SystemExit(
@@ -95,6 +97,8 @@ def _record_projection(meta: dict) -> tuple:
         int(meta["decision_every_k"]),
         int(meta["subsample_k"]),
         int(meta["rollout_replicates"]),
+        int(meta["total_budget"]),
+        int(meta["max_actions"]),
     )
 
 
@@ -122,6 +126,8 @@ def _expected_resume_meta(spec) -> tuple:
         int(spec.decision_every_k_actions),
         int(spec.rollout_action_subsample or 8),  # None = full rollout
         int(spec.rollout_replicates),
+        int(spec.total_budget),
+        int(spec.max_actions),
     )
 
 

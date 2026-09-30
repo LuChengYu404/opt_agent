@@ -1,0 +1,17 @@
+FINAL PACKAGE AUDIT round 4 (closing approval re-check). Branch: exp/boundary-scheme-round2, commit 8d3bc12. Your final-audit round 3 (runs/codex_boundary_final_audit3.log) returned REVISE — 2 BLOCKER, both in the longhorizon resume path; you ADDRESSED-confirmed the other 10 dispositions and your independent sweep confirmed the training loader boundary complete (20 read_jsonl training consumers; the §29 count is now corrected 21 -> 20). Both BLOCKERs fixed in 8d3bc12:
+
+- BLOCKER 1 (weak config check): the generator now RECORDS the requested generation config as record-metadata provenance — decision_every_k, subsample_k (None normalized to 8 = full rollout), rollout_replicates — closing your "unrecorded fields" note entirely. The resume guard compares the COMPLETE recorded projection across ALL existing records (not just the first): horizon_mode, utility_weights, continuation_policy, decision_every_k, subsample_k, rollout_replicates, and horizon — with horizon compared only in "fixed" mode (in "remaining" mode the recorded value is the trajectory's actual remaining horizon, which varies per trajectory and is not config-comparable; the mode string is compared instead). Fails closed on records missing any provenance field (legacy records) and on mixed values within the file. Two bugs in the first-pass implementation were caught by our own functional test BEFORE commit: int(None) on the subsample default, and false-positive refusals from (a) per-trajectory horizon values and (b) len(partial_rollout) being min(k, feasible candidates) rather than k.
+- BLOCKER 2 (data destruction): --resume with nothing left to do now prints a "nothing to do / output left untouched" summary and returns 0 WITHOUT writing or replacing the output (previously it wrote an empty temp file and replaced the dataset with it).
+
+Functional verification on a REAL tiny generated dataset (Branin, budget 10): same-config resume -> "all requested trajectories already exist; output left untouched" with md5 identical before/after; quota mismatch (k=4 vs 6) -> refusal; horizon mismatch (remaining vs fixed 3) -> refusal; the real legacy artifact runs/longhorizon_k4_20seed_5family.jsonl -> refused at the stamp gate, file untouched. 93 tests green across the affected modules (incl. longhorizon quota, both gate modules, RLCD, versioning, registry).
+
+Review tasks:
+
+A. Verify both round-3 BLOCKER dispositions (ADDRESSED / PARTIAL / UNADDRESSED) against the code.
+B. New-issue check on these changes only (the provenance metadata addition's interaction with existing consumers — e.g., validate_record, replay, analysis; the guard's horizon normalization; the early-return path's summary; any regression in the generator tests).
+C. Final merge-readiness judgment for the standing modification specification.
+
+Answer format: A two-row verdict table; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, parse runs/*.json, inspect git log/diffs, and recompute from serialized data.

@@ -994,3 +994,14 @@ same-config resume reports "output left untouched" (md5 identical);
 quota mismatch refused; horizon mismatch refused; the real legacy
 artifact runs/longhorizon_k4_20seed_5family.jsonl is refused at the
 stamp gate and left untouched. Tests: 93 across the affected modules.
+
+## 32. Final-audit round-4 disposition: budget/max-actions in the resume guard (2026-09-30)
+
+Final-audit round-4 (`runs/codex_boundary_final_audit4.log`): REVISE —
+1 BLOCKER only (the no-op data-destruction fix ADDRESSED; all other
+round-3 items confirmed). The projection omitted --budget and
+--max-actions. Fixed: generator provenance now records total_budget and
+max_actions; the resume projection requires and compares both (fail
+closed on missing). Functional retest on a real tiny dataset: same-config
+noop (md5 intact), budget mismatch refused, max-actions mismatch refused;
+70 tests green across affected modules.
