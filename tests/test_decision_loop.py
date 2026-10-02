@@ -77,7 +77,7 @@ def test_sample_delta_matches_action_result() -> None:
     for action in [
         OptimizationAction(ActionType.RETRAIN_SURROGATE),
         OptimizationAction(ActionType.SURROGATE_ACQUISITION),
-        OptimizationAction(ActionType.GLOBAL_EXPLORATION, {"n_samples": 2, "seed": 4}),
+        OptimizationAction(ActionType.GLOBAL_EXPLORATION, {"n_samples": 2}),
     ]:
         next_state, result = loop.step(action)
         transition = loop.steps[-1]
@@ -195,7 +195,7 @@ def test_rule_policy_explores_after_three_stagnant_steps() -> None:
 
     assert action.type == ActionType.GLOBAL_EXPLORATION
     assert action.params["n_samples"] == 2
-    assert action.params["seed"] == 9  # seed + current n_samples
+    assert "seed" not in action.params  # h3: AF sampling carries no seed
 
 
 def test_rule_policy_stop_has_priority_when_budget_is_low() -> None:

@@ -1,0 +1,72 @@
+Waiting for at least eight reference workers to finish before starting confirmation.
+Starting frozen 100-seed confirmation.
+rastrigin_confirmation: 10/300 elapsed=1.4s rastrigin/s50004/raw/surrogate_acquisition
+rastrigin_confirmation: 20/300 elapsed=13.6s rastrigin/s50008/raw/local_exploitation
+rastrigin_confirmation: 30/300 elapsed=19.5s rastrigin/s50012/raw/surrogate_acquisition
+rastrigin_confirmation: 40/300 elapsed=23.9s rastrigin/s50015/raw/surrogate_acquisition
+rastrigin_confirmation: 50/300 elapsed=33.0s rastrigin/s50018/raw/local_exploitation
+rastrigin_confirmation: 60/300 elapsed=39.3s rastrigin/s50022/raw/surrogate_acquisition
+rastrigin_confirmation: 70/300 elapsed=45.3s rastrigin/s50018/normalized/surrogate_acquisition
+rastrigin_confirmation: 80/300 elapsed=49.2s rastrigin/s50028/raw/local_exploitation
+rastrigin_confirmation: 90/300 elapsed=58.0s rastrigin/s50032/raw/surrogate_acquisition
+rastrigin_confirmation: 100/300 elapsed=63.5s rastrigin/s50029/normalized/surrogate_acquisition
+rastrigin_confirmation: 110/300 elapsed=68.7s rastrigin/s50038/raw/local_exploitation
+rastrigin_confirmation: 120/300 elapsed=75.0s rastrigin/s50042/raw/surrogate_acquisition
+rastrigin_confirmation: 130/300 elapsed=84.5s rastrigin/s50038/normalized/surrogate_acquisition
+rastrigin_confirmation: 140/300 elapsed=87.4s rastrigin/s50048/raw/local_exploitation
+rastrigin_confirmation: 150/300 elapsed=96.6s rastrigin/s50052/raw/surrogate_acquisition
+rastrigin_confirmation: 160/300 elapsed=102.4s rastrigin/s50049/normalized/surrogate_acquisition
+rastrigin_confirmation: 170/300 elapsed=107.3s rastrigin/s50058/raw/local_exploitation
+rastrigin_confirmation: 180/300 elapsed=118.1s rastrigin/s50062/raw/surrogate_acquisition
+rastrigin_confirmation: 190/300 elapsed=122.3s rastrigin/s50060/normalized/surrogate_acquisition
+rastrigin_confirmation: 200/300 elapsed=129.3s rastrigin/s50068/raw/local_exploitation
+rastrigin_confirmation: 210/300 elapsed=134.3s rastrigin/s50072/raw/surrogate_acquisition
+rastrigin_confirmation: 220/300 elapsed=143.9s rastrigin/s50070/normalized/surrogate_acquisition
+rastrigin_confirmation: 230/300 elapsed=149.7s rastrigin/s50078/raw/local_exploitation
+rastrigin_confirmation: 240/300 elapsed=153.2s rastrigin/s50082/raw/surrogate_acquisition
+rastrigin_confirmation: 250/300 elapsed=161.7s rastrigin/s50078/normalized/surrogate_acquisition
+rastrigin_confirmation: 260/300 elapsed=164.4s rastrigin/s50088/raw/local_exploitation
+rastrigin_confirmation: 270/300 elapsed=173.3s rastrigin/s50092/raw/surrogate_acquisition
+rastrigin_confirmation: 280/300 elapsed=178.5s rastrigin/s50085/normalized/surrogate_acquisition
+rastrigin_confirmation: 290/300 elapsed=183.6s rastrigin/s50098/raw/local_exploitation
+rastrigin_confirmation: 300/300 elapsed=194.5s rastrigin/s50096/normalized/surrogate_acquisition
+{
+  "normalization": {
+    "mean": 14.488023159238,
+    "ci95": [
+      9.866268631168206,
+      19.190521106992467
+    ],
+    "ci99": [
+      8.647061796767682,
+      20.647245759426323
+    ],
+    "n": 100,
+    "wins_ties_losses": [
+      70,
+      2,
+      28
+    ],
+    "paired_sign_randomization_p": 4.999750012499375e-05,
+    "holm_p": 9.99950002499875e-05
+  },
+  "best_pipeline": {
+    "mean": 14.13616343300517,
+    "ci95": [
+      9.126986444744048,
+      19.23209517613934
+    ],
+    "ci99": [
+      7.525772692747539,
+      20.879511264323394
+    ],
+    "n": 100,
+    "wins_ties_losses": [
+      71,
+      1,
+      28
+    ],
+    "paired_sign_randomization_p": 4.999750012499375e-05,
+    "holm_p": 9.99950002499875e-05
+  }
+}

@@ -51,3 +51,6 @@ class Checkpoint:
     fitted: bool
     model_state_dict: Optional[bytes] = None
     torch_rng_state: Optional[bytes] = None
+    # None marks legacy checkpoints. New snapshots explicitly preserve the
+    # input-transform setting even when no GP is currently fitted.
+    normalize_inputs: Optional[bool] = None

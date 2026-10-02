@@ -84,6 +84,10 @@ def _make_replay_record(
         metadata={
             "trajectory_id": 0, "step": 0, "run_seed": 0,
             "utility_version": "phase8.6b",
+            # Handcrafted records must carry the current harness stamp to be
+            # replayable (validation._assert_replayable_harness); real
+            # datasets get this from versioning.stamp_metadata.
+            "harness_version": "h3",
             "optimization_scale": 0.5, "evaluation_scale": 20.0,
             "fit_scale": 20.0, "horizon": 1, "w_stop_opportunity": 0.75,
             "backend_X": X, "backend_objectives": Y, "backend_constraints": C,
@@ -268,3 +272,22 @@ def test_oracle_test_from_record_rejects_missing_replay() -> None:
     )
     with pytest.raises(ValueError, match="missing"):
         oracle_test_from_record(bad_record)
+
+
+def test_oracle_replay_refuses_foreign_harness_stamp() -> None:
+    """Round-1 D regression: executing a replay through the current executor
+    is refused for known-past harness stamps unless explicitly acknowledged;
+    unrecognized stamps are never replayable."""
+    import pytest as _pytest
+
+    rec = _make_replay_record(action_probs={"global_exploration": 1.0})
+    rec.metadata["harness_version"] = "h2"
+    with _pytest.raises(ValueError, match="harness"):
+        oracle_test_from_record(rec, random_replicates=1, max_actions=5)
+    result = oracle_test_from_record(
+        rec, random_replicates=1, max_actions=5, allow_legacy_harness=True
+    )
+    assert result.gold_action is not None
+    rec.metadata["harness_version"] = "h99"
+    with _pytest.raises(ValueError, match="harness"):
+        oracle_test_from_record(rec, allow_legacy_harness=True)

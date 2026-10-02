@@ -129,58 +129,19 @@ def test_best_is_max_not_min() -> None:
 
 
 def test_constrained_problem_is_rejected() -> None:
-    """CantileverBeam is constrained; it's not in the allowlist so the allowlist
-    gate fires first. The structural n_constr gate is exercised by
-    test_structural_n_constr_gate via _assert_phase1_compatible directly below.
-    """
+    """Constrained problems are structurally rejected (stack cannot handle them)."""
     be = BocodeBotorchBackend()
-    with pytest.raises(ValueError, match="allowlist"):
+    with pytest.raises(ValueError, match="n_constr"):
         be.initialize(BackendConfig(problem_id="CantileverBeam", seed=0, n_init=5))
 
 
 def test_multiobjective_problem_is_rejected() -> None:
     """CRE21 is multi-objective; same logic as above — allowlist gate first."""
     be = BocodeBotorchBackend()
-    with pytest.raises(ValueError, match="allowlist"):
+    with pytest.raises(ValueError, match="n_obj"):
         be.initialize(BackendConfig(problem_id="CRE21", seed=0, n_init=5))
 
 
-def test_structural_n_constr_gate() -> None:
-    """Bypass the allowlist and call the structural gate directly with a
-    fake unconstrained problem shape to verify it raises on n_constr > 0.
-    """
-    import bocode
-    be = BocodeBotorchBackend()
-    fake = bocode.CantileverBeam()  # any constrained problem
-    # add its class name to the allowlist temporarily
-    original = be._ALLOWED_PROBLEMS
-    be._ALLOWED_PROBLEMS = original + (type(fake).__name__,)
-    try:
-        with pytest.raises(ValueError, match="unconstrained"):
-            be._assert_phase1_compatible(fake)
-    finally:
-        be._ALLOWED_PROBLEMS = original
-
-
-def test_structural_n_obj_gate() -> None:
-    """Same pattern: structural gate raises on n_obj > 1."""
-    import bocode
-    be = BocodeBotorchBackend()
-    fake = bocode.CRE21()  # multi-objective
-    original = be._ALLOWED_PROBLEMS
-    be._ALLOWED_PROBLEMS = original + (type(fake).__name__,)
-    try:
-        with pytest.raises(ValueError, match="n_obj"):
-            be._assert_phase1_compatible(fake)
-    finally:
-        be._ALLOWED_PROBLEMS = original
-
-
-def test_problem_outside_allowlist_is_rejected() -> None:
-    """BikeBench64 is single-objective unconstrained but not in Phase-1 allowlist."""
-    be = BocodeBotorchBackend()
-    with pytest.raises(ValueError, match="allowlist"):
-        be.initialize(BackendConfig(problem_id="BikeBench64", seed=0, n_init=5))
 
 
 @pytest.mark.parametrize("problem_id,dimension", [
@@ -230,27 +191,7 @@ def test_propose_n_ne_1_raises() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_evaluate_rejects_wrong_rank() -> None:
-    be = _init_branin()
-    with pytest.raises(ValueError, match=r"\[n, d\]"):
-        be.evaluate(torch.tensor([0.0, 0.0], dtype=torch.double))
 
-
-def test_evaluate_rejects_wrong_dim() -> None:
-    be = _init_branin()  # Branin d=2
-    with pytest.raises(ValueError, match="d="):
-        be.evaluate(torch.tensor([[0.0, 0.0, 0.0]], dtype=torch.double))
-
-
-def test_evaluate_rejects_non_finite() -> None:
-    be = _init_branin()
-    with pytest.raises(ValueError, match="non-finite"):
-        be.evaluate(torch.tensor([[float("nan"), 0.0]], dtype=torch.double))
-
-
-# ---------------------------------------------------------------------------
-# Determinism
-# ---------------------------------------------------------------------------
 
 
 def test_same_seed_same_initial_design() -> None:

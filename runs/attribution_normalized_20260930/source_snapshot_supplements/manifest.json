@@ -1,0 +1,21 @@
+{
+  "scripts/exp_attribution_normalized.py": "86f70fdce64736a2f359457f54caf6e3fd518fe3cdf9b7ec415b960845592264",
+  "docs/ATTRIBUTION_NORMALIZED_FOLLOWUP_20260930.md": "3fc5a5574c00f1c07cef7c95cf280597c8f3bde729bc14f5d077e170c2b1edd4",
+  "src/opt_agent/backend/bocode_botorch.py": "67b6729bc54f1ccbda5e5dca0e4b02cf73dc57aec351d6b397b25ec2d075fb8b",
+  "src/opt_agent/backend/checkpoint.py": "886045c3018cbd49922f4cc0059489ea5e7c191a07794fdba1e007cb874a0cfd",
+  "src/opt_agent/actions/executor.py": "2d0555e041a6b98e563acaa88c808c4921b0b9609383e0bdcd651fe3e27ec5d6",
+  "src/opt_agent/actions/factory.py": "ccfd4ce4a9f34349fc8450918d88f642818d376fa2d1befa9281df8005768eb0",
+  "src/opt_agent/state/extractor.py": "90ecbd0a02c2e17f02003f983ef1f606581d3b21997893042e892cae1c12eff2",
+  "scripts/exp_attribution_suite.py": "c4d0f5994f4f5082f59a5babf088611eb26e35c3e46906800f272eaef3692a7a",
+  "scripts/exp_rq1_rq2_closed_loop.py": "5a3669744a47dbb88699eaa346ab18906a323dd5244734c53c61a958ad6f7cef",
+  "scripts/_shared_rq_features.py": "f54ed9968bcd6161e0dbc493db96293dba593b33ad8185d119c3dbe20fe1051f",
+  "scripts/ioh_backend.py": "4362e0f9d33d7d779f7ac8389d91f134b890625ccd31f49341eafa3f89907601",
+  "scripts/exp_attribution_normalized_confirmation.py": "7a144aa099b703a0677489db3c976ee36614d4bc3f1a9940b6aa063a5e8af160",
+  "scripts/exp_attribution_rastrigin_opportunity.py": "6be3e1af20bfaab20c653b01492ea3bc71e2d02cc56c6fc2cae498028a8afd17",
+  "scripts/audit_attribution_decision_metric.py": "28916a6ba62194bd77a48028a59dbed1de50c9d2116871b0db0d904cacb98ef5",
+  "scripts/analyze_attribution_normalized.py": "1156cc9e77a2e112e889156e95c65480ead266edaac3ec0433389d806e119a0c",
+  "docs/ATTRIBUTION_RASTRIGIN_CONFIRMATION_20260930.md": "1917400522d90a5ae9a85185e440026db390b6842db91332c66775a203db29e6",
+  "docs/ATTRIBUTION_RASTRIGIN_OPPORTUNITY_20260930.md": "3a40a457771efb4546fc1efc04f2b449a2e14e4acecc94c3fc9c5b6e64e058f5",
+  "src/opt_agent/dataset/generator.py": "5eea03823146b7309c0bb1f652b7987e503120fb2cca44a5bc5d62ae3994f398",
+  "src/opt_agent/dataset/validation.py": "da0c04175153aee74b8756780a650b52eb706aab19cbbfc7b0691eba58d853c6"
+}

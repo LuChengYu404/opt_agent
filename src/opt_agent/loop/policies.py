@@ -88,24 +88,22 @@ class RulePolicy:
             and state.resource.remaining_budget >= 2
         ):
             return OptimizationAction(
-                ActionType.GLOBAL_EXPLORATION,
-                {"n_samples": 2, "seed": self._seed + state.sampling.n_samples},
+                ActionType.GLOBAL_EXPLORATION, {"n_samples": 2}
             )
         return OptimizationAction(ActionType.SURROGATE_ACQUISITION)
 
 
 class UniformPolicy:
-    """Samples uniformly over ALL 8 ActionTypes — behaviorally identical to
+    """Samples uniformly over ALL ActionTypes — behaviorally identical to
     RandomPolicy (both use `choice(list(ActionType))` + `sample_params`).
 
     Historical note (codex Q-T2 review): introduced as a state-aware uniform
-    ablation arm when RandomPolicy sampled only 5 action types; RandomPolicy
-    later converged to the full 8, so the two now coincide. Kept as the
+    ablation arm when RandomPolicy sampled fewer action types; RandomPolicy
+    later converged to the full menu, so the two now coincide. Kept as the
     named policy for the `uniform` continuation arm and ablation specs.
-    Params (n_samples, step, tol, seed) are filled in for parameterized
-    actions (GLOBAL_EXPLORATION, LOCAL_EXPLOITATION, UNCERTAINTY_SAMPLING,
-    ERROR_GUIDED_SAMPLING, BOUNDARY_SAMPLING) so the action is
-    budget-feasible.
+    Params (n_samples, step) are filled in for parameterized actions
+    (GLOBAL_EXPLORATION, LOCAL_EXPLOITATION, UNCERTAINTY_SAMPLING) so the
+    action is budget-feasible.
     """
 
     def __init__(self, seed: int = 0) -> None:

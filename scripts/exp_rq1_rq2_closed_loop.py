@@ -64,7 +64,7 @@ class FixedPolicy:
         self.action_id, self.seed = action_id, seed
 
     def select_action(self, state):
-        return candidate_actions_for_state(state, seed=self.seed)[self.action_id]
+        return candidate_actions_for_state(state)[self.action_id]
 
 
 class GlobalThenLocal:
@@ -75,7 +75,7 @@ class GlobalThenLocal:
         self.decisions = 0
 
     def select_action(self, state):
-        choices = candidate_actions_for_state(state, seed=self.seed)
+        choices = candidate_actions_for_state(state)
         action_id = "global_exploration" if self.decisions < 10 else "local_exploitation"
         self.decisions += 1
         return choices[action_id]
@@ -87,7 +87,7 @@ class RFPolicy:
         self.allow_retrain = allow_retrain
 
     def select_action(self, state):
-        choices = candidate_actions_for_state(state, seed=self.seed)
+        choices = candidate_actions_for_state(state)
         if not self.allow_retrain and len(choices) > 1:
             choices.pop("retrain_surrogate", None)
         phase = phase_of_ratio(state.resource.remaining_budget_ratio)

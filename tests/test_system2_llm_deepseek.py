@@ -66,7 +66,7 @@ def _default_body() -> dict:
         "id": "fake-response-id",
         "choices": [{"message": {"content": json.dumps({
             "action_id": "global_exploration",
-            "params": {"n_samples": 1, "seed": 7},
+            "params": {"n_samples": 1},
             "reasoning": "explore widely given large remaining budget",
         })}}],
         "usage": {"prompt_tokens": 200, "completion_tokens": 30, "total_tokens": 230},
@@ -112,7 +112,7 @@ def test_llm_system2_parses_json_response() -> None:
     assert isinstance(decision, System2Decision)
     assert decision.action.type == ActionType.GLOBAL_EXPLORATION
     assert decision.action.params["n_samples"] == 1
-    assert decision.action.params["seed"] == 7
+    assert "seed" not in decision.action.params  # h3: dropped as unsupported
     assert decision.confidence == 1.0  # parsed cleanly, not fallback
     assert "explore widely" in decision.reasoning.lower() or "budget" in decision.reasoning.lower()
     # Stats recorded.
@@ -227,20 +227,6 @@ def _body_with(action_id: str, params: dict, reasoning: str = "x") -> dict:
     }
 
 
-def test_llm_system2_candidate_seed_varies_by_run() -> None:
-    """Independent runs must not share a fixed exploratory candidate seed."""
-    state = _state_with_budget(20)
-    body = _body_with("global_exploration", {})
-    first = LLMSystem2(
-        candidate_seed=17, client=_FakeClient(body=body), _skip_key_check=True,
-    ).reason(state)
-    second = LLMSystem2(
-        candidate_seed=29, client=_FakeClient(body=body), _skip_key_check=True,
-    ).reason(state)
-    assert first.action.params["seed"] == 17 + state.sampling.n_samples
-    assert second.action.params["seed"] == 29 + state.sampling.n_samples
-    assert first.action.params["seed"] != second.action.params["seed"]
-
 
 def test_llm_system2_preserves_candidate_defaults_when_params_empty() -> None:
     """If the LLM emits an empty params dict, the candidate's defaults
@@ -251,8 +237,7 @@ def test_llm_system2_preserves_candidate_defaults_when_params_empty() -> None:
     state = _state_with_budget(20)
     decision = s.reason(state)
     assert decision.action.type == ActionType.GLOBAL_EXPLORATION
-    # Candidate factory sets seed = 0 + n_samples=2. Both must survive.
-    assert "seed" in decision.action.params
+    # Candidate factory's default n_samples=2 must survive.
     assert decision.action.params["n_samples"] == 2
     assert "defaults" in decision.reasoning.lower() or s.fallback_count == 0
 
@@ -316,18 +301,6 @@ def test_llm_system2_drops_zero_n_samples() -> None:
     assert "n_samples=0<=0" in decision.reasoning or "n_samples=0.0<=0" in decision.reasoning
 
 
-def test_llm_system2_drops_negative_seed() -> None:
-    """Negative numeric seeds are dropped (seed must be non-negative)."""
-    s = LLMSystem2(client=_FakeClient(body=_body_with(
-        "global_exploration", {"seed": -1}, "negative seed",
-    )), _skip_key_check=True)
-    state = _state_with_budget(20)
-    decision = s.reason(state)
-    # Default seed (positive, from candidate) wins.
-    assert decision.action.params["seed"] >= 0
-    assert s.fallback_count == 1
-    assert "seed=-1<0" in decision.reasoning or "seed=-1.0<0" in decision.reasoning
-
 
 def test_llm_system2_drops_boolean_n_samples() -> None:
     """Booleans pass the isinstance(int,float) check; we exclude them
@@ -358,22 +331,10 @@ def test_llm_system2_coerces_float_n_samples_to_int() -> None:
     assert s.fallback_count == 0
 
 
-def test_llm_system2_coerces_float_seed_to_int() -> None:
-    """Per codex gpt-6-sol 2026-09-24: a float `seed: 0.0` must be
-    coerced to int (seed validator requires int)."""
-    s = LLMSystem2(client=_FakeClient(body=_body_with(
-        "global_exploration", {"seed": 0.0}, "float seed",
-    )), _skip_key_check=True)
-    state = _state_with_budget(20)
-    decision = s.reason(state)
-    assert isinstance(decision.action.params["seed"], int)
-    assert decision.action.params["seed"] == 0
-
 
 def test_llm_system2_coerces_step_and_tol_to_float() -> None:
-    """Per-action float-typed params (step in local_exploitation,
-    tol in boundary_sampling) must coerce int to float so the float
-    validator accepts them."""
+    """Per-action float-typed params (step in local_exploitation) must
+    coerce int to float so the float validator accepts them."""
     s = LLMSystem2(client=_FakeClient(body=_body_with(
         "local_exploitation", {"step": 1}, "int step",
     )), _skip_key_check=True)
@@ -382,14 +343,6 @@ def test_llm_system2_coerces_step_and_tol_to_float() -> None:
     assert isinstance(decision.action.params["step"], float)
     assert decision.action.params["step"] == 1.0
 
-
-def test_llm_system2_coerces_tol_to_float_in_boundary_sampling() -> None:
-    s = LLMSystem2(client=_FakeClient(body=_body_with(
-        "boundary_sampling", {"tol": 0}, "int tol",
-    )), _skip_key_check=True)
-    state = _state_with_budget(20)
-    decision = s.reason(state)
-    assert isinstance(decision.action.params["tol"], float)
 
 
 def test_llm_system2_drops_out_of_range_step() -> None:
@@ -418,25 +371,6 @@ def test_llm_system2_drops_overflow_n_samples() -> None:
     assert s.fallback_count == 1
     assert "unrepresentable" in decision.reasoning
 
-
-def test_llm_system2_step_drop_keeps_valid_overrides() -> None:
-    """Per codex gpt-6-sol 2026-09-24: if the LLM supplies BOTH a
-    failing `step=5.0` and a valid `seed=7`, only the failing step is
-    dropped; the seed override must still apply."""
-    s = LLMSystem2(client=_FakeClient(body=_body_with(
-        "local_exploitation", {"step": 5.0, "seed": 7}, "mixed overrides",
-    )), _skip_key_check=True)
-    state = _state_with_budget(20)
-    decision = s.reason(state)
-    # step falls back to the candidate default (0.1).
-    assert decision.action.params["step"] == pytest.approx(0.1)
-    # seed override survives (seed=7 is valid).
-    assert decision.action.params["seed"] == 7
-    assert s.fallback_count == 1
-    # The fallback note records the dropped step but not the seed.
-    assert "step" in decision.reasoning
-    assert "seed" not in decision.reasoning.split("LLM overrides")[1].split(";")[0] \
-        if "LLM overrides" in decision.reasoning else True
 
 
 def test_llm_system2_fallback_count_increments_on_unparseable() -> None:

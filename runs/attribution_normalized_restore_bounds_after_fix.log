@@ -1,0 +1,15 @@
+......................                                                   [100%]
+=============================== warnings summary ===============================
+tests/test_attribution_normalized.py::test_fitted_and_legacy_restore_preserve_predictions_and_setting[False]
+tests/test_attribution_normalized.py::test_fitted_and_legacy_restore_preserve_predictions_and_setting[False]
+tests/test_backend_checkpoint.py::test_checkpoint_restores_history_bit_for_bit
+tests/test_backend_checkpoint.py::test_checkpoint_preserves_fitted_state_with_gp_model
+tests/test_backend_checkpoint.py::test_checkpoint_preserves_fitted_state_with_gp_model
+tests/test_backend_checkpoint.py::test_two_restores_produce_same_history_after_one_more_step
+tests/test_backend_checkpoint.py::test_two_restores_produce_same_history_after_one_more_step
+tests/test_backend_checkpoint.py::test_two_restores_produce_same_history_after_one_more_step
+  /home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/botorch/models/utils/assorted.py:276: InputDataWarning: Data (input features) is not contained to the unit cube. Please consider min-max scaling the input data.
+    check_min_max_scaling(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 8 warnings in 4.03s

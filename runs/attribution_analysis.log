@@ -1,0 +1,12 @@
+{
+  "labels": 280,
+  "loops": 2125,
+  "controls": 1000,
+  "dim_labels": 135,
+  "dim_loops": 1350,
+  "dim_controls": 1350,
+  "label_states": 280,
+  "dim_label_states": 405,
+  "repeat32_states": 30,
+  "posterior_loops": 100
+}

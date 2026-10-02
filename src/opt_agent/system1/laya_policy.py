@@ -102,7 +102,7 @@ class LayaPolicy:
         return self._agent
 
     def decide(self, state: OptimizationState) -> DecisionOutput:
-        choices = candidate_actions_for_state(state, seed=self.seed)
+        choices = candidate_actions_for_state(state)
         if state.resource.remaining_budget <= 0:
             decision = DecisionOutput(
                 choices["stop"], {"stop": 1.0}, 1.0,

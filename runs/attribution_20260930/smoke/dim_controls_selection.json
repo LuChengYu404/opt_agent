@@ -1,0 +1,18 @@
+{
+  "f6/d2": {
+    "fixed": "local_exploitation",
+    "schedule": "schedule_0.2",
+    "development_means": {
+      "local_exploitation": -36.649306598700385,
+      "global_exploration": -57.5632175384616,
+      "uncertainty_sampling": -48.231586354525035,
+      "boundary_sampling": -54.50469969540319,
+      "error_guided_sampling": -569.4797393459598,
+      "schedule_0.2": -36.42299676186517,
+      "schedule_0.4": -38.37745466580882,
+      "schedule_0.6": -40.34607753151616,
+      "schedule_0.8": -55.33200759521249,
+      "surrogate_acquisition": -37.20493999832386
+    }
+  }
+}

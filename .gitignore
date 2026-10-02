@@ -64,3 +64,19 @@ runs/rlcd_laya_*/*
 # Reference paper PDFs (~60 MB; re-downloadable via the links in
 # docs/ref_papers/optimization_theory_survey.md)
 docs/ref_papers/pdfs/
+
+# Trained model dumps under runs/ (regenerable; keep the repo lean —
+# the 4x569MB typed_decision_*.pt accidents are recoverable from history)
+runs/*.pt
+
+# Attribution batch: model pickles and heavy raw per-step payloads
+# (loops/labels/controls JSONs, 3-17MB each). Small analysis summaries,
+# REPORT.md and smoke runs stay tracked, matching the runs/**/*.jsonl policy.
+runs/**/*.pkl
+runs/attribution_*/loops.json
+runs/attribution_*/labels.json
+runs/attribution_*/controls.json
+runs/attribution_*/dim_loops.json
+runs/attribution_*/dim_labels.json
+runs/attribution_*/dim_controls.json
+runs/attribution_*/repeat32.json

@@ -4,7 +4,7 @@ Per codex (gpt-5.6-sol) review 2025-09-23:
   - Behavior policy (RulePolicy + random mix) is INDEPENDENT of gold_probs;
     never sample from gold_probs during trajectory walking.
   - Decision points are extracted at every Nth step (sparse by default).
-  - Candidates are the FULL action vocabulary (8 actions) per record; ids
+  - Candidates are the FULL action vocabulary (h3: 6 actions) per record; ids
     are deterministic to ensure aligned vocabulary across records.
   - `derive_run_seed` uses SHA-256 of problem name (NOT Python's built-in
     `hash()`, which varies with PYTHONHASHSEED across processes).
@@ -19,11 +19,7 @@ import random
 from dataclasses import dataclass, field, replace
 from typing import Callable, Iterable, Iterator
 
-from opt_agent.actions import (
-    ActionType,
-    OptimizationAction,
-    execute_action,
-)
+from opt_agent.actions import OptimizationAction, execute_action
 from opt_agent.actions.factory import ALL_CANDIDATE_SPECS
 from opt_agent.actions.models import ActionResult
 from opt_agent.dataset.versioning import stamp_metadata
@@ -41,28 +37,21 @@ from opt_agent.rollout.utility import UtilityWeights
 from opt_agent.state import OptimizationState, extract_state
 
 
-def full_candidates(seed: int = 0) -> list[Candidate]:
-    """Return the unfiltered 8-action candidate set used by the dataset.
+def full_candidates() -> list[Candidate]:
+    """Return the unfiltered candidate set used by the dataset.
 
     Per codex M1: this reads `actions.factory.ALL_CANDIDATE_SPECS` — the
     SINGLE source of truth for the action vocabulary. The runtime factory
     (`actions.candidate_actions_for_state`) filters this same list by
-    state. There is no second 8-action list anywhere in the codebase.
+    state. There is no second action list anywhere in the codebase.
     """
-    out: list[Candidate] = []
-    for action_id, action_type, params in ALL_CANDIDATE_SPECS:
-        merged = dict(params)
-        if "seed" in params or action_type in {
-            ActionType.GLOBAL_EXPLORATION, ActionType.LOCAL_EXPLOITATION,
-            ActionType.UNCERTAINTY_SAMPLING, ActionType.ERROR_GUIDED_SAMPLING,
-            ActionType.BOUNDARY_SAMPLING,
-        }:
-            merged["seed"] = seed
-        out.append(Candidate(
+    return [
+        Candidate(
             action_id=action_id,
-            action=OptimizationAction(action_type, merged),
-        ))
-    return out
+            action=OptimizationAction(action_type, dict(params)),
+        )
+        for action_id, action_type, params in ALL_CANDIDATE_SPECS
+    ]
 
 
 def derive_seed(*parts: int) -> int:
@@ -376,7 +365,7 @@ class DatasetGenerator:
                 )
                 if self.config.horizon_mode == "remaining" and remaining <= 0:
                     break  # nothing left to decide; budget exhausted
-                cands = full_candidates(seed=derive_seed(run_seed, step))
+                cands = full_candidates()
                 k = self.config.rollout_action_subsample
                 if k is not None and k < len(cands):
                     rolled = subsample_candidates(
@@ -396,7 +385,7 @@ class DatasetGenerator:
                     # fresh action seeds and continuation seed per replicate.
                     rep_cands = (
                         cands if R == 1
-                        else full_candidates(seed=derive_seed(run_seed, step, rep))
+                        else full_candidates()
                     )
                     rep_rolled = rolled if R == 1 else subsample_candidates(
                         rep_cands, len(rolled), subset_seed
@@ -501,6 +490,7 @@ class DatasetGenerator:
                 "backend_problem_id": cp.problem_id,
                 "backend_problem_bounds": cp.problem_bounds,
                 "backend_fitted": cp.fitted,
+                "backend_normalize_inputs": getattr(cp, "normalize_inputs", None),
                 "backend_model_state_b64": (
                     base64.b64encode(cp.model_state_dict).decode("ascii")
                     if cp.model_state_dict is not None else None
@@ -565,7 +555,8 @@ class DatasetGenerator:
                     getattr(self.config, "decision_every_k_actions", 0)),
                 "subsample_k": int(
                     getattr(self.config, "rollout_action_subsample", None)
-                    or 8),  # None = full 8-action rollout
+                    or len(ALL_CANDIDATE_SPECS)
+                ),  # None = full-menu rollout (menu-size fallback)
                 "rollout_replicates": int(
                     getattr(self.config, "rollout_replicates", 1)),
                 "total_budget": int(self.config.total_budget),

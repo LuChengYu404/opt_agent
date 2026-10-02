@@ -1,0 +1,56 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_normalized_restore_sets_checkpoint_bounds[False] _____________
+
+initialized_elsewhere = False
+
+    @pytest.mark.parametrize('initialized_elsewhere',[False,True])
+    def test_normalized_restore_sets_checkpoint_bounds(initialized_elsewhere):
+        torch.set_num_threads(1)
+        source=BocodeBotorchBackend(normalize_inputs=True)
+        source.initialize(BackendConfig(problem_id='SixHumpCamel',seed=917,n_init=5))
+        source.fit()
+        cp=source.checkpoint()
+        restored=BocodeBotorchBackend()
+        if initialized_elsewhere:
+            restored.initialize(BackendConfig(problem_id='Branin',seed=918,n_init=5))
+        restored.restore(cp)
+>       assert restored.bounds is not None
+E       assert None is not None
+E        +  where None = <opt_agent.backend.bocode_botorch.BocodeBotorchBackend object at 0x7172a7753830>.bounds
+
+tests/test_normalized_restore_bounds.py:18: AssertionError
+_____________ test_normalized_restore_sets_checkpoint_bounds[True] _____________
+
+initialized_elsewhere = True
+
+    @pytest.mark.parametrize('initialized_elsewhere',[False,True])
+    def test_normalized_restore_sets_checkpoint_bounds(initialized_elsewhere):
+        torch.set_num_threads(1)
+        source=BocodeBotorchBackend(normalize_inputs=True)
+        source.initialize(BackendConfig(problem_id='SixHumpCamel',seed=917,n_init=5))
+        source.fit()
+        cp=source.checkpoint()
+        restored=BocodeBotorchBackend()
+        if initialized_elsewhere:
+            restored.initialize(BackendConfig(problem_id='Branin',seed=918,n_init=5))
+        restored.restore(cp)
+        assert restored.bounds is not None
+>       assert torch.equal(restored.bounds,source.bounds)
+E       assert False
+E        +  where False = <built-in method equal of type object at 0x7173832a5640>(tensor([[-5.,  0.],\n        [10., 15.]], dtype=torch.float64), tensor([[-3., -2.],\n        [ 3.,  2.]], dtype=torch.float64))
+E        +    where <built-in method equal of type object at 0x7173832a5640> = torch.equal
+E        +    and   tensor([[-5.,  0.],\n        [10., 15.]], dtype=torch.float64) = <opt_agent.backend.bocode_botorch.BocodeBotorchBackend object at 0x7172a763b230>.bounds
+E        +    and   tensor([[-3., -2.],\n        [ 3.,  2.]], dtype=torch.float64) = <opt_agent.backend.bocode_botorch.BocodeBotorchBackend object at 0x7172a7146840>.bounds
+
+tests/test_normalized_restore_bounds.py:19: AssertionError
+=============================== warnings summary ===============================
+tests/test_normalized_restore_bounds.py::test_normalized_restore_sets_checkpoint_bounds[True]
+  /home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/botorch/models/utils/assorted.py:276: InputDataWarning: Data (input features) is not contained to the unit cube. Please consider min-max scaling the input data.
+    check_min_max_scaling(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_normalized_restore_bounds.py::test_normalized_restore_sets_checkpoint_bounds[False]
+FAILED tests/test_normalized_restore_bounds.py::test_normalized_restore_sets_checkpoint_bounds[True]
+2 failed, 1 warning in 1.12s

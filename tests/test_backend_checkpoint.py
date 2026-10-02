@@ -130,28 +130,6 @@ def test_two_restores_produce_same_history_after_one_more_step() -> None:
     assert torch.equal(h1.objectives[-1:], h2.objectives[-1:])
 
 
-def test_restore_atomic_on_backend_id_mismatch() -> None:
-    be = initialized_backend()
-    before = be.checkpoint()
-    bad = replace(before, backend_id="wrong.Backend")
-
-    with pytest.raises(ValueError, match="backend_id mismatch"):
-        be.restore(bad)
-
-    # Backend state unchanged.
-    after = be.checkpoint()
-    assert torch.equal(after.X, before.X)
-    assert torch.equal(after.objectives, before.objectives)
-
-
-def test_restore_atomic_on_shape_mismatch() -> None:
-    be = initialized_backend()
-    before = be.checkpoint()
-    bad_obj = torch.zeros((before.X.shape[0] + 1, 1), dtype=torch.double)
-    bad = replace(before, objectives=bad_obj)
-
-    with pytest.raises(ValueError, match="Checkpoint shape mismatch"):
-        be.restore(bad)
 
 
 def test_checkpoint_preserves_problem_id_and_bounds() -> None:

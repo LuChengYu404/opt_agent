@@ -1,170 +1,104 @@
-"""Minimal IOH backend adapter — exposes IOH problems through the BocodeBotorchBackend interface.
+"""Minimal IOH backend adapter (BocodeBotorchBackend-compatible surface).
 
-Implements just enough of BocodeBotorchBackend's surface to drive DecisionLoop:
-- initialize(BackendConfig)
-- evaluate(X)
-- fit()
-- propose(n=1)
-- predict(X)
-- is_fitted / bounds / history properties
-
-We use IOH problems (Rastrigin, Sphere, Ellipsoid, BuecheRastrigin, LinearSlope)
-at arbitrary dimensions, which gives the dimension-crossed benchmark
-that EXP-RQ0.5 / Codex #1 needs.
+IOH minimizes; we negate values at storage time so the v3 maximization
+convention holds throughout. problems are BBOB-class (both consumers);
+problem_id encodes "fid:dim:instance" for checkpoint restore.
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
 import torch
 
-# We implement a minimal Backend-like object directly; not subclassing
-# BocodeBotorchBackend because the interface differs slightly.
-# All methods used by DecisionLoop.run + executor are implemented.
-
 
 @dataclass
 class IOHBackend:
-    """Minimal BO backend around an IOH problem."""
-
+    normalize_inputs: bool = False
     problem: any = field(default=None, init=False)
     bounds_lb: np.ndarray = field(default=None, init=False)
     bounds_ub: np.ndarray = field(default=None, init=False)
     dim: int = field(default=0, init=False)
     _history_X: Optional[torch.Tensor] = field(default=None, init=False)
     _history_y: Optional[torch.Tensor] = field(default=None, init=False)
-    _fitted_X: Optional[torch.Tensor] = field(default=None, init=False)
-    _fitted_y: Optional[torch.Tensor] = field(default=None, init=False)
     _fitted: bool = field(default=False, init=False)
-    _counter: int = field(default=0, init=False)
+    _model: any = field(default=None, init=False)
 
     def initialize(self, problem, n_init: int = 5, seed: int = 0) -> None:
-        """Initialize with an ioh problem. n_init and seed are honored.
+        from torch.quasirandom import SobolEngine
 
-        Convention: IOH minimizes, but v3 framework assumes maximization.
-        We negate IOH values at storage time so `history.objectives.max()`
-        gives the best-seen (negated-min = max of negated). The LLM sees
-        correct maximization values; local_exploitation's argmax works.
-        """
         self.problem = problem
         self.dim = int(problem.meta_data.n_variables)
-        # bounds.lb / bounds.ub may be scalars or per-dim arrays.
-        lb_arr = np.asarray(problem.bounds.lb).flatten()
-        ub_arr = np.asarray(problem.bounds.ub).flatten()
-        if lb_arr.size == 1:
-            lb = float(lb_arr[0])
-            ub = float(ub_arr[0])
-            self.bounds_lb = np.full(self.dim, lb)
-            self.bounds_ub = np.full(self.dim, ub)
-        else:
-            assert lb_arr.size == self.dim and ub_arr.size == self.dim
-            self.bounds_lb = lb_arr.astype(float)
-            self.bounds_ub = ub_arr.astype(float)
-        # Sobol-like initial points (using torch.quasirandom).
-        from torch.quasirandom import SobolEngine
+        lb = np.asarray(problem.bounds.lb, dtype=float).flatten()
+        ub = np.asarray(problem.bounds.ub, dtype=float).flatten()
+        if lb.size == 1:  # scalar bounds broadcast per-dim
+            lb, ub = np.full(self.dim, lb[0]), np.full(self.dim, ub[0])
+        self.bounds_lb, self.bounds_ub = lb, ub
+
         torch.manual_seed(seed)
-        sobol = SobolEngine(dimension=self.dim, scramble=True, seed=seed)
-        unit = sobol.draw(n_init).to(dtype=torch.double)
-        X0 = torch.tensor(self.bounds_lb, dtype=torch.double) + unit * (
-            torch.tensor(self.bounds_ub - self.bounds_lb, dtype=torch.double)
-        )
-        # Evaluate IOH problems in batch (ioh supports vectorized).
-        with torch.no_grad():
-            raw_y0 = torch.tensor(
-                [self.problem(x.cpu().numpy()) for x in X0], dtype=torch.double
-            ).reshape(-1, 1)
-        # NEGATE so that maximization semantics hold throughout the
-        # downstream state extraction / LLM payload.
-        y0 = -raw_y0
+        unit = SobolEngine(dimension=self.dim, scramble=True,
+                           seed=seed).draw(n_init).to(torch.double)
+        X0 = (torch.tensor(lb, dtype=torch.double)
+              + unit * torch.tensor(ub - lb, dtype=torch.double))
         self._history_X = X0.detach().clone()
-        self._history_y = y0.detach().clone()
+        self._history_y = -self._raw_eval(X0)
         self._fitted = False
-        self._counter = 0
+
+    def _raw_eval(self, X: torch.Tensor) -> torch.Tensor:
+        with torch.no_grad():
+            return torch.tensor(
+                [self.problem(x.cpu().numpy()) for x in X],
+                dtype=torch.double).reshape(-1, 1)
 
     def evaluate(self, X: torch.Tensor):
-        if X.ndim != 2 or X.shape[1] != self.dim:
-            raise ValueError(f"shape mismatch: {tuple(X.shape)} vs dim={self.dim}")
-        if not torch.isfinite(X).all():
-            raise ValueError("non-finite X")
-        with torch.no_grad():
-            raw_y = torch.tensor(
-                [self.problem(x.cpu().numpy()) for x in X], dtype=torch.double
-            ).reshape(-1, 1)
-        # NEGATE for maximization semantics.
-        new_y = -raw_y
-        self._history_X = torch.cat([self._history_X, X.detach()], dim=0)
-        self._history_y = torch.cat([self._history_y, new_y.detach()], dim=0)
+        new_y = -self._raw_eval(X)  # negate for maximization semantics
+        self._history_X = torch.cat([self._history_X, X.detach()])
+        self._history_y = torch.cat([self._history_y, new_y.detach()])
         self._fitted = False
         return new_y.detach()
 
     def fit(self) -> None:
+        from botorch.fit import fit_gpytorch_mll
         from botorch.models import SingleTaskGP
         from botorch.models.transforms import Normalize
         from gpytorch.mlls import ExactMarginalLogLikelihood
-        from botorch.fit import fit_gpytorch_mll
 
-        X = self._history_X.detach().clone()
-        # history_y already stores -IOH_y; GP fits a maximization model
-        # directly on it. No negation needed here.
-        Y = self._history_y.detach().clone()
-        # Normalize inputs to [0, 1] unit cube (BoTorch best practice).
-        # NOTE: Normalize transform state is not preserved through our
-        # custom checkpoint/restore; defer normalization until checkpoint
-        # boundary handling is updated.
-        self._model = SingleTaskGP(X, Y)
-        self._mll = ExactMarginalLogLikelihood(self._model.likelihood, self._model)
-        try:
-            fit_gpytorch_mll(self._mll)
-            self._fitted = True
-        except Exception:
-            self._fitted = False
-            raise
+        transform = (Normalize(d=self.dim, bounds=self.bounds)
+                     if self.normalize_inputs else None)
+        self._model = SingleTaskGP(self._history_X.clone(),
+                                   self._history_y.clone(),
+                                   input_transform=transform)
+        fit_gpytorch_mll(ExactMarginalLogLikelihood(
+            self._model.likelihood, self._model))
+        self._fitted = True
 
     @property
     def is_fitted(self) -> bool:
         return self._fitted
 
-    def propose(self, n: int = 1) -> torch.Tensor:
+    def propose(self, n: int = 1, af: str = "LogEI",
+                bounds: torch.Tensor | None = None) -> torch.Tensor:
         if not self._fitted:
             raise RuntimeError("Backend not fitted — call fit() first.")
         if n != 1:
             raise ValueError("IOHBackend only supports n=1 propose.")
-        from botorch.acquisition.analytic import LogExpectedImprovement
-        from botorch.optim import optimize_acqf
-
-        assert self._fitted
-        bounds_t = torch.stack([
-            torch.tensor(self.bounds_lb, dtype=torch.double),
-            torch.tensor(self.bounds_ub, dtype=torch.double),
-        ])
-        # history_y stores -IOH_y; max is the best (negated-min).
-        best_f = float(self._history_y.max().item())
-        ei = LogExpectedImprovement(model=self._model, best_f=best_f)
-        candidate, _ = optimize_acqf(
-            acq_function=ei, bounds=bounds_t, q=1,
-            num_restarts=4, raw_samples=16,
-        )
-        return candidate.detach()
+        from opt_agent.backend.acquisitions import propose_candidate
+        return propose_candidate(
+            af, model=self._model,
+            best_f=float(self._history_y.max().item()),  # negated-min best
+            bounds=self.bounds if bounds is None else bounds)
 
     def predict(self, X: torch.Tensor):
         if not self._fitted:
             raise RuntimeError("not fitted")
-        if X.ndim != 2:
-            raise ValueError(f"predict expects [n, d]; got {tuple(X.shape)}")
         self._model.eval()
         with torch.no_grad():
             posterior = self._model.posterior(X)
-            mean = posterior.mean
             var = posterior.variance
             if var.ndim == 1:
                 var = var.unsqueeze(-1)
-            std = var.clamp(min=0.0).sqrt()
-        # GP is fit on -IOH_y; posterior.mean is on the negated scale
-        # (= v3 maximizing scale). Return as-is.
-        return mean.detach(), std.detach()
+            return posterior.mean.detach(), var.clamp(min=0.0).sqrt().detach()
 
     @property
     def bounds(self):
@@ -181,3 +115,79 @@ class IOHBackend:
             def __len__(self):
                 return self.X.shape[0]
         return _Batch(self._history_X.detach(), self._history_y.detach())
+
+    # -- checkpoint / restore (atomic greedy actions roll back through these)
+
+    def checkpoint(self):
+        from io import BytesIO
+
+        from opt_agent.backend.checkpoint import Checkpoint
+
+        model_bytes = None
+        if self._fitted and self._model is not None:
+            buf = BytesIO()
+            torch.save(self._model.state_dict(), buf)
+            model_bytes = buf.getvalue()
+        rng_buf = BytesIO()
+        torch.save(torch.random.get_rng_state(), rng_buf)
+        md = self.problem.meta_data
+        return Checkpoint(
+            backend_id=type(self).__module__ + "." + type(self).__name__,
+            problem_id=f"{md.problem_id}:{self.dim}:{md.instance}",
+            problem_bounds=list(zip(self.bounds_lb.tolist(),
+                                    self.bounds_ub.tolist())),
+            X=self._history_X.clone(),
+            objectives=self._history_y.clone(),
+            constraints=torch.zeros((self._history_X.shape[0], 0),
+                                    dtype=torch.double),
+            fitted=self._fitted,
+            model_state_dict=model_bytes,
+            torch_rng_state=rng_buf.getvalue(),
+            normalize_inputs=self.normalize_inputs,
+        )
+
+    def restore(self, cp) -> None:
+        from io import BytesIO
+
+        from opt_agent.backend.checkpoint import Checkpoint
+
+        assert isinstance(cp, Checkpoint)
+        fid, dim, inst = (int(v) for v in cp.problem_id.split(":"))
+        problem = self._problem_matching(fid, dim, inst)
+        self.problem = problem
+        self.dim = dim
+        self._bounds_tensor = torch.tensor(
+            cp.problem_bounds, dtype=torch.double).T.contiguous()
+        self.bounds_lb = self._bounds_tensor[0].numpy().astype(float)
+        self.bounds_ub = self._bounds_tensor[1].numpy().astype(float)
+        self._history_X = cp.X.clone()
+        self._history_y = cp.objectives.clone()
+        self.normalize_inputs = bool(cp.normalize_inputs)
+
+        if cp.fitted and cp.model_state_dict is not None:
+            from botorch.models import SingleTaskGP
+            from botorch.models.transforms import Normalize
+
+            model = SingleTaskGP(
+                self._history_X, self._history_y,
+                input_transform=(Normalize(d=dim, bounds=self._bounds_tensor)
+                                 if self.normalize_inputs else None))
+            model.load_state_dict(
+                torch.load(BytesIO(cp.model_state_dict), weights_only=False))
+            model.eval()  # normalizes train inputs; see _entropy_workspace
+            self._model = model
+            self._fitted = True
+        else:
+            self._model = None
+            self._fitted = False
+        torch.random.set_rng_state(
+            torch.load(BytesIO(cp.torch_rng_state), weights_only=False))
+
+    def _problem_matching(self, fid, dim, inst):
+        md = getattr(self.problem, "meta_data", None)
+        if md is not None and (md.problem_id, self.dim, md.instance) == (
+                fid, dim, inst):
+            return self.problem
+        import ioh
+        return ioh.get_problem(fid=fid, dimension=dim, instance=inst,
+                               problem_class=ioh.ProblemClass.BBOB)

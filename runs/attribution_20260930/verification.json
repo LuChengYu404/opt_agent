@@ -1,0 +1,63 @@
+{
+  "labels": {
+    "tasks": 280,
+    "duplicate_keys": 0
+  },
+  "controls": {
+    "trajectories": 1000,
+    "budget_max": 30,
+    "all_nonstop_exhaust_budget": true,
+    "duplicate_keys": 0
+  },
+  "loops": {
+    "trajectories": 2125,
+    "budget_max": 30,
+    "all_nonstop_exhaust_budget": true,
+    "duplicate_keys": 0
+  },
+  "dim_controls": {
+    "trajectories": 1350,
+    "budget_max": 30,
+    "all_nonstop_exhaust_budget": true,
+    "duplicate_keys": 0
+  },
+  "dim_labels": {
+    "tasks": 135,
+    "duplicate_keys": 0
+  },
+  "dim_loops": {
+    "trajectories": 1350,
+    "budget_max": 30,
+    "all_nonstop_exhaust_budget": true,
+    "duplicate_keys": 0
+  },
+  "repeat32": {
+    "tasks": 30,
+    "duplicate_keys": 0
+  },
+  "posterior_loops": {
+    "trajectories": 100,
+    "budget_max": 30,
+    "all_nonstop_exhaust_budget": true,
+    "duplicate_keys": 0
+  },
+  "summary": {
+    "real_closed_loop_trajectories": 5925,
+    "new_seed_or_instance_trajectories": 3575,
+    "primary_label_states": 685,
+    "repeat32_states": 30,
+    "repeat32_first_four_exact_primary": true,
+    "serial_parallel_exact_match": true,
+    "hartmann_normalization_all_20_trajectories_exact_match": true,
+    "primary_and_supplementary_provenance_verified": true,
+    "saved_model_hash_verified": true,
+    "current_gp_primary_states": 4
+  },
+  "tests": {
+    "command": ".venv/bin/python -m pytest -q tests/test_attribution_suite.py tests/test_attribution_analysis.py tests/test_experiment_closed_loop.py",
+    "passed": 13,
+    "failed": 0,
+    "warnings": 6,
+    "warning_description": "BoTorch warns about raw-input control data not in the unit cube; these controls intentionally reproduce the original GP."
+  }
+}

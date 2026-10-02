@@ -62,11 +62,18 @@ def main() -> int:
             record,
             random_replicates=args.random_replicates,
             max_actions=args.max_actions,
+            # Archived phase8.6b artifacts predate the h2 AF executor;
+            # replayed for analysis with the semantics mismatch acknowledged
+            # (guide 4.5 frozen-artifact replay discipline).
+            allow_legacy_harness=True,
         )
         oracle_rows.append({
             "family": family,
             "seed": seed,
             "record_id": record.id,
+            # Execution provenance (codex round-2 MINOR): these rows replay
+            # legacy-harness records through the current executor.
+            "replay_execution": "current-harness executor on legacy records (migration analysis)",
             "gold_action": result.gold_action,
             "terminal": result.terminal,
             "gains": result.gains,

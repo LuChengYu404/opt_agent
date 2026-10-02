@@ -60,7 +60,7 @@ def test_rollout_returns_one_result_per_candidate() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2, seed=1),
+        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2),
         _candidate("stop", ActionType.STOP),
         _candidate("retrain", ActionType.RETRAIN_SURROGATE),
     ]
@@ -73,8 +73,8 @@ def test_all_candidates_produce_finite_utilities() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2, seed=1),
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=2),
+        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
         _candidate("stop", ActionType.STOP),
     ]
     out = CounterfactualRollout(be, horizon=1).rollout(state, candidates)
@@ -90,8 +90,8 @@ def test_state_unchanged_after_rollout() -> None:
     history_before = be.get_history()
 
     candidates = [
-        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2, seed=1),
-        _candidate("local", ActionType.LOCAL_EXPLOITATION, step=0.05, seed=2),
+        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2),
+        _candidate("local", ActionType.LOCAL_EXPLOITATION, step=0.05),
     ]
     CounterfactualRollout(be, horizon=1).rollout(state_before, candidates)
 
@@ -112,8 +112,8 @@ def test_rollout_restores_backend_when_candidate_raises() -> None:
     # Build candidates where one will raise: GLOBAL_EXPLORATION with n_samples
     # exceeding remaining budget → ValueError.
     candidates = [
-        _candidate("ok", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=1),
-        _candidate("bad", ActionType.GLOBAL_EXPLORATION, n_samples=999, seed=2),
+        _candidate("ok", ActionType.GLOBAL_EXPLORATION, n_samples=1),
+        _candidate("bad", ActionType.GLOBAL_EXPLORATION, n_samples=999),
         _candidate("stop", ActionType.STOP),
     ]
     out = CounterfactualRollout(be, horizon=1, max_rollout_steps=10).rollout(
@@ -135,8 +135,8 @@ def test_rollout_is_candidate_order_invariant() -> None:
     state = extract_state(be, total_budget=20)
 
     cands_ab = [
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=1),
-        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2, seed=2),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
+        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2),
     ]
     cands_ba = list(reversed(cands_ab))
 
@@ -155,8 +155,8 @@ def test_same_action_type_different_params_not_overwritten() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=1),
-        _candidate("g3", ActionType.GLOBAL_EXPLORATION, n_samples=3, seed=2),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
+        _candidate("g3", ActionType.GLOBAL_EXPLORATION, n_samples=3),
     ]
     out = CounterfactualRollout(be, horizon=1).rollout(state, candidates)
     assert [r.action_id for r in out.results] == ["g1", "g3"]
@@ -173,7 +173,7 @@ def test_to_gold_probs_sums_to_one_and_nonnegative() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2, seed=1),
+        _candidate("g2", ActionType.GLOBAL_EXPLORATION, n_samples=2),
         _candidate("stop", ActionType.STOP),
     ]
     out = CounterfactualRollout(be, horizon=1).rollout(state, candidates)
@@ -187,8 +187,8 @@ def test_to_gold_probs_ordering_preserved() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate("g3", ActionType.GLOBAL_EXPLORATION, n_samples=3, seed=1),
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=2),
+        _candidate("g3", ActionType.GLOBAL_EXPLORATION, n_samples=3),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
     ]
     out = CounterfactualRollout(be, horizon=1).rollout(state, candidates)
     probs = to_gold_probs(out.results)
@@ -205,7 +205,7 @@ def test_to_gold_probs_stop_is_dominant_at_zero_budget() -> None:
     state = extract_state(be, total_budget=3)
 
     candidates = [
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=1),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
         _candidate("stop", ActionType.STOP),
     ]
     # Note: g1 will be rejected by executor (budget=0). STOP is allowed.
@@ -240,7 +240,7 @@ def test_to_gold_probs_rejects_all_invalid() -> None:
     # total_budget=3 → remaining=0 → every non-STOP action will be rejected.
     state = extract_state(be, total_budget=3)
     candidates = [
-        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=1),
+        _candidate("g1", ActionType.GLOBAL_EXPLORATION, n_samples=1),
     ]
     out = CounterfactualRollout(be, horizon=1, max_rollout_steps=10).rollout(
         state, candidates
@@ -271,7 +271,7 @@ def test_max_rollout_steps_cap_rejected() -> None:
     be = RecordingBackend()
     state = extract_state(be, total_budget=20)
     candidates = [
-        _candidate(f"c{i}", ActionType.GLOBAL_EXPLORATION, n_samples=1, seed=i)
+        _candidate(f"c{i}", ActionType.GLOBAL_EXPLORATION, n_samples=1)
         for i in range(5)
     ]
     with pytest.raises(ValueError, match="rollout step cap"):
@@ -309,7 +309,7 @@ def test_real_branin_rollout_finds_different_utilities() -> None:
     state = extract_state(be, total_budget=30)
 
     candidates = [
-        _candidate("global", ActionType.GLOBAL_EXPLORATION, n_samples=3, seed=0),
+        _candidate("global", ActionType.GLOBAL_EXPLORATION, n_samples=3),
         _candidate("surrogate", ActionType.SURROGATE_ACQUISITION),
         _candidate("retrain", ActionType.RETRAIN_SURROGATE),
         _candidate("stop", ActionType.STOP),
@@ -330,7 +330,11 @@ def test_real_branin_rollout_finds_different_utilities() -> None:
     fits = {r.action_id: r.n_model_fits for r in out.results}
     assert fits["surrogate"] == 1
     assert fits["retrain"] == 1
-    assert fits["global"] == 0
+    # h2: GLOBAL_EXPLORATION is greedy Thompson sampling — one lazy fit per
+    # proposed point on a stale GP (n_samples=3, GP unfitted at rollout start
+    # because Brannin was initialized without fit). Pre-h2 Sobol sampling
+    # never fitted.
+    assert fits["global"] == 3
     assert fits["stop"] == 0
     # Backend must be restored.
     assert len(be.get_history()) == 5

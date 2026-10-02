@@ -1,0 +1,2101 @@
+{
+  "branin": {
+    "selection": {
+      "fixed": "surrogate_acquisition",
+      "raw_fixed": "surrogate_acquisition",
+      "schedule": "schedule_0.4",
+      "development_means": {
+        "raw": {
+          "global_exploration": -2.432967179536384,
+          "local_exploitation": -1.8103501214251339,
+          "uncertainty_sampling": -1.345183478919373,
+          "error_guided_sampling": -9.62507070671743,
+          "boundary_sampling": -3.1758032340575717,
+          "surrogate_acquisition": -0.4271725095839788
+        },
+        "normalized": {
+          "global_exploration": -2.432967179536384,
+          "local_exploitation": -1.8103501214251339,
+          "uncertainty_sampling": -1.7331896784804546,
+          "error_guided_sampling": -9.074985714298261,
+          "boundary_sampling": -3.1758032340575717,
+          "surrogate_acquisition": -0.4232812162908104
+        }
+      },
+      "schedule_means": {
+        "schedule_0.2": -1.478414099315117,
+        "schedule_0.4": -0.8580089010611095,
+        "schedule_0.6": -1.0470141329100477,
+        "schedule_0.8": -1.330893335115595
+      }
+    },
+    "contrasts": {
+      "normalization/global_exploration": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/local_exploitation": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/uncertainty_sampling": {
+        "mean": -0.18643556655851096,
+        "ci95": [
+          -0.6908042233362408,
+          0.3211342661335609
+        ],
+        "ci99": [
+          -0.8367526846873601,
+          0.4623621311338242
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          6,
+          2,
+          12
+        ],
+        "paired_sign_randomization_p": 0.47462626868656566,
+        "holm_p": 1.0
+      },
+      "normalization/error_guided_sampling": {
+        "mean": -0.23071066664669465,
+        "ci95": [
+          -0.5206872983029239,
+          0.0
+        ],
+        "ci99": [
+          -0.6217629166324119,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          17,
+          3
+        ],
+        "paired_sign_randomization_p": 0.25123743812809357,
+        "holm_p": 0.8145592720363982
+      },
+      "normalization/boundary_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/surrogate_acquisition": {
+        "mean": -0.026427860281649007,
+        "ci95": [
+          -0.06616549151455997,
+          0.006967957058746917
+        ],
+        "ci99": [
+          -0.07942318361334919,
+          0.01584685730737341
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          8,
+          0,
+          12
+        ],
+        "paired_sign_randomization_p": 0.20908954552272385,
+        "holm_p": 0.6272686365681716
+      },
+      "best_pipeline": {
+        "mean": -0.026427860281649007,
+        "ci95": [
+          -0.06616549151455997,
+          0.006967957058746917
+        ],
+        "ci99": [
+          -0.07942318361334919,
+          0.01584685730737341
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          8,
+          0,
+          12
+        ],
+        "paired_sign_randomization_p": 0.20908954552272385,
+        "holm_p": 0.8363581820908954
+      },
+      "schedule_minus_fixed": {
+        "mean": -0.533632600391174,
+        "ci95": [
+          -0.963202663325451,
+          -0.21185708941255574
+        ],
+        "ci99": [
+          -1.1430128551166017,
+          -0.152260663042549
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          2,
+          0,
+          18
+        ],
+        "paired_sign_randomization_p": 0.00014999250037498125,
+        "holm_p": 0.000599970001499925
+      },
+      "reference_unit_minus_fixed": {
+        "mean": 0.04502289422433137,
+        "ci95": [
+          0.0005070080099052939,
+          0.0980886517759347
+        ],
+        "ci99": [
+          -0.007601657819363569,
+          0.1175970260425751
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          8,
+          0,
+          2
+        ],
+        "paired_sign_randomization_p": 0.111994400279986,
+        "holm_p": 0.55997200139993
+      },
+      "reference_block_minus_fixed": {
+        "mean": 0.016440088927568475,
+        "ci95": [
+          -0.05748731879271646,
+          0.09483228238025444
+        ],
+        "ci99": [
+          -0.07726931626173865,
+          0.11817221946216759
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          5,
+          0,
+          5
+        ],
+        "paired_sign_randomization_p": 0.7016149192540373,
+        "holm_p": 1.0
+      },
+      "reference_block_minus_unit": {
+        "mean": -0.02858280529676289,
+        "ci95": [
+          -0.07738416561731008,
+          0.014003714883498995
+        ],
+        "ci99": [
+          -0.09488076846821866,
+          0.02397400755914568
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          3,
+          0,
+          7
+        ],
+        "paired_sign_randomization_p": 0.30763461826908656,
+        "holm_p": 1.0
+      }
+    },
+    "policies": {
+      "normalized/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -2.7959637508515756,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -7.131374996260161,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -2.074677452261163,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -0.8314379956987246,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/reference_1": {
+        "n": 10,
+        "mean_terminal_best": -0.4236333141110329,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1680.0,
+        "actions": {
+          "uncertainty_sampling": 9,
+          "surrogate_acquisition": 209,
+          "global_exploration": 8,
+          "boundary_sampling": 4,
+          "local_exploitation": 9,
+          "error_guided_sampling": 11
+        },
+        "reference_nonfixed_blocks": 41
+      },
+      "normalized/reference_5": {
+        "n": 10,
+        "mean_terminal_best": -0.45221611940779577,
+        "mean_fits": 17.8,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1440.0,
+        "actions": {
+          "local_exploitation": 60,
+          "global_exploration": 10,
+          "surrogate_acquisition": 115,
+          "uncertainty_sampling": 15,
+          "error_guided_sampling": 30,
+          "boundary_sampling": 20
+        },
+        "reference_nonfixed_blocks": 27
+      },
+      "normalized/schedule_0.4": {
+        "n": 20,
+        "mean_terminal_best": -0.978708978955984,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 200,
+          "local_exploitation": 300
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -0.44507637856480986,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -1.5955161207374862,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -2.7959637508515756,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -6.900664329613465,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -2.074677452261163,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -0.8314379956987246,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -0.41864851828316085,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -1.4090805541789753,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      }
+    }
+  },
+  "hartmann": {
+    "selection": {
+      "fixed": "surrogate_acquisition",
+      "raw_fixed": "surrogate_acquisition",
+      "schedule": "schedule_0.2",
+      "development_means": {
+        "raw": {
+          "global_exploration": 1.3966216761707433,
+          "local_exploitation": 2.107720753732985,
+          "uncertainty_sampling": 1.314898186763818,
+          "error_guided_sampling": 1.0829538053453718,
+          "boundary_sampling": 1.3521349187133742,
+          "surrogate_acquisition": 2.788368124151573
+        },
+        "normalized": {
+          "global_exploration": 1.3966216761707433,
+          "local_exploitation": 2.107720753732985,
+          "uncertainty_sampling": 1.314898186763818,
+          "error_guided_sampling": 1.0829538053453718,
+          "boundary_sampling": 1.3521349187133742,
+          "surrogate_acquisition": 2.788368124151573
+        }
+      },
+      "schedule_means": {
+        "schedule_0.2": 2.302728259861245,
+        "schedule_0.4": 2.2516795901111153,
+        "schedule_0.6": 2.0193114263921648,
+        "schedule_0.8": 1.7243748209255318
+      }
+    },
+    "contrasts": {
+      "normalization/global_exploration": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/local_exploitation": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/uncertainty_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/error_guided_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/boundary_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/surrogate_acquisition": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "best_pipeline": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "schedule_minus_fixed": {
+        "mean": -0.49266795062301255,
+        "ci95": [
+          -0.8703818221841398,
+          -0.1222488031246988
+        ],
+        "ci99": [
+          -1.0000693102338076,
+          0.0018284916509884793
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          5,
+          0,
+          15
+        ],
+        "paired_sign_randomization_p": 0.022548872556372182,
+        "holm_p": 0.06764661766911655
+      },
+      "reference_unit_minus_fixed": {
+        "mean": 0.03918671205404802,
+        "ci95": [
+          -0.20414623492354161,
+          0.2682313790018142
+        ],
+        "ci99": [
+          -0.28280230725557814,
+          0.32343563845718515
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          6,
+          0,
+          4
+        ],
+        "paired_sign_randomization_p": 0.7570621468926554,
+        "holm_p": 1.0
+      },
+      "reference_block_minus_fixed": {
+        "mean": 0.1373288853044939,
+        "ci95": [
+          0.0014154887448111942,
+          0.28039497391684487
+        ],
+        "ci99": [
+          -0.034452871445813285,
+          0.3325633385853138
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          5,
+          1,
+          4
+        ],
+        "paired_sign_randomization_p": 0.11499425028748562,
+        "holm_p": 0.4982250887455627
+      },
+      "reference_block_minus_unit": {
+        "mean": 0.09814217325044586,
+        "ci95": [
+          -0.05493016481404022,
+          0.28287650216413207
+        ],
+        "ci99": [
+          -0.08469542900291924,
+          0.34155296241190863
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          6,
+          0,
+          4
+        ],
+        "paired_sign_randomization_p": 0.384030798460077,
+        "holm_p": 1.0
+      }
+    },
+    "policies": {
+      "normalized/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.3783732693928479,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.112652064527865,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": 1.3573120794161557,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": 2.4554579662830127,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/reference_1": {
+        "n": 10,
+        "mean_terminal_best": 2.9443132268805163,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1680.0,
+        "actions": {
+          "error_guided_sampling": 13,
+          "surrogate_acquisition": 213,
+          "boundary_sampling": 5,
+          "global_exploration": 4,
+          "local_exploitation": 12,
+          "uncertainty_sampling": 3
+        },
+        "reference_nonfixed_blocks": 37
+      },
+      "normalized/reference_5": {
+        "n": 10,
+        "mean_terminal_best": 3.0424554001309625,
+        "mean_fits": 18.6,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1440.0,
+        "actions": {
+          "local_exploitation": 75,
+          "surrogate_acquisition": 135,
+          "error_guided_sampling": 30,
+          "uncertainty_sampling": 5,
+          "global_exploration": 5
+        },
+        "reference_nonfixed_blocks": 23
+      },
+      "normalized/schedule_0.2": {
+        "n": 20,
+        "mean_terminal_best": 2.352146161762159,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 100,
+          "local_exploitation": 400
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": 2.8448141123851713,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.2408607016850643,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.3783732693928479,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.1126520645278648,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": 1.3573120794161557,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": 2.4554579662830127,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": 2.8448141123851713,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": 1.2408607016850643,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      }
+    }
+  },
+  "ackley": {
+    "selection": {
+      "fixed": "surrogate_acquisition",
+      "raw_fixed": "local_exploitation",
+      "schedule": "schedule_0.2",
+      "development_means": {
+        "raw": {
+          "global_exploration": -19.881354212752477,
+          "local_exploitation": -19.070350593164356,
+          "uncertainty_sampling": -19.781287744327784,
+          "error_guided_sampling": -19.916169964050916,
+          "boundary_sampling": -20.465523719657398,
+          "surrogate_acquisition": -20.17443019257169
+        },
+        "normalized": {
+          "global_exploration": -19.881354212752477,
+          "local_exploitation": -19.070350593164356,
+          "uncertainty_sampling": -20.429830442413742,
+          "error_guided_sampling": -20.107664678970835,
+          "boundary_sampling": -20.465523719657398,
+          "surrogate_acquisition": -13.032267007435303
+        }
+      },
+      "schedule_means": {
+        "schedule_0.2": -18.098443407096898,
+        "schedule_0.4": -18.5845009346566,
+        "schedule_0.6": -19.374874099055553,
+        "schedule_0.8": -19.594092558020915
+      }
+    },
+    "contrasts": {
+      "normalization/global_exploration": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/local_exploitation": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/uncertainty_sampling": {
+        "mean": -0.6204615885009183,
+        "ci95": [
+          -0.9131328037282387,
+          -0.3722286078524178
+        ],
+        "ci99": [
+          -1.042901551361973,
+          -0.31861439782332873
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          3,
+          17
+        ],
+        "paired_sign_randomization_p": 4.999750012499375e-05,
+        "holm_p": 0.00024998750062496874
+      },
+      "normalization/error_guided_sampling": {
+        "mean": -0.13092556481844309,
+        "ci95": [
+          -0.32789864554023007,
+          0.04837056258626873
+        ],
+        "ci99": [
+          -0.38944084636991066,
+          0.10525553040991552
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          6,
+          3,
+          11
+        ],
+        "paired_sign_randomization_p": 0.20363981800909955,
+        "holm_p": 0.8145592720363982
+      },
+      "normalization/boundary_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/surrogate_acquisition": {
+        "mean": 5.485645902310124,
+        "ci95": [
+          4.094977292666668,
+          6.903809005426716
+        ],
+        "ci99": [
+          3.5641128466511356,
+          7.343539861965442
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          19,
+          0,
+          1
+        ],
+        "paired_sign_randomization_p": 4.999750012499375e-05,
+        "holm_p": 0.00024998750062496874
+      },
+      "best_pipeline": {
+        "mean": 4.766461931292445,
+        "ci95": [
+          3.3565682753452415,
+          6.106653428673884
+        ],
+        "ci99": [
+          2.9192291773312697,
+          6.555529446952755
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          19,
+          0,
+          1
+        ],
+        "paired_sign_randomization_p": 4.999750012499375e-05,
+        "holm_p": 0.00024998750062496874
+      },
+      "schedule_minus_fixed": {
+        "mean": -4.85893592467571,
+        "ci95": [
+          -6.137609125566526,
+          -3.5963249047935544
+        ],
+        "ci99": [
+          -6.514248057617657,
+          -3.218961090701896
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          0,
+          20
+        ],
+        "paired_sign_randomization_p": 4.999750012499375e-05,
+        "holm_p": 0.00024998750062496874
+      },
+      "reference_unit_minus_fixed": {
+        "mean": -0.604684045090367,
+        "ci95": [
+          -2.549299139235377,
+          1.2539885160281004
+        ],
+        "ci99": [
+          -3.1085582686802518,
+          1.8041150403345798
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          5,
+          0,
+          5
+        ],
+        "paired_sign_randomization_p": 0.5580220988950553,
+        "holm_p": 1.0
+      },
+      "reference_block_minus_fixed": {
+        "mean": -1.393267326316374,
+        "ci95": [
+          -3.2686481160734386,
+          0.42940884312754896
+        ],
+        "ci99": [
+          -3.909728785957366,
+          0.9808856893547289
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          2,
+          1,
+          7
+        ],
+        "paired_sign_randomization_p": 0.19579021048947554,
+        "holm_p": 0.5873706314684266
+      },
+      "reference_block_minus_unit": {
+        "mean": -0.788583281226007,
+        "ci95": [
+          -3.1778782237457657,
+          1.519465154199441
+        ],
+        "ci99": [
+          -3.957292977284212,
+          2.2215116018723915
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          4,
+          0,
+          6
+        ],
+        "paired_sign_randomization_p": 0.5567221638918054,
+        "holm_p": 1.0
+      }
+    },
+    "policies": {
+      "normalized/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -20.39504810209435,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -20.052968316242165,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -19.89639235200446,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -18.99337323923745,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/reference_1": {
+        "n": 10,
+        "mean_terminal_best": -15.273121953808218,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1680.0,
+        "actions": {
+          "surrogate_acquisition": 211,
+          "boundary_sampling": 7,
+          "error_guided_sampling": 10,
+          "local_exploitation": 5,
+          "uncertainty_sampling": 7,
+          "global_exploration": 10
+        },
+        "reference_nonfixed_blocks": 39
+      },
+      "normalized/reference_5": {
+        "n": 10,
+        "mean_terminal_best": -16.061705235034225,
+        "mean_fits": 17.8,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1440.0,
+        "actions": {
+          "global_exploration": 15,
+          "uncertainty_sampling": 10,
+          "error_guided_sampling": 15,
+          "surrogate_acquisition": 135,
+          "local_exploitation": 35,
+          "boundary_sampling": 40
+        },
+        "reference_nonfixed_blocks": 23
+      },
+      "normalized/schedule_0.2": {
+        "n": 20,
+        "mean_terminal_best": -19.085847232620715,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 100,
+          "local_exploitation": 400
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -14.226911307945008,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -20.48762697139181,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -20.39504810209435,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -19.92204275142372,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -19.89639235200446,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -18.99337323923745,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -19.712557210255135,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -19.867165382890885,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      }
+    }
+  },
+  "sixhumpcamel": {
+    "selection": {
+      "fixed": "surrogate_acquisition",
+      "raw_fixed": "surrogate_acquisition",
+      "schedule": "schedule_0.6",
+      "development_means": {
+        "raw": {
+          "global_exploration": 0.38248569768071483,
+          "local_exploitation": 0.42618689335315507,
+          "uncertainty_sampling": 0.3595500894718173,
+          "error_guided_sampling": -1.2506663485093195,
+          "boundary_sampling": -1.2790318732907102,
+          "surrogate_acquisition": 0.7259490440322052
+        },
+        "normalized": {
+          "global_exploration": 0.38248569768071483,
+          "local_exploitation": 0.42618689335315507,
+          "uncertainty_sampling": 0.16126944092643145,
+          "error_guided_sampling": -1.2310373597212432,
+          "boundary_sampling": -1.2790318732907102,
+          "surrogate_acquisition": 0.9328097158903266
+        }
+      },
+      "schedule_means": {
+        "schedule_0.2": 0.769276457718746,
+        "schedule_0.4": 0.9127921644117668,
+        "schedule_0.6": 0.9376373760170071,
+        "schedule_0.8": 0.7568490245885799
+      }
+    },
+    "contrasts": {
+      "normalization/global_exploration": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/local_exploitation": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/uncertainty_sampling": {
+        "mean": -0.04988691494256073,
+        "ci95": [
+          -0.3262977807338267,
+          0.20432751745304228
+        ],
+        "ci99": [
+          -0.41194384388589517,
+          0.2903520384661157
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          10,
+          3,
+          7
+        ],
+        "paired_sign_randomization_p": 0.72036398180091,
+        "holm_p": 1.0
+      },
+      "normalization/error_guided_sampling": {
+        "mean": 0.3865057788284828,
+        "ci95": [
+          0.13071183486858212,
+          0.6978593911717068
+        ],
+        "ci99": [
+          0.06693472815555528,
+          0.8083705170104576
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          7,
+          12,
+          1
+        ],
+        "paired_sign_randomization_p": 0.015099245037748113,
+        "holm_p": 0.07549622518874056
+      },
+      "normalization/boundary_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/surrogate_acquisition": {
+        "mean": -0.06610721249843769,
+        "ci95": [
+          -0.20298388666248118,
+          0.06943323063843161
+        ],
+        "ci99": [
+          -0.24841560438970198,
+          0.11530899360792655
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          8,
+          0,
+          12
+        ],
+        "paired_sign_randomization_p": 0.37953102344882755,
+        "holm_p": 0.7590620468976551
+      },
+      "best_pipeline": {
+        "mean": -0.06610721249843769,
+        "ci95": [
+          -0.20298388666248118,
+          0.06943323063843161
+        ],
+        "ci99": [
+          -0.24841560438970198,
+          0.11530899360792655
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          8,
+          0,
+          12
+        ],
+        "paired_sign_randomization_p": 0.37953102344882755,
+        "holm_p": 1.0
+      },
+      "schedule_minus_fixed": {
+        "mean": -0.05066915984738816,
+        "ci95": [
+          -0.2589453565113542,
+          0.14390570412634665
+        ],
+        "ci99": [
+          -0.3303961964518485,
+          0.19909267292455649
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          8,
+          1,
+          11
+        ],
+        "paired_sign_randomization_p": 0.6499675016249188,
+        "holm_p": 0.6499675016249188
+      },
+      "reference_unit_minus_fixed": {
+        "mean": 0.08243346024635759,
+        "ci95": [
+          -0.1569989711983804,
+          0.27554243402901996
+        ],
+        "ci99": [
+          -0.2370276582736279,
+          0.33273504315738356
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          8,
+          0,
+          2
+        ],
+        "paired_sign_randomization_p": 0.48817559122043896,
+        "holm_p": 1.0
+      },
+      "reference_block_minus_fixed": {
+        "mean": 0.04912225916955816,
+        "ci95": [
+          -0.18599064128139906,
+          0.25494596961404514
+        ],
+        "ci99": [
+          -0.2619902980270253,
+          0.32172581859590615
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          6,
+          0,
+          4
+        ],
+        "paired_sign_randomization_p": 0.6336183190840458,
+        "holm_p": 1.0
+      },
+      "reference_block_minus_unit": {
+        "mean": -0.03331120107679943,
+        "ci95": [
+          -0.2921116000250681,
+          0.21455997837533466
+        ],
+        "ci99": [
+          -0.3810101857347137,
+          0.2934053244136602
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          3,
+          0,
+          7
+        ],
+        "paired_sign_randomization_p": 0.5230238488075596,
+        "holm_p": 1.0
+      }
+    },
+    "policies": {
+      "normalized/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -1.2349229484887327,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -0.8101818196198792,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": 0.4120900502244037,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": 0.8537031416140991,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/reference_1": {
+        "n": 10,
+        "mean_terminal_best": 0.9173050142521608,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1680.0,
+        "actions": {
+          "local_exploitation": 8,
+          "surrogate_acquisition": 209,
+          "global_exploration": 16,
+          "uncertainty_sampling": 9,
+          "error_guided_sampling": 6,
+          "boundary_sampling": 2
+        },
+        "reference_nonfixed_blocks": 41
+      },
+      "normalized/reference_5": {
+        "n": 10,
+        "mean_terminal_best": 0.8839938131753616,
+        "mean_fits": 16.6,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1440.0,
+        "actions": {
+          "uncertainty_sampling": 40,
+          "surrogate_acquisition": 70,
+          "global_exploration": 45,
+          "local_exploitation": 55,
+          "error_guided_sampling": 35,
+          "boundary_sampling": 5
+        },
+        "reference_nonfixed_blocks": 36
+      },
+      "normalized/schedule_0.6": {
+        "n": 20,
+        "mean_terminal_best": 0.7484757943413386,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 300,
+          "local_exploitation": 200
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": 0.7991449541887268,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": 0.22180950377202407,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -1.2349229484887327,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -1.1966875984483623,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": 0.4120900502244037,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": 0.8537031416140991,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": 0.8652521666871644,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": 0.27169641871458483,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      }
+    }
+  },
+  "rastrigin": {
+    "selection": {
+      "fixed": "surrogate_acquisition",
+      "raw_fixed": "local_exploitation",
+      "schedule": "schedule_0.2",
+      "development_means": {
+        "raw": {
+          "global_exploration": -121.72770275965509,
+          "local_exploitation": -114.462636148829,
+          "uncertainty_sampling": -118.19798685859863,
+          "error_guided_sampling": -124.04906746385241,
+          "boundary_sampling": -129.57812656224797,
+          "surrogate_acquisition": -115.93964392377802
+        },
+        "normalized": {
+          "global_exploration": -121.72770275965509,
+          "local_exploitation": -114.462636148829,
+          "uncertainty_sampling": -137.71336572515287,
+          "error_guided_sampling": -117.41917044792544,
+          "boundary_sampling": -129.57812656224797,
+          "surrogate_acquisition": -102.0011890278939
+        }
+      },
+      "schedule_means": {
+        "schedule_0.2": -107.53809505979969,
+        "schedule_0.4": -116.6914438666482,
+        "schedule_0.6": -115.47491283477841,
+        "schedule_0.8": -119.30550938585729
+      }
+    },
+    "contrasts": {
+      "normalization/global_exploration": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/local_exploitation": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/uncertainty_sampling": {
+        "mean": -14.291251738818286,
+        "ci95": [
+          -22.825796778177747,
+          -6.254975957400853
+        ],
+        "ci99": [
+          -25.290984914795985,
+          -3.8345764982119825
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          2,
+          5,
+          13
+        ],
+        "paired_sign_randomization_p": 0.0038498075096245186,
+        "holm_p": 0.015399230038498074
+      },
+      "normalization/error_guided_sampling": {
+        "mean": -1.7457628722470069,
+        "ci95": [
+          -7.824961944310135,
+          3.6699559625323777
+        ],
+        "ci99": [
+          -9.799677985802205,
+          5.456687583451154
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          5,
+          7,
+          8
+        ],
+        "paired_sign_randomization_p": 0.592720363981801,
+        "holm_p": 1.0
+      },
+      "normalization/boundary_sampling": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "ci99": [
+          0.0,
+          0.0
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          0,
+          20,
+          0
+        ],
+        "paired_sign_randomization_p": 1.0,
+        "holm_p": 1.0
+      },
+      "normalization/surrogate_acquisition": {
+        "mean": 11.500298862227261,
+        "ci95": [
+          -0.25148486886477034,
+          22.725798255876853
+        ],
+        "ci99": [
+          -4.123202310741925,
+          26.60581674774638
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          14,
+          0,
+          6
+        ],
+        "paired_sign_randomization_p": 0.0751962401879906,
+        "holm_p": 0.3007849607519624
+      },
+      "best_pipeline": {
+        "mean": 5.330919873189913,
+        "ci95": [
+          -4.746862045532961,
+          17.114553561712114
+        ],
+        "ci99": [
+          -7.606673028885694,
+          21.570823203700833
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          11,
+          1,
+          8
+        ],
+        "paired_sign_randomization_p": 0.4060796960151992,
+        "holm_p": 1.0
+      },
+      "schedule_minus_fixed": {
+        "mean": -8.87256677973866,
+        "ci95": [
+          -19.17423293232518,
+          1.1100192985443524
+        ],
+        "ci99": [
+          -22.458851082179155,
+          4.135103964298584
+        ],
+        "n": 20,
+        "wins_ties_losses": [
+          7,
+          1,
+          12
+        ],
+        "paired_sign_randomization_p": 0.11544422778861058,
+        "holm_p": 0.23088845557722115
+      },
+      "reference_unit_minus_fixed": {
+        "mean": 12.142364407392527,
+        "ci95": [
+          -2.91439170545857,
+          28.182451474561304
+        ],
+        "ci99": [
+          -7.380229485663074,
+          33.83932762550547
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          7,
+          1,
+          2
+        ],
+        "paired_sign_randomization_p": 0.2046897655117244,
+        "holm_p": 0.8187590620468976
+      },
+      "reference_block_minus_fixed": {
+        "mean": 14.370454892538518,
+        "ci95": [
+          -0.24157568453553563,
+          28.774872517177737
+        ],
+        "ci99": [
+          -4.405808288613475,
+          32.61517552860824
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          7,
+          2,
+          1
+        ],
+        "paired_sign_randomization_p": 0.09964501774911254,
+        "holm_p": 0.4982250887455627
+      },
+      "reference_block_minus_unit": {
+        "mean": 2.228090485145991,
+        "ci95": [
+          -13.42913363999052,
+          17.68790009109928
+        ],
+        "ci99": [
+          -17.446671651717352,
+          22.10521684626371
+        ],
+        "n": 10,
+        "wins_ties_losses": [
+          4,
+          1,
+          5
+        ],
+        "paired_sign_randomization_p": 0.8623068846557672,
+        "holm_p": 1.0
+      }
+    },
+    "policies": {
+      "normalized/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -125.82935277366441,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -126.19785097825965,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -118.76816527475144,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -111.68235529210611,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/reference_1": {
+        "n": 10,
+        "mean_terminal_best": -97.0077383028922,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1680.0,
+        "actions": {
+          "global_exploration": 14,
+          "surrogate_acquisition": 206,
+          "error_guided_sampling": 8,
+          "uncertainty_sampling": 9,
+          "local_exploitation": 8,
+          "boundary_sampling": 5
+        },
+        "reference_nonfixed_blocks": 44
+      },
+      "normalized/reference_5": {
+        "n": 10,
+        "mean_terminal_best": -94.77964781774621,
+        "mean_fits": 17.0,
+        "mean_planning_evaluations": 1800.0,
+        "mean_planning_fits": 1440.0,
+        "actions": {
+          "surrogate_acquisition": 75,
+          "error_guided_sampling": 50,
+          "global_exploration": 70,
+          "local_exploitation": 25,
+          "uncertainty_sampling": 25,
+          "boundary_sampling": 5
+        },
+        "reference_nonfixed_blocks": 35
+      },
+      "normalized/schedule_0.2": {
+        "n": 20,
+        "mean_terminal_best": -115.22400219865486,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 100,
+          "local_exploitation": 400
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -106.35143541891618,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "normalized/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -134.06102509939882,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/boundary_sampling": {
+        "n": 20,
+        "mean_terminal_best": -125.82935277366441,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "boundary_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/error_guided_sampling": {
+        "n": 20,
+        "mean_terminal_best": -124.45208810601264,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "error_guided_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/global_exploration": {
+        "n": 20,
+        "mean_terminal_best": -118.76816527475144,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "global_exploration": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/local_exploitation": {
+        "n": 20,
+        "mean_terminal_best": -111.68235529210611,
+        "mean_fits": 0.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "local_exploitation": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/surrogate_acquisition": {
+        "n": 20,
+        "mean_terminal_best": -117.85173428114346,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "surrogate_acquisition": 500
+        },
+        "reference_nonfixed_blocks": null
+      },
+      "raw/uncertainty_sampling": {
+        "n": 20,
+        "mean_terminal_best": -119.76977336058053,
+        "mean_fits": 25.0,
+        "mean_planning_evaluations": 0.0,
+        "mean_planning_fits": 0.0,
+        "actions": {
+          "uncertainty_sampling": 500
+        },
+        "reference_nonfixed_blocks": null
+      }
+    }
+  }
+}

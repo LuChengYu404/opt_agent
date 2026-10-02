@@ -142,7 +142,7 @@ class HybridPolicy:
                 f"distribution {sorted(probs)}; check that the candidate "
                 f"factory and the model output share the same vocabulary."
             )
-        factory_candidates = candidate_actions_for_state(state, seed=0)
+        factory_candidates = candidate_actions_for_state(state)
         if action_id not in factory_candidates:
             raise ValueError(
                 f"system1 action {action_id!r} is not in the state-filtered "

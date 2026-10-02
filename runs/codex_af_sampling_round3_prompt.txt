@@ -1,0 +1,27 @@
+REVIEW round 3 (final): LMABO AF sampling transplant (harness h2). Branch exp/boundary-scheme-round2, working tree (uncommitted). Round-1 (runs/codex_af_sampling_review.log): REVISE, 4 MAJOR + 4 MINOR. Round-2 (runs/codex_af_sampling_round2_review.log): 6/8 ADDRESSED, 2 PARTIAL → 2 new MAJOR + 2 MINOR, all dispositions in docs/AF_SAMPLING_20261001.md §5-§6.
+
+ROUND-2 DISPOSITIONS (verify each: ADDRESSED / PARTIAL / UNADDRESSED):
+
+R2-A [MAJOR, _entropy_workspace del-before-eval on restored train-mode GP] ADDRESSED: order is now `af_model.eval()` FIRST (normalizes train inputs via _set_transformed_inputs while the transform still exists), `del af_model.input_transform` SECOND. Empirically confirmed: del-first inconsistent on a restored GP, eval-first consistent on both fresh-fit and restored. New regressions: tests/test_acquisitions.py::test_entropy_workspace_posterior_equivalence_fresh_and_restored (asserts be._model.training on the restored path) and ::test_entropy_af_replay_after_restore_returns_physical_points.
+
+R2-B [MAJOR, IOHBackend lacks checkpoint/restore → non-atomic greedy actions] ADDRESSED: IOHBackend now implements the Checkpoint protocol mirroring BocodeBotorchBackend (history + fitted GP state_dict + RNG; problem_id encodes fid:dim:instance; BBOB-class assumption documented in the docstring — both repo consumers are BBOB). Regressions: test_ioh_backend_checkpoint_roundtrip (predictions identical after roundtrip), test_ioh_backend_multi_point_action_is_atomic (injected 2nd-evaluate failure rolls history back to 5). Drive-by fix in the same file: get_history().__len__ referenced an out-of-scope `X` (NameError on every execute_action) → `self.X`.
+
+R2-C [MINOR, rollback failure silently swallowed] ADDRESSED: rollback failure now raises RuntimeError chaining the original exception (`from exc`), reporting both failures.
+
+R2-D [MINOR, script outputs unlabelled legacy execution] ADDRESSED: validate_phase8_6b + ablate_phase8_6d rows carry "replay_execution": "current-harness executor on legacy records (migration analysis)"; diagnose_qs5 report header carries an Execution line.
+
+R2-E [MINOR, coverage depth] ADDRESSED: posterior-equivalence (fresh + restored), real-backend (BocodeBotorchBackend) atomic rollback incl. RNG-state assertion, IOH checkpoint roundtrip + IOH atomicity added.
+
+R2-F [MINOR, doc claims] ADDRESSED: §2 seed wording now "parameter compatibility != replayability" pointing at the harness guard; lenz item moved out of the open-issues list (synced in round-2).
+
+Full suite after these fixes: 516 passed (includes all new regressions).
+
+REVIEW TASKS:
+A. Verify each round-2 disposition.
+B. New-issue check on the round-2 fix diffs only (acquisitions workspace order, IOHBackend checkpoint/restore + get_history len fix, executor exception chaining, script output labels, new tests).
+C. Final merge-readiness for the h2 change set.
+
+Answer format: A one row per disposition; B findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, inspect git log/diff, and read both prior review logs.

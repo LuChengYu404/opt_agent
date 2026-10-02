@@ -1,0 +1,33 @@
+/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:144: UserWarning: /home/lcy/Documents/projects/opt_agent_v3/runs/phase8_6d_h3_20seed_5family.jsonl: harness stamp is legacy/absent (record 'branin:0:0:0' first seen); pooling legacy records with current-version records requires an explicit same-data A/B note (guide 6.6 rule 1)
+  enforce_record_versions(
+{
+  "global_fixed_order": [
+    "retrain_surrogate",
+    "local_exploitation",
+    "error_guided_sampling",
+    "surrogate_acquisition",
+    "uncertainty_sampling",
+    "global_exploration",
+    "boundary_sampling",
+    "stop"
+  ],
+  "global_fixed_metrics": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.8760816891658013,
+    "top1_agreement": 0.4,
+    "records": 115
+  },
+  "family_fixed_metrics": {
+    "pairs": 2889,
+    "pairwise_accuracy": 0.8760816891658013,
+    "top1_agreement": 0.4,
+    "records": 115
+  },
+  "always_local_top1_agreement": 0.24347826086956523
+}
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+bt {"n_states": 20, "training_vs_sdk_same_action_share": 1.0, "raw_top_actions": {"local_exploitation": 17, "retrain_surrogate": 3}, "reverse_same_action_share": 0.25, "reverse_same_slot_share": 0.75, "checkpoint_sha256": "7f35bebde8f54b986574e38854a9bae619c12182dbab8e4547d795c923b4750a"}
+/home/lcy/Documents/projects/opt_agent_v3/.venv/lib/python3.12/site-packages/laya/agent.py:464: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder)
+proper {"n_states": 20, "training_vs_sdk_same_action_share": 1.0, "raw_top_actions": {"retrain_surrogate": 15, "local_exploitation": 5}, "reverse_same_action_share": 0.75, "reverse_same_slot_share": 0.25, "checkpoint_sha256": "3e5e573c5c63fd2d183eef3ad70feecacafb33b787b3f04fb6f87e28dcf424e5"}

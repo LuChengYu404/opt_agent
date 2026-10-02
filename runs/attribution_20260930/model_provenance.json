@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "dataset_sha256": "b08125550482d9d743ebf846d6b64eb5bc7dcf7ec4249577669de0bcea225425",
+  "script_sha256": "c4d0f5994f4f5082f59a5babf088611eb26e35c3e46906800f272eaef3692a7a",
+  "protocol_sha256": "09b25c7e7aa30c47932b7fed7b7e195eb6a9f649b4a9721b3565e4627224231a",
+  "packages": {
+    "torch": "2.14.0",
+    "botorch": "0.18.1",
+    "gpytorch": "1.15.2",
+    "ioh": "0.3.22",
+    "scikit-learn": "1.9.1"
+  },
+  "scales": {
+    "branin": 38.4975318504866,
+    "hartmann": 0.3423352006137798,
+    "ackley": 0.32946248272898665,
+    "sixhumpcamel": 19.211713945914177,
+    "rastrigin": 25.35152574473255
+  },
+  "n_states": 280,
+  "training_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "policies": [
+    "rf_original_short_state",
+    "rf_original_short_time",
+    "rf_original_terminal_state",
+    "rf_original_terminal_time",
+    "rf_unit_short_state",
+    "rf_unit_short_time",
+    "rf_unit_terminal_state",
+    "rf_unit_terminal_time",
+    "rf_legacy"
+  ],
+  "labels_sha256": "ffd2cdc4a663e54547149000d8bd873b9f344ae59402dd3834e54605b1be51d3"
+}

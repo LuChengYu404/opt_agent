@@ -39,8 +39,8 @@ def test_jev_choice_uses_budget_valid_factory_action_and_records_usage():
         return httpx.Response(200, json={
             "model": "jev-test",
             "answers": {"next_action": {
-                "type": "choice", "choice": "boundary_sampling",
-                "probabilities": {name: (1.0 if name == "boundary_sampling" else 0.0) for name in choices},
+                "type": "choice", "choice": "global_exploration",
+                "probabilities": {name: (1.0 if name == "global_exploration" else 0.0) for name in choices},
                 "confidence": 1.0,
             }},
             "usage": {"input_tokens": 123, "output_tokens": 4},
@@ -55,16 +55,14 @@ def test_jev_choice_uses_budget_valid_factory_action_and_records_usage():
     criteria = question["criteria"]
     assert "retrain_surrogate" not in criteria
     assert "without supplying parameters" in question["instructions"]
-    assert "n_samples=1" in criteria["boundary_sampling"]
-    assert "tol=0.05" in criteria["boundary_sampling"]
-    assert "seed=22" in criteria["boundary_sampling"]
-    assert "Uses 1 objective evaluation" in criteria["boundary_sampling"]
-    assert "Does not fit the surrogate" in criteria["boundary_sampling"]
+    assert "n_samples=1" in criteria["global_exploration"]  # capped at remaining=1
+    assert "Uses 1 objective evaluation" in criteria["global_exploration"]
+    assert "Fits the surrogate lazily" in criteria["global_exploration"]
     assert "step=0.1 of the domain width" in criteria["local_exploitation"]
     assert "Uses the current surrogate without refitting" in criteria["surrogate_acquisition"]
     assert "remaining budget unused" in criteria["stop"]
     assert result.action.params["n_samples"] == 1
-    assert result.action.params["seed"] == 22
+    assert "seed" not in result.action.params  # h3: no seed params
     assert policy.call_count == 1
     assert policy.total_input_tokens == 123
 
@@ -113,7 +111,8 @@ def test_jev_legacy_criteria_remain_available_for_prior_baselines():
         JevPolicy(api_key="test-key", client=client,
                   criteria_format="legacy").decide(_state())
     assert seen["question"]["criteria"]["global_exploration"] == (
-        "Evaluate new space-filling points across the search domain."
+        "Thompson sampling: evaluate the maximizer of one posterior sample "
+        "(global exploration, LMABO portfolio AF)."
     )
     assert "without supplying parameters" not in seen["question"]["instructions"]
 
@@ -138,7 +137,7 @@ def test_jev_normalizes_display_rounded_probabilities():
         choices = __import__("json").loads(request.content)["questions"]["next_action"]["criteria"]
         probabilities = {name: 0.0 for name in choices}
         probabilities["global_exploration"] = 0.50
-        probabilities["boundary_sampling"] = 0.49
+        probabilities["uncertainty_sampling"] = 0.49
         return httpx.Response(200, json={
             "answers": {"next_action": {
                 "type": "choice", "choice": "global_exploration",

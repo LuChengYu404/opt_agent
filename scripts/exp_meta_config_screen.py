@@ -133,7 +133,7 @@ class AlwaysSurrogatePolicy:
         self.seed = seed
 
     def select_action(self, state, backend=None):
-        choices = candidate_actions_for_state(state, seed=self.seed)
+        choices = candidate_actions_for_state(state)
         if "surrogate_acquisition" in choices:
             return choices["surrogate_acquisition"]
         return next(iter(choices.values()))

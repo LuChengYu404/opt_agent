@@ -1,0 +1,2 @@
+loops: 10/20 elapsed=8.1s sixhumpcamel/s8888/oracle_short_local
+loops: 20/20 elapsed=11.7s sixhumpcamel/s8888/rf_legacy

@@ -94,7 +94,7 @@ def test_counterfactual_result_has_surrogate_and_coverage_fields() -> None:
     be = BocodeBotorchBackend()
     be.initialize(BackendConfig(problem_id="Branin", seed=0, n_init=5))
     state = extract_state(be, total_budget=20)
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     out = CounterfactualRollout(be, horizon=1, max_rollout_steps=20).rollout(
         state, cands
     )
@@ -123,18 +123,17 @@ def test_include_invalid_as_zero_preserves_vocabulary() -> None:
     for _ in range(15):  # 5 init + 15 eval = 20 samples
         be.evaluate(torch.tensor([[0.5, 7.5]], dtype=torch.double))
     state = extract_state(be, total_budget=20)  # remaining = 0
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     out = CounterfactualRollout(be, horizon=1, max_rollout_steps=20).rollout(
         state, cands
     )
 
     probs = to_gold_probs(out.results, temperature=1.0, include_invalid_as_zero=True)
-    # All 8 ids must be present.
-    assert len(probs) == 8
+    # All 6 ids must be present (h3 menu).
+    assert len(probs) == 6
     # Sampling actions must have prob=0 (they were rejected by executor).
     for sampling_id in ("global_exploration", "local_exploitation",
-                        "uncertainty_sampling", "error_guided_sampling",
-                        "boundary_sampling"):
+                        "uncertainty_sampling"):
         assert probs[sampling_id] == 0.0
     # Zero-cost actions split mass among themselves. At least one must be >0.
     valid_ids = ("stop", "surrogate_acquisition", "retrain_surrogate")
@@ -254,8 +253,8 @@ def test_generator_record_has_aligned_vocabulary() -> None:
     assert records
     for r in records:
         ids = [c["action_id"] for c in r.candidate_actions]
-        assert len(ids) == 8
-        assert len(set(ids)) == 8  # no duplicates
+        assert len(ids) == 6
+        assert len(set(ids)) == 6  # no duplicates
         assert set(ids) == set(r.gold_probs)
         assert set(ids) == set(r.rollout_results)
         # gold_probs may contain NaN-surrogates but must sum to 1 if any valid.
@@ -312,8 +311,8 @@ def test_generator_to_jsonl_round_trip(tmp_path) -> None:
         assert "id" in r.__dict__
 
 
-def test_full_candidates_returns_8_unique_ids() -> None:
-    cands = full_candidates(seed=0)
+def test_full_candidates_returns_6_unique_ids() -> None:
+    cands = full_candidates()
     ids = [c.action_id for c in cands]
-    assert len(ids) == 8
-    assert len(set(ids)) == 8
+    assert len(ids) == 6
+    assert len(set(ids)) == 6

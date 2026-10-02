@@ -149,18 +149,19 @@ def test_nonfinite_utility_scales_rejected() -> None:
 def test_gate3_criterion_matches_declared_semantics() -> None:
     """adjusted_lift = log(p_exp / p_stop) - log(N_exploration).
 
-    With p_exp = 0.8 and p_stop = 0.2: raw = 0.6, adj = log(4) - log(4) = 0.
+    h3 menu: exploration actions are global_exploration + uncertainty_
+    sampling (N=2). With p_exp = 0.8 and p_stop = 0.2:
+    raw = 0.6, adj = log(4) - log(2) = log(2).
     """
     probs = {
-        "global_exploration": 0.2, "uncertainty_sampling": 0.2,
-        "boundary_sampling": 0.2, "error_guided_sampling": 0.2,
+        "global_exploration": 0.5, "uncertainty_sampling": 0.3,
         "stop": 0.2,
         "local_exploitation": 0.0, "retrain_surrogate": 0.0,
         "surrogate_acquisition": 0.0,
     }
     raw, adj = _lift(probs)
     assert raw == pytest.approx(0.6)
-    assert adj == pytest.approx(math.log(4) - math.log(4), abs=1e-9)
+    assert adj == pytest.approx(math.log(4) - math.log(2), abs=1e-9)
 
 
 def test_stop_weight_shifts_log_lift_analytically() -> None:

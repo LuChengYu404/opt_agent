@@ -1,0 +1,12 @@
+/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:144: UserWarning: /home/lcy/Documents/projects/opt_agent_v3/runs/phase8_6d_h3_20seed_5family.jsonl: harness stamp is legacy/absent (record 'branin:0:0:0' first seen); pooling legacy records with current-version records requires an explicit same-data A/B note (guide 6.6 rule 1)
+  enforce_record_versions(
+posterior_loops: 10/100 elapsed=9.4s branin/s1010/rf_unit_terminal_posterior
+posterior_loops: 20/100 elapsed=16.6s branin/s1019/rf_unit_terminal_posterior
+posterior_loops: 30/100 elapsed=33.8s hartmann/s1011/rf_unit_terminal_posterior
+posterior_loops: 40/100 elapsed=46.0s hartmann/s1019/rf_unit_terminal_posterior
+posterior_loops: 50/100 elapsed=49.6s ackley/s1009/rf_unit_terminal_posterior
+posterior_loops: 60/100 elapsed=53.3s ackley/s1018/rf_unit_terminal_posterior
+posterior_loops: 70/100 elapsed=61.6s sixhumpcamel/s1009/rf_unit_terminal_posterior
+posterior_loops: 80/100 elapsed=68.2s sixhumpcamel/s1019/rf_unit_terminal_posterior
+posterior_loops: 90/100 elapsed=84.6s rastrigin/s1010/rf_unit_terminal_posterior
+posterior_loops: 100/100 elapsed=96.2s rastrigin/s1019/rf_unit_terminal_posterior

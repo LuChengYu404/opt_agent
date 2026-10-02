@@ -1,0 +1,3 @@
+labels: 10/25 elapsed=2208.7s hartmann/s22
+labels: 20/25 elapsed=3539.4s ackley/s23
+labels: 25/25 elapsed=5418.3s rastrigin/s23

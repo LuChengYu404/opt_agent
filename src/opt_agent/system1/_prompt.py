@@ -28,12 +28,23 @@ from opt_agent.state import OptimizationState
 
 
 _DESCRIPTIONS: dict[str, str] = {
-    "global_exploration": "Evaluate new space-filling points across the search domain.",
-    "local_exploitation": "Evaluate a small perturbation of the best observed point.",
-    "uncertainty_sampling": "Evaluate where the surrogate predicts high uncertainty.",
-    "error_guided_sampling": "Evaluate near a point with high surrogate residual.",
-    "boundary_sampling": "Evaluate points near the search-domain boundary.",
-    "surrogate_acquisition": "Evaluate the surrogate acquisition function's proposed point.",
+    "global_exploration": (
+        "Thompson sampling: evaluate the maximizer of one posterior sample "
+        "(global exploration, LMABO portfolio AF)."
+    ),
+    "local_exploitation": (
+        "Probability of improvement: evaluate the PI maximizer inside a "
+        "trust region around the best observed point (step radius)."
+    ),
+    "uncertainty_sampling": (
+        "Evaluate the point where the surrogate posterior standard "
+        "deviation is maximized (pure exploration AF)."
+    ),
+    "surrogate_acquisition": (
+        "Evaluate the acquisition-function maximizer; `af` selects from the "
+        "LMABO portfolio (PI, LogPI, EI, LogEI, UCB, PosMean, PosSTD, TS, "
+        "qKG, qPES, qMES, qJES), default LogEI."
+    ),
     "retrain_surrogate": "Refit the surrogate without using an evaluation.",
     "stop": "Stop optimization and return the best observed point.",
 }
@@ -112,26 +123,32 @@ def _executable_criterion(action: OptimizationAction, state: OptimizationState) 
     # params, so this only narrates hand-constructed bare actions.
     n_evaluations = int(params.get("n_samples", 1))
     details = []
+    if "af" in params:
+        details.append(f"acquisition af={params['af']}")
     if "n_samples" in params:
         details.append(f"n_samples={n_evaluations}")
     if "step" in params:
         details.append(f"step={params['step']:g} of the domain width around the best point")
-    if "tol" in params:
-        details.append(f"tol={params['tol']:g} of the domain width from a boundary")
-    if "seed" in params:
-        details.append(f"seed={params['seed']} (fixed for reproducibility)")
     parameter_text = f" Fixed call parameters: {', '.join(details)}." if details else ""
-    fit_text = (
-        " Fits the surrogate first if it is not current."
-        if kind in (ActionType.UNCERTAINTY_SAMPLING,
-                    ActionType.ERROR_GUIDED_SAMPLING,
-                    ActionType.SURROGATE_ACQUISITION) and not state.surrogate.is_current
-        else " Uses the current surrogate without refitting."
-        if kind in (ActionType.UNCERTAINTY_SAMPLING,
-                    ActionType.ERROR_GUIDED_SAMPLING,
-                    ActionType.SURROGATE_ACQUISITION)
-        else " Does not fit the surrogate."
-    )
+
+    if kind in (ActionType.GLOBAL_EXPLORATION,
+                ActionType.LOCAL_EXPLOITATION,
+                ActionType.UNCERTAINTY_SAMPLING):
+        # h3: acquisition-driven sampling fits lazily per proposed point —
+        # after a point is evaluated the surrogate is stale again.
+        fit_text = (
+            " Fits the surrogate lazily before each proposed point: the first "
+            "only if the current surrogate is stale; every later point refits "
+            "after its evaluation invalidates the surrogate."
+        )
+    elif kind is ActionType.SURROGATE_ACQUISITION:
+        fit_text = (
+            " Fits the surrogate first if it is not current."
+            if not state.surrogate.is_current
+            else " Uses the current surrogate without refitting."
+        )
+    else:  # RETRAIN fits explicitly; STOP touches nothing.
+        fit_text = ""
     return (
         f"{description}{parameter_text} Uses {n_evaluations} objective "
         f"evaluation{'s' if n_evaluations != 1 else ''}.{fit_text}"

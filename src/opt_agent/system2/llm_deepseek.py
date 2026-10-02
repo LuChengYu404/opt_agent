@@ -28,7 +28,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping
 
 from opt_agent.actions import ActionType, OptimizationAction, candidate_actions_for_state
-from opt_agent.actions.models import _ALLOWED_PARAMS
+from opt_agent.actions.models import PARAM_VALIDATORS
 from opt_agent.state import OptimizationState
 from opt_agent.system2.base import System2Decision, System2Policy
 
@@ -70,9 +70,6 @@ class LLMSystem2(System2Policy):
     System-1 action (defensive — never crash the loop because of an LLM
     typo).
 
-    Pass ``candidate_seed`` from the problem run when comparing independent
-    seeds; otherwise exploration candidates at the same sample count reuse
-    the same deterministic points.
     """
 
     def __init__(
@@ -84,7 +81,6 @@ class LLMSystem2(System2Policy):
         timeout_s: float = 30.0,
         max_tokens: int = 256,
         temperature: float = 0.2,
-        candidate_seed: int = 0,
         client: Any = None,
         _skip_key_check: bool = False,
     ) -> None:
@@ -101,9 +97,6 @@ class LLMSystem2(System2Policy):
         self.timeout_s = timeout_s
         self.max_tokens = max_tokens
         self.temperature = temperature
-        if isinstance(candidate_seed, bool) or not isinstance(candidate_seed, int) or candidate_seed < 0:
-            raise ValueError("candidate_seed must be a non-negative integer")
-        self.candidate_seed = candidate_seed
         self._client = client  # injectable for tests
         self.last_stats: DeepSeekCallStats | None = None
         self.call_count = 0
@@ -231,7 +224,7 @@ class LLMSystem2(System2Policy):
                 reason=f"LLM returned unknown action_id={action_id!r}",
             )
         # Use the candidate's params as the base; LLM `params` are
-        # overrides filtered through `_ALLOWED_PARAMS`, a budget
+        # overrides filtered through `PARAM_VALIDATORS`, a budget
         # check on `n_samples`, and a TYPE check on numeric values.
         # Per codex gpt-6-sol review 2026-09-24: a non-numeric value
         # (e.g. `n_samples: "2"`) must NOT raise TypeError mid-build;
@@ -242,16 +235,13 @@ class LLMSystem2(System2Policy):
         params = parsed.get("params") or {}
         if not isinstance(params, Mapping):
             params = {}
-        allowed = _ALLOWED_PARAMS[base.type]
+        allowed = PARAM_VALIDATORS[base.type]
         # Per-action-type param schema: which keys must be int vs float.
-        # Mirrors `_PARAM_SCHEMAS` in `actions.models` without importing
+        # Mirrors the validators in `actions.models` without importing
         # the private constant — kept in sync by convention.
         int_keys = {
-            ActionType.GLOBAL_EXPLORATION: frozenset({"n_samples", "seed"}),
-            ActionType.LOCAL_EXPLOITATION: frozenset({"seed"}),
-            ActionType.UNCERTAINTY_SAMPLING: frozenset({"n_samples", "seed"}),
-            ActionType.ERROR_GUIDED_SAMPLING: frozenset({"n_samples", "seed"}),
-            ActionType.BOUNDARY_SAMPLING: frozenset({"n_samples", "seed"}),
+            ActionType.GLOBAL_EXPLORATION: frozenset({"n_samples"}),
+            ActionType.UNCERTAINTY_SAMPLING: frozenset({"n_samples"}),
         }.get(base.type, frozenset())
         # Validate each override individually; collect (key, typed_value)
         # for ones that pass type/budget checks. Construction recovery
@@ -363,7 +353,7 @@ class LLMSystem2(System2Policy):
         recent_actions: tuple[str, ...] = (),
         remaining_budget: int | None = None,
     ) -> System2Decision:
-        candidates = candidate_actions_for_state(state, seed=self.candidate_seed)
+        candidates = candidate_actions_for_state(state)
         # If only STOP is offered (budget exhausted), short-circuit.
         if set(candidates) == {"stop"}:
             return System2Decision(

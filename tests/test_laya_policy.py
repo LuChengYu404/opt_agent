@@ -156,17 +156,17 @@ def test_laya_default_criteria_uses_legacy_descriptions() -> None:
 
 def test_laya_criteria_format_executable_includes_fixed_call_params() -> None:
     """Mirrors test_jev_choice_uses_budget_valid_factory_action_and_records_usage:
-    executable criteria must mention the action's fixed n_samples, seed, and
-    whether it fits the surrogate."""
-    agent = FakeLaya("boundary_sampling")
+    executable criteria must mention the action's fixed n_samples and its
+    lazy per-point surrogate fitting (h3: no seed/tol params anymore)."""
+    agent = FakeLaya("global_exploration")
     policy = LayaPolicy(agent=agent, criteria_format="executable")
     state = extract_state(RecordingBackend(), total_budget=4)
     policy.decide(state)
     criteria = agent.requests[0][1]["next_action"]["criteria"]
-    assert "n_samples=" in criteria["boundary_sampling"]
-    assert "tol=" in criteria["boundary_sampling"]
-    assert "seed=" in criteria["boundary_sampling"]
-    assert "objective evaluation" in criteria["boundary_sampling"]
+    assert "n_samples=" in criteria["global_exploration"]
+    assert "seed=" not in criteria["global_exploration"]
+    assert "objective evaluation" in criteria["global_exploration"]
+    assert "Fits the surrogate lazily" in criteria["global_exploration"]
     assert (
         "without supplying parameters"
         in agent.requests[0][1]["next_action"]["instructions"]

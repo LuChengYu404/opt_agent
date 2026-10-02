@@ -1,0 +1,75 @@
+{
+  "config": {
+    "schema": 1,
+    "source_sha256": {
+      "scripts/exp_attribution_normalized.py": "86f70fdce64736a2f359457f54caf6e3fd518fe3cdf9b7ec415b960845592264",
+      "docs/ATTRIBUTION_NORMALIZED_FOLLOWUP_20260930.md": "3fc5a5574c00f1c07cef7c95cf280597c8f3bde729bc14f5d077e170c2b1edd4",
+      "src/opt_agent/backend/bocode_botorch.py": "67b6729bc54f1ccbda5e5dca0e4b02cf73dc57aec351d6b397b25ec2d075fb8b",
+      "src/opt_agent/backend/checkpoint.py": "886045c3018cbd49922f4cc0059489ea5e7c191a07794fdba1e007cb874a0cfd",
+      "src/opt_agent/actions/executor.py": "2d0555e041a6b98e563acaa88c808c4921b0b9609383e0bdcd651fe3e27ec5d6",
+      "src/opt_agent/actions/factory.py": "ccfd4ce4a9f34349fc8450918d88f642818d376fa2d1befa9281df8005768eb0",
+      "src/opt_agent/state/extractor.py": "90ecbd0a02c2e17f02003f983ef1f606581d3b21997893042e892cae1c12eff2",
+      "scripts/exp_attribution_suite.py": "c4d0f5994f4f5082f59a5babf088611eb26e35c3e46906800f272eaef3692a7a",
+      "scripts/exp_rq1_rq2_closed_loop.py": "5a3669744a47dbb88699eaa346ab18906a323dd5244734c53c61a958ad6f7cef",
+      "scripts/_shared_rq_features.py": "f54ed9968bcd6161e0dbc493db96293dba593b33ad8185d119c3dbe20fe1051f",
+      "scripts/ioh_backend.py": "4362e0f9d33d7d779f7ac8389d91f134b890625ccd31f49341eafa3f89907601"
+    },
+    "packages": {
+      "torch": "2.14.0",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "scikit-learn": "1.9.1",
+      "bocode": "1.0.1"
+    },
+    "confirmation_script_sha256": "7a144aa099b703a0677489db3c976ee36614d4bc3f1a9940b6aa063a5e8af160",
+    "confirmation_protocol_sha256": "1917400522d90a5ae9a85185e440026db390b6842db91332c66775a203db29e6",
+    "selection_sha256": "083b28ecd051a9698646cc6316d01decc8214c3add38e5424993548840c7734b",
+    "seeds": [
+      50000,
+      50100
+    ]
+  },
+  "n_trajectories": 300,
+  "n_seeds": 100,
+  "contrasts": {
+    "normalization": {
+      "mean": 14.488023159238,
+      "ci95": [
+        9.866268631168206,
+        19.190521106992467
+      ],
+      "ci99": [
+        8.647061796767682,
+        20.647245759426323
+      ],
+      "n": 100,
+      "wins_ties_losses": [
+        70,
+        2,
+        28
+      ],
+      "paired_sign_randomization_p": 4.999750012499375e-05,
+      "holm_p": 9.99950002499875e-05
+    },
+    "best_pipeline": {
+      "mean": 14.13616343300517,
+      "ci95": [
+        9.126986444744048,
+        19.23209517613934
+      ],
+      "ci99": [
+        7.525772692747539,
+        20.879511264323394
+      ],
+      "n": 100,
+      "wins_ties_losses": [
+        71,
+        1,
+        28
+      ],
+      "paired_sign_randomization_p": 4.999750012499375e-05,
+      "holm_p": 9.99950002499875e-05
+    }
+  },
+  "raw_data_sha256": "3d31acdb70a2cdf19a15e9acdb1f57c04a3d9a22dad4ecbd6bf5825514cebefb"
+}

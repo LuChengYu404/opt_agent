@@ -1,0 +1,18 @@
+{
+  "sixhumpcamel": {
+    "fixed": "global_exploration",
+    "schedule": "schedule_0.2",
+    "development_means": {
+      "local_exploitation": 0.9017199010856748,
+      "global_exploration": 0.98951319896864,
+      "uncertainty_sampling": 0.7453549206273161,
+      "boundary_sampling": 0.4399276634929003,
+      "error_guided_sampling": 0.4399276634929003,
+      "schedule_0.2": 0.9937281906739163,
+      "schedule_0.4": 0.98951319896864,
+      "schedule_0.6": 0.98951319896864,
+      "schedule_0.8": 0.98951319896864,
+      "surrogate_acquisition": 0.8505466883188258
+    }
+  }
+}

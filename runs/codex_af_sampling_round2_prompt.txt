@@ -1,0 +1,25 @@
+REVIEW round 2: LMABO AF sampling transplant (harness h2). Branch exp/boundary-scheme-round2, working tree (uncommitted). Your round-1 review (runs/codex_af_sampling_review.log, gpt-6.1-sol) returned REVISE with 4 MAJOR + 4 MINOR. All dispositions are recorded in docs/AF_SAMPLING_20261001.md §5. Full suite now 511 passed.
+
+ROUND-1 DISPOSITIONS (verify each: ADDRESSED / PARTIAL / UNADDRESSED):
+
+A [MAJOR, acquisitions.py qPES/qJES/qMES normalize_inputs coordinates] ADDRESSED: new `_entropy_workspace(model, bounds)` — for a model with an active input_transform, entropy AFs run on a transform-stripped deepcopy (`del af_model.input_transform`; botorch falls back to identity via AttributeError) in the model's internal normalized space, with normalized bounds, and the selected point mapped back via `tf.untransform`. Numerically validated: stripped-posterior(normalized X) == original-posterior(physical X), untransform roundtrip exact. TS is untouched (model.posterior handles transforms). New regression: tests/test_acquisitions.py::test_entropy_afs_on_normalized_model_return_physical_points.
+
+B [MAJOR, executor partial-commit on later greedy-point failure] ADDRESSED: `_greedy_af_samples` is now atomic — `cp = backend.checkpoint()` before the loop (only if the backend supports checkpoint), any exception → `backend.restore(cp)` (history+GP+RNG) then re-raise. Backends without checkpoint (scripts/ioh_backend.py IOHBackend) keep pre-h2 partial-commit behaviour, documented in the docstring. New regression: test_action_executor.py::test_global_exploration_failure_rolls_back_committed_points.
+
+D [MAJOR, replay/oracle entry points never check harness stamp] ADDRESSED: new `validation._assert_replayable_harness` guards `oracle_test_from_record` (first statement) and `replay_with_config` (after structural `_reconstruct_checkpoint` validation, per the file's missing-keys-first design, but before ANY execution). LEGACY stamps pass only with explicit `allow_legacy_harness=True`; MISMATCH always raises. Three frozen-artifact analysis scripts (validate_phase8_6b, diagnose_qs5, ablate_phase8_6d_utility) opt in explicitly with comments. Tests: test_phase8_6b_gates.py::test_oracle_replay_refuses_foreign_harness_stamp; handcrafted replay records in tests now carry harness_version="h2".
+
+F [MAJOR, _prompt.py executable criteria stale fit/seed claims] ADDRESSED: `_executable_criterion` rewritten — GLOBAL/LOCAL/UNCERTAINTY describe per-point lazy fits ("first only if stale; later points refit after evaluation invalidates"); seed on AF-based actions described as accepted-for-compatibility with backend-RNG reproducibility; `af` param surfaced when present. BOUNDARY "Does not fit" and SURROGATE/ERROR_GUIDED stale/current wording preserved (pinned by tests).
+
+D-minor [versioning stamp definition] ADDRESSED: versioning.py docstring now names "executable semantics of the menu" as part of HARNESS_VERSION.
+E-minor [test gaps] ADDRESSED (subset + rationale): added atomicity rollback, IOH af forwarding + inline-fallback (sys.modules block) + loud non-default-AF failure, LogEI-default == inline-reference byte-equality under restored RNG, TS checkpoint-restore replay equality, normalized-model entropy-AF physical-bounds sweep, PI vs LogEI distinct-maximizer pin, h1→LEGACY classification + STRICT mixed-pool refusal. Not added (judged redundant): candidate-order invariance (TS argmax is order-invariant up to ties; replay equality covers the contract).
+F-minor [docs] ADDRESSED: AF_SAMPLING §2 fit-accounting row for uncertainty fixed (per-point for n>1); backend-API vs policy-exposed AF availability split documented; models.py module header re-based; lenz_state acquisition string now "LMABO portfolio (default LogEI)" (both call sites + pinned tests updated).
+
+REVIEW TASKS:
+A. Verify each round-1 disposition (ADDRESSED / PARTIAL / UNADDRESSED). For A, also judge whether the stripped-copy approach is semantically sound (EP system in normalized space vs paper's physical-space PES — same maximizer up to the input transform being monotone per-dim? argument your verdict).
+B. New-issue check on the fix diffs only (acquisitions.py workspace, executor atomicity, validation guard + script opt-ins, _prompt.py rewrite, test additions).
+C. Final merge-readiness for the h2 change set.
+
+Answer format: A one row per disposition; B findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, inspect git log/diff, and read runs/codex_af_sampling_review.log.

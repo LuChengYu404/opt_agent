@@ -60,7 +60,7 @@ class _FakeSystem1:
         action_type, probs = self._sequence[self._idx % len(self._sequence)]
         self._idx += 1
         chosen_id = action_type.value
-        factory_keys = sorted(candidate_actions_for_state(state, seed=0))
+        factory_keys = sorted(candidate_actions_for_state(state))
         # If the user provided probabilities keyed by factory ids, pass
         # them through unchanged (after renormalization).
         if any(k in factory_keys for k in probs):

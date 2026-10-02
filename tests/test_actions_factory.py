@@ -80,13 +80,11 @@ def test_factory_omits_retrain_when_surrogate_current() -> None:
 def test_factory_omits_local_actions_when_no_samples() -> None:
     cands = candidate_actions_for_state(_state(remaining_budget=10, n_samples=0))
     assert "local_exploitation" not in cands
-    assert "error_guided_sampling" not in cands
 
 
 def test_factory_includes_local_actions_when_samples_exist() -> None:
     cands = candidate_actions_for_state(_state(remaining_budget=10, n_samples=5))
     assert "local_exploitation" in cands
-    assert "error_guided_sampling" in cands
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +96,7 @@ def test_factory_action_ids_align_with_full_candidates() -> None:
     """The factory's action_id vocabulary must be a subset of full_candidates'
     vocabulary (per codex M1: a single source of truth)."""
     from opt_agent.dataset import full_candidates
-    expected = {c.action_id for c in full_candidates(seed=0)}
+    expected = {c.action_id for c in full_candidates()}
     cands = candidate_actions_for_state(_state(remaining_budget=10, n_samples=5, is_current=False))
     assert set(cands) <= expected, (
         f"factory emitted ids not in full_candidates: {set(cands) - expected}"
@@ -125,14 +123,4 @@ def test_factory_caps_n_samples_at_remaining_budget() -> None:
     assert ge.params["n_samples"] <= 1
 
 
-def test_factory_seed_varies_with_n_samples() -> None:
-    """action_seed = seed + n_samples so trajectories are reproducible."""
-    s0 = candidate_actions_for_state(_state(remaining_budget=10, n_samples=0), seed=42)
-    s5 = candidate_actions_for_state(_state(remaining_budget=10, n_samples=5), seed=42)
-    assert s0["global_exploration"].params["seed"] != s5["global_exploration"].params["seed"]
 
-
-def test_factory_uses_caller_seed() -> None:
-    a = candidate_actions_for_state(_state(remaining_budget=10, n_samples=0), seed=7)
-    b = candidate_actions_for_state(_state(remaining_budget=10, n_samples=0), seed=99)
-    assert a["global_exploration"].params["seed"] != b["global_exploration"].params["seed"]

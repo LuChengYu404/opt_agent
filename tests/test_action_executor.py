@@ -1,9 +1,11 @@
-"""Phase 3 acceptance tests for execute_action().
+"""Acceptance tests for execute_action().
 
-Per codex (gpt-5.6-sol) review 2025-09-23:
-  - RecordingBackend stub tracks fit/propose/evaluate call counts.
-  - 15+ behavioral tests covering all 5 actions + validation + budget +
-    stale-state + failure propagation.
+Per codex (gpt-5.6-sol) review 2025-09-23; h2 (2026-10-01) re-based on the
+LMABO AF portfolio (docs/AF_SAMPLING_20261001.md):
+  - RecordingBackend stub tracks fit/propose/evaluate call counts and the
+    af/bounds arguments the executor passes.
+  - Behavioral tests covering all 8 actions + validation + budget +
+    stale-state + failure propagation + greedy-action atomicity.
 """
 
 from __future__ import annotations
@@ -51,6 +53,11 @@ def state_for(
 
 
 def test_global_exploration_adds_samples() -> None:
+    """h2: GLOBAL_EXPLORATION = sequential greedy TS proposals.
+
+    One fit → propose(af="TS") → evaluate per point; the stub starts
+    unfitted and every evaluate() invalidates it, so 3 points cost 3 fits.
+    """
     backend = RecordingBackend()
     state = state_for(backend, total_budget=10)
 
@@ -61,32 +68,87 @@ def test_global_exploration_adds_samples() -> None:
     )
 
     assert result.n_new_samples == 3
-    assert result.n_model_fits == 0
+    assert result.n_model_fits == 3
     assert result.should_stop is False
-    assert backend.evaluate_calls == 1
+    assert backend.evaluate_calls == 3
+    assert backend.propose_calls == 3
+    assert backend.propose_afs == ["TS", "TS", "TS"]
     assert len(backend.get_history()) == 5  # 2 initial + 3
 
 
-def test_local_exploitation_perturbs_best() -> None:
-    """LOCAL_EXPLOITATION perturbs the current best (max objective) point."""
+def test_local_exploitation_uses_pi_in_trust_region() -> None:
+    """h2: LOCAL_EXPLOITATION = PI maximized inside the step trust region.
+
+    Stub-level contract: the backend receives af="PI" and the trust-region
+    bounds [best ± step*span] ∩ domain (best = [0,0], step = 0.1).
+    """
     backend = RecordingBackend()
-    history_before = backend.get_history()
-    # Current best = index 0 (objective -0.5 > -1.0).
-    best = history_before.X[history_before.objectives[:, 0].argmax()].clone()
 
     execute_action(
         backend,
         state_for(backend),
         OptimizationAction(
-            ActionType.LOCAL_EXPLOITATION, {"step": 0.1, "seed": 4}
+            ActionType.LOCAL_EXPLOITATION, {"step": 0.1}
         ),
     )
 
-    candidate = backend.last_evaluated[0]
-    assert torch.all(torch.abs(candidate - best) <= 0.1 * 1.0 + 1e-12)
-    assert torch.all(candidate >= backend.bounds[0])
-    assert torch.all(candidate <= backend.bounds[1])
-    assert not torch.equal(candidate, best)
+    assert backend.propose_afs == ["PI"]
+    expected = torch.tensor([[0.0, 0.0], [0.1, 0.1]], dtype=torch.double)
+    assert torch.allclose(backend.propose_bounds[0], expected)
+    assert backend.evaluate_calls == 1
+
+
+def test_local_exploitation_real_backend_respects_trust_region() -> None:
+    """Integration: on Branin the PI maximizer stays within step*span of the
+    incumbent (same locality guarantee as the pre-h2 perturbation)."""
+    be = BocodeBotorchBackend()
+    be.initialize(BackendConfig(problem_id="Branin", seed=0, n_init=5))
+    execute_action(
+        be,
+        extract_state(be, total_budget=20),
+        OptimizationAction(ActionType.LOCAL_EXPLOITATION, {"step": 0.1}),
+    )
+    history = be.get_history()
+    best_before = history.X[:-1][history.objectives[:-1, 0].argmax()]
+    candidate = history.X[-1]
+    span = be.bounds[1] - be.bounds[0]
+    assert torch.all(candidate >= be.bounds[0] - 1e-9)
+    assert torch.all(candidate <= be.bounds[1] + 1e-9)
+    assert torch.all(torch.abs(candidate - best_before) <= 0.1 * span + 1e-9)
+
+
+def test_uncertainty_sampling_uses_posstd() -> None:
+    backend = RecordingBackend()
+
+    result = execute_action(
+        backend,
+        state_for(backend),
+        OptimizationAction(ActionType.UNCERTAINTY_SAMPLING, {"n_samples": 2}),
+    )
+
+    assert backend.propose_afs == ["PosSTD", "PosSTD"]
+    assert backend.evaluate_calls == 2
+    assert result.n_model_fits == 2
+    assert len(backend.get_history()) == 4
+
+
+def test_surrogate_acquisition_af_param_forwarded() -> None:
+    backend = RecordingBackend(fitted=True)
+
+    result = execute_action(
+        backend,
+        state_for(backend),
+        OptimizationAction(ActionType.SURROGATE_ACQUISITION, {"af": "UCB"}),
+    )
+
+    assert backend.propose_afs == ["UCB"]
+    assert backend.evaluate_calls == 1
+    assert result.n_model_fits == 0
+
+
+def test_surrogate_acquisition_invalid_af_rejected() -> None:
+    with pytest.raises(ValueError, match="portfolio"):
+        OptimizationAction(ActionType.SURROGATE_ACQUISITION, {"af": "SuperEI"})
 
 
 def test_surrogate_acquisition_fits_proposes_and_evaluates() -> None:
@@ -287,3 +349,32 @@ def test_real_branin_global_exploration_works_end_to_end() -> None:
     )
     assert result.n_new_samples == 2
     assert len(be.get_history()) == 5
+
+
+
+def test_global_exploration_failure_rolls_back_real_backend() -> None:
+    """Round-2 E regression: atomicity on the real backend restores history,
+    GP, and RNG (not just the stub's)."""
+
+    class FailSecondEvaluate(BocodeBotorchBackend):
+        def __init__(self, *a, **k):
+            super().__init__(*a, **k)
+            self._n_eval = 0
+
+        def evaluate(self, X):
+            self._n_eval += 1
+            if self._n_eval == 2:
+                raise RuntimeError("injected second evaluation failure")
+            return super().evaluate(X)
+
+    be = FailSecondEvaluate()
+    be.initialize(BackendConfig(problem_id="Branin", seed=1, n_init=5))
+    rng_before = torch.random.get_rng_state().clone()
+    with pytest.raises(RuntimeError, match="injected second evaluation"):
+        execute_action(
+            be,
+            state_for(be),
+            OptimizationAction(ActionType.GLOBAL_EXPLORATION, {"n_samples": 2}),
+        )
+    assert len(be.get_history()) == 5
+    assert torch.equal(torch.random.get_rng_state(), rng_before)

@@ -2,12 +2,12 @@
 
 Covers the two quota axes added to the dataset generator:
 
-  1. `rollout_action_subsample=k` — deterministic k-of-8 candidate subsets
+  1. `rollout_action_subsample=k` — deterministic k-of-menu candidate subsets
      per decision point, partial-rollout metadata, subset gold_probs.
   2. `horizon_mode="remaining"` — per-decision-point horizon equals the
      remaining budget (true long-horizon labels).
 
-Regression guards: k=None and k=8 must reproduce the historical full-vocab
+Regression guards: k=None and k=<menu size> must reproduce the full-vocab
 behaviour exactly (same gold_probs keys and metadata without partial_rollout).
 
 Tests use Branin with tiny budgets (cf. test_objective_transform.py) to keep
@@ -72,7 +72,7 @@ def test_horizon_mode_validation() -> None:
 
 
 def test_subsample_candidates_deterministic_and_order_preserving() -> None:
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     ids = [c.action_id for c in cands]
     a = subsample_candidates(cands, 3, seed=123)
     b = subsample_candidates(cands, 3, seed=123)
@@ -82,12 +82,12 @@ def test_subsample_candidates_deterministic_and_order_preserving() -> None:
 
 
 def test_subsample_candidates_full_k_is_identity() -> None:
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     assert subsample_candidates(cands, len(cands), seed=5) == cands
 
 
 def test_subsample_candidates_rejects_bad_k() -> None:
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     with pytest.raises(ValueError):
         subsample_candidates(cands, 0, seed=1)
     with pytest.raises(ValueError):
@@ -115,12 +115,12 @@ def test_partial_record_metadata_and_subset_gold_probs() -> None:
         assert set(rec.rollout_results) == rolled_ids
         # Subset distribution still normalizes.
         assert sum(rec.gold_probs.values()) == pytest.approx(1.0, abs=1e-9)
-        # candidate_actions still describe the FULL vocabulary.
-        assert len(rec.candidate_actions) == 8
+        # candidate_actions still describe the FULL vocabulary (h3: 6).
+        assert len(rec.candidate_actions) == 6
         # Same record id produced without subsampling (trajectory untouched).
         twin = full_by_id[rec.id]
         assert twin.metadata.get("partial_rollout") is None
-        assert set(twin.gold_probs) == set(twin.candidate_actions[i]["action_id"] for i in range(8))
+        assert set(twin.gold_probs) == {c["action_id"] for c in twin.candidate_actions}
 
 
 def test_subsample_does_not_change_the_walked_trajectory() -> None:
@@ -137,9 +137,9 @@ def test_subsample_does_not_change_the_walked_trajectory() -> None:
         )
 
 
-def test_k8_matches_no_subsample_records() -> None:
+def test_k_full_menu_matches_no_subsample_records() -> None:
     none_recs = _records(_quick_spec(horizon=2))
-    k8_recs = _records(_quick_spec(horizon=2, rollout_action_subsample=8))
+    k8_recs = _records(_quick_spec(horizon=2, rollout_action_subsample=6))
     assert len(none_recs) == len(k8_recs)
     for x, y in zip(none_recs, k8_recs):
         assert x.id == y.id
@@ -151,7 +151,7 @@ def test_subset_choice_is_stable_across_records_and_transforms() -> None:
     """The subset depends only on (run_seed, step, salt) — the same record id
     produced under different objective transforms rolls out the same subset,
     keeping Gate-5-style paired comparisons valid."""
-    cands = full_candidates(seed=0)
+    cands = full_candidates()
     s1 = subsample_candidates(cands, 3, seed=derive_seed(77, 0, _SUBSAMPLE_SALT))
     s2 = subsample_candidates(cands, 3, seed=derive_seed(77, 0, _SUBSAMPLE_SALT))
     assert [c.action_id for c in s1] == [c.action_id for c in s2]

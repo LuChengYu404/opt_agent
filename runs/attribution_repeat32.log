@@ -1,0 +1,5 @@
+/home/lcy/Documents/projects/opt_agent_v3/src/opt_agent/dataset/decision_record.py:144: UserWarning: /home/lcy/Documents/projects/opt_agent_v3/runs/phase8_6d_h3_20seed_5family.jsonl: harness stamp is legacy/absent (record 'branin:0:0:0' first seen); pooling legacy records with current-version records requires an explicit same-data A/B note (guide 6.6 rule 1)
+  enforce_record_versions(
+repeat32: 10/30 elapsed=154.0s branin:19:0:0
+repeat32: 20/30 elapsed=276.7s hartmann:15:0:0
+repeat32: 30/30 elapsed=536.7s hartmann:11:0:0

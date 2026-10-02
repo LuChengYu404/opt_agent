@@ -35,12 +35,12 @@ def _record(
     partial: bool = False,
     invalid: set[str] | None = None,
 ) -> DecisionRecord:
-    """Synthetic record with the FULL 8-action vocabulary as candidates but
-    rollout_results only for `utilities` (mimics partial quota records)."""
+    """Synthetic record with the FULL 6-action vocabulary (h3 menu) as
+    candidates but rollout_results only for `utilities` (mimics partial
+    quota records)."""
     all_ids = (
         "global_exploration", "local_exploitation", "uncertainty_sampling",
-        "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
-        "retrain_surrogate", "stop",
+        "surrogate_acquisition", "retrain_surrogate", "stop",
     )
     invalid = invalid or set()
     rr = {
@@ -246,8 +246,8 @@ class TestBuildItem:
                        "retrain_surrogate": 0.0})
         item = build_item(rec, tok)
         assert item is not None
-        # Full 8-action vocabulary is offered; 3 have pairs.
-        assert len(item["markers"]) == 8 == len(item["option_ids"])
+        # Full 6-action vocabulary (h3) is offered; 3 have pairs.
+        assert len(item["markers"]) == 6 == len(item["option_ids"])
         index_of = {a: i for i, a in enumerate(item["option_ids"])}
         # item["pairs"] already carries option indices.
         assert {(i, j) for i, j, _ in item["pairs"]} == {

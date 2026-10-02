@@ -51,8 +51,6 @@ from opt_agent.state import extract_state
 EXPLORATION_ACTIONS: frozenset[str] = frozenset({
     "global_exploration",
     "uncertainty_sampling",
-    "error_guided_sampling",
-    "boundary_sampling",
 })
 
 EPS = 1e-12
@@ -355,6 +353,7 @@ def oracle_test_from_record(
     random_replicates: int = 5,
     max_actions: int = 200,
     backend_factory: Callable | None = None,
+    allow_legacy_harness: bool = False,
 ) -> OracleResult:
     """Replay a DecisionRecord's backend state and run the oracle test.
 
@@ -366,9 +365,14 @@ def oracle_test_from_record(
     backend_factory : Callable | None
         Optional factory returning a fresh backend. Defaults to a
         BocodeBotorchBackend reconstructed with the problem id from the record.
+    allow_legacy_harness : bool
+        Explicit opt-in to replay a record stamped with a known-past harness
+        version (execution-semantics mismatch, see
+        `_assert_replayable_harness`).
     """
     from opt_agent.backend.bocode_botorch import BackendConfig, BocodeBotorchBackend
 
+    _assert_replayable_harness(record, allow_legacy_harness=allow_legacy_harness)
     cp = _reconstruct_checkpoint(record)
     if backend_factory is None:
         # Phase 9 Gate 5 — thread the affine objective transform from record
@@ -419,22 +423,33 @@ def oracle_test_from_record(
 
 def affine_rescaling_test(
     generate_for_transform: Callable[[float, float], Iterable[DecisionRecord]],
+    *,
+    transforms: tuple[tuple[float, float], ...] = ((1.0, 0.0), (0.1, 0.0), (10.0, 0.0), (1.0, 5.0)),
 ) -> dict:
     """Compare top-action distribution across (scale, shift) transforms.
 
     Pass criteria per (problem, phase): median Spearman ≥ 0.9, top-1
     agreement ≥ 0.8, mean JS divergence ≤ 0.02.
+
+    `transforms` overrides the compared set (each tuple is compared against
+    the first entry as base). Unit tests may restrict it to a shift-only
+    pair: on tiny generated configs the extreme scales (0.1x / 10x) are
+    dominated by floating-point near-tie flips rather than systematic
+    violations — the h3 AF executor's per-point fit accounting amplifies
+    single-flip divergence, so the full transform sweep belongs to real
+    (large-n) datasets, not the tiny-config smoke.
     """
     transforms = ((1.0, 0.0), (0.1, 0.0), (10.0, 0.0), (1.0, 5.0))
     datasets = {
         t: {r.id: r for r in generate_for_transform(*t)}
         for t in transforms
     }
-    base = datasets[(1.0, 0.0)]
+    base_key = transforms[0]
+    base = datasets[base_key]
     rows: list[dict] = []
 
     for transform, candidate in datasets.items():
-        if transform == (1.0, 0.0):
+        if transform == base_key:
             continue
         if candidate.keys() != base.keys():
             return {"pass_": False, "reason": "unpaired record IDs",
@@ -634,6 +649,41 @@ def gate2_stability(records: list[DecisionRecord]) -> Gate2Result:
 # ---------------------------------------------------------------------------
 
 
+def _assert_replayable_harness(
+    record: DecisionRecord, *, allow_legacy_harness: bool = False
+) -> None:
+    """Refuse to EXECUTE a record whose harness stamp differs from current.
+
+    Replay/oracle entry points re-run actions through the *current* executor:
+    an h1 record (Sobol/perturbation sampling semantics) replayed under the
+    h2 executor silently mis-executes its action sequence (codex round-1
+    review, finding D). Reading/pooling legacy records for analysis remains
+    governed by `versioning.read_jsonl` — this guard is about execution.
+
+    LEGACY stamps (missing or known-past, i.e. pre-h2) pass only with an
+    explicit `allow_legacy_harness=True` (acknowledged migration replay);
+    MISMATCH (unrecognized stamps) always raises.
+    """
+    from opt_agent.dataset.versioning import (
+        HARNESS_VERSION,
+        VersionStatus,
+        check_record_versions,
+    )
+
+    status = check_record_versions(record.metadata).get("harness")
+    if status is VersionStatus.OK:
+        return
+    if status is VersionStatus.LEGACY and allow_legacy_harness:
+        return
+    raise ValueError(
+        f"record {record.id!r} carries harness stamp "
+        f"{record.metadata.get('harness_version')!r} (current: {HARNESS_VERSION}); "
+        f"replaying it would execute current action semantics on a different "
+        f"harness's data. Regenerate the dataset, or pass "
+        f"allow_legacy_harness=True for an explicit legacy replay."
+    )
+
+
 def _reconstruct_checkpoint(record: DecisionRecord) -> Checkpoint:
     """Build a `Checkpoint` from a record's replay metadata.
 
@@ -681,6 +731,7 @@ def _reconstruct_checkpoint(record: DecisionRecord) -> Checkpoint:
         fitted=fitted,
         model_state_dict=model_bytes,
         torch_rng_state=rng_bytes,
+        normalize_inputs=meta.get("backend_normalize_inputs"),
     )
 
 
@@ -749,6 +800,7 @@ def replay_with_config(
     horizon: int | None = None,
     temperature: float | None = None,
     backend_factory: Callable | None = None,
+    allow_legacy_harness: bool = False,
 ) -> RolloutOutput:
     """Replay a `DecisionRecord` with a new (or original) rollout config.
 
@@ -779,6 +831,10 @@ def replay_with_config(
     backend_factory : Callable | None
         Optional factory returning a fresh `UnifiedBackend`. Defaults to a
         `BocodeBotorchBackend` initialized with the problem from the record.
+    allow_legacy_harness : bool
+        Explicit opt-in to replay a record stamped with a known-past harness
+        version (execution-semantics mismatch, see
+        `_assert_replayable_harness`).
 
     Returns
     -------
@@ -793,6 +849,10 @@ def replay_with_config(
     # Validate replay metadata FIRST so the user sees the missing-keys error
     # before any other metadata access (e.g. `meta["horizon"]`).
     base = _reconstruct_checkpoint(record)
+    # Harness guard after structural validation but BEFORE any execution:
+    # a foreign-stamp record must never be replayed through the current
+    # executor (codex round-1 review, finding D).
+    _assert_replayable_harness(record, allow_legacy_harness=allow_legacy_harness)
 
     spec = continuation_spec if continuation_spec is not None else spec_from_metadata(
         meta.get("continuation_policy")

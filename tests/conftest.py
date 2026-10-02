@@ -23,11 +23,23 @@ from opt_agent.backend.bocode_botorch import (  # noqa: E402
 )
 
 
+import pytest  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _single_torch_thread():
+    """One torch thread per test: under pytest-xdist each worker owns a
+    core, and BLAS oversubscription (n_workers x n_threads) slows the
+    small GP fits dramatically (repo convention: OMP_NUM_THREADS=1)."""
+    torch.set_num_threads(1)
+
+
 class RecordingBackend(UnifiedBackend):
     """Stub backend that records all calls and returns synthetic data.
 
     Initial history = 2 points at [[0,0],[1,1]] with objectives [-0.5, -1.0].
-    Sobol step from seed=0 with d=2 yields candidate [0.5, 0.5].
+    propose() always returns [0.25, 0.25] (drifting slightly per call);
+    propose_afs / propose_bounds record what the executor asked for (h2).
     """
 
     def __init__(
@@ -49,6 +61,8 @@ class RecordingBackend(UnifiedBackend):
         self.fit_calls = 0
         self.propose_calls = 0
         self.evaluate_calls = 0
+        self.propose_afs: list[str] = []
+        self.propose_bounds: list[torch.Tensor | None] = []
         self.last_evaluated: torch.Tensor | None = None
         self._propose_value = propose_value or torch.tensor(
             [[0.25, 0.25]], dtype=torch.double
@@ -92,8 +106,15 @@ class RecordingBackend(UnifiedBackend):
         self.fit_calls += 1
         self._fitted = True
 
-    def propose(self, n: int = 1) -> torch.Tensor:
+    def propose(
+        self,
+        n: int = 1,
+        af: str = "LogEI",
+        bounds: torch.Tensor | None = None,
+    ) -> torch.Tensor:
         self.propose_calls += 1
+        self.propose_afs.append(af)
+        self.propose_bounds.append(bounds)
         # Return a slightly perturbed point each call so different candidates
         # don't all evaluate the same point.
         base = self._propose_value.clone()

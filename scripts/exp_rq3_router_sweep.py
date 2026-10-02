@@ -69,7 +69,7 @@ class RFDecider:
         self.models, self.calibrator, self.seed = models, calibrator, seed
 
     def decide(self, state):
-        choices = candidate_actions_for_state(state, seed=self.seed)
+        choices = candidate_actions_for_state(state)
         phase = phase_of_ratio(state.resource.remaining_budget_ratio)
         x = extract_features(asdict(state), phase)
         scores = {action: float(self.models[action].predict([x])[0])
@@ -131,7 +131,7 @@ def prepare_model(dataset: Path):
 def _make_system2(mode: str, seed: int):
     if mode == "mock":
         return FallbackSystem2()
-    return LLMSystem2(candidate_seed=seed)
+    return LLMSystem2()
 
 
 def run_one(family: str, seed: int, budget: int, policy_name: str,

@@ -71,8 +71,10 @@
 │
 ├─ 策略层  π: s_t → a_t，动作空间分为两个子集：
 │    A_pt（点选择动作：决定下一个评估点的位置——AF 选择/AF 参数/批量 q；
-│         抽象槽位。当前实现 = 5 个采样模式 + surrogate_acquisition，
-│         见 §2.4；"AF 选择/参数/批量"为预留的扩张方向，尚未实现）
+│         抽象槽位。当前实现（h3）= 3 个固定 AF 采样位
+│         （global=TS、local=PI+step 信任域、uncertainty=PosSTD）
+│         + surrogate_acquisition（af 参数可选 LMABO 12-AF，默认 LogEI），
+│         见 §2.4；"AF 选择"已实现，"AF 参数/批量"仍为预留扩张方向）
 │    A_flow（流程控制动作：控制优化流程的推进——stop/retrain/切换
 │         采样模式。重启不属于内层动作集：它是元层动作（§1.2/§4.1），
 │         内层仅能以终止型动作触发 episode 边界）
@@ -127,7 +129,7 @@ option = 一次时间上扩展的执行 = 一个 episode。元层的"换模型"�
 |---|---|
 | harness / scaffold（控制循环） | rollout 循环 |
 | observation | 状态摘要（15 维特征 / LMABO 序列化文本） |
-| tool use / typed actions | 8 个 ActionType + 参数 schema + 校验 |
+| tool use / typed actions | h3 起 6 个 ActionType + 参数 schema + 校验 |
 | trajectory | 一次 rollout 记录 |
 | episodic memory | 跨 episode 轨迹库 |
 | policy | RF（当前）/ RLCD 微调 Laya（exp/rlcd-laya-finetune） |
@@ -171,9 +173,10 @@ option = 一次时间上扩展的执行 = 一个 episode。元层的"换模型"�
   ESP（Shahriari et al., 2014）→ LMABO（零样本 LLM 选择器）整条脉络。
 - AF 内部参数：SAWEI（自调权重 λ，AutoML 2023 / PMLR v224）、
   PI-is-back（按数据质量切 PI/EI，`arxiv_2211.01455`）。
-- 本项目 8 动作中的采样模式位（global_exploration、
-  local_exploitation、uncertainty_sampling、error_guided_sampling、
-  boundary_sampling）与 surrogate_acquisition 占此生态位。
+- 本项目采样位（h3 起 6 动作菜单：global_exploration、
+  local_exploitation、uncertainty_sampling、surrogate_acquisition 全部
+  AF 化）占此生态位；h1 时代的 error_guided/boundary 启发式采样位
+  已于 h3 移除。
 
 **B3 · 可调但文献覆盖有限（工程常用，理论保证缺乏）**
 - 批量 q、重拟合频率（周期重拟合：预留设计、未实现）、初始点数 2D+1。
@@ -201,16 +204,14 @@ option = 一次时间上扩展的执行 = 一个 episode。元层的"换模型"�
 - SMAC（Hutter et al., 2011）以序贯模型配置算法为工具；本项目与其实
   结构同构、对象互补——**配置对象是 BO 自身**。这是元层的文献支点。
 
-### 2.4 本项目 8 动作菜单的归类（`src/opt_agent/actions/models.py`；机器可读版：`actions/boundary_registry.py`，三方同步测试强制一致）
+### 2.4 本项目动作菜单（h3 起 6 动作）的归类（`src/opt_agent/actions/models.py`；机器可读版：`actions/boundary_registry.py`，三方同步测试强制一致）
 
 | ActionType | 归类 | 子菜单 | 备注 |
 |---|---|---|---|
-| GLOBAL_EXPLORATION | B2 | A_pt | 采样模式位（Sobol）；经验充分、理论真空档 |
-| LOCAL_EXPLOITATION | B2 | A_pt | 采样模式位（当前最优邻域扰动） |
-| UNCERTAINTY_SAMPLING | B2 | A_pt | 采样模式位（后验 std 引导） |
-| ERROR_GUIDED_SAMPLING | B2 | A_pt | 采样模式位（留一误差引导） |
-| BOUNDARY_SAMPLING | B2 | A_pt | 采样模式位（边界覆盖） |
-| SURROGATE_ACQUISITION | B2 | A_pt | 标准 AF 求点（LogEI，按需拟合） |
+| GLOBAL_EXPLORATION | B2 | A_pt | 采样模式位（h2：TS，LMABO portfolio exploratory 组，后验采样 argmax；h1 为 Sobol） |
+| LOCAL_EXPLOITATION | B2 | A_pt | 采样模式位（h2：PI，τ=incumbent，step 为信任域半径；h1 为最优邻域扰动） |
+| UNCERTAINTY_SAMPLING | B2 | A_pt | 采样模式位（h2：PosSTD 解析 AF 连续最大化；h1 为 Sobol 网格 std-argmax） |
+| SURROGATE_ACQUISITION | B2 | A_pt | 标准 AF 求点（默认 LogEI；af 参数可选 LMABO 12-AF，h2；按需拟合） |
 | RETRAIN_SURROGATE | B1 | A_flow | 惰性生命周期中的显式重拟合位（重估语义受 B1 约束，频率属 B3）；**必须**限定为族内 MLE 重估；**禁止**将其扩展为换族/换核——那属于元层重启动作（§4.1） |
 | STOP | B1 | A_flow | 终止型动作；理论对应 Bayesian optimal stopping / probabilistic-regret stopping；Gate-4 stop-gain 是其数据侧对应 |
 
@@ -372,7 +373,7 @@ create the measurability"——LMABO 零监督、靠 LLM 内化知识；本项�
 每层内部理论自洽（内层标准 BO + 策略层经验比较；元层 bandit），
 P1/P2/P3 作为层级不变的筛选与安全工具。定位锚：LMABO 是边界最保守
 端的实证点（1 个动作位、零监督、最强 LLM、50 问题稳定增益）；
-本项目在中间偏激进处（8 动作位 + 人造监督）。
+本项目在中间偏激进处（h3 起 6 动作位 + 人造监督）。
 
 ### 5.4 可检验的成功判据（挂现有 Gate 体系）
 
@@ -571,7 +572,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 | episode | episode | 一次完整优化运行：初始设计 → [拟合→决策→采点→评估→更新]×T → 输出。模型构建在设计期，不属于 episode |
 | 设计期 | design phase | episode 之前：选模型族/核/动作菜单/预算结构。冻结发生在这里 |
 | 元层 | meta-level / configuration layer | episode 边界之上的配置决策层；SMDP 语义下选择 option；反馈为 outcome 级 |
-| 内层 | inner level | episode 内部的策略层决策（8 动作）；反馈为 per-decision 级 |
+| 内层 | inner level | episode 内部的策略层决策（h3 起 6 动作）；反馈为 per-decision 级 |
 | 元轨迹 | meta-trajectory | config₁ → outcome₁ → config₂ → … 的序列 |
 | 暖启动 | warm start | 重启的新 episode 全量带入历史观测 {(x,y)}；数据是真值记录，不依附模型，故合法 |
 | 选项/半马尔可夫 | options / SMDP | 分层 RL 框架（Sutton et al. 1999）：时间上扩展的动作；一个 option ≙ 一个 episode |
@@ -584,7 +585,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 | episode 内模型规范冻结 | intra-episode model-specification freeze | 模型族（核函数）与超参估计规则在 episode 启动前确定、运行中不变；跨 episode 比较与经验累积以该不变性为前提（C 类与 §4.1 的形式基础） |
 | 反事实 rollout | counterfactual rollout | 从状态 s 执行候选动作 a + 固定延续的短视程分支，构造 U(a,s) 监督 |
 | 决策实用度 | U(a, s) | THEORY.md §0 定义的标签量，共**六**项：w_opt·Δopt/σ_opt + w_sur·Δsur + w_cov·Δcov − w_eval·n_new/σ_eval − w_fit·n_fit/σ_fit − w_stop_opportunity·剩余预算比·1[a=STOP]。代码默认 w_stop_opportunity=0.75（STOP 项默认激活，`rollout/utility.py`） |
-| gold 概率 | gold_probs | softmax(U(·,s)/T)，在**实际 rollout 的候选集**上计算——该候选集可能为配额采样的动作子集（quota k<8 时，`dataset/generator.py`） |
+| gold 概率 | gold_probs | softmax(U(·,s)/T)，在**实际 rollout 的候选集**上计算——该候选集可能为配额采样的动作子集（quota k<菜单大小时，h3 起为 6；`dataset/generator.py`） |
 | 逐态优势 | A(s) | P3 路由模型中 Q(s,a₂(s)) − Q(s,a₁(s))：System-2 对 System-1 的匹配延续净优势 |
 | Gate 4 / Gate 5 | gates | 项目预宣告实验门槛：Gate 4 = 终端行为增益（含 stop-gain 子项）；Gate 5 = 标签仿射不变性。定义与通过状态见 PROGRESS 记录与 THEORY.md |
 | 惰性拟合 | lazy fitting | 代理维护现状：评估使拟合失效，GP 依赖动作按需重拟合，RETRAIN 显式重拟合（`actions/executor.py`） |
@@ -593,7 +594,7 @@ k<8）、rollout 复制数（teacher 噪声控制）。
 | meta-D | configuration-conditionality descriptor | 族标准化效用上的 E_f[max_a u] − max_a E_f[u]；总体意义 >0 ⟺ 各族优势 Δ_f 符号不全同。度量"已知族标签的 oracle 选择价值"，是**描述量而非检验统计量**，且与签名可学性无关 |
 | HARNESS_VERSION / UTILITY_VERSION | version stamps | `dataset/versioning.py` 的双版本戳：前者冻结观测格式+动作菜单+标签管线整体，后者只追踪 S 类标签定义；修改对应组件必须递增并在 `_KNOWN_PAST` 登记旧值 |
 | legacy / mismatch | stamp statuses | `check_record_versions` 的分类：legacy = 旧值或缺戳（可读、禁止与当前版本静默混池）；mismatch = 未知值（拒绝混池） |
-| 动作菜单 | action menu | 类型化动作集（现 8 个 ActionType）；扩张受 §3.4 三项前置检查约束 |
+| 动作菜单 | action menu | 类型化动作集（h3 起现 6 个 ActionType）；扩张受 §3.4 三项前置检查约束 |
 | 点选择动作 | A_pt（point-selection） | 决定下一个评估点的位置（AF 选择/参数/批量；抽象槽位，当前实现见 §2.4） |
 | 流程控制动作 | A_flow（process-control） | 控制优化流程的推进（stop/retrain/切换采样模式；重启属元层）；人工流程控制决策的形式化对应物 |
 | 问题签名 | problem signature | 元层状态特征：维度、预算、历史 episode 结果摘要等 |

@@ -1,0 +1,151 @@
+rastrigin_opportunity_controls: 10/200 elapsed=6.2s rastrigin/s20/gp_then_uncertainty_sampling_15
+rastrigin_opportunity_controls: 20/200 elapsed=9.7s rastrigin/s20/gp_then_boundary_sampling_25
+rastrigin_opportunity_controls: 30/200 elapsed=15.3s rastrigin/s21/gp_then_global_exploration_25
+rastrigin_opportunity_controls: 40/200 elapsed=18.4s rastrigin/s21/gp_then_error_guided_sampling_20
+rastrigin_opportunity_controls: 50/200 elapsed=23.7s rastrigin/s22/gp_then_uncertainty_sampling_15
+rastrigin_opportunity_controls: 60/200 elapsed=27.4s rastrigin/s23/gp_then_global_exploration_15
+rastrigin_opportunity_controls: 70/200 elapsed=34.2s rastrigin/s24/gp_then_local_exploitation_10
+rastrigin_opportunity_controls: 80/200 elapsed=38.1s rastrigin/s23/gp_then_uncertainty_sampling_15
+rastrigin_opportunity_controls: 90/200 elapsed=41.5s rastrigin/s23/gp_then_error_guided_sampling_25
+rastrigin_opportunity_controls: 100/200 elapsed=45.1s rastrigin/s24/gp_then_boundary_sampling_25
+rastrigin_opportunity_controls: 110/200 elapsed=50.8s rastrigin/s23/gp_then_boundary_sampling_25
+rastrigin_opportunity_controls: 120/200 elapsed=57.3s rastrigin/s26/gp_then_global_exploration_20
+rastrigin_opportunity_controls: 130/200 elapsed=60.4s rastrigin/s27/gp_then_global_exploration_10
+rastrigin_opportunity_controls: 140/200 elapsed=67.0s rastrigin/s27/gp_then_local_exploitation_20
+rastrigin_opportunity_controls: 150/200 elapsed=71.2s rastrigin/s28/gp_then_global_exploration_10
+rastrigin_opportunity_controls: 160/200 elapsed=75.7s rastrigin/s28/gp_then_local_exploitation_15
+rastrigin_opportunity_controls: 170/200 elapsed=78.7s rastrigin/s26/gp_then_boundary_sampling_25
+rastrigin_opportunity_controls: 180/200 elapsed=84.3s rastrigin/s29/gp_then_global_exploration_20
+rastrigin_opportunity_controls: 190/200 elapsed=88.3s rastrigin/s28/gp_then_uncertainty_sampling_20
+rastrigin_opportunity_controls: 200/200 elapsed=94.7s rastrigin/s29/gp_then_boundary_sampling_25
+rastrigin_opportunity_test: 10/120 elapsed=24.5s rastrigin/s60002/surrogate_acquisition
+rastrigin_opportunity_test: 20/120 elapsed=73.9s rastrigin/s60009/surrogate_acquisition
+rastrigin_opportunity_test: 30/120 elapsed=800.5s rastrigin/s60012/surrogate_acquisition
+rastrigin_opportunity_test: 40/120 elapsed=1088.7s rastrigin/s60009/reference_5
+rastrigin_opportunity_test: 50/120 elapsed=1247.4s rastrigin/s60001/reference_1
+rastrigin_opportunity_test: 60/120 elapsed=1408.5s rastrigin/s60019/frozen_gp_schedule
+rastrigin_opportunity_test: 70/120 elapsed=1636.3s rastrigin/s60022/surrogate_acquisition
+rastrigin_opportunity_test: 80/120 elapsed=1896.1s rastrigin/s60015/reference_5
+rastrigin_opportunity_test: 90/120 elapsed=2083.7s rastrigin/s60027/surrogate_acquisition
+rastrigin_opportunity_test: 100/120 elapsed=2365.7s rastrigin/s60022/reference_5
+rastrigin_opportunity_test: 110/120 elapsed=2757.4s rastrigin/s60026/reference_1
+rastrigin_opportunity_test: 120/120 elapsed=3215.7s rastrigin/s60028/reference_1
+{
+  "selected": "surrogate_acquisition",
+  "contrasts": {
+    "schedule_minus_gp": {
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "ci99": [
+        0.0,
+        0.0
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        0,
+        30,
+        0
+      ],
+      "paired_sign_randomization_p": 1.0,
+      "holm_p": 1.0
+    },
+    "unit_minus_gp": {
+      "mean": -5.037537719300735,
+      "ci95": [
+        -13.173558534581627,
+        3.6214621375739022
+      ],
+      "ci99": [
+        -15.221126838363539,
+        6.575103774119539
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        11,
+        2,
+        17
+      ],
+      "paired_sign_randomization_p": 0.2617869106544673,
+      "holm_p": 1.0
+    },
+    "block_minus_gp": {
+      "mean": 2.2751301956503243,
+      "ci95": [
+        -5.851907982881677,
+        10.59262927959562
+      ],
+      "ci99": [
+        -7.9865054142567375,
+        13.761765762698728
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        15,
+        1,
+        14
+      ],
+      "paired_sign_randomization_p": 0.5976201189940503,
+      "holm_p": 1.0
+    },
+    "unit_minus_schedule": {
+      "mean": -5.037537719300735,
+      "ci95": [
+        -13.173558534581627,
+        3.6214621375739022
+      ],
+      "ci99": [
+        -15.221126838363539,
+        6.575103774119539
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        11,
+        2,
+        17
+      ],
+      "paired_sign_randomization_p": 0.2617869106544673,
+      "holm_p": 1.0
+    },
+    "block_minus_schedule": {
+      "mean": 2.2751301956503243,
+      "ci95": [
+        -5.851907982881677,
+        10.59262927959562
+      ],
+      "ci99": [
+        -7.9865054142567375,
+        13.761765762698728
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        15,
+        1,
+        14
+      ],
+      "paired_sign_randomization_p": 0.5976201189940503,
+      "holm_p": 1.0
+    },
+    "block_minus_unit": {
+      "mean": 7.312667914951059,
+      "ci95": [
+        -0.5167671378570028,
+        15.37762628030337
+      ],
+      "ci99": [
+        -2.9025227065437442,
+        18.04142807988415
+      ],
+      "n": 30,
+      "wins_ties_losses": [
+        21,
+        1,
+        8
+      ],
+      "paired_sign_randomization_p": 0.08299585020748962,
+      "holm_p": 0.4979751012449377
+    }
+  }
+}

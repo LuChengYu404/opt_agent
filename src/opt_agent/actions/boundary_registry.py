@@ -46,32 +46,22 @@ BOUNDARY_REGISTRY: dict[ActionType, BoundaryClassification] = {
     ActionType.GLOBAL_EXPLORATION: BoundaryClassification(
         boundary_class="B2",
         submenu="A_pt",
-        guide_note="采样模式位（Sobol）；经验充分、理论真空档",
+        guide_note="采样模式位（h2：TS，LMABO portfolio exploratory 组，后验采样 argmax）",
     ),
     ActionType.LOCAL_EXPLOITATION: BoundaryClassification(
         boundary_class="B2",
         submenu="A_pt",
-        guide_note="采样模式位（当前最优扰动）",
+        guide_note="采样模式位（h2：PI，τ=incumbent，step 为信任域半径）",
     ),
     ActionType.UNCERTAINTY_SAMPLING: BoundaryClassification(
         boundary_class="B2",
         submenu="A_pt",
-        guide_note="采样模式位（后验 std 引导）",
-    ),
-    ActionType.ERROR_GUIDED_SAMPLING: BoundaryClassification(
-        boundary_class="B2",
-        submenu="A_pt",
-        guide_note="采样模式位（留一误差引导）",
-    ),
-    ActionType.BOUNDARY_SAMPLING: BoundaryClassification(
-        boundary_class="B2",
-        submenu="A_pt",
-        guide_note="采样模式位（边界覆盖）",
+        guide_note="采样模式位（h2：PosSTD 解析 AF 连续最大化）",
     ),
     ActionType.SURROGATE_ACQUISITION: BoundaryClassification(
         boundary_class="B2",
         submenu="A_pt",
-        guide_note="标准 AF 求点（LogEI，按需拟合）",
+        guide_note="标准 AF 求点（默认 LogEI；af 参数可选 LMABO 12-AF，h2；按需拟合）",
     ),
     ActionType.RETRAIN_SURROGATE: BoundaryClassification(
         boundary_class="B1",

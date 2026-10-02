@@ -1,0 +1,17 @@
+{
+  "contexts": [
+    {
+      "family": "sixhumpcamel",
+      "seed": 8881
+    },
+    {
+      "fid": 6,
+      "dim": 2,
+      "instance": 99,
+      "seed": 8881
+    }
+  ],
+  "policy": "surrogate_acquisition",
+  "exact_match": true,
+  "pool_started_before_parent_autograd": true
+}

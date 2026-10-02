@@ -154,6 +154,8 @@ def main() -> None:
                 record,
                 continuation_spec=ContinuationPolicySpec(name="rule", seed=0),
                 horizon=int(record.state["resource"]["remaining_budget"]),
+                # Archived h1-era artifacts; replay with mismatch acknowledged.
+                allow_legacy_harness=True,
             )
             label_record = replace(record, rollout_results={
                 result.action_id: {
@@ -182,6 +184,9 @@ def main() -> None:
             "record_id": record.id,
             "family": record.problem["family"],
             "seed": int(record.problem["seed"]),
+            # Execution provenance (codex round-2 MINOR): legacy-harness
+            # records replayed through the current executor.
+            "replay_execution": "current-harness executor on legacy records (migration analysis)",
             "objective_scale": record.metadata["optimization_scale"],
             "baselines": {k: gate["terminal"][k] for k in ("stop", "uniform", "behavior")},
             "labels": labels,

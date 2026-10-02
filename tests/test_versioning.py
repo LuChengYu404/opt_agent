@@ -295,3 +295,21 @@ def test_pooling_note_persists_and_combinable(tmp_path, monkeypatch):
             pooling_note="must persist or fail")
     # a failed opt-in leaves NO in-memory residue (round-7 MINOR)
     assert len(ver.pooling_decisions()) == before
+
+
+def test_h1_records_classified_legacy_and_strict_refuses_mixing():
+    """h2 bump (AF sampling transplant): h1-stamped records are LEGACY —
+    readable but not poolable with h2 data without an explicit note."""
+    import pytest as _pytest
+
+    import opt_agent.dataset.versioning as ver
+
+    status = ver.check_record_versions({
+        "harness_version": "h1", "utility_version": ver.UTILITY_VERSION,
+    })
+    assert status["harness"] is ver.VersionStatus.LEGACY
+    with _pytest.raises(ver.VersionPolicyError):
+        ver.enforce_record_pooling(
+            [{"harness_version": "h1"}, {"harness_version": "h2"}],
+            "strict", source="mixed.jsonl",
+        )

@@ -10,7 +10,6 @@ max_uncertainty (populated only when backend.is_fitted; NaN otherwise).
 from __future__ import annotations
 
 import functools
-import math
 from typing import Optional
 
 import torch
@@ -29,16 +28,13 @@ from opt_agent.state.models import (
 # Grid size for posterior uncertainty statistics.
 _UNCERTAINTY_GRID_SIZE = 64
 
+# Boundary-coverage threshold as a fraction of the per-dimension range.
+# h3: the BOUNDARY_SAMPLING action was removed; this constant now solely
+# defines the `boundary_coverage` state feature.
+BOUNDARY_TOL: float = 0.05
 
-def _boundary_tol() -> float:
-    """Boundary coverage threshold as a fraction of the per-dimension
-    range. Deferred import keeps `state.extractor` from depending on
-    `actions.factory` at module load time. The single source of truth is
-    `actions.factory.BOUNDARY_TOL`; that constant also drives
-    BOUNDARY_SAMPLING's default `tol` so the coverage metric stays in
-    sync with the action's actual search margin."""
-    from opt_agent.actions.factory import BOUNDARY_TOL
-    return BOUNDARY_TOL
+
+
 
 
 def _min_pairwise_distance(X: torch.Tensor) -> float:
@@ -167,7 +163,7 @@ def extract_state(
     bounds = backend.bounds
     if bounds is not None and bounds.shape[1] == dimension:
         min_pd = _min_pairwise_distance(history.X)
-        bcov = _boundary_coverage(history.X, bounds, tol=_boundary_tol())
+        bcov = _boundary_coverage(history.X, bounds, tol=BOUNDARY_TOL)
     else:
         min_pd = float("inf")
         bcov = 0.0

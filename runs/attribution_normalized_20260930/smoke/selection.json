@@ -1,0 +1,31 @@
+{
+  "sixhumpcamel": {
+    "fixed": "surrogate_acquisition",
+    "raw_fixed": "local_exploitation",
+    "schedule": "schedule_0.4",
+    "development_means": {
+      "raw": {
+        "global_exploration": 0.4076253378254214,
+        "local_exploitation": 0.9759039566196716,
+        "uncertainty_sampling": 0.9423812129020447,
+        "error_guided_sampling": -0.4495865840001968,
+        "boundary_sampling": -0.4495865840001968,
+        "surrogate_acquisition": 0.7435522502685035
+      },
+      "normalized": {
+        "global_exploration": 0.4076253378254214,
+        "local_exploitation": 0.9759039566196716,
+        "uncertainty_sampling": 0.04619643764531856,
+        "error_guided_sampling": -0.4495865840001968,
+        "boundary_sampling": -0.4495865840001968,
+        "surrogate_acquisition": 1.0281502837262453
+      }
+    },
+    "schedule_means": {
+      "schedule_0.2": 0.9759039566196716,
+      "schedule_0.4": 1.0147426192202014,
+      "schedule_0.6": 0.8864485032084254,
+      "schedule_0.8": 0.09143092094585858
+    }
+  }
+}

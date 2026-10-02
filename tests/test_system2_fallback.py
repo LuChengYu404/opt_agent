@@ -80,7 +80,8 @@ def test_fallback_uses_stagnation_rule() -> None:
 
 
 def test_hybrid_smoke_fallback_matches_same_seed_rule_policy() -> None:
-    """Paired hybrid and RulePolicy runs must use the same exploration seed."""
+    """Paired hybrid and RulePolicy runs pick the same exploration action
+    (h3: no exploration seed exists anymore; actions are equal above)."""
     from scripts.run_hybrid_smoke import _make_system2
     from opt_agent.loop.policies import RulePolicy
 
@@ -89,7 +90,7 @@ def test_hybrid_smoke_fallback_matches_same_seed_rule_policy() -> None:
     fallback_action = _make_system2("fallback", seed=17).reason(state).action
     rule_action = RulePolicy(seed=17).select_action(state)
     assert fallback_action == rule_action
-    assert fallback_action.params["seed"] == 17 + state.sampling.n_samples
+    assert fallback_action.params == {"n_samples": 2}
 
 
 # ---------------------------------------------------------------------------

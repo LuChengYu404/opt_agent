@@ -1,0 +1,17 @@
+REVIEW round 4 (closing): LMABO AF sampling transplant (harness h2). Branch exp/boundary-scheme-round2, working tree (uncommitted). Round-3 (runs/codex_af_sampling_round3_review.log) resolved both prior MAJORs (ADDRESSED) and left exactly two MINORs. Both are now fixed; dispositions in docs/AF_SAMPLING_20261001.md §7.
+
+ROUND-3 DISPOSITIONS (verify: ADDRESSED / PARTIAL / UNADDRESSED):
+
+R3-A [MINOR, IOHBackend.restore suppressed GP/RNG restoration failures] ADDRESSED: both the GP rehydration path and the RNG restore now propagate exceptions (try/except removed); the executor's atomic rollback therefore sees a failed restore and reports both exceptions via its chained RuntimeError.
+
+R3-B [MINOR, diagnose_qs5 JSON artifact lacked execution provenance] ADDRESSED: the JSON payload's metadata now carries a "replay_execution" block: execution_harness (= versioning.HARNESS_VERSION), records_harness (sorted distinct harness_version stamps of the sampled records), and the migration note — matching the Markdown header line added in round-2.
+
+REVIEW TASKS:
+A. Verify the two round-3 dispositions.
+B. New-issue check on these two diffs only.
+C. Final merge-readiness for the h2 change set (round-3 already found no BLOCKER/MAJOR; if nothing new, close).
+
+Answer format: A one row per disposition; B PASS or findings [BLOCKER|MAJOR|MINOR] with file:line and one-line fixes; C one paragraph.
+Then one final line: VERDICT: APPROVE | REVISE
+
+Read-only: do NOT edit files, do NOT run tests/training. You may read any repo file, inspect git log/diff, and read all prior review logs.

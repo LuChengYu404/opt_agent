@@ -253,6 +253,8 @@ def run_one(
             utility_weights=weights,
             horizon=resolved_horizon,
             continuation_spec=CONTINUATION,
+            # Archived h1-era artifacts; replay with mismatch acknowledged.
+            allow_legacy_harness=True,
         )
         new_probs = to_gold_probs(
             output.results, temperature=record.temperature,
@@ -421,6 +423,9 @@ def format_markdown(
     lines.append("# Q-S5 Diagnostic Report")
     lines.append("")
     lines.append(f"- **Dataset**: `{args.dataset}`")
+    # Execution provenance (codex round-2 MINOR): replays below run legacy-
+    # harness records through the current executor.
+    lines.append("- **Execution**: current-harness executor on legacy records (migration analysis)")
     lines.append(f"- **Records sampled**: {len(sampled)} (seed={args.seed})")
     lines.append(f"- **Configs**: {len(results) // max(1, len(sampled))} per record × {len(sampled)} records = {len(results)} runs")
     lines.append(f"- **Continuation policy**: `{CONTINUATION.name}` (fixed per Q-S5 Decision 4-Z)")
@@ -528,9 +533,20 @@ def main() -> None:
     print("[diagnose_qs5] Aggregating")
     summary = aggregate(results)
 
+    from opt_agent.dataset.versioning import HARNESS_VERSION
+
     json_payload: dict[str, Any] = {
         "metadata": {
             "dataset": str(args.dataset),
+            # Execution provenance (codex round-3 MINOR): these replays run
+            # legacy-harness records through the current executor.
+            "replay_execution": {
+                "execution_harness": HARNESS_VERSION,
+                "records_harness": sorted({
+                    str(r.metadata.get("harness_version")) for r in sampled
+                }),
+                "note": "current-harness executor on legacy records (migration analysis)",
+            },
             "n_records_total": len(records),
             "n_records_sampled": len(sampled),
             "sample_seed": args.seed,

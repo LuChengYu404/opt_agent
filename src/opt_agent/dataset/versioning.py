@@ -3,7 +3,9 @@
 Discipline (RESEARCH_BOUNDARY_GUIDE.md):
 
 - ``HARNESS_VERSION`` freezes the measurement system: observation format
-  (state features), the action menu, and the harness-side record schema.
+  (state features), the action menu, the harness-side record schema, AND the
+  executable semantics of the menu (executor implementations — h2 re-based
+  the sampling actions on the LMABO AF portfolio, docs/AF_SAMPLING_20261001.md).
   ``UTILITY_VERSION`` is the finer stamp tracking the S-class
   supervision-defining components (utility weights/scales, continuation
   policy, rollout horizon, gold temperature, action-subset quota,
@@ -34,13 +36,21 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping
 
-HARNESS_VERSION = "h1"
+# h2 (2026-10-01): LMABO AF transplant (docs/AF_SAMPLING_20261001.md) —
+# executor sampling semantics changed (TS / trust-region PI / PosSTD) and
+# SURROGATE_ACQUISITION gained the `af` param. h2 never generated data
+# (in-session iteration only).
+# h3 (2026-10-01): menu simplification — ERROR_GUIDED_SAMPLING and
+# BOUNDARY_SAMPLING removed; no action carries a `seed` param anymore.
+# Trajectories and U(a,s) labels are not comparable across h1/h2/h3.
+HARNESS_VERSION = "h3"
 UTILITY_VERSION = "phase8.6b"
 
 # Stamps that may appear in historical records. "phase8.6b" doubles as the
-# current UTILITY_VERSION; harness_version was simply absent before h1.
+# current UTILITY_VERSION; "h1" predates the LMABO AF transplant and "h2"
+# was an in-session iteration that produced no datasets.
 _KNOWN_PAST: dict[str, set[str]] = {
-    "harness": set(),  # h1 is the first stamped harness version
+    "harness": {"h1", "h2"},
     "utility": set(),  # phase8.6b is the first formalized utility version
 }
 

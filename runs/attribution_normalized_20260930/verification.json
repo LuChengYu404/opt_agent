@@ -1,0 +1,32 @@
+{
+  "closed_loop_trajectories": 2200,
+  "label_states": 75,
+  "all_real_budgets_exactly_30": true,
+  "supplementary_closed_loops": 620,
+  "total_closed_loop_trajectories": 2820,
+  "matched_block_first_prefixes": true,
+  "fixed_intervention_matches_across_blocks": true,
+  "current_gp_on_all_label_states": true,
+  "frozen_source_hashes_verified": true,
+  "identity_negative_control_pairs_exact": 540,
+  "positive_control_passed": true,
+  "tests": {
+    "baseline_and_compatibility_passed": 60,
+    "normalized_backend_and_analysis_passed": 11,
+    "dataset_replay_and_analysis_passed": 27,
+    "bounds_restore_regression_and_checkpoint_passed": 22
+  },
+  "model_audit_dataset_and_checkpoint_hashes_verified": true,
+  "supplementary_source_hashes_verified": true,
+  "post_freeze_compatibility_fixes": {
+    "dataset_normalization_flag_preserved": true,
+    "uninitialized_or_different_problem_bounds_restored": true,
+    "not_exercised_by_main_panel": true
+  },
+  "current_compatibility_source_sha256": {
+    "src/opt_agent/backend/bocode_botorch.py": "67b6729bc54f1ccbda5e5dca0e4b02cf73dc57aec351d6b397b25ec2d075fb8b",
+    "src/opt_agent/backend/checkpoint.py": "886045c3018cbd49922f4cc0059489ea5e7c191a07794fdba1e007cb874a0cfd",
+    "src/opt_agent/dataset/generator.py": "5eea03823146b7309c0bb1f652b7987e503120fb2cca44a5bc5d62ae3994f398",
+    "src/opt_agent/dataset/validation.py": "da0c04175153aee74b8756780a650b52eb706aab19cbbfc7b0691eba58d853c6"
+  }
+}
