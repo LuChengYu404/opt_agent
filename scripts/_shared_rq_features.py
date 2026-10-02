@@ -1,7 +1,7 @@
 """Shared RF probe feature/target extraction for RQ1.3 / RQ2.1.
 
-Both `exp_rq1_3_rf_probe.py` (Hartmann state-conditionality, leave-one-seed-out)
-and `exp_rq2_1_cross_family_transfer.py` (RQ2.1, leave-one-family-out) need
+Both the original RQ1.3 RF probe (removed 2026-10-02; recoverable from git
+history) and `exp_rq2_1_cross_family_transfer.py` (RQ2.1, leave-one-family-out) needed
 the same feature extractor and utility recomputer under family_median
 normalization. Factoring them here prevents silent divergence if the
 schema changes.
@@ -11,12 +11,11 @@ Used by:
 - scripts/exp_rlcd_loo_transfer.py / exp_rlcd_loo_confirmatory.py (RF
   baseline arms, via local imports)
 
-Note: `exp_rq1_3_rf_probe.py` is an ARCHIVED script and intentionally keeps
-a frozen local copy of this logic (archive policy: archived scripts don't
-import shared modules); do not list it as a live consumer.
+Note: `exp_rq1_3_rf_probe.py` was removed in the 2026-10-02 cleanup; its
+frozen local copy of this logic is recoverable from git history.
 
 Public API:
-    ACTIONS          : 8-tuple of action IDs (canonical order)
+    ACTIONS          : 6-tuple of action IDs (canonical order, h3 menu)
     FAMILIES         : 5-tuple of family names (canonical order)
     PHASE_VALUES     : 3-tuple of phase values (early, mid, late)
     extract_features(state, phase) -> list[float]
@@ -30,10 +29,12 @@ import statistics
 from collections import defaultdict
 from typing import Iterable
 
+# h3 (2026-10-01): 6-action menu — error_guided/boundary removed.
+# Archived h1 attribution artifacts (8-action) are no longer indexable by
+# the current analysis scripts; check out the h1 commit to analyze them.
 ACTIONS = (
     "global_exploration", "local_exploitation", "uncertainty_sampling",
-    "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
-    "retrain_surrogate", "stop",
+    "surrogate_acquisition", "retrain_surrogate", "stop",
 )
 
 FAMILIES = ("branin", "hartmann", "ackley", "sixhumpcamel", "rastrigin")

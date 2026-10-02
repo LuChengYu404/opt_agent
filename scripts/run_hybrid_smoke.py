@@ -135,24 +135,6 @@ class _FakeLayaUniform:
         }}}
 
 
-def _make_system1(system1_kind: str, system1_checkpoint: str | None) -> Any:
-    """Build a System-1 policy for the smoke run.
-
-    `laya` (default): the deterministic Laya stub (FakeLayaSurrogateAcquisition).
-    `typed-decision`: a trained JevStyleSystem1 checkpoint loaded from disk.
-    """
-    if system1_kind == "laya":
-        return LayaPolicy(agent=_FakeLayaSurrogateAcquisition(), seed=0)
-    if system1_kind == "typed-decision":
-        if not system1_checkpoint:
-            raise ValueError(
-                "--system1 typed-decision requires --system1-checkpoint"
-            )
-        from opt_agent.system1 import TypedDecisionPolicy
-        return TypedDecisionPolicy.from_checkpoint(system1_checkpoint)
-    raise ValueError(f"unknown system1 kind: {system1_kind!r}")
-
-
 def _make_system2(system2_kind: str, *, seed: int = 0) -> Any:
     """Build a System-2 policy for the smoke run.
 
@@ -173,30 +155,14 @@ def _make_system2(system2_kind: str, *, seed: int = 0) -> Any:
                 "LLMSystem2 unavailable; install httpx to enable the "
                 "deepseek system-2 backend."
             ) from exc
-        return LLMSystem2(timeout_s=20.0, max_tokens=256, temperature=0.2,
-                          candidate_seed=seed)
+        return LLMSystem2(timeout_s=20.0, max_tokens=256, temperature=0.2)
     raise ValueError(f"unknown system2 kind: {system2_kind!r}")
-
-
-_TYPED_DECISION_CACHE: dict = {}
-
-
-def _get_typed_decision_policy(checkpoint_path):
-    """Load the typed-decision checkpoint once and cache it."""
-    path = str(checkpoint_path)
-    if path not in _TYPED_DECISION_CACHE:
-        from opt_agent.system1 import TypedDecisionPolicy
-        _TYPED_DECISION_CACHE[path] = TypedDecisionPolicy.from_checkpoint(path)
-    return _TYPED_DECISION_CACHE[path]
 
 
 def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
                  laya_agent: Any = None,
-                 system1_kind: str = "laya",
-                 system1_checkpoint: str | Path | None = None,
                  system2_kind: str = "fallback") -> HybridPolicy:
-    """Build a HybridPolicy backed by a deterministic Laya stub OR a
-    trained Jev-style checkpoint.
+    """Build a HybridPolicy backed by a deterministic Laya stub.
 
     Parameters
     ----------
@@ -209,27 +175,15 @@ def _make_hybrid(seed: int, *, tau_conf: float = 0.5,
         the router escalates as long as tau_conf > 1/K.
     laya_agent : object
         Laya agent (predict callable). Defaults to the deterministic
-        surrogate_acquisition stub. Ignored when system1_kind is
-        'typed-decision'.
-    system1_kind : {"laya", "typed-decision"}
-        Which System-1 policy to install. Default `laya`. `typed-decision`
-        loads a Jev-style checkpoint from `system1_checkpoint` (cached
-        so multiple runs share one model load).
-    system1_checkpoint : str | Path | None
-        Path to the trained checkpoint (used when
-        system1_kind == 'typed-decision').
+        surrogate_acquisition stub.
     system2_kind : {"fallback", "deepseek"}
         Which System-2 policy to install. Default `fallback`
         (deterministic RulePolicy). `deepseek` uses LLMSystem2
         against the DeepSeek Chat Completions API.
     """
-    if system1_kind == "typed-decision":
-        s1 = _get_typed_decision_policy(system1_checkpoint)
-        s1.seed = seed
-    else:
-        agent = (laya_agent if laya_agent is not None
-                 else _FakeLayaSurrogateAcquisition())
-        s1 = LayaPolicy(agent=agent, seed=seed)
+    agent = (laya_agent if laya_agent is not None
+             else _FakeLayaSurrogateAcquisition())
+    s1 = LayaPolicy(agent=agent, seed=seed)
     return HybridPolicy(
         system1=s1,
         router=ConfidenceRouter(tau_conf=tau_conf),
@@ -266,17 +220,10 @@ def _run_hybrid(
     problem: str, seed: int, total_budget: int, n_init: int,
     *, tau_conf: float = 0.5, policy_name: str = "hybrid",
     laya_agent: Any = None,
-    system1_kind: str = "laya",
-    system1_checkpoint: str | Path | None = None,
     system2_kind: str = "fallback",
 ) -> RunResult:
-    # Loading a trained System-1 checkpoint constructs torch modules and
-    # consumes the global RNG. Initialize the paired backend afterward so
-    # each policy starts from the same problem/seed RNG state.
     hybrid = _make_hybrid(
         seed, tau_conf=tau_conf, laya_agent=laya_agent,
-        system1_kind=system1_kind,
-        system1_checkpoint=system1_checkpoint,
         system2_kind=system2_kind,
     )
     backend = _build_backend(problem, seed, n_init)
@@ -477,15 +424,6 @@ def main() -> int:
                              "deterministic) or 'deepseek' (LLMSystem2 "
                              "against DeepSeek API; requires "
                              "DEEPSEEK_API_KEY in env).")
-    parser.add_argument("--system1", choices=["laya", "typed-decision"],
-                        default="laya",
-                        help="System-1 policy: 'laya' (default, "
-                             "deterministic Laya stub) or 'typed-decision' "
-                             "(trained Jev-style checkpoint).")
-    parser.add_argument("--system1-checkpoint", type=Path,
-                        default=Path("runs/typed_decision_v1.pt"),
-                        help="Path to a trained Jev-style checkpoint "
-                             "(used when --system1 typed-decision).")
     args = parser.parse_args()
 
     runs: list[RunResult] = []
@@ -496,8 +434,6 @@ def main() -> int:
                 try:
                     runs.append(_run_hybrid(
                         problem, seed, budget, args.n_init,
-                        system1_kind=args.system1,
-                        system1_checkpoint=args.system1_checkpoint,
                         system2_kind=args.system2,
                     ))
                 except Exception as exc:
@@ -521,8 +457,6 @@ def main() -> int:
                         problem, seed, budget, args.n_init,
                         tau_conf=1.0, policy_name="hybrid_forced_escalate",
                         laya_agent=_FakeLayaUniform(),
-                        system1_kind=args.system1,
-                        system1_checkpoint=args.system1_checkpoint,
                         system2_kind=args.system2,
                     ))
                 except Exception as exc:
@@ -567,8 +501,6 @@ def main() -> int:
             "budgets": args.budgets,
             "n_init": args.n_init,
             "tau_conf": 0.5,
-            "system1": args.system1,
-            "system1_checkpoint": str(args.system1_checkpoint) if args.system1_checkpoint else None,
             "system2": args.system2,
             "known_optima": KNOWN_OPTIMA,
         },

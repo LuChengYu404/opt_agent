@@ -1,56 +1,20 @@
-"""Calibration and decision-quality metrics for System-1 probability outputs.
+"""Post-hoc temperature-scaling calibration for System-1 probability outputs.
 
-Per MASTER_PLAN §13 + codex gpt-6-sol review 2026-09-23:
-- ECE / Brier / NLL / reliability curves
-- Calibration here measures INTERNAL consistency between a model's
-  predicted distribution and the model's own argmax outcome — NOT real-
-  world accuracy (which requires a separate held-out label source).
-- 15-bin default with optional override; per-bin counts reported so small
-  samples don't masquerade as calibration evidence.
-
-Decision-quality metrics (top-1, top-k, KL vs gold_probs) live in
-`decision.py` to keep the calibration API focused.
+Used by the router-sweep line (scripts/exp_rq3_router_sweep.py) to compare
+trained calibration against a fitted temperature. The ECE/Brier/NLL and
+top-k/KL metric modules were removed in the 2026-10-02 cleanup: no script
+consumed them (experiments compute their metrics inline in the analyze_*
+scripts).
 """
 
-from opt_agent.metrics.calibration import (
-    CalibrationResult,
-    ReliabilityBin,
-    brier_score,
-    expected_calibration_error,
-    negative_log_likelihood,
-    reliability_diagram_data,
-)
-from opt_agent.metrics.decision import (
-    DecisionResult,
-    aggregate_decision_metrics,
-    kl_divergence,
-    negative_log_likelihood_vs_gold,
-    top_k_agreement,
-    top_one_agreement,
-)
 from opt_agent.metrics.temperature import (
-    CalibrationResult as TSResult,
+    CalibrationResult,
     TemperatureCalibrator,
     fit_temperature,
 )
 
 __all__ = [
-    # calibration
     "CalibrationResult",
-    "ReliabilityBin",
-    "expected_calibration_error",
-    "brier_score",
-    "negative_log_likelihood",
-    "reliability_diagram_data",
-    # decision
-    "DecisionResult",
-    "top_one_agreement",
-    "top_k_agreement",
-    "kl_divergence",
-    "negative_log_likelihood_vs_gold",
-    "aggregate_decision_metrics",
-    # temperature scaling
     "TemperatureCalibrator",
     "fit_temperature",
-    "TSResult",
 ]

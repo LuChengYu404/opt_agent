@@ -154,3 +154,35 @@ def read_jsonl(
         source=str(path), pool_legacy=pool_legacy,
         pooling_note=pooling_note)
     return records
+
+
+def validate_record(record: DecisionRecord) -> None:
+    """Enforce vocabulary and probability invariants.
+
+    ``gold_probs`` and ``rollout_results`` must cover the same action ids,
+    and those ids must be a subset of the candidate vocabulary: with
+    ``rollout_action_subsample < 8`` (partial rollout) only a k-subset of
+    the candidates is rolled out and labeled. Full datasets remain
+    set-equal across all three fields.
+    """
+    ids = [a["action_id"] for a in record.candidate_actions]
+    if len(ids) != len(set(ids)):
+        raise ValueError(f"{record.id}: duplicate candidate IDs")
+    if set(record.gold_probs) != set(record.rollout_results):
+        raise ValueError(f"{record.id}: unaligned action vocabulary")
+    if not set(record.gold_probs) <= set(ids):
+        raise ValueError(f"{record.id}: labeled ids outside candidate vocabulary")
+
+    probs = record.gold_probs
+    if any(not math.isfinite(p) or p < 0 for p in probs.values()):
+        raise ValueError(f"{record.id}: invalid probability")
+    if not math.isclose(sum(probs.values()), 1.0, abs_tol=1e-9):
+        raise ValueError(
+            f"{record.id}: probabilities do not sum to one (got {sum(probs.values())})"
+        )
+
+    for action_id, result in record.rollout_results.items():
+        if result["status"] == "invalid" and probs[action_id] != 0:
+            raise ValueError(
+                f"{record.id}: invalid action {action_id!r} has nonzero probability"
+            )

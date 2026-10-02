@@ -14,9 +14,9 @@ Consolidates pieces that were copy-pasted across the RLCD-family scripts
   - ``per_record_laya`` — per-record Laya ranking metrics (correct pairs,
     total pairs, top-1 match, mean log score with the proper_reward floor)
 
-Only ACTIVE scripts import from here; archived one-shot experiment scripts
-(exp_rq*, exp_rq0_5_*, diagnose_*, analyze_rq3_*) intentionally keep their
-frozen copies so their historical behavior stays reproducible.
+Only ACTIVE scripts import from here. One-shot frozen experiment scripts
+removed in the 2026-10-02 cleanup are recoverable from git history
+(`git show HEAD:scripts/<name>.py`) or the pre-cleanup backup tarball.
 """
 
 from __future__ import annotations
@@ -29,8 +29,7 @@ FLOOR = -9.21  # log floor matching laya.common.proper_reward
 
 ACTIONS_T = (
     "global_exploration", "local_exploitation", "uncertainty_sampling",
-    "error_guided_sampling", "boundary_sampling", "surrogate_acquisition",
-    "retrain_surrogate", "stop",
+    "surrogate_acquisition", "retrain_surrogate", "stop",
 )
 
 
@@ -49,7 +48,7 @@ def _policies():
             self.seed = seed
 
         def select_action(self, state, backend=None):
-            choices = candidate_actions_for_state(state, seed=self.seed)
+            choices = candidate_actions_for_state(state)
             if "surrogate_acquisition" in choices:
                 return choices["surrogate_acquisition"]
             return next(iter(choices.values()))

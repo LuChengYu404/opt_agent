@@ -8,10 +8,6 @@ from opt_agent.system1.hybrid_policy import (
 )
 from opt_agent.system1.laya_policy import LayaPolicy
 from opt_agent.system1.jev_policy import JevDecision, JevPolicy
-from opt_agent.system1.typed_decision_policy import (
-    TypedDecisionOutput,
-    TypedDecisionPolicy,
-)
 
 __all__ = [
     "LayaPolicy",
@@ -20,7 +16,5 @@ __all__ = [
     "HybridPolicy",
     "HybridStep",
     "System1Decider",
-    "TypedDecisionOutput",
-    "TypedDecisionPolicy",
     "adapt_policy_as_system1",
 ]

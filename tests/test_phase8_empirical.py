@@ -37,7 +37,6 @@ from opt_agent.dataset import (  # noqa: E402
     DatasetConfig,
     DatasetGenerator,
     DecisionRecord,
-    analyze_dataset,
     derive_run_seed,
     full_candidates,
     iter_jsonl,
@@ -183,15 +182,14 @@ def test_zero_budget_masks_all_sampling_actions() -> None:
         be.evaluate(torch.tensor([[0.5, 7.5]], dtype=torch.double))
     state = extract_state(be, total_budget=20)  # remaining=0
     output = CounterfactualRollout(be, horizon=1, max_rollout_steps=20).rollout(
-        state, full_candidates(seed=0)
+        state, full_candidates()
     )
     probs = to_gold_probs(output.results, include_invalid_as_zero=True)
 
     invalid = {
         "global_exploration", "local_exploitation",
-        "uncertainty_sampling", "error_guided_sampling",
-        "boundary_sampling",
-    }
+        "uncertainty_sampling",
+    }  # h3: error_guided / boundary no longer exist
     for action in invalid:
         assert probs[action] == 0
     assert probs["stop"] > 0
@@ -213,22 +211,6 @@ def test_jsonl_round_trip_is_canonically_equal(tmp_path) -> None:
         for record in records
     ]
     assert list(iter_jsonl(path)) == expected
-
-
-# ---------------------------------------------------------------------------
-# analyze_dataset summary
-# ---------------------------------------------------------------------------
-
-
-def test_analyze_dataset_smoke(tmp_path) -> None:
-    """End-to-end: generate → write → analyze → check non-empty stats."""
-    spec = _small_spec()
-    path = tmp_path / "ds.jsonl"
-    write_jsonl(DatasetGenerator(spec, backend_factory=_real_backend_factory).generate(), path)
-    stats = analyze_dataset(path)
-    assert stats.n_records > 0
-    assert "branin" in stats.problems
-    assert stats.problems["branin"] == stats.n_records
 
 
 # ---------------------------------------------------------------------------
@@ -286,45 +268,3 @@ def test_generated_state_preserves_last_action() -> None:
         "Expected at least one record after the first to have last_action set; "
         "generator is not passing the prior action name to extract_state."
     )
-
-
-# ---------------------------------------------------------------------------
-# Driver script smoke
-# ---------------------------------------------------------------------------
-
-
-def test_driver_main_function_smoke(tmp_path) -> None:
-    """`generate_dataset.main()` writes a valid JSONL and returns 0."""
-    out_path = tmp_path / "quick.jsonl"
-    sys.path.insert(0, str(ROOT / "scripts"))
-    import importlib
-    if "generate_dataset" in sys.modules:
-        importlib.reload(sys.modules["generate_dataset"])
-    import generate_dataset
-
-    import io, contextlib
-    captured = io.StringIO()
-    saved_argv = sys.argv
-    sys.argv = ["generate_dataset", "--quick", str(out_path)]
-    try:
-        with contextlib.redirect_stdout(captured):
-            rc = generate_dataset.main()
-    finally:
-        sys.argv = saved_argv
-    assert rc == 0
-    assert out_path.exists()
-    records = list(iter_jsonl(out_path))
-    assert records
-    stdout = captured.getvalue()
-    obj = None
-    decoder = json.JSONDecoder()
-    idx = 0
-    while idx < len(stdout):
-        try:
-            obj, idx = decoder.raw_decode(stdout, idx=idx)
-            while idx < len(stdout) and stdout[idx] in " \t\r\n":
-                idx += 1
-        except json.JSONDecodeError:
-            break
-    assert obj is not None
-    assert obj["n_records"] > 0
